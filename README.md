@@ -8,7 +8,7 @@ Each command has it's own separate subdirectory, in case the implementor wishes 
 
 ## Building
 
-... coming soon...
+Running `make` or `v run build.vsh` will build all the programs in `bin/`.
 
 ## Contributing
 

@@ -5,3 +5,4 @@ main
 *.so
 *.dylib
 *.dll
+bin/
