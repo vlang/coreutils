@@ -18,114 +18,114 @@ Please only contribute versions of the original utilities written in V.  Contrib
 
 ## Completed (2/109)
 
-| | |
-|-|-|
-|[ ] **[**    |Alternate form of `test`|
-|[ ] arch     |Print machine hardware name|
-|[ ] b2sum    |Print or check BLAKE2 digests|
-|[ ] base32   |Transform data into printable data|
-|[ ] base64   |Transform data into printable data|
-|[ ] basename |Strip directory and suffix from a file name|
-|[ ] basenc   |Transform data into printable data|
-|[ ] cat      |Concatenate and write files|
-|[ ] chcon    |Change SELinux context of file|
-|[ ] chgrp    |Change group ownership|
-|[ ] chmod    |Change access permissions|
-|[ ] chown    |Change file owner and group|
-|[ ] chroot   |Run a command with a different root directory|
-|[ ] cksum    |Print CRC checksum and byte counts|
-|[ ] comm     |Compare two sorted files line by line|
-|[ ] coreutils|Multi-call program|
-|[ ] cp       |Copy files and directories|
-|[ ] csplit   |Split a file into context-determined pieces|
-|[ ] cut      |Print selected parts of lines|
-|[ ] date     |Print or set system date and time|
-|[ ] dd       |Convert and copy a file|
-|[ ] df       |Report file system disk space usage|
-|[ ] dir      |Briefly list directory contents|
-|[ ] dircolors|Color setup for ls|
-|[ ] dirname  |Strip last file name component|
-|[ ] du       |Estimate file space usage|
-|[ ] echo     |Print a line of text|
-|[ ] env      |Run a command in a modified environment|
-|[ ] expand   |Convert tabs to spaces|
-|[ ] expr     |Evaluate expressions|
-|[ ] factor   |Print prime factors|
-|[X] false    |Do nothing, unsuccessfully|
-|[ ] fmt      |Reformat paragraph text|
-|[ ] fold     |Wrap input lines to fit in specified width|
-|[ ] groups   |Print group names a user is in|
-|[ ] head     |Output the first part of files|
-|[ ] hostid   |Print numeric host identifier|
-|[ ] hostname |Print or set system name|
-|[ ] id       |Print user identity|
-|[ ] install  |Copy files and set attributes|
-|[ ] join     |Join lines on a common field|
-|[ ] kill     |Send a signal to processes|
-|[ ] link     |Make a hard link via the link syscall|
-|[ ] ln       |Make links between files|
-|[ ] logname  |Print current login name|
-|[ ] ls       |List directory contents|
-|[ ] md5sum   |Print or check MD5 digests|
-|[ ] mkdir    |Make directories|
-|[ ] mkfifo   |Make FIFOs (named pipes)|
-|[ ] mknod    |Make block or character special files|
-|[ ] mktemp   |Create temporary file or directory|
-|[ ] mv       |Move (rename) files|
-|[ ] nice     |Run a command with modified niceness|
-|[ ] nl       |Number lines and write files|
-|[ ] nohup    |Run a command immune to hangups|
-|[ ] nproc    |Print the number of available processors|
-|[ ] numfmt   |Reformat numbers|
-|[ ] od       |Write files in octal or other formats|
-|[ ] paste    |Merge lines of files|
-|[ ] pathchk  |Check file name validity and portability|
-|[ ] pinky    |Lightweight finger|
-|[ ] pr       |Paginate or columnate files for printing|
-|[ ] printenv |Print all or some environment variables|
-|[ ] printf   |Format and print data|
-|[ ] ptx      |Produce permuted indexes|
-|[ ] pwd      |Print working directory|
-|[ ] readlink |Print value of a symlink or canonical file name|
-|[ ] realpath |Print the resolved file name.|
-|[ ] rm       |Remove files or directories|
-|[ ] rmdir    |Remove empty directories|
-|[ ] runcon   |Run a command in specified SELinux context|
-|[ ] seq      |Print numeric sequences|
-|[ ] sha1sum  |Print or check SHA-1 digests|
-|[ ] sha224sum|Print or check SHA-2 224 bit digests|
-|[ ] sha256sum|Print or check SHA-2 256 bit digests|
-|[ ] sha384sum|Print or check SHA-2 384 bit digests|
-|[ ] sha512sum|Print or check SHA-2 512 bit digests|
-|[ ] shred    |Remove files more securely|
-|[ ] shuf     |Shuffling text|
-|[ ] sleep    |Delay for a specified time|
-|[ ] sort     |Sort text files|
-|[ ] split    |Split a file into pieces.|
-|[ ] stat     |Report file or file system status|
-|[ ] stdbuf   |Run a command with modified I/O stream buffering|
-|[ ] stty     |Print or change terminal characteristics|
-|[ ] sum      |Print checksum and block counts|
-|[ ] sync     |Synchronize cached writes to persistent storage|
-|[ ] tac      |Concatenate and write files in reverse|
-|[ ] tail     |Output the last part of files|
-|[ ] tee      |Redirect output to multiple files or processes|
-|[ ] test     |Check file types and compare values|
-|[ ] timeout  |Run a command with a time limit|
-|[ ] touch    |Change file timestamps|
-|[ ] tr       |Translate, squeeze, and/or delete characters|
-|[X] true     |Do nothing, successfully|
-|[ ] truncate |Shrink or extend the size of a file|
-|[ ] tsort    |Topological sort|
-|[ ] tty      |Print file name of terminal on standard input|
-|[ ] uname    |Print system information|
-|[ ] unexpand |Convert spaces to tabs|
-|[ ] uniq     |Uniquify files|
-|[ ] unlink   |Remove files via the unlink syscall|
-|[ ] uptime   |Print system uptime and load|
-|[ ] users    |Print login names of users currently logged in|
-|[ ] vdir     |Verbosely list directory contents|
-|[ ] wc       |Print newline, word, and byte counts|
-|[ ] who      |Print who is currently logged in|
-|[ ] whoami   |Print effective user ID|
-|[ ] yes      |Print a string until interrupted|
+| ?   | cmd       | description                                      |
+| --- | --------- | ------------------------------------------------ |
+| X   | **[**     | Alternate form of `test`                         |
+| X   | arch      | Print machine hardware name                      |
+| X   | b2sum     | Print or check BLAKE2 digests                    |
+| X   | base32    | Transform data into printable data               |
+| X   | base64    | Transform data into printable data               |
+| X   | basename  | Strip directory and suffix from a file name      |
+| X   | basenc    | Transform data into printable data               |
+| X   | cat       | Concatenate and write files                      |
+| X   | chcon     | Change SELinux context of file                   |
+| X   | chgrp     | Change group ownership                           |
+| X   | chmod     | Change access permissions                        |
+| X   | chown     | Change file owner and group                      |
+| X   | chroot    | Run a command with a different root directory    |
+| X   | cksum     | Print CRC checksum and byte counts               |
+| X   | comm      | Compare two sorted files line by line            |
+| X   | coreutils | Multi-call program                               |
+| X   | cp        | Copy files and directories                       |
+| X   | csplit    | Split a file into context-determined pieces      |
+| X   | cut       | Print selected parts of lines                    |
+| X   | date      | Print or set system date and time                |
+| X   | dd        | Convert and copy a file                          |
+| X   | df        | Report file system disk space usage              |
+| X   | dir       | Briefly list directory contents                  |
+| X   | dircolors | Color setup for ls                               |
+| X   | dirname   | Strip last file name component                   |
+| X   | du        | Estimate file space usage                        |
+| X   | echo      | Print a line of text                             |
+| X   | env       | Run a command in a modified environment          |
+| X   | expand    | Convert tabs to spaces                           |
+| X   | expr      | Evaluate expressions                             |
+| X   | factor    | Print prime factors                              |
+| V   | false     | Do nothing, unsuccessfully                       |
+| X   | fmt       | Reformat paragraph text                          |
+| X   | fold      | Wrap input lines to fit in specified width       |
+| X   | groups    | Print group names a user is in                   |
+| X   | head      | Output the first part of files                   |
+| X   | hostid    | Print numeric host identifier                    |
+| X   | hostname  | Print or set system name                         |
+| X   | id        | Print user identity                              |
+| X   | install   | Copy files and set attributes                    |
+| X   | join      | Join lines on a common field                     |
+| X   | kill      | Send a signal to processes                       |
+| X   | link      | Make a hard link via the link syscall            |
+| X   | ln        | Make links between files                         |
+| X   | logname   | Print current login name                         |
+| X   | ls        | List directory contents                          |
+| X   | md5sum    | Print or check MD5 digests                       |
+| X   | mkdir     | Make directories                                 |
+| X   | mkfifo    | Make FIFOs (named pipes)                         |
+| X   | mknod     | Make block or character special files            |
+| X   | mktemp    | Create temporary file or directory               |
+| X   | mv        | Move (rename) files                              |
+| X   | nice      | Run a command with modified niceness             |
+| X   | nl        | Number lines and write files                     |
+| X   | nohup     | Run a command immune to hangups                  |
+| X   | nproc     | Print the number of available processors         |
+| X   | numfmt    | Reformat numbers                                 |
+| X   | od        | Write files in octal or other formats            |
+| X   | paste     | Merge lines of files                             |
+| X   | pathchk   | Check file name validity and portability         |
+| X   | pinky     | Lightweight finger                               |
+| X   | pr        | Paginate or columnate files for printing         |
+| X   | printenv  | Print all or some environment variables          |
+| X   | printf    | Format and print data                            |
+| X   | pt X      | Produce permuted indexes                         |
+| X   | pwd       | Print working directory                          |
+| X   | readlink  | Print value of a symlink or canonical file name  |
+| X   | realpath  | Print the resolved file name.                    |
+| X   | rm        | Remove files or directories                      |
+| X   | rmdir     | Remove empty directories                         |
+| X   | runcon    | Run a command in specified SELinux context       |
+| X   | seq       | Print numeric sequences                          |
+| X   | sha1sum   | Print or check SHA-1 digests                     |
+| X   | sha224sum | Print or check SHA-2 224 bit digests             |
+| X   | sha256sum | Print or check SHA-2 256 bit digests             |
+| X   | sha384sum | Print or check SHA-2 384 bit digests             |
+| X   | sha512sum | Print or check SHA-2 512 bit digests             |
+| X   | shred     | Remove files more securely                       |
+| X   | shuf      | Shuffling text                                   |
+| X   | sleep     | Delay for a specified time                       |
+| X   | sort      | Sort text files                                  |
+| X   | split     | Split a file into pieces.                        |
+| X   | stat      | Report file or file system status                |
+| X   | stdbuf    | Run a command with modified I/O stream buffering |
+| X   | stty      | Print or change terminal characteristics         |
+| X   | sum       | Print checksum and block counts                  |
+| X   | sync      | Synchronize cached writes to persistent storage  |
+| X   | tac       | Concatenate and write files in reverse           |
+| X   | tail      | Output the last part of files                    |
+| X   | tee       | Redirect output to multiple files or processes   |
+| X   | test      | Check file types and compare values              |
+| X   | timeout   | Run a command with a time limit                  |
+| X   | touch     | Change file timestamps                           |
+| X   | tr        | Translate, squeeze, and/or delete characters     |
+| V   | true      | Do nothing, successfully                         |
+| X   | truncate  | Shrink or extend the size of a file              |
+| X   | tsort     | Topological sort                                 |
+| X   | tty       | Print file name of terminal on standard input    |
+| X   | uname     | Print system information                         |
+| X   | unexpand  | Convert spaces to tabs                           |
+| X   | uniq      | Uniquify files                                   |
+| X   | unlink    | Remove files via the unlink syscall              |
+| X   | uptime    | Print system uptime and load                     |
+| X   | users     | Print login names of users currently logged in   |
+| X   | vdir      | Verbosely list directory contents                |
+| X   | wc        | Print newline, word, and byte counts             |
+| X   | who       | Print who is currently logged in                 |
+| X   | whoami    | Print effective user ID                          |
+| X   | yes       | Print a string until interrupted                 |
