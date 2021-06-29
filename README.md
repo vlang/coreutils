@@ -84,7 +84,7 @@ Please only contribute versions of the original utilities written in V.  Contrib
 | X   | pr        | Paginate or columnate files for printing         |
 | X   | printenv  | Print all or some environment variables          |
 | X   | printf    | Format and print data                            |
-| X   | pt X      | Produce permuted indexes                         |
+| X   | ptx       | Produce permuted indexes                         |
 | X   | pwd       | Print working directory                          |
 | X   | readlink  | Print value of a symlink or canonical file name  |
 | X   | realpath  | Print the resolved file name.                    |
