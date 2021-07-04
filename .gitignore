@@ -6,3 +6,4 @@ main
 *.dylib
 *.dll
 bin/
+.DS_Store

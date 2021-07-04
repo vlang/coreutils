@@ -51,7 +51,7 @@ Please only contribute versions of the original utilities written in V.  Contrib
 |[ ] expand   |Convert tabs to spaces|
 |[ ] expr     |Evaluate expressions|
 |[ ] factor   |Print prime factors|
-|[X] false    |Do nothing, unsuccessfully|
+|[x] false    |Do nothing, unsuccessfully|
 |[ ] fmt      |Reformat paragraph text|
 |[ ] fold     |Wrap input lines to fit in specified width|
 |[ ] groups   |Print group names a user is in|
@@ -114,7 +114,7 @@ Please only contribute versions of the original utilities written in V.  Contrib
 |[ ] timeout  |Run a command with a time limit|
 |[ ] touch    |Change file timestamps|
 |[ ] tr       |Translate, squeeze, and/or delete characters|
-|[X] true     |Do nothing, successfully|
+|[x] true     |Do nothing, successfully|
 |[ ] truncate |Shrink or extend the size of a file|
 |[ ] tsort    |Topological sort|
 |[ ] tty      |Print file name of terminal on standard input|
@@ -128,4 +128,4 @@ Please only contribute versions of the original utilities written in V.  Contrib
 |[ ] wc       |Print newline, word, and byte counts|
 |[ ] who      |Print who is currently logged in|
 |[ ] whoami   |Print effective user ID|
-|[ ] yes      |Print a string until interrupted|
+|[x] yes      |Print a string until interrupted|
