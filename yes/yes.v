@@ -35,7 +35,7 @@ fn yes() {
 
 	mut str := 'y'
 
-	if additional_args.len > 1 {
+	if additional_args.len > 0 {
 		str = additional_args.join(' ')
 	}
 
