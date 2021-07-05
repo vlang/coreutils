@@ -127,5 +127,5 @@ Please only contribute versions of the original utilities written in V.  Contrib
 |[ ] vdir     |Verbosely list directory contents|
 |[ ] wc       |Print newline, word, and byte counts|
 |[ ] who      |Print who is currently logged in|
-|[ ] whoami   |Print effective user ID|
+|[x] whoami   |Print effective user ID|
 |[x] yes      |Print a string until interrupted|
