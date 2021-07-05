@@ -22,7 +22,7 @@ Contributions are welcome!
 
 Please only contribute versions of the original utilities written in V.  Contributions written in other langauges will likely be rejected.
 
-## Completed (4/109)
+## Completed (5/109)
 
 | Done    | Cmd       | Descripton                                       |
 | :-----: |-----------|--------------------------------------------------|
@@ -70,7 +70,7 @@ Please only contribute versions of the original utilities written in V.  Contrib
 |         | kill      | Send a signal to processes                       |
 |         | link      | Make a hard link via the link syscall            |
 |         | ln        | Make links between files                         |
-|         | logname   | Print current login name                         |
+| &check; | logname   | Print current login name                         |
 |         | ls        | List directory contents                          |
 |         | md5sum    | Print or check MD5 digests                       |
 |         | mkdir     | Make directories                                 |
