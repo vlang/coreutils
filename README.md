@@ -18,7 +18,7 @@ Please only contribute versions of the original utilities written in V.  Contrib
 
 ## Completed (4/109)
 
-|         |           |                                                  |
+| Done    | Cmd       | Descripton                                       |
 |---------|-----------|--------------------------------------------------|
 |         | **[**     | Alternate form of `test`                         |
 |         | arch      | Print machine hardware name                      |
