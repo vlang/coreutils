@@ -21,6 +21,14 @@ struct Settings {
 	fnames           []string
 }
 
+///===================================================================///
+///                       Main Logic                                  ///
+///===================================================================///
+
+fn main() {
+	cat(args())
+}
+
 fn cat(settings Settings) {
 	mut fnames := settings.fnames
 
@@ -30,34 +38,67 @@ fn cat(settings Settings) {
 	}
 
 	for fname in fnames {
+		mut file := os.File{}
 		if fname == '-' {
-			// mut content := os.get_lines()
-			//// formatted := format(content[0], settings) or { continue }
-			// println(formatted)
+			file = os.stdin()
 		} else {
-			file := os.open(fname) or {
+			file = os.open(fname) or {
 				eprintln('$fname couldn\'t be opened')
 				exit(1)
 			}
-			// Instead of checking conditions for each line
-			// a different path can be taken for different options group
-			format_cond := settings.show_ends || settings.show_tabs || settings.show_nonprinting
-			number_cond := settings.number_nonblanks || settings.number_all
-				|| settings.squeeze_blank
-			match true {
-				format_cond && number_cond { dump_lines(file, settings) }
-				format_cond { dump_lines(file, settings) }
-				number_cond { dump_lines(file, settings) }
-				else { dump_lines(file, settings) }
-			}
+		}
+		// mut content := os.get_lines()
+		//// formatted := format(content[0], settings) or { continue }
+		// println(formatted)
+		mut br := io.new_buffered_reader(io.BufferedReaderConfig{ reader: file })
+		// Instead of checking conditions for each line
+		// a different path can be taken for different options group
+		// for better 'performance'
+		format_cond := settings.show_ends || settings.show_tabs || settings.show_nonprinting
+		number_cond := settings.number_nonblanks || settings.number_all || settings.squeeze_blank
+
+		match true {
+			format_cond && number_cond { path_number_and_format(mut br, settings) }
+			format_cond { path_format(mut br, settings) }
+			number_cond { path_number(mut br, settings) }
+			else { path_no_change(mut br, settings) }
 		}
 	}
 }
 
-fn dump_lines(file os.File, settings Settings) {
+///===================================================================///
+///                       Different 'Paths'                           ///
+///===================================================================///
+fn path_no_change(mut br io.BufferedReader, _settings Settings) {
+	mut line := ''
+	for {
+		line = br.read_line() or { break }
+		println(line)
+	}
+}
+
+fn path_number(mut br io.BufferedReader, settings Settings) {
 	mut last_line, mut line, mut line_number := '', '', 0
-	mut br := io.new_buffered_reader(io.BufferedReaderConfig{ reader: file })
-	println(settings)
+	for {
+		line = br.read_line() or { break }
+		line, last_line, line_number = number_lines(line, last_line, line_number, settings) or {
+			continue
+		}
+		println(line)
+	}
+}
+
+fn path_format(mut br io.BufferedReader, settings Settings) {
+	mut line := ''
+	for {
+		line = br.read_line() or { break }
+		line = format(line, settings)
+		println(line)
+	}
+}
+
+fn path_number_and_format(mut br io.BufferedReader, settings Settings) {
+	mut last_line, mut line, mut line_number := '', '', 0
 	for {
 		line = br.read_line() or { break }
 		line, last_line, line_number = number_lines(line, last_line, line_number, settings) or {
@@ -68,6 +109,9 @@ fn dump_lines(file os.File, settings Settings) {
 	}
 }
 
+///===================================================================///
+///                       Helper Functions                           ///
+///===================================================================///
 // number , lines according to settings
 // 'errors'  to signal that a line should be skipped
 // Handles the following
@@ -107,7 +151,10 @@ fn format(content string, settings Settings) string {
 	return line
 }
 
-fn main() {
+///===================================================================///
+///                                Args                               ///
+///===================================================================///
+fn args() Settings {
 	mut fp := flag.new_flag_parser(os.args)
 	fp.application(app_name)
 	fp.version(app_version)
@@ -149,6 +196,6 @@ fn main() {
 	show_nonprinting = show_nonprinting || show_ends_and_v || show_all || show_tabs_and_v
 	number_all = number_all && !number_nonblanks
 
-	cat(Settings{number_nonblanks, number_all, squeeze_blank, show_ends, show_nonprinting
-		|| show_ends_and_v, show_tabs, unbuffered, fnames})
+	return Settings{number_nonblanks, number_all, squeeze_blank, show_ends, show_nonprinting
+		|| show_ends_and_v, show_tabs, unbuffered, fnames}
 }
