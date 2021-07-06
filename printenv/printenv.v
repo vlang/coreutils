@@ -2,9 +2,10 @@ import os
 
 const cmd_ns = 'printenv'
 
+/*
 fn try(arg string) string {
 	return '$cmd_ns: unknown argument: $arg\nUse $cmd_ns --help to see options'
-}
+}*/
 
 fn unrec(arg string) string {
 	return '$cmd_ns: unrecognized option $arg\nUse $cmd_ns --help to see options'
@@ -21,7 +22,7 @@ fn print_avliable_params() {
 		'--version': 'output version information and exit'
 	}
 	// Other avliable parameters
-	entries['--null'] = 'end each output line with NUL, not newline'
+	entries['-0, --null'] = 'end each output line with NUL, not newline'
 	// Print avliable parameters
 	println('Options:')
 	for param, desp in entries {
@@ -33,10 +34,12 @@ fn main() {
 	usage := 'Usage: $cmd_ns [OPTION]... [VARIABLE]...\n'
 	version := '$cmd_ns (V coreutils) 0.0.1'
 	args := os.args[1..]
-	params := args.filter(it.len > 2 && it[0..2] == '--')
-	if params.len > 0 {
-		// Parameters provided
-		match params[0] {
+
+	mut nul_terminate := false
+	// Parameters provided
+	if args.len > 0 {
+		option := args[0]
+		match option {
 			'--help' {
 				println(usage)
 				print_avliable_params()
@@ -46,17 +49,44 @@ fn main() {
 				println(version)
 				exit(0)
 			}
-			'--null' { // -0
+			'--null', '-0' {
+				nul_terminate = true
 			}
 			else {
-				error_exit(unrec(params[0]))
+				if option[0..1] == '-' {
+					error_exit(unrec(option))
+				}
 			}
 		}
-		exit(0)
 	}
-	if args.len > 0 {
-		// Unnecessary argument
-		error_exit(try(args[0]))
-	}
+
 	// Main functionality
+	mut vars := []string{}
+	if nul_terminate {
+		vars << args[1..]
+	} else {
+		vars << args
+	}
+	if vars.len == 0 {
+		for k, v in os.environ() {
+			mut s := '$k=$v'
+			if nul_terminate {
+				print(s)
+			} else {
+				println(s)
+			}
+		}
+	} else {
+		for k in vars {
+			mut v := os.getenv(k)
+			if v == '' {
+				continue
+			}
+			if nul_terminate {
+				print(v)
+			} else {
+				println(v)
+			}
+		}
+	}
 }
