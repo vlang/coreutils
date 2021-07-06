@@ -1,7 +1,8 @@
 import os
 import flag
 
-/* The following block has been created in this file, but should be extracted to a common module for use by all utils
+/*
+The following block has been created in this file, but should be extracted to a common module for use by all utils
 */
 
 const (
@@ -68,7 +69,8 @@ fn flags_common_no_args(args []string, app_name string) (&flag.FlagParser, strin
 	return flags_common(args, app_name, 0, 0)
 }
 
-/* End of common block
+/*
+End of common block
 */
 
 /*
