@@ -52,7 +52,7 @@ Please only contribute versions of the original utilities written in V.  Contrib
 |         | dircolors | Color setup for ls                               |
 |         | dirname   | Strip last file name component                   |
 |         | du        | Estimate file space usage                        |
-|         | echo      | Print a line of text                             |
+| &check; | echo      | Print a line of text                             |
 |         | env       | Run a command in a modified environment          |
 |         | expand    | Convert tabs to spaces                           |
 |         | expr      | Evaluate expressions                             |
