@@ -121,7 +121,7 @@ Echo the STRING(s) to standard output.
   -E             disable interpretation of backslash escapes (default)
       --help     display this help and exit
       --version  output version information and exit'
-	version = 'echo (V coreutils) 0.0.1'
+	version = 'echo (V coreutils 0.0.1)'
 )
 
 fn main() {
