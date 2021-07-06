@@ -40,20 +40,19 @@ fn cat(settings Settings) {
 	for fname in fnames {
 		mut file := os.File{}
 		if fname == '-' {
+			// handle stdin like Files
 			file = os.stdin()
 		} else {
 			file = os.open(fname) or {
-				eprintln('$fname couldn\'t be opened')
+				eprintln('$app_name: $fname: No such file or directory')
 				exit(1)
 			}
 		}
-		// mut content := os.get_lines()
-		//// formatted := format(content[0], settings) or { continue }
-		// println(formatted)
+
 		mut br := io.new_buffered_reader(io.BufferedReaderConfig{ reader: file })
 		// Instead of checking conditions for each line
-		// a different path can be taken for different options group
-		// for better 'performance'
+		// a different path can be taken for different
+		// options group for better 'performance'
 		format_cond := settings.show_ends || settings.show_tabs || settings.show_nonprinting
 		number_cond := settings.number_nonblanks || settings.number_all || settings.squeeze_blank
 
@@ -119,11 +118,12 @@ fn path_number_and_format(mut br io.BufferedReader, settings Settings) {
 // number_all       bool
 // squeeze_blank    bool
 fn number_lines(line string, last_line string, line_number int, settings Settings) ?(string, string, int) {
+	// number_all has overrides number_nonblanks.
 	if settings.squeeze_blank && line == '' && last_line == '' {
 		return error('skip line')
 	}
 	if settings.number_nonblanks && line != '' {
-		return ' $line_number\t$line', line, line_number + 1 // TODO DOCS!
+		return ' $line_number\t$line', line, line_number + 1
 	}
 	if settings.number_all {
 		return ' $line_number\t$line', line, line_number + 1
