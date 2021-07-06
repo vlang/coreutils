@@ -9,31 +9,37 @@ import flag
 ** Follows POSIX (uses C getlogin)
 ** 
 ** Remaining issues:
-** Standard error messages
-** Standard way to take arguments
+** Standard error messages - Ongoing
+** Standard way to take arguments - Solved by using flags module
 */
 
-fn try(arg string) string {
-	line1 := 'Unknown argument: ' + arg
-	line2 := 'Use logname --help to see options'
-	return line1 + '\n' + line2
-}
-fn unrec(arg string) string {
-	line1 := 'logname: unrecognized option ' + arg
-	line2 := 'Use logname --help to see options'
-	return line1 + '\n' + line2
-}
-fn error_exit(error string) {
-	eprintln(error)
+fn error_exit(errors ...string) {
+	for error in errors {
+		eprintln(error)
+	}
 	exit(1) 	
 }
-fn main() {
+
+/*
+** Standard function to perform basic flag parsing an help and version processing
+** params: args - string array (should usually be os.args in main function)
+** returns: FlagParser object reference - may be used if other options are there
+** logic: Creates a parser with given arguments. Checks if --help or --version flag are present, and prints and exits if yes
+*/
+
+fn get_flags_help_version(args []string, app_name string, version_str string, free_args_min int, free_args_max int) &flag.FlagParser{
 	// Flags
 	mut fp := flag.new_flag_parser(os.args)
-	fp.application('logname')
-	fp.limit_free_args_to_exactly(0)
+	fp.application(app_name)
+	fp.limit_free_args(free_args_min,free_args_max)
+	fp.version(version_str)	// Preferably take from common version constant, should be updated
+	// exec := fp.args[0]
+	// println(exec)
+
+	// --help and --version are standard flags for coreutils programs
 	help := fp.bool('help',0,false,'display this help and exit')
 	version := fp.bool('version',0,false,'output version information and exit')
+	
 	if help{
 		println(fp.usage())
 		exit(0)
@@ -42,46 +48,23 @@ fn main() {
 		println('version')
 		exit(0)
 	}
+
 	fp.skip_executable()
+
 	fp.finalize() or {
-		eprintln(err)
-		println(fp.usage())	
-		exit(1)
+		error_exit(err.str(),fp.usage())
 	}
-	lname := os.loginname()
-	if lname == '' {
-		error_exit('no login name')
-	}
-	println(lname)
+
+	return fp
 }
-fn old_main() {
-	usage := 'Usage: logname [OPTION]. [OPTION] can be --help, --version'
-	version := 'logname (V coreutils) 0.0.1'
-	args := os.args[1..]
-	params := args.filter(it.len > 2 && it[0..2] == '--')
-	if params.len > 0 {
-		// Parameters provided
-		match params[0] {
-			'--help' {
-				println(usage)
-				exit(0)
-			}
-			'--version' {
-				println(version)
-				exit(0)
-			}
-			else {
-				error_exit(unrec(params[0]))
-			}
-		}
-		exit(0)
-	}
-	if args.len > 0 {
-		// Unnecessary argument
-		error_exit(try(args[0]))
-	} 
+
+fn main() {
+	// No options used here, so don't store returned parser
+	get_flags_help_version(os.args, 'logname', '0.0.1', 0, 0)
+
 	// Main functionality
-	// Internally uses C.getlogin
+
+	// Uses C.getlogin internally
 	lname := os.loginname()
 	if lname == '' {
 		// C.getlogin failed
