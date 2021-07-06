@@ -1,6 +1,9 @@
 import os
 import flag
 
+/* The following block has been created in this file, but should be extracted to a common module for use by all utils
+*/
+
 const (
 	version_str = 'V Coreutils 0.0.1'
 )
@@ -10,7 +13,7 @@ fn error_exit(errors ...string) {
 	error_exit_code(1, ...errors)
 }
 
-// Use only if error code is important (some semantic meaning to particular codes
+// Use only if error code is important (some semantic meaning to particular codes)
 fn error_exit_code(code int, errors ...string) {
 	for error in errors {
 		eprintln(error)
@@ -38,7 +41,8 @@ fn flags_common(args []string, app_name string, free_args_min int, free_args_max
 	mut fp := flag.new_flag_parser(os.args)
 	fp.application(app_name)
 	fp.limit_free_args(free_args_min, free_args_max)
-	fp.version(version_str) // Preferably take from common version constant, should be updated
+	fp.version(version_str) // Preferably take from common version constant, should be updated regularly
+	fp.description('Tool to display login name')
 	exec := fp.args[0]
 
 	// println(exec)
@@ -63,6 +67,9 @@ fn flags_common(args []string, app_name string, free_args_min int, free_args_max
 fn flags_common_no_args(args []string, app_name string) (&flag.FlagParser, string) {
 	return flags_common(args, app_name, 0, 0)
 }
+
+/* End of common block
+*/
 
 /*
 logname
