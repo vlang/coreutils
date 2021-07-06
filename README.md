@@ -33,7 +33,7 @@ Please only contribute versions of the original utilities written in V.  Contrib
 |         | base64    | Transform data into printable data               |
 |         | basename  | Strip directory and suffix from a file name      |
 |         | basenc    | Transform data into printable data               |
-|         | cat       | Concatenate and write files                      |
+| &check; | cat       | Concatenate and write files                      |
 |         | chcon     | Change SELinux context of file                   |
 |         | chgrp     | Change group ownership                           |
 |         | chmod     | Change access permissions                        |
