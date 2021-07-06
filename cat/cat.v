@@ -10,7 +10,7 @@ const (
 )
 
 struct Settings {
-	number_nonblanks bool
+	number_nonblanks bool // both number_nonblank, and number_all can never be true together
 	number_all       bool
 	squeeze_blank    bool
 	show_ends        bool
@@ -30,11 +30,42 @@ fn cat(settings Settings) {
 
 	for file in files {
 		if file == '-' {
-			content := os.get_raw_lines_joined()
+			// mut content := os.get_lines()
+			//// formatted := format(content[0], settings) or { continue }
+			// println(formatted)
 		} else {
-			content := os.read_file(file) or { panic('No Such File; $file') }
+			mut lines := os.read_lines(file) or { panic('$file could not be opened') }
+			// TODO: make unbuffered
+			for line in lines {
+				formatted := format(line, settings)
+				println(formatted)
+			}
 		}
 	}
+}
+
+// format , formats a line according to the settings,
+// returns error on empty lines
+fn format(content string, settings Settings) string {
+	mut line := content
+
+	// if settings.squeeze_blank && line == '' {
+	//}
+	// if settings.number_nonblanks && line != '' {
+	//	line = ' $line_number\t$line'
+	//}
+	// if settings.number_all {
+	//	line = ' $line_number\t$line'
+	//}
+	if settings.show_ends {
+		line += '$'
+	}
+	if settings.show_nonprinting {
+	}
+	if settings.show_tabs {
+		line = line.replace('\t', '^I')
+	}
+	return line
 }
 
 fn main() {
