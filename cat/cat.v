@@ -39,9 +39,16 @@ fn cat(settings Settings) {
 				eprintln('$fname couldn\'t be opened')
 				exit(1)
 			}
+			// Instead of checking conditions for each line
+			// a different path can be taken for different options group
+			format_cond := settings.show_ends || settings.show_tabs || settings.show_nonprinting
+			number_cond := settings.number_nonblanks || settings.number_all
+				|| settings.squeeze_blank
 			match true {
-				true { dump_lines(file, settings) }
-				false {}
+				format_cond && number_cond { dump_lines(file, settings) }
+				format_cond { dump_lines(file, settings) }
+				number_cond { dump_lines(file, settings) }
+				else { dump_lines(file, settings) }
 			}
 		}
 	}
@@ -50,6 +57,7 @@ fn cat(settings Settings) {
 fn dump_lines(file os.File, settings Settings) {
 	mut last_line, mut line, mut line_number := '', '', 0
 	mut br := io.new_buffered_reader(io.BufferedReaderConfig{ reader: file })
+	println(settings)
 	for {
 		line = br.read_line() or { break }
 		line, last_line, line_number = number_lines(line, last_line, line_number, settings) or {
@@ -61,8 +69,11 @@ fn dump_lines(file os.File, settings Settings) {
 }
 
 // number , lines according to settings
-// handles showing numbering and squeezing blank lins
 // 'errors'  to signal that a line should be skipped
+// Handles the following
+// number_nonblanks bool
+// number_all       bool
+// squeeze_blank    bool
 fn number_lines(line string, last_line string, line_number int, settings Settings) ?(string, string, int) {
 	if settings.squeeze_blank && line == '' && last_line == '' {
 		return error('skip line')
@@ -73,12 +84,15 @@ fn number_lines(line string, last_line string, line_number int, settings Setting
 	if settings.number_all {
 		return ' $line_number\t$line', line, line_number + 1
 	}
-	// Should never happen, making compiler happy
-	return line, line, line_number + 1
+	// no numbering, shouldn't happen since this path is always be numbered
+	return line, line, line_number
 }
 
 // format , formats a line according to the settings,
-// handles showing non-printing characters
+// handles the following settings
+// show_ends        bool
+// show_nonprinting bool
+// show_tabs        bool
 fn format(content string, settings Settings) string {
 	mut line := content
 	if settings.show_ends {
