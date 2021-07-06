@@ -22,7 +22,7 @@ Contributions are welcome!
 
 Please only contribute versions of the original utilities written in V.  Contributions written in other langauges will likely be rejected.
 
-## Completed (7/109)
+## Completed (8/109)
 
 | Done    | Cmd       | Descripton                                       |
 | :-----: |-----------|--------------------------------------------------|
@@ -56,7 +56,7 @@ Please only contribute versions of the original utilities written in V.  Contrib
 |         | env       | Run a command in a modified environment          |
 |         | expand    | Convert tabs to spaces                           |
 |         | expr      | Evaluate expressions                             |
-|         | factor    | Print prime factors                              |
+| &check; | factor    | Print prime factors                              |
 | &check; | false     | Do nothing, unsuccessfully                       |
 |         | fmt       | Reformat paragraph text                          |
 |         | fold      | Wrap input lines to fit in specified width       |
