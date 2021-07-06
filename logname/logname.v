@@ -1,5 +1,6 @@
 import os
 import flag
+
 /* logname
 ** VinWare, 2021-07-05 05:00:00 UTC
 **
@@ -30,7 +31,7 @@ fn main() {
 	// Flags
 	mut fp := flag.new_flag_parser(os.args)
 	fp.application('logname')
-	// fp.limit_free_args(0,0)
+	fp.limit_free_args_to_exactly(0)
 	help := fp.bool('help',0,false,'display this help and exit')
 	version := fp.bool('version',0,false,'output version information and exit')
 	if help{
@@ -40,6 +41,12 @@ fn main() {
 	if version {
 		println('version')
 		exit(0)
+	}
+	fp.skip_executable()
+	fp.finalize() or {
+		eprintln(err)
+		println(fp.usage())	
+		exit(1)
 	}
 	lname := os.loginname()
 	if lname == '' {
