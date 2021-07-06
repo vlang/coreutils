@@ -2,6 +2,7 @@ module main
 
 import flag
 import os
+import io
 
 const (
 	app_name        = 'cat'
@@ -17,50 +18,74 @@ struct Settings {
 	show_nonprinting bool
 	show_tabs        bool
 	unbuffered       bool
-	files            []string
+	fnames           []string
 }
 
 fn cat(settings Settings) {
-	mut files := settings.files
+	mut fnames := settings.fnames
 
 	// if there are no files, read from stdin
-	if files.len < 1 {
-		files = ['-']
+	if fnames.len < 1 {
+		fnames = ['-']
 	}
 
-	for file in files {
-		if file == '-' {
+	for fname in fnames {
+		if fname == '-' {
 			// mut content := os.get_lines()
 			//// formatted := format(content[0], settings) or { continue }
 			// println(formatted)
 		} else {
-			mut lines := os.read_lines(file) or { panic('$file could not be opened') }
-			// TODO: make unbuffered
-			for line in lines {
-				formatted := format(line, settings)
-				println(formatted)
+			file := os.open(fname) or {
+				eprintln('$fname couldn\'t be opened')
+				exit(1)
+			}
+			match true {
+				true { dump_lines(file, settings) }
+				false {}
 			}
 		}
 	}
 }
 
+fn dump_lines(file os.File, settings Settings) {
+	mut last_line, mut line, mut line_number := '', '', 0
+	mut br := io.new_buffered_reader(io.BufferedReaderConfig{ reader: file })
+	for {
+		line = br.read_line() or { break }
+		line, last_line, line_number = number_lines(line, last_line, line_number, settings) or {
+			continue
+		}
+		line = format(line, settings)
+		println(line)
+	}
+}
+
+// number , lines according to settings
+// handles showing numbering and squeezing blank lins
+// 'errors'  to signal that a line should be skipped
+fn number_lines(line string, last_line string, line_number int, settings Settings) ?(string, string, int) {
+	if settings.squeeze_blank && line == '' && last_line == '' {
+		return error('skip line')
+	}
+	if settings.number_nonblanks && line != '' {
+		return ' $line_number\t$line', line, line_number + 1 // TODO DOCS!
+	}
+	if settings.number_all {
+		return ' $line_number\t$line', line, line_number + 1
+	}
+	// Should never happen, making compiler happy
+	return line, line, line_number + 1
+}
+
 // format , formats a line according to the settings,
-// returns error on empty lines
+// handles showing non-printing characters
 fn format(content string, settings Settings) string {
 	mut line := content
-
-	// if settings.squeeze_blank && line == '' {
-	//}
-	// if settings.number_nonblanks && line != '' {
-	//	line = ' $line_number\t$line'
-	//}
-	// if settings.number_all {
-	//	line = ' $line_number\t$line'
-	//}
 	if settings.show_ends {
 		line += '$'
 	}
 	if settings.show_nonprinting {
+		// TODO!
 	}
 	if settings.show_tabs {
 		line = line.replace('\t', '^I')
@@ -89,7 +114,7 @@ fn main() {
 	help := fp.bool('help', 0, false, 'display this help and exit')
 	version := fp.bool('version', 0, false, 'output version information and exit')
 
-	files := fp.finalize() or {
+	fnames := fp.finalize() or {
 		eprintln(err)
 		println(fp.usage())
 		exit(1)
@@ -111,5 +136,5 @@ fn main() {
 	number_all = number_all && !number_nonblanks
 
 	cat(Settings{number_nonblanks, number_all, squeeze_blank, show_ends, show_nonprinting
-		|| show_ends_and_v, show_tabs, unbuffered, files})
+		|| show_ends_and_v, show_tabs, unbuffered, fnames})
 }
