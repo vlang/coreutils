@@ -1,5 +1,5 @@
 import os
-
+import flag
 /* logname
 ** VinWare, 2021-07-05 05:00:00 UTC
 **
@@ -24,9 +24,30 @@ fn unrec(arg string) string {
 }
 fn error_exit(error string) {
 	eprintln(error)
-	exit(1) 
+	exit(1) 	
 }
 fn main() {
+	// Flags
+	mut fp := flag.new_flag_parser(os.args)
+	fp.application('logname')
+	// fp.limit_free_args(0,0)
+	help := fp.bool('help',0,false,'display this help and exit')
+	version := fp.bool('version',0,false,'output version information and exit')
+	if help{
+		println(fp.usage())
+		exit(0)
+	}
+	if version {
+		println('version')
+		exit(0)
+	}
+	lname := os.loginname()
+	if lname == '' {
+		error_exit('no login name')
+	}
+	println(lname)
+}
+fn old_main() {
 	usage := 'Usage: logname [OPTION]. [OPTION] can be --help, --version'
 	version := 'logname (V coreutils) 0.0.1'
 	args := os.args[1..]
