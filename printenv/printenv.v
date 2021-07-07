@@ -2,6 +2,8 @@ import os
 
 const cmd_ns = 'printenv'
 
+const zero_byte = byte(0).ascii_str()
+
 /*
 fn try(arg string) string {
 	return '$cmd_ns: unknown argument: $arg\nUse $cmd_ns --help to see options'
@@ -78,6 +80,7 @@ fn main() {
 			mut s := '$k=$v'
 			if nul_terminate {
 				print(s)
+				print(zero_byte)
 			} else {
 				println(s)
 			}
@@ -92,6 +95,7 @@ fn main() {
 			}
 			if nul_terminate {
 				print(v)
+				print(zero_byte)
 			} else {
 				println(v)
 			}
