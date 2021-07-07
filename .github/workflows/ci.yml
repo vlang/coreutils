@@ -18,7 +18,7 @@ jobs:
       run: |
         make
         sudo ./v symlink
-		cd coreutils/
+        cd coreutils/
     - name: V doctor
       run: v doctor
     - name: Run tests
