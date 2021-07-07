@@ -72,14 +72,24 @@ fn flags_common_no_args(args []string, app_name string) (&flag.FlagParser, strin
 fn main() {
 mut fp, _ := flags_common(os.args, 'rm', 1,flag.max_args_number)
 try_help := "Try 'rm --help' for more information"
-fp.bool('',0, false,'empty')
+// empty := fp.bool('file',0, false,'empty')
+// println(empty)
 files := fp.finalize() or { 
 	error_exit(err, try_help)
 	return
 }
 println(files)
 mut errors := []string{}
+recursive := true
 for file in files {
+	if os.is_dir(file) {
+		if !recursive {
+			errors << 'Cannot remove file: Is a directory'
+		continue
+		}
+		// Recurse on the directory (Should ordinary recursiong be used?)
+		// rm_recurse(file)
+	}
 	os.rm(file) or { errors << err.str() }
 }
 if errors.len > 0 {error_exit(...errors)}
