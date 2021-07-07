@@ -22,7 +22,7 @@ Contributions are welcome!
 
 Please only contribute versions of the original utilities written in V.  Contributions written in other langauges will likely be rejected.
 
-## Completed (9/109)
+## Completed (10/109)
 
 | Done    | Cmd       | Descripton                                       |
 | :-----: |-----------|--------------------------------------------------|
@@ -105,7 +105,7 @@ Please only contribute versions of the original utilities written in V.  Contrib
 |         | sha512sum | Print or check SHA-2 512 bit digests             |
 |         | shred     | Remove files more securely                       |
 |         | shuf      | Shuffling text                                   |
-|         | sleep     | Delay for a specified time                       |
+| &check; | sleep     | Delay for a specified time                       |
 |         | sort      | Sort text files                                  |
 |         | split     | Split a file into pieces                         |
 |         | stat      | Report file or file system status                |
