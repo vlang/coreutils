@@ -7,6 +7,6 @@ main
 *.dll
 bin/
 .DS_Store
-**/*
-!**/*.v
-!**/*.md
+*/*
+!*/*.v
+!*/*.md
