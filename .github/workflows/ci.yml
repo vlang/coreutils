@@ -10,12 +10,14 @@ jobs:
       uses: actions/checkout@v2
       with:
         repository: vlang/v
-        path: /var/tmp/v
+        path: v
     - name: Checkout Coreutils
       uses: actions/checkout@v2
+      with:
+        path: coreutils
     - name: Build V
       run: |
-        cd /var/tmp/v
+        cd v
         make
         sudo ./v symlink
         cd -
@@ -23,13 +25,13 @@ jobs:
       run: v doctor
 
     - name: Ensure everything is formatted
-      run: make testfmt
+      run: cd coreutils && make testfmt
 
     - name: Run tests
-      run: make test
+      run: cd coreutils && make test
 
     - name: Build all
-      run: v run build.vsh
+      run: cd coreutils && v run build.vsh
 
     - name: Build all with -prod
-      run: v run build.vsh -prod
+      run: cd coreutils && v run build.vsh -prod
