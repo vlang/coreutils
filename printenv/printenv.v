@@ -30,6 +30,10 @@ fn print_avliable_params() {
 	}
 }
 
+// Exit status:
+// 0 if all variables specified were found
+// 1 if at least one specified variable was not found
+// 2 if a write error occurred
 fn main() {
 	usage := 'Usage: $cmd_ns [OPTION]... [VARIABLE]...\n'
 	version := '$cmd_ns (V coreutils) 0.0.1'
@@ -68,6 +72,8 @@ fn main() {
 		vars << args
 	}
 	if vars.len == 0 {
+		// TODO : resolve the issue about
+		// different output order from the original printenv
 		for k, v in os.environ() {
 			mut s := '$k=$v'
 			if nul_terminate {
@@ -77,9 +83,11 @@ fn main() {
 			}
 		}
 	} else {
+		mut code := 0 // exit code
 		for k in vars {
 			mut v := os.getenv(k)
 			if v == '' {
+				code = 1 // at least one specified variable was not found
 				continue
 			}
 			if nul_terminate {
@@ -88,5 +96,6 @@ fn main() {
 				println(v)
 			}
 		}
+		exit(code)
 	}
 }
