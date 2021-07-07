@@ -21,15 +21,15 @@ jobs:
         cd -
     - name: V doctor
       run: v doctor
-	  
+
     - name: Ensure everything is formatted
       run: make testfmt
-	  
+
     - name: Run tests
       run: make test
-	  
+
     - name: Build all
       run: v run build.vsh
-	  
+
     - name: Build all with -prod
       run: v run build.vsh -prod
