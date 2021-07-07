@@ -10,12 +10,12 @@ jobs:
       uses: actions/checkout@v2
       with:
         repository: vlang/v
-        path: ~/v
+        path: /var/tmp/v
     - name: Checkout Coreutils
       uses: actions/checkout@v2
     - name: Build V
       run: |
-        cd ~/v
+        cd /var/tmp/v
         make
         sudo ./v symlink
         cd -
