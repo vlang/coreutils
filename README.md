@@ -22,7 +22,7 @@ Contributions are welcome!
 
 Please only contribute versions of the original utilities written in V.  Contributions written in other langauges will likely be rejected.
 
-## Completed (8/109)
+## Completed (9/109)
 
 | Done    | Cmd       | Descripton                                       |
 | :-----: |-----------|--------------------------------------------------|
@@ -88,7 +88,7 @@ Please only contribute versions of the original utilities written in V.  Contrib
 |         | pathchk   | Check file name validity and portability         |
 |         | pinky     | Lightweight finger                               |
 |         | pr        | Paginate or columnate files for printing         |
-|         | printenv  | Print all or some environment variables          |
+| &check; | printenv  | Print all or some environment variables          |
 |         | printf    | Format and print data                            |
 |         | ptx       | Produce permuted indexes                         |
 |         | pwd       | Print working directory                          |
