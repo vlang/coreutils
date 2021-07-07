@@ -69,11 +69,8 @@ fn cat(settings Settings) {
 ///                       Different 'Paths'                           ///
 ///===================================================================///
 fn path_no_change(mut br io.BufferedReader, _settings Settings) {
-	mut line := ''
-	for {
-		line = br.read_line() or { break }
-		println(line)
-	}
+	mut stdout := os.stdout()
+	io.cp(br, mut stdout) or {}
 }
 
 fn path_number(mut br io.BufferedReader, settings Settings) {
