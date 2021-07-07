@@ -3,13 +3,16 @@ import os
 fn try(arg string) string {
 	return 'whoami: unknown argument: $arg\nUse whoami --help to see options'
 }
+
 fn unrec(arg string) string {
 	return 'whoami: unrecognized option $arg\nUse whoami --help to see options'
 }
+
 fn error_exit(error string) {
 	eprintln(error)
-	exit(1) 
+	exit(1)
 }
+
 fn main() {
 	usage := 'Usage: whoami [OPTION]. [OPTION] can be --help, --version'
 	version := 'whoami (V coreutils) 0.0.1'
@@ -35,7 +38,7 @@ fn main() {
 	if args.len > 0 {
 		// Unnecessary argument
 		error_exit(try(args[0]))
-	} 
+	}
 	// Main functionality
 	// Internally uses C.getlogin
 	user := os.loginname()

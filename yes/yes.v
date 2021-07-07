@@ -4,8 +4,8 @@ import flag
 import os
 
 const (
-	app_name     = 'yes'
-	app_version  = 'v0.0.1'
+	app_name    = 'yes'
+	app_version = 'v0.0.1'
 )
 
 fn yes() {
@@ -47,4 +47,3 @@ fn yes() {
 fn main() {
 	yes()
 }
-

@@ -22,7 +22,7 @@ Contributions are welcome!
 
 Please only contribute versions of the original utilities written in V.  Contributions written in other langauges will likely be rejected.
 
-## Completed (6/109)
+## Completed (8/109)
 
 | Done    | Cmd       | Descripton                                       |
 | :-----: |-----------|--------------------------------------------------|
@@ -33,7 +33,7 @@ Please only contribute versions of the original utilities written in V.  Contrib
 |         | base64    | Transform data into printable data               |
 |         | basename  | Strip directory and suffix from a file name      |
 |         | basenc    | Transform data into printable data               |
-|         | cat       | Concatenate and write files                      |
+| &check; | cat       | Concatenate and write files                      |
 |         | chcon     | Change SELinux context of file                   |
 |         | chgrp     | Change group ownership                           |
 |         | chmod     | Change access permissions                        |
@@ -56,7 +56,7 @@ Please only contribute versions of the original utilities written in V.  Contrib
 |         | env       | Run a command in a modified environment          |
 |         | expand    | Convert tabs to spaces                           |
 |         | expr      | Evaluate expressions                             |
-|         | factor    | Print prime factors                              |
+| &check; | factor    | Print prime factors                              |
 | &check; | false     | Do nothing, unsuccessfully                       |
 |         | fmt       | Reformat paragraph text                          |
 |         | fold      | Wrap input lines to fit in specified width       |
