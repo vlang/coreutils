@@ -69,18 +69,22 @@ fn flags_common_no_args(args []string, app_name string) (&flag.FlagParser, strin
 
 /* End of common block
 */
+
+fn rm_recurse(file string) {
+
+}
 fn main() {
 mut fp, _ := flags_common(os.args, 'rm', 1,flag.max_args_number)
 try_help := "Try 'rm --help' for more information"
 // empty := fp.bool('file',0, false,'empty')
 // println(empty)
 files := fp.finalize() or { 
-	error_exit(err, try_help)
+	error_exit(err.str(), try_help)
 	return
 }
 println(files)
 mut errors := []string{}
-recursive := true
+recursive := fp.bool('r', 0, false, 'recursive')
 for file in files {
 	if os.is_dir(file) {
 		if !recursive {
@@ -88,9 +92,8 @@ for file in files {
 		continue
 		}
 		// Recurse on the directory (Should ordinary recursiong be used?)
-		// rm_recurse(file)
-	}
-	os.rm(file) or { errors << err.str() }
+		rm_recurse(file)
+	} else { os.rm(file) or { errors << err.str() } }
 }
 if errors.len > 0 {error_exit(...errors)}
 success_exit()
