@@ -10,7 +10,9 @@ fn unrec(arg string) string {
 }*/
 
 fn error_exit(error string) {
-	eprintln(error)
+	if error.len > 0 {
+		eprintln(error)
+	}
 	println("Try '$cmd_ns --help' for more information.")
 	exit(1)
 }
@@ -95,7 +97,7 @@ fn main() {
 		}
 	}
 	if !ok {
-		error_exit("Try '$cmd_ns --help' for more information.")
+		error_exit('') // print helping hint then exit
 	}
 	// if seconds = +inf, it would not sleep
 	// but orginal `sleep` would sleep
