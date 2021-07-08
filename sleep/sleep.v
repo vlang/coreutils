@@ -100,7 +100,7 @@ fn main() {
 	// if seconds = +inf, it would not sleep
 	// but orginal `sleep` would sleep
 	t := ticks()
-	sleep(seconds * 1e9) // in nanoseconds
+	sleep(seconds * time.second) // in nanoseconds
 	$if debug {
 		println(ticks() - t)
 	}
