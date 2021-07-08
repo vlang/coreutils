@@ -1,32 +1,18 @@
 import os
+import flag
 import time { sleep, ticks }
 
 const cmd_ns = 'sleep'
 
 /*
-fn try(arg string) string {
-	return '$cmd_ns: unknown argument: $arg\nUse $cmd_ns --help to see options'
-}*/
-
 fn unrec(arg string) string {
 	return '$cmd_ns: unrecognized option $arg\nUse $cmd_ns --help to see options'
-}
+}*/
 
 fn error_exit(error string) {
 	eprintln(error)
+	println("Try '$cmd_ns --help' for more information.")
 	exit(1)
-}
-
-fn print_avliable_params() {
-	mut entries := map{
-		'--help':    'display this help and exit'
-		'--version': 'output version information and exit'
-	}
-	// Print avliable parameters
-	println('Options:')
-	for param, desp in entries {
-		println('\t${param:-16} $desp')
-	}
 }
 
 // <stdlib.h>
@@ -40,36 +26,32 @@ fn C.strtold(str &char, endptr &&char) f64
 // 0 indicates success
 // other indicates failure
 fn main() {
-	usage := 'Usage: $cmd_ns sleep NUMBER[smhd]...\n  or:  sleep OPTION\n'
-	version := '$cmd_ns (V coreutils) 0.0.1'
-	description := 'Pause for NUMBER (integer ot floating-point number) seconds.\n' +
+	// Define options
+	mut fp := flag.new_flag_parser(os.args)
+	fp.application(cmd_ns)
+	fp.version('(V coreutils) 0.0.1')
+	fp.skip_executable()
+	fp.arguments_description('| NUMBER[smhd]...')
+	fp.description('Pause for NUMBER (integer ot floating-point number) seconds.\n' +
 		'"s" for seconds (the default), "m" for minutes, "h" for hours or "d" for days.\n' +
-		'Pause for the amount of time specified by the sum of arguments.\n'
-	args := os.args[1..]
+		'Pause for the amount of time specified by the sum of arguments.\n')
+	help_opt := fp.bool('help', 0, false, 'display this help and exit')
+	version_opt := fp.bool('version', 0, false, 'output version information and exit')
+	args := fp.finalize() or {
+		error_exit(err.msg)
+		exit(1)
+	}
+	if help_opt {
+		println(fp.usage())
+		exit(0)
+	}
+	if version_opt {
+		println('$cmd_ns $fp.application_version')
+		exit(0)
+	}
 
-	// Parameters provided
-	if args.len > 0 {
-		option := args[0]
-		match option {
-			'--help' {
-				println(usage)
-				println(description)
-				print_avliable_params()
-				exit(0)
-			}
-			'--version' {
-				println(version)
-				exit(0)
-			}
-			else {
-				if option[0..2] == '--' {
-					error_exit(unrec(option))
-				}
-			}
-		}
-	} else {
-		eprintln('$cmd_ns: missing operand')
-		error_exit("Try '$cmd_ns --help' for more information.")
+	if args.len == 0 {
+		error_exit('$cmd_ns: missing operand')
 	}
 
 	// convert to seconds
