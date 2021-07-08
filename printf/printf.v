@@ -4,7 +4,63 @@ import os
 import strings
 import strconv
 
+const appname = 'printf'
+const version = 'v0.0.1'
+const usage = '$appname $version
+----------------------------------------------
+Usage: printf FORMAT [ARGUMENT]...
+   or: printf OPTION
+
+Options:
+  --help                   display this help and exit
+  --version                output version information and exit'
+
 fn main() {
+	match os.args.len {
+		1 {
+			eprintln(usage)
+			exit(1)
+		}
+		2 {
+			match os.args[1] {
+				'--help' {
+					println(usage)
+					exit(0)
+				}
+				'--version' {
+					println('$appname $version')
+					exit(0)
+				}
+				else {}
+			}
+		}
+		else {}
+	}
+
+	format := apply_controls(os.args[1])
+	mut args := os.args[2..]
+	mut idx := 0
+	mut out := ''
+	for {
+		args = args[idx..]
+		out, idx = v_sprintf(format, args)
+		print(out)
+		if idx == 0 || args.len <= idx {
+			break
+		}
+	}
+}
+
+fn apply_controls(format string) string {
+/*	mut out := strings.new_builder(format.len)
+	mut idx := 0
+	for idx < format.len {
+		match format[idx] {
+			'\\'
+			else {}
+		}
+	}*/
+	return format
 }
 
 // A code below is modded version of vlib/strconv/vprintf.v whose parameter to be an array of string
@@ -30,11 +86,8 @@ enum Char_parse_state {
 	reset_params
 }
 
-pub fn v_printf(str string, pt []string) {
-	print(v_sprintf(str, pt))
-}
-
-pub fn v_sprintf(str string, pt []string) string {
+pub fn v_sprintf(str string, _pt []string) (string, int) {
+	mut pt := _pt.clone()
 	mut res := strings.new_builder(pt.len * 16)
 
 	mut i := 0 // main string index
@@ -78,7 +131,7 @@ pub fn v_sprintf(str string, pt []string) string {
 
 		// single char, manage it here
 		if ch == `c` && status == .field_char {
-			v_sprintf_panic(p_index, pt.len)
+			v_sprintf_panic(mut pt, p_index, pt.len)
 			d1 := byte(pt[p_index].u16())
 			res.write_b(d1)
 			status = .reset_params
@@ -89,7 +142,7 @@ pub fn v_sprintf(str string, pt []string) string {
 
 		// pointer, manage it here
 		if ch == `p` && status == .field_char {
-			v_sprintf_panic(p_index, pt.len)
+			v_sprintf_panic(mut pt, p_index, pt.len)
 			res.write_string('0x')
 			res.write_string(pt[p_index].u64().hex())
 			status = .reset_params
@@ -131,10 +184,10 @@ pub fn v_sprintf(str string, pt []string) string {
 			}
 			// manage "%.*s" precision field
 			else if ch == `.` && fc_ch1 == `*` && fc_ch2 == `s` {
-				v_sprintf_panic(p_index, pt.len)
+				v_sprintf_panic(mut pt, p_index, pt.len)
 				len := pt[p_index].int()
 				p_index++
-				v_sprintf_panic(p_index, pt.len)
+				v_sprintf_panic(mut pt, p_index, pt.len)
 				mut s := pt[p_index]
 				s = s[..len]
 				p_index++
@@ -234,7 +287,7 @@ pub fn v_sprintf(str string, pt []string) string {
 					// hh fot 8 bit int
 					`h` {
 						if ch2 == `h` {
-							v_sprintf_panic(p_index, pt.len)
+							v_sprintf_panic(mut pt, p_index, pt.len)
 							x := pt[p_index].i8()
 							positive = if x >= 0 { true } else { false }
 							d1 = if positive { u64(x) } else { u64(-x) }
@@ -261,14 +314,14 @@ pub fn v_sprintf(str string, pt []string) string {
 							d1 = if positive { u64(x) } else { u64(-x) }
 						}
 						*/
-						v_sprintf_panic(p_index, pt.len)
+						v_sprintf_panic(mut pt, p_index, pt.len)
 						x := pt[p_index].i64()
 						positive = if x >= 0 { true } else { false }
 						d1 = if positive { u64(x) } else { u64(-x) }
 					}
 					// default int
 					else {
-						v_sprintf_panic(p_index, pt.len)
+						v_sprintf_panic(mut pt, p_index, pt.len)
 						x := pt[p_index].int()
 						positive = if x >= 0 { true } else { false }
 						d1 = if positive { u64(x) } else { u64(-x) }
@@ -293,7 +346,7 @@ pub fn v_sprintf(str string, pt []string) string {
 			else if ch == `u` {
 				mut d1 := u64(0)
 				positive := true
-				v_sprintf_panic(p_index, pt.len)
+				v_sprintf_panic(mut pt, p_index, pt.len)
 				match ch1 {
 					// h for 16 bit unsigned int
 					// hh fot 8 bit unsigned int
@@ -338,7 +391,7 @@ pub fn v_sprintf(str string, pt []string) string {
 			}
 			// hex
 			else if ch in [`x`, `X`] {
-				v_sprintf_panic(p_index, pt.len)
+				v_sprintf_panic(mut pt, p_index, pt.len)
 				mut s := ''
 				match ch1 {
 					// h for 16 bit int
@@ -394,7 +447,7 @@ pub fn v_sprintf(str string, pt []string) string {
 
 			// float and double
 			if ch in [`f`, `F`] {
-				v_sprintf_panic(p_index, pt.len)
+				v_sprintf_panic(mut pt, p_index, pt.len)
 				x := pt[p_index].f64()
 				positive := x >= f64(0.0)
 				len1 = if len1 >= 0 { len1 } else { def_len1 }
@@ -412,7 +465,7 @@ pub fn v_sprintf(str string, pt []string) string {
 				i++
 				continue
 			} else if ch in [`e`, `E`] {
-				v_sprintf_panic(p_index, pt.len)
+				v_sprintf_panic(mut pt, p_index, pt.len)
 				x := pt[p_index].f64()
 				positive := x >= f64(0.0)
 				len1 = if len1 >= 0 { len1 } else { def_len1 }
@@ -430,7 +483,7 @@ pub fn v_sprintf(str string, pt []string) string {
 				i++
 				continue
 			} else if ch in [`g`, `G`] {
-				v_sprintf_panic(p_index, pt.len)
+				v_sprintf_panic(mut pt, p_index, pt.len)
 				x := pt[p_index].f64()
 				positive := x >= f64(0.0)
 				mut s := ''
@@ -467,7 +520,7 @@ pub fn v_sprintf(str string, pt []string) string {
 			}
 			// string
 			else if ch == `s` {
-				v_sprintf_panic(p_index, pt.len)
+				v_sprintf_panic(mut pt, p_index, pt.len)
 				s1 := pt[p_index]
 				pad_ch = ` `
 				res.write_string(strconv.format_str(s1,
@@ -490,17 +543,14 @@ pub fn v_sprintf(str string, pt []string) string {
 		i++
 	}
 
-	if p_index != pt.len {
-		panic('$p_index % conversion specifiers, but given $pt.len args')
-	}
-
-	return res.str()
+	return res.str(), p_index
 }
 
 [inline]
-fn v_sprintf_panic(idx int, len int) {
+fn v_sprintf_panic(mut pt []string, idx int, len int) {
 	if idx >= len {
-		panic('${idx + 1} % conversion specifiers, but given only $len args')
+		pt << ''
+		//panic('${idx + 1} % conversion specifiers, but given only $len args')
 	}
 }
 
