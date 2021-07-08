@@ -1,16 +1,22 @@
 # coreutils in V
 
-This repository contains programs equivalent to GNU [coreutils](https://www.gnu.org/software/coreutils/), written in the [V language](https://vlang.io).
+This repository contains programs equivalent to GNU
+[coreutils](https://www.gnu.org/software/coreutils/), written in the
+[V language](https://vlang.io).
 
 ## Goal
 
-Complete set of coreutils, written as closely as possible to the POSIX spec, with as many GNU extensions as feasible.
+Complete set of coreutils, written as closely as possible to the POSIX spec,
+with as many GNU extensions as feasible.
 
-We are looking for solid, working implementations of the commands, not 100% 1-to-1 parity, especially not quirks and unintended side-effects.
+We are looking for solid, working implementations of the commands, not 100%
+1-to-1 parity, especially not quirks and unintended side-effects.
 
 ## Layout
 
-Each command has it's own separate subdirectory, in case the implementor wishes to create multiple `.v` files to implement a command.
+Each command has it's own separate subdirectory under `src`, in case the
+implementor wishes to create multiple `.v` files to implement a command, or add
+a README.md specifically for that command.
 
 ## Building
 
@@ -20,7 +26,8 @@ Running `make` or `v run build.vsh` will build all the programs in `bin/`.
 
 Contributions are welcome!
 
-Please only contribute versions of the original utilities written in V.  Contributions written in other langauges will likely be rejected.
+Please only contribute versions of the original utilities written in V.
+Contributions written in other langauges will likely be rejected.
 
 ## Completed (10/109)
 
