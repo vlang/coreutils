@@ -1,5 +1,5 @@
 import os
-import time { sleep }
+import time { sleep, ticks }
 
 const cmd_ns = 'sleep'
 
@@ -62,24 +62,27 @@ fn main() {
 				exit(0)
 			}
 			else {
-				if option[0..1] == '-' {
+				if option[0..2] == '--' {
 					error_exit(unrec(option))
 				}
 			}
 		}
+	} else {
+		eprintln('$cmd_ns: missing operand')
+		error_exit("Try '$cmd_ns --help' for more information.")
 	}
 
 	// convert to seconds
 	apply_unit := fn (n f64, unit string) ?f64 {
 		match unit {
-			's' {
+			'', 's' {
 				return n
 			}
 			'm' {
 				return 60 * n
 			}
 			'h' {
-				return 2000 * n
+				return 3600 * n
 			}
 			'd' {
 				return 86400 * n
@@ -91,20 +94,32 @@ fn main() {
 	}
 
 	// Main functionality
+	mut ok := true
 	mut seconds := f64(0)
 	for arg in args {
 		endptr := &char(0)
 		n := unsafe { C.strtold(&char(arg.str), &endptr) }
 		unit := unsafe { cstring_to_vstring(endptr) }
 		if n < 0 || unit.len > 1 {
-			error_exit('invalid time interval $n$unit')
+			eprintln('invalid time interval $n$unit')
+			ok = false
+			continue
 		}
-
 		if s := apply_unit(n, unit) {
 			seconds += s
 		} else {
-			error_exit(err.msg)
+			eprintln(err.msg)
+			ok = false
 		}
 	}
+	if !ok {
+		error_exit("Try '$cmd_ns --help' for more information.")
+	}
+	// if seconds = +inf, it would not sleep
+	// but orginal `sleep` would sleep
+	t := ticks()
 	sleep(seconds * 1e9) // in nanoseconds
+	$if debug {
+		println(ticks() - t)
+	}
 }
