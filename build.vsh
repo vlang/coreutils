@@ -6,6 +6,9 @@ const (
 
 vargs := if os.args.len > 1 { os.args[1..] } else { []string{} }
 
+curdir := getwd()
+chdir('src')
+
 dirs := ls('.') ?.filter(is_dir(it))
 
 if !exists('bin') {
@@ -27,6 +30,8 @@ for dir in dirs {
 		final_args += arg + ' '
 	}
 	println('compiling ${dir}...')
-	cmd := 'v $final_args-o bin/$dir $dir'
+	cmd := 'v $final_args-o $curdir/bin/$dir $dir'
 	execute_or_panic(cmd)
 }
+
+chdir(curdir)
