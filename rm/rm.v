@@ -1,6 +1,8 @@
 import os
-import flag		
-/* The following block has been created in this file, but should be extracted to a common module for use by all utils
+import flag
+
+/*
+The following block has been created in this file, but should be extracted to a common module for use by all utils
 */
 
 const (
@@ -67,52 +69,59 @@ fn flags_common_no_args(args []string, app_name string) (&flag.FlagParser, strin
 	return flags_common(args, app_name, 0, 0)
 }
 
-/* End of common block
+/*
+End of common block
 */
 
-fn rm_recurse(dir string) []string{
+fn rm_recurse(dir string) []string {
 	mut files_stack := [dir]
+
 	// println(direct_ls)
 	// files_stack << direct_ls
-	mut i:=0
+	mut i := 0
 	for i < files_stack.len {
 		curr_file := files_stack[i]
-		direct_ls := os.ls(curr_file) or {[]}
+		direct_ls := os.ls(curr_file) or { [] }
 		println('$curr_file: $direct_ls')
-		files_stack << direct_ls.map(os.join_path(curr_file,it))
+		files_stack << direct_ls.map(os.join_path(curr_file, it))
 		i++
 	}
 	println(files_stack)
 	mut errors := []string{}
-	for j := files_stack.len-1; j >= 0; j-- {
+	for j := files_stack.len - 1; j >= 0; j-- {
 		println(files_stack[j])
-		os.rm(files_stack[j]) or {errors << err.str()}
+		os.rm(files_stack[j]) or { errors << err.str() }
 	}
 	return errors
 }
+
 fn main() {
-mut fp, _ := flags_common(os.args, 'rm', 1,flag.max_args_number)
-try_help := "Try 'rm --help' for more information"
-// empty := fp.bool('file',0, false,'empty')
-// println(empty)
-recursive := fp.bool('recursive', 0, false, 'recursive')
-files := fp.finalize() or { 
-	error_exit(err.str(), try_help)
-	return
-}
-// println(files)
-mut errors := []string{}
-for file in files {
-	if os.is_dir(file) {
-		if !recursive {
-			errors << 'Cannot remove file: Is a directory'
-			continue
-		}
-		os.rmdir_all(file) or {errors << err.str()}
-	} else { 
-		os.rm(file) or { errors << err.str() } 
+	mut fp, _ := flags_common(os.args, 'rm', 1, flag.max_args_number)
+	try_help := "Try 'rm --help' for more information"
+
+	// empty := fp.bool('file',0, false,'empty')
+	// println(empty)
+	recursive := fp.bool('recursive', 0, false, 'recursive')
+	files := fp.finalize() or {
+		error_exit(err.str(), try_help)
+		return
 	}
-}
-if errors.len > 0 {error_exit(...errors)}
-success_exit()
+
+	// println(files)
+	mut errors := []string{}
+	for file in files {
+		if os.is_dir(file) {
+			if !recursive {
+				errors << 'Cannot remove file: Is a directory'
+				continue
+			}
+			os.rmdir_all(file) or { errors << err.str() }
+		} else {
+			os.rm(file) or { errors << err.str() }
+		}
+	}
+	if errors.len > 0 {
+		error_exit(...errors)
+	}
+	success_exit()
 }
