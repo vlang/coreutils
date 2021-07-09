@@ -51,16 +51,20 @@ fn main() {
 	}
 }
 
-fn apply_controls(format string) string {
-/*	mut out := strings.new_builder(format.len)
+fn apply_controls(s string) string {
+/*	mut out := strings.new_builder(s.len)
 	mut idx := 0
-	for idx < format.len {
-		match format[idx] {
+	for idx < s.len {
+		match s[idx] {
 			'\\'
 			else {}
 		}
 	}*/
-	return format
+	return s
+}
+
+fn apply_posix_escape(s string) string {
+	return s
 }
 
 // A code below is modded version of vlib/strconv/vprintf.v whose parameter to be an array of string
@@ -151,6 +155,13 @@ pub fn v_sprintf(str string, _pt []string) (string, int) {
 			continue
 		}
 
+		if ch == `%` && status == .field_char {
+			res.write_b(`%`)
+			status = .reset_params
+			i++
+			continue
+		}
+
 		if status == .field_char {
 			mut fc_ch1 := `0`
 			mut fc_ch2 := `0`
@@ -183,12 +194,16 @@ pub fn v_sprintf(str string, _pt []string) (string, int) {
 				continue
 			}
 			// manage "%.*s" precision field
-			else if ch == `.` && fc_ch1 == `*` && fc_ch2 == `s` {
+			else if ch == `.` && fc_ch1 == `*` && fc_ch2 in [`s`, `b`, `q`] {
 				v_sprintf_panic(mut pt, p_index, pt.len)
 				len := pt[p_index].int()
 				p_index++
 				v_sprintf_panic(mut pt, p_index, pt.len)
-				mut s := pt[p_index]
+				mut s := match fc_ch2 {
+					`s` { pt[pt_index] }
+					`b` { apply_controls(pt[pt_index]) }
+					`q` { apply_posix_escape(pt[pt_index]) }
+				}
 				s = s[..len]
 				p_index++
 				res.write_string(s)
@@ -519,9 +534,13 @@ pub fn v_sprintf(str string, _pt []string) (string, int) {
 				continue
 			}
 			// string
-			else if ch == `s` {
+			else if ch in [`s`, `b`, `q`] {
 				v_sprintf_panic(mut pt, p_index, pt.len)
-				s1 := pt[p_index]
+				s1 := match ch {
+					`s` { pt[pt_index] }
+					`b` { apply_controls(pt[pt_index]) }
+					`q` { apply_posix_escape(pt[pt_index]) }
+				}
 				pad_ch = ` `
 				res.write_string(strconv.format_str(s1,
 					pad_ch: pad_ch
