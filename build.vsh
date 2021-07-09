@@ -11,8 +11,8 @@ chdir('src')
 
 dirs := ls('.') ?.filter(is_dir(it))
 
-if !exists('bin') {
-	mkdir('bin') ?
+if !exists('$curdir/bin') {
+	mkdir('$curdir/bin') ?
 }
 
 for dir in dirs {
