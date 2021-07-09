@@ -37,19 +37,9 @@ fn main() {
 	fp.description('Pause for NUMBER (integer ot floating-point number) seconds.\n' +
 		'"s" for seconds (the default), "m" for minutes, "h" for hours or "d" for days.\n' +
 		'Pause for the amount of time specified by the sum of arguments.\n')
-	help_opt := fp.bool('help', 0, false, 'display this help and exit')
-	version_opt := fp.bool('version', 0, false, 'output version information and exit')
 	args := fp.finalize() or {
 		error_exit(err.msg)
 		exit(1)
-	}
-	if help_opt {
-		println(fp.usage())
-		exit(0)
-	}
-	if version_opt {
-		println('$cmd_ns $fp.application_version')
-		exit(0)
 	}
 
 	if args.len == 0 {

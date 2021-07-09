@@ -169,22 +169,11 @@ fn args() Settings {
 	// unbuffered        := fp.bool('', `u`, false, 'The output is guaranteed to be unbuffered')
 	unbuffered := fp.bool('', `u`, false, '(ignored)') // ignored in GNU cat!
 	mut show_nonprinting := fp.bool('show-nonprinting', `v`, false, 'use ^ and M- notation, except for LFD and TAB')
-	help := fp.bool('help', 0, false, 'display this help and exit')
-	version := fp.bool('version', 0, false, 'output version information and exit')
 
 	fnames := fp.finalize() or {
 		eprintln(err)
 		println(fp.usage())
 		exit(1)
-	}
-
-	if help {
-		println(fp.usage())
-		exit(0)
-	}
-	if version {
-		println('$app_name $app_version')
-		exit(0)
 	}
 
 	// some flags override each other
