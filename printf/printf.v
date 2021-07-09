@@ -37,7 +37,7 @@ fn main() {
 		else {}
 	}
 
-	format := apply_controls(os.args[1])
+	format := apply_controls(os.args[1], false)
 	mut args := os.args[2..]
 	mut idx := 0
 	mut out := ''
@@ -51,16 +51,137 @@ fn main() {
 	}
 }
 
-fn apply_controls(s string) string {
-/*	mut out := strings.new_builder(s.len)
+const control_ch = {
+	`a`: `\a`,
+	`b`: `\b`,
+	`e`: `\e`,
+	`f`: `\f`,
+	`n`: `\n`,
+	`r`: `\r`,
+	`t`: `\t`,
+	`v`: `\v`,
+}
+
+fn apply_controls(s string, zero_top bool) string {
+	mut out := strings.new_builder(s.len)
 	mut idx := 0
 	for idx < s.len {
-		match s[idx] {
-			'\\'
-			else {}
+		ch := s[idx]
+		match ch {
+			`\\` {
+				idx += 2
+				if idx > s.len {
+					out.write_b(ch)
+					break
+				}
+				ch2 := s[idx - 1]
+				match ch2 {
+					`"`, `\\` {
+						out.write_b(ch2)
+					}
+					`a`, `b`, `e`, `f`, `n`, `r`, `t`, `v` {
+						out.write_b(control_ch[ch2])
+					}
+					`c` {}
+					`0` ... `7` {
+						if zero_top && ch2 == `0` {
+							if idx >= s.len || !s[idx].is_oct_digit() {
+								out.write_b(`\0`)
+								continue
+							}
+							idx++
+						}
+						mut out_ch := byte(0)
+						idx--
+						for _ in 0..3 {
+							num := s[idx] - `0`
+							out_ch *= 8
+							out_ch += num
+							idx++
+							if idx >= s.len || !s[idx].is_oct_digit() {
+								break
+							}
+						}
+						out.write_b(out_ch)
+					}
+					`x` {
+						if idx >= s.len || !s[idx].is_hex_digit() {
+							out.write_string('\\x')
+							continue
+						}
+						mut out_ch := byte(0)
+						for _ in 0..2 {
+							num := byte(match s[idx] {
+								`0` ... `9` { s[idx] - `0` }
+								`A` ... `F` { s[idx] - `A` + 10 }
+								`a` ... `f` { s[idx] - `a` + 10 }
+								else { rune(0) }
+							})
+							out_ch *= 16
+							out_ch += num
+							idx++
+							if idx >= s.len || !s[idx].is_hex_digit() {
+								break
+							}
+						}
+						out.write_b(out_ch)
+					}
+					`u` {
+						if idx >= s.len || !s[idx].is_hex_digit() {
+							out.write_string('\\u')
+							continue
+						}
+						mut out_ch := u32(0)
+						for _ in 0..4 {
+							num := u32(match s[idx] {
+								`0` ... `9` { s[idx] - `0` }
+								`A` ... `F` { s[idx] - `A` + 10 }
+								`a` ... `f` { s[idx] - `a` + 10 }
+								else { rune(0) }
+							})
+							out_ch *= 16
+							out_ch += num
+							idx++
+							if idx >= s.len || !s[idx].is_hex_digit() {
+								break
+							}
+						}
+						out.write_string(utf32_to_str(out_ch))
+					}
+					`U` {
+						if idx >= s.len || !s[idx].is_hex_digit() {
+							out.write_string('\\U')
+							continue
+						}
+						mut out_ch := u32(0)
+						for _ in 0..8 {
+							num := u32(match s[idx] {
+								`0` ... `9` { s[idx] - `0` }
+								`A` ... `F` { s[idx] - `A` + 10 }
+								`a` ... `f` { s[idx] - `a` + 10 }
+								else { rune(0) }
+							})
+							out_ch *= 16
+							out_ch += num
+							idx++
+							if idx >= s.len || !s[idx].is_hex_digit() {
+								break
+							}
+						}
+						out.write_string(utf32_to_str(out_ch))
+					}
+					else {
+						out.write_string('\\$ch2')
+					}
+				}
+			}
+			else {
+				out.write_b(ch)
+				idx++
+			}
 		}
-	}*/
-	return s
+	}
+	return out.str()
 }
 
 fn apply_posix_escape(s string) string {
@@ -200,9 +321,10 @@ pub fn v_sprintf(str string, _pt []string) (string, int) {
 				p_index++
 				v_sprintf_panic(mut pt, p_index, pt.len)
 				mut s := match fc_ch2 {
-					`s` { pt[pt_index] }
-					`b` { apply_controls(pt[pt_index]) }
-					`q` { apply_posix_escape(pt[pt_index]) }
+					`s` { pt[p_index] }
+					`b` { apply_controls(pt[p_index], true) }
+					`q` { apply_posix_escape(pt[p_index]) }
+					else { '' }
 				}
 				s = s[..len]
 				p_index++
@@ -537,9 +659,10 @@ pub fn v_sprintf(str string, _pt []string) (string, int) {
 			else if ch in [`s`, `b`, `q`] {
 				v_sprintf_panic(mut pt, p_index, pt.len)
 				s1 := match ch {
-					`s` { pt[pt_index] }
-					`b` { apply_controls(pt[pt_index]) }
-					`q` { apply_posix_escape(pt[pt_index]) }
+					`s` { pt[p_index] }
+					`b` { apply_controls(pt[p_index], true) }
+					`q` { apply_posix_escape(pt[p_index]) }
+					else { '' }
 				}
 				pad_ch = ` `
 				res.write_string(strconv.format_str(s1,
