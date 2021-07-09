@@ -211,7 +211,7 @@ enum Char_parse_state {
 	reset_params
 }
 
-pub fn v_sprintf(str string, _pt []string) (string, int) {
+fn v_sprintf(str string, _pt []string) (string, int) {
 	mut pt := _pt.clone()
 	mut res := strings.new_builder(pt.len * 16)
 
@@ -705,7 +705,7 @@ fn fabs(x f64) f64 {
 
 // strings.Builder version of format_fl
 [manualfree]
-pub fn format_fl_old(f f64, p strconv.BF_param) string {
+fn format_fl_old(f f64, p strconv.BF_param) string {
 	unsafe {
 		mut s := ''
 		// mut fs := "1.2343"
@@ -781,7 +781,7 @@ pub fn format_fl_old(f f64, p strconv.BF_param) string {
 }
 
 [manualfree]
-pub fn format_es_old(f f64, p strconv.BF_param) string {
+fn format_es_old(f f64, p strconv.BF_param) string {
 	unsafe {
 		mut s := ''
 		mut fs := strconv.f64_to_str_pad(if f > 0 { f } else { -f }, p.len1)
@@ -842,7 +842,7 @@ pub fn format_es_old(f f64, p strconv.BF_param) string {
 	}
 }
 
-pub fn remove_tail_zeros_old(s string) string {
+fn remove_tail_zeros_old(s string) string {
 	mut i := 0
 	mut last_zero_start := -1
 	mut dot_pos := -1
@@ -883,7 +883,7 @@ pub fn remove_tail_zeros_old(s string) string {
 }
 
 // max int64 9223372036854775807
-pub fn format_dec_old(d u64, p strconv.BF_param) string {
+fn format_dec_old(d u64, p strconv.BF_param) string {
 	mut s := ''
 	mut res := strings.new_builder(20)
 	mut sign_len_diff := 0
