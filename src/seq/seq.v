@@ -24,6 +24,14 @@ struct Settings {
 
 fn main() {
 	settings := args() ?
+
+	// sanitize settings
+	check_settings(settings) or {
+		eprintln(err)
+		eprintln("Try '$app_name --help' for more information.")
+		exit(1)
+	}
+
 	seq(settings)
 }
 
@@ -90,6 +98,13 @@ fn num_of_decimals(s string) int {
 [inline]
 fn largest(x int, y int) int {
 	return if x > y { x } else { y }
+}
+
+[inline]
+fn check_settings(set Settings) ? {
+	if set.increment.f64() == 0 {
+		return error("$app_name: invalid zero increment value '0'")
+	}
 }
 
 ///===================================================================///
