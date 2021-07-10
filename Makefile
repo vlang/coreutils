@@ -1,4 +1,4 @@
-.PHONY: all fmt testfmt
+.PHONY: all fmt test testfmt
 
 all:
 	@v run build.vsh
@@ -6,8 +6,8 @@ all:
 fmt:
 	v fmt -w .
 
-# TODO: add tests
-test: testfmt
+test:
+	v test .	
 
 testfmt:
 	v fmt -verify .

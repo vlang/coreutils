@@ -8,5 +8,6 @@ main
 bin/
 .DS_Store
 **/*
+!*/
 !**/*.v
 !**/*.md
