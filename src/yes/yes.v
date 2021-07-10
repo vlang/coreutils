@@ -14,18 +14,6 @@ fn yes() {
 	fp.version(app_version)
 	fp.description('')
 	fp.skip_executable()
-	help := fp.bool('help', 0, false, 'display this help and exit')
-	version := fp.bool('version', 0, false, 'output version information and exit')
-
-	if help {
-		println(fp.usage())
-		exit(0)
-	}
-
-	if version {
-		println('$app_name $app_version')
-		exit(0)
-	}
 
 	additional_args := fp.finalize() or {
 		eprintln(err)
