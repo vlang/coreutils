@@ -23,7 +23,8 @@ struct Settings {
 ///===================================================================///
 
 fn main() {
-	seq(args())
+	settings := args() ?
+	seq(settings)
 }
 
 fn seq(set Settings) {
@@ -95,7 +96,7 @@ fn largest(x int, y int) int {
 ///                                Args                               ///
 ///===================================================================///
 
-fn args() Settings {
+fn args() ?Settings {
 	mut fp := flag.new_flag_parser(os.args)
 	fp.application(app_name)
 	fp.version(app_version)
@@ -107,9 +108,6 @@ fn args() Settings {
 	separator := fp.string('separator', `s`, '\n', 'use STRING to separate numbers (default: \n)')
 	equal_width := fp.bool('equal-width', `w`, false, 'equalize width by padding with leading zeroes')
 
-	help := fp.bool('help', 0, false, 'display this help and exit')
-	version := fp.bool('version', 0, false, 'output version information and exit')
-
 	// extra arguments -a -b -c arg1 arg2 arg3
 	// arg1..3 will be taken
 	// flags used that are not specified will panic
@@ -119,18 +117,9 @@ fn args() Settings {
 		exit(1)
 	}
 
-	if help {
-		println(fp.usage())
-		exit(0)
-	}
-	if version {
-		println('$app_name $app_version')
-		exit(0)
-	}
-
 	match fnames.len {
 		0 {
-			eprintln('$app_name: missinge operand')
+			eprintln('$app_name: missing operand')
 			eprintln("Try '$app_name --help' for more information.")
 			exit(1)
 		}
@@ -152,6 +141,5 @@ fn args() Settings {
 			exit(1)
 		}
 	}
-	// making compiler happy, should never happen
-	return Settings{format, separator, equal_width, '0', '0', '0'}
+	return error('invalid parameters')
 }
