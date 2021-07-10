@@ -2,6 +2,7 @@ module main
 
 import flag
 import os
+import math
 
 const (
 	app_name        = 'seq'
@@ -13,9 +14,9 @@ struct Settings {
 	format      string
 	separator   string
 	equal_width bool
-	first       f64 // can be a decimal
-	increment   f64
-	last        f64
+	first       string // can be a decimal
+	increment   string
+	last        string
 }
 
 ///===================================================================///
@@ -26,16 +27,19 @@ fn main() {
 	seq(args())
 }
 
-fn seq(s Settings) {
-	sep := s.separator.bytes()
-	last := s.last
-	inc := s.increment
+//
+fn seq(set Settings) {
+	last := set.last.f64()
+	inc := set.increment.f64()
 
-	mut i := s.first
-	mut stdout := os.stdout()
+	/// gets format string for printf
+	// fstr := get_fstr(set)
+	fstr := '${get_fstr(set)}'
+	println(fstr)
+
+	mut i := set.first.f64()
 	for i <= last {
-		stdout.write(i.str().bytes()) or {}
-		stdout.write(sep) or {}
+		C.printf(fstr.str, i)
 		i += inc
 	}
 }
@@ -43,6 +47,47 @@ fn seq(s Settings) {
 ///===================================================================///
 ///                       Helper Functions                            ///
 ///===================================================================///
+
+// returns the string used in printf, example "05.3f"
+fn get_fstr(set Settings) string {
+	// use value in --format as specified by user.
+	if set.format != '' {
+		return set.format
+	}
+	// else
+
+	// number of 0s to pad  on the right, 5.0 with 6 padding => 00005.0
+	mut padding := 0
+	// C's pritnf type
+	mut ctype := 'f'
+
+	idec := num_of_decimals(set.increment)
+	fdec := num_of_decimals(set.first)
+	// number of decimal places, 9.000000 => 5 decimals
+	decimals := largest(idec, fdec)
+
+	// equalize the width by padding with zeros
+	// 001,002,...100
+	if set.equal_width {
+		flen := set.first.split('.')[0].len
+		llen := set.last.split('.')[0].len
+		padding = largest(flen, llen)
+	}
+
+	return '%0${padding}.$decimals$ctype$set.separator'
+}
+
+// '9.00' => 2, 0.889 => 3
+[inline]
+fn num_of_decimals(s string) int {
+	return if s.split('.').len > 1 { s.split('.')[1].len } else { 0 }
+}
+
+// returns largest number
+[inline]
+fn largest(x int, y int) int {
+	return if x > y { x } else { y }
+}
 
 ///===================================================================///
 ///                                Args                               ///
@@ -56,7 +101,7 @@ fn args() Settings {
 	fp.skip_executable()
 
 	// need to change this
-	format := fp.string('format', `f`, '%i', 'use printf style floating-point FORMAT')
+	format := fp.string('format', `f`, '', 'use printf style floating-point FORMAT')
 	separator := fp.string('separator', `s`, '\n', 'use STRING to separate numbers (default: \n)')
 	equal_width := fp.bool('equal-width', `w`, false, 'equalize width by padding with leading zeroes')
 
@@ -89,15 +134,15 @@ fn args() Settings {
 		}
 		1 {
 			// _, _, last=fnames[0]
-			return Settings{format, separator, equal_width, 0, 1, fnames[0].f64()}
+			return Settings{format, separator, equal_width, '0', '1', fnames[0]}
 		}
 		2 {
 			//  first=fnames[0], _, last=fnames[1],
-			return Settings{format, separator, equal_width, fnames[0].f64(), 1, fnames[1].f64()}
+			return Settings{format, separator, equal_width, fnames[0], '1', fnames[1]}
 		}
 		3 {
 			//  first=fnames[0], increment[1], last=fnames[2],
-			return Settings{format, separator, equal_width, fnames[0].f64(), fnames[1].f64(), fnames[2].f64()}
+			return Settings{format, separator, equal_width, fnames[0], fnames[1], fnames[2]}
 		}
 		else {
 			eprintln("$app_name: extra operand '${fnames[3]}'")
@@ -106,5 +151,5 @@ fn args() Settings {
 		}
 	}
 	// making compiler happy, should never happen
-	return Settings{format, separator, equal_width, 0, 0, 0}
+	return Settings{format, separator, equal_width, '0', '0', '0'}
 }
