@@ -34,9 +34,9 @@ fn seq(set Settings) {
 	fstr := get_fstr(set).str
 
 	mut i := set.first.f64()
-	for i <= last {
-		C.printf(fstr, i)
+	for i < last {
 		i += inc
+		C.printf(fstr, i)
 	}
 }
 
