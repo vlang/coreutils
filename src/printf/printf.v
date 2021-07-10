@@ -184,8 +184,78 @@ fn apply_controls(s string, zero_top bool) string {
 	return out.str()
 }
 
+const unprintables = [
+	'\\000',
+	'\\001',
+	'\\002',
+	'\\003',
+	'\\004',
+	'\\005',
+	'\\006',
+	'\\a',
+	'\\b',
+	'\\t',
+	'\\n',
+	'\\v',
+	'\\f',
+	'\\r',
+	'\\016',
+	'\\017',
+	'\\020',
+	'\\021',
+	'\\022',
+	'\\023',
+	'\\024',
+	'\\025',
+	'\\026',
+	'\\027',
+	'\\030',
+	'\\031',
+	'\\032',
+	'\\033',
+	'\\034',
+	'\\035',
+	'\\036',
+	'\\037',
+]
+
 fn apply_posix_escape(s string) string {
-	return s
+	mut has_unprintable := false
+	mut upout := strings.new_builder(s.len)
+	for ch in s {
+		match ch {
+			0 ... 0x1f {
+				has_unprintable = true
+				upout.write_string(unprintables[ch])
+			}
+			0x7f {
+				has_unprintable = true
+				upout.write_string('\\177')
+			}
+			else {
+				upout.write_b(ch)
+			}
+		}
+	}
+	return if has_unprintable {
+		'\$\'$upout\''
+	} else {
+		s.replace_each([
+			'|', '\\|',
+			'&', '\\&',
+			';', '\\;',
+			'<', '\\<',
+			'>', '\\>',
+			'(', '\\(',
+			')', '\\)',
+			'\$', '\\\$',
+			'`', '\\`',
+			'\'', '\\'+'\'', // TODO: v must fix this
+			'\\', '\\\\',
+			'"', '\\"',
+			' ', '\\ ',
+		])
+	}
 }
 
 // A code below is modded version of vlib/strconv/vprintf.v whose parameter to be an array of string
