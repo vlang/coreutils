@@ -2,6 +2,7 @@ module main
 
 import flag
 import os
+import strconv
 
 const (
 	app_name        = 'seq'
@@ -40,12 +41,12 @@ fn seq(set Settings) {
 	inc := set.increment.f64()
 
 	/// gets format string for printf
-	fstr := get_fstr(set).str
+	fstr := get_fstr(set)
 
 	mut i := set.first.f64()
 	for i < last {
 		i += inc
-		C.printf(fstr, i)
+		print(strconv.v_sprintf(fstr, i))
 	}
 }
 
