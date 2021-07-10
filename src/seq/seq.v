@@ -2,7 +2,6 @@ module main
 
 import flag
 import os
-import math
 
 const (
 	app_name        = 'seq'
@@ -14,7 +13,7 @@ struct Settings {
 	format      string
 	separator   string
 	equal_width bool
-	first       string // can be a decimal
+	first       string
 	increment   string
 	last        string
 }
@@ -27,19 +26,16 @@ fn main() {
 	seq(args())
 }
 
-//
 fn seq(set Settings) {
 	last := set.last.f64()
 	inc := set.increment.f64()
 
 	/// gets format string for printf
-	// fstr := get_fstr(set)
-	fstr := '${get_fstr(set)}'
-	println(fstr)
+	fstr := get_fstr(set).str
 
 	mut i := set.first.f64()
 	for i <= last {
-		C.printf(fstr.str, i)
+		C.printf(fstr, i)
 		i += inc
 	}
 }
@@ -72,6 +68,12 @@ fn get_fstr(set Settings) string {
 		flen := set.first.split('.')[0].len
 		llen := set.last.split('.')[0].len
 		padding = largest(flen, llen)
+
+		// decimals are counted in padding
+		// 0.999 padded to 6 => 00.999
+		if decimals > 0 {
+			padding += decimals + 1 // +1 since '.' is counted too
+		}
 	}
 
 	return '%0${padding}.$decimals$ctype$set.separator'
