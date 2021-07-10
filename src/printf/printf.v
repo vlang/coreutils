@@ -37,15 +37,16 @@ fn main() {
 		else {}
 	}
 
-	format := apply_controls(os.args[1], false)
+	format, ctrl_c_fmt := apply_controls(os.args[1], false)
 	mut args := os.args[2..]
 	mut idx := 0
 	mut out := ''
+	mut ctrl_c_arg := false
 	for {
 		args = args[idx..]
-		out, idx = v_sprintf(format, args)
+		out, idx, ctrl_c_arg = v_sprintf(format, args)
 		print(out)
-		if idx == 0 || args.len <= idx {
+		if ctrl_c_fmt || ctrl_c_arg || idx == 0 || args.len <= idx {
 			break
 		}
 	}
@@ -62,7 +63,7 @@ const control_ch = {
 	`v`: `\v`,
 }
 
-fn apply_controls(s string, zero_top bool) string {
+fn apply_controls(s string, zero_top bool) (string, bool) {
 	mut out := strings.new_builder(s.len)
 	mut idx := 0
 	for idx < s.len {
@@ -82,7 +83,9 @@ fn apply_controls(s string, zero_top bool) string {
 					`a`, `b`, `e`, `f`, `n`, `r`, `t`, `v` {
 						out.write_b(control_ch[ch2])
 					}
-					`c` {}
+					`c` {
+						return out.str(), true
+					}
 					`0` ... `7` {
 						if zero_top && ch2 == `0` {
 							if idx >= s.len || !s[idx].is_oct_digit() {
@@ -181,7 +184,7 @@ fn apply_controls(s string, zero_top bool) string {
 			}
 		}
 	}
-	return out.str()
+	return out.str(), false
 }
 
 const unprintables = [
@@ -281,7 +284,7 @@ enum Char_parse_state {
 	reset_params
 }
 
-fn v_sprintf(str string, _pt []string) (string, int) {
+fn v_sprintf(str string, _pt []string) (string, int, bool) {
 	mut pt := _pt.clone()
 	mut res := strings.new_builder(pt.len * 16)
 
@@ -390,15 +393,19 @@ fn v_sprintf(str string, _pt []string) (string, int) {
 				len := pt[p_index].int()
 				p_index++
 				v_sprintf_panic(mut pt, p_index, pt.len)
+				mut ctrl_c := false
 				mut s := match fc_ch2 {
 					`s` { pt[p_index] }
-					`b` { apply_controls(pt[p_index], true) }
+					`b` { ss, ctrl_c_ := apply_controls(pt[p_index], true) ctrl_c = ctrl_c_ ss }
 					`q` { apply_posix_escape(pt[p_index]) }
 					else { '' }
 				}
 				s = s[..len]
 				p_index++
 				res.write_string(s)
+				if ctrl_c {
+					return res.str(), p_index, true
+				}
 				status = .reset_params
 				i += 3
 				continue
@@ -728,9 +735,10 @@ fn v_sprintf(str string, _pt []string) (string, int) {
 			// string
 			else if ch in [`s`, `b`, `q`] {
 				v_sprintf_panic(mut pt, p_index, pt.len)
+				mut ctrl_c := false
 				s1 := match ch {
 					`s` { pt[p_index] }
-					`b` { apply_controls(pt[p_index], true) }
+					`b` { ss, ctrl_c_ := apply_controls(pt[p_index], true) ctrl_c = ctrl_c_ ss }
 					`q` { apply_posix_escape(pt[p_index]) }
 					else { '' }
 				}
@@ -745,6 +753,9 @@ fn v_sprintf(str string, _pt []string) (string, int) {
 				))
 				status = .reset_params
 				p_index++
+				if ctrl_c {
+					return res.str(), p_index, true
+				}
 				i++
 				continue
 			}
@@ -755,7 +766,7 @@ fn v_sprintf(str string, _pt []string) (string, int) {
 		i++
 	}
 
-	return res.str(), p_index
+	return res.str(), p_index, false
 }
 
 [inline]
