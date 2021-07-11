@@ -2,9 +2,9 @@ import os
 import flag
 import common
 
-/*** Constants and simple string substitution functions ***/
+//** Constants and simple string substitution functions **
 const (
-	name = 'rm'
+	name                = 'rm'
 	interactive_yes     = ['y']
 	invalid_interactive = 'Invalid for interactive. Use either of [never, no, none], [once], [always, yes]'
 	valid_interactive   = [
@@ -59,9 +59,9 @@ fn rem_recurse(len int) string {
 	return 'rm: remove $len $arg recursively? '
 }
 
-/*** End of constants and string substitution functions ***/
+//** End of constants and string substitution functions **
 
-/*** RmCommand struct to hold values ***/
+//** RmCommand struct to hold values **
 struct RmCommand {
 	recursive   bool
 	dir         bool
@@ -74,13 +74,13 @@ struct RmCommand {
 fn (r RmCommand) rm_dir(path string) {
 	if !r.recursive {
 		if !r.dir {
-			error_message(name,err_is_dir(path))
+			error_message(name, err_is_dir(path))
 			return
 		}
 
 		// --dir flag set, so remove if empty dir
 		if !os.is_dir_empty(path) {
-			error_message(name,err_is_dir_empty(path))
+			error_message(name, err_is_dir_empty(path))
 			return
 		}
 	}
@@ -153,9 +153,7 @@ fn (r RmCommand) rm_path(path string) {
 		return
 	}
 	if !r.interactive || r.force || r.int_yes(prompt_file(path)) {
-		os.rm(path) or { 
-			error_message(name,err.msg)
-		}
+		os.rm(path) or { error_message(name, err.msg) }
 		if r.verbose {
 			println(rem(path))
 		}
@@ -164,7 +162,7 @@ fn (r RmCommand) rm_path(path string) {
 
 fn error_message(tool_name string, error string) {
 	if error.len > 0 {
-	eprintln('$tool_name: $error')
+		eprintln('$tool_name: $error')
 	}
 }
 
@@ -174,7 +172,6 @@ fn success_exit(messages ...string) {
 	}
 	exit(0)
 }
-
 
 enum Interactive {
 	no
@@ -217,7 +214,7 @@ fn setup_rm_command(mut fp flag.FlagParser) ?(RmCommand, []string) {
 		success_exit(fp.usage())
 	}
 	if version {
-		success_exit('rm ${common.coreutils_version()}')
+		success_exit('rm $common.coreutils_version()')
 	}
 	rm := RmCommand{
 		recursive: recursive
@@ -253,7 +250,7 @@ fn main() {
 		}
 	}
 	for file in files {
-			rm.rm_path(file)
+		rm.rm_path(file)
 	}
 	success_exit()
 }
