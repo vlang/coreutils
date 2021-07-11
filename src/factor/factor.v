@@ -1,4 +1,5 @@
 import os
+import common
 import strconv
 
 fn prime_factors(product u64) []u64 {
@@ -26,49 +27,43 @@ fn prime_factors(product u64) []u64 {
 	return factors
 }
 
-fn output_of(arg string) string {
+fn output_of(arg string) ?string {
 	if product := strconv.parse_uint(arg, 10, 64) {
 		factors := prime_factors(product)
-		return '$product: ${factors.map(it.str()).join(' ')}'
-	} else {
-		return 'factor: ‘$arg’ is not a valid positive integer'
+		if factors.len > 0 {
+			return '$product: ${factors.map(it.str()).join(' ')}'
+		} else {
+			return '$product:'
+		}
 	}
+	return error('factor: ‘$arg’ is not a valid positive integer')
 }
 
-const (
-	usage = 'Usage: factor [NUMBER]...
-  or:  factor OPTION
-Print the prime factors of each specified integer NUMBER.  If none
-are specified on the command line, read them from standard input.
-
-      --help     display this help and exit
-      --version  output version information and exit'
-	version = 'factor (V coreutils 0.0.1)'
-)
-
 fn main() {
-	match os.args.len {
-		1 {
-			for {
-				println(output_of(os.input('')))
-			}
+	mut fp := common.flag_parser(os.args)
+	fp.application('factor')
+	fp.usage_example('[NUMBER]...')
+	fp.usage_example('OPTION')
+	fp.description('Print the prime factors of each specified integer NUMBER.')
+	fp.description('If none are specified on the command line, read them from standard input.')
+	args := fp.remaining_parameters()
+	mut errors := 0
+	if args.len == 0 {
+		for {
+			println(output_of(os.input_opt('') or { common.exit_on_errors(errors) }) or {
+				errors++
+				eprintln(err.msg)
+				continue
+			})
 		}
-		else {
-			for arg in os.args[1..] {
-				match arg {
-					'--help' {
-						println(usage)
-						exit(0)
-					}
-					'--version' {
-						println(version)
-						exit(0)
-					}
-					else {
-						println(output_of(arg))
-					}
-				}
-			}
+	} else {
+		for arg in args {
+			println(output_of(arg) or {
+				errors++
+				eprintln(err.msg)
+				continue
+			})
 		}
 	}
+	common.exit_on_errors(errors)
 }
