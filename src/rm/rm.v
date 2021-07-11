@@ -1,14 +1,167 @@
 import os
 import flag
 
+const (
+	version_str         = 'V Coreutils 0.0.1'
+	interactive_yes     = ['y']
+	try_help            = "Try 'rm --help' for more information"
+	invalid_interactive = 'Invalid for interactive. Use either of [never, no, none], [once], [always, yes]'
+	valid_interactive   = [
+		['never', 'no', 'none'],
+		['once'],
+		['', 'always', 'yes'],
+	]
+)
+
+fn rem(path string) string {
+	return "removed '$path'"
+}
+
+fn prompt_file(path string) string {
+	if os.file_size(path) == 0 {
+		return prompt_file_empty(path)
+	}
+	return prompt_file_nonempty(path)
+}
+
+fn err_is_dir(path string) string {
+	return "rm: cannot remove '$path': Is a directory"
+}
+
+fn err_is_dir_empty(path string) string {
+	return "rm: cannot remove '$path': Directory not empty"
+}
+
+fn prompt_descend(path string) string {
+	return "rm: descend into directory '$path'? "
+}
+
+fn prompt_file_nonempty(path string) string {
+	return "rm: remove regular file '$path'? "
+}
+
+fn prompt_file_empty(path string) string {
+	return "rm: remove regular empty file '$path'? "
+}
+
+fn prompt_dir(path string) string {
+	return "rm: remove directory '$path? "
+}
+
+fn rem_args(len int) string {
+	return 'Remove $len args? '
+}
+
+fn rem_recurse(len int) string {
+	arg := if len == 1 { 'argument' } else { 'arguments' }
+	return 'rm: remove $len $arg recursively? '
+}
+
+fn not_exist(path string) string {
+	return 'rm: cannot remove $path: No such file or directory'
+}
+
+struct RmCommand {
+	recursive   bool
+	dir         bool
+	interactive bool
+	verbose     bool
+	force       bool
+	less_int    bool
+}
+
+fn (r RmCommand) rm_dir(path string) {
+	if !r.recursive {
+		if !r.dir {
+			eprintln(err_is_dir(path))
+			return
+		}
+
+		// --dir flag set, so remove if empty dir
+		if !os.is_dir_empty(path) {
+			eprintln(err_is_dir_empty(path))
+			return
+		}
+	}
+	// Can just delete all
+	if !r.interactive && !r.verbose {
+		os.rmdir_all(path) or { eprintln(err.str()) }
+	}
+	// Need to go through recursively to print/interact
+	r.rm_dir_verbose_inter(path)
+}
+
+fn int_yes(prompt string) bool {
+	mut is_yes := false
+	for yes in interactive_yes {
+		is_yes = is_yes || os.input(prompt).to_lower().contains(yes)
+	}
+	return is_yes
+}
+
+fn (r RmCommand) rm_dir_verbose_inter(path string) bool {
+	if !r.int_yes(prompt_descend(path)) {
+		return true
+	}
+
+	items := os.ls(path) or {
+		eprintln(err.str())
+		return false
+	}
+	mut ok := true
+	for item in items {
+		curr_path := os.join_path(path, item)
+		if os.is_dir(curr_path) {
+			ok = ok && r.rm_dir_verbose_inter(curr_path)
+			continue
+		}
+
+		if !r.int_yes(prompt_file(curr_path)) {
+			continue
+		}
+
+		os.rm(curr_path) or {
+			eprintln(err.str())
+			return false
+		}
+		if r.verbose {
+			println(rem(curr_path))
+		}
+	}
+
+	if r.int_yes(prompt_dir(path)) {
+		os.rmdir(path) or {
+			eprintln(err.str())
+			return false
+		}
+		if r.verbose {
+			println(rem(path))
+		}
+	}
+
+	return ok
+}
+
+fn (r RmCommand) int_yes(prompt string) bool {
+	return !r.interactive || int_yes(prompt)
+}
+
+fn (r RmCommand) rm_path(path string) {
+	if os.is_dir(path) {
+		r.rm_dir(path)
+		return
+	}
+	if !r.interactive || r.force || r.int_yes(prompt_file(path)) {
+		os.rm(path) or { eprintln(err.str()) }
+		if r.verbose {
+			println(rem(path))
+		}
+	}
+}
+
 /*
 The following block has been created in this file, but should be extracted to a common module for use by all utils
 */
-
-const (
-	version_str = 'V Coreutils 0.0.1'
-)
-
 // A default error exit, when code is not important
 fn error_exit(errors ...string) {
 	error_exit_code(1, ...errors)
@@ -56,72 +209,98 @@ fn flags_common(args []string, app_name string, free_args_min int, free_args_max
 		success_exit(fp.usage())
 	}
 	if version {
-		success_exit(version_str) // Needs to be modified
+		success_exit(version_str)
 	}
+	// Needs to be modified
 
 	fp.skip_executable()
 
 	return fp, exec
 }
 
-// Use if no arguments are taken
-fn flags_common_no_args(args []string, app_name string) (&flag.FlagParser, string) {
-	return flags_common(args, app_name, 0, 0)
-}
-
 /*
 End of common block
 */
 
-fn rm_recurse(dir string) []string {
-	mut files_stack := [dir]
+enum Interactive {
+	no
+	once
+	yes
+}
 
-	// println(direct_ls)
-	// files_stack << direct_ls
-	mut i := 0
-	for i < files_stack.len {
-		curr_file := files_stack[i]
-		direct_ls := os.ls(curr_file) or { [] }
-		println('$curr_file: $direct_ls')
-		files_stack << direct_ls.map(os.join_path(curr_file, it))
-		i++
+fn check_interactive(interactive string) ?Interactive {
+	for i in int(Interactive.no) .. int(Interactive.yes) + 1 {
+		if interactive in valid_interactive[i] {
+			return Interactive(i)
+		}
 	}
-	println(files_stack)
-	mut errors := []string{}
-	for j := files_stack.len - 1; j >= 0; j-- {
-		println(files_stack[j])
-		os.rm(files_stack[j]) or { errors << err.str() }
+	return error(invalid_interactive)
+}
+
+fn setup_command(mut fp flag.FlagParser) ?(RmCommand, []string) {
+	mut recursive := fp.bool('recursive', `r`, false, 'recursive')
+	recursive = recursive || fp.bool('', `R`, false, '')
+	dir := fp.bool('dir', `d`, false, 'dir')
+	force := fp.bool('force', `f`, false, 'force')
+	interactive := fp.string('interactive', 0, '', 'interactive')
+	mut int_type := Interactive.no
+	if interactive != '' {
+		int_type = check_interactive(interactive) ?
+	} else {
+		int_type = Interactive.no
 	}
-	return errors
+	interactive_all := fp.bool('', `i`, false, 'interactive always') || (int_type == .yes)
+	less_int := fp.bool('', `I`, false, 'less interactive') || (int_type == .once)
+
+	verbose := fp.bool('verbose', `v`, false, 'verbose')
+
+	rm := RmCommand{
+		recursive: recursive
+		dir: dir
+		interactive: interactive_all
+		less_int: less_int
+		verbose: verbose
+		force: force
+	}
+	files := fp.finalize() ?
+	return rm, files
+}
+
+fn has_dir(files []string) bool {
+	mut ret := false
+	for file in files {
+		ret = ret || os.is_dir(file)
+	}
+	return ret
 }
 
 fn main() {
 	mut fp, _ := flags_common(os.args, 'rm', 1, flag.max_args_number)
-	try_help := "Try 'rm --help' for more information"
 
-	// empty := fp.bool('file',0, false,'empty')
-	// println(empty)
-	recursive := fp.bool('recursive', 0, false, 'recursive')
-	files := fp.finalize() or {
+	rm, files := setup_command(mut fp) or {
 		error_exit(err.str(), try_help)
 		return
 	}
 
-	// println(files)
-	mut errors := []string{}
-	for file in files {
-		if os.is_dir(file) {
-			if !recursive {
-				errors << 'Cannot remove file: Is a directory'
-				continue
-			}
-			os.rmdir_all(file) or { errors << err.str() }
+	if rm.less_int && !rm.interactive {
+		ans := if files.len > 3 {
+			int_yes(rem_args(files.len))
+		} else if rm.recursive {
+			int_yes(rem_recurse(files.len))
 		} else {
-			os.rm(file) or { errors << err.str() }
+			true
+		}
+
+		if !ans {
+			success_exit()
 		}
 	}
-	if errors.len > 0 {
-		error_exit(...errors)
+	for file in files {
+		if !os.exists(file) {
+			eprintln(not_exist(file))
+		} else {
+			rm.rm_path(file)
+		}
 	}
 	success_exit()
 }
