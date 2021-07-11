@@ -32,17 +32,22 @@ fn main() {
 	fp.application(cmd_ns)
 	fp.version('(V coreutils) 0.0.1')
 	fp.skip_executable()
-	fp.arguments_description('[VARIABLE]...') // 'Usage: sleep [options] arg...'
-	fp.description('Print the values of the specified environment VARIABLE(s).\n' +
-		'If no VARIABLE is specified, print name and value pairs for them all.') // 'Description: ...'
-	// Define options
-	//`-0, --null`
-	opt_nul_terminate := fp.bool('null', '0'.bytes()[0], false, 'end each output line with NUL, not newline')
-
-	args := fp.finalize() or {
-		error_exit(err.msg)
-		exit(1)
+	fp.arguments_description('[VARIABLE]...')
+	fp.description('Print the values of the specified environment VARIABLE(s).')
+	fp.description('If no VARIABLE is specified, print name and value pairs for them all.')
+	mut exit_code := 0
+	mut opt_nul_terminate := fp.bool('null', '0'[0], false, 'end each output line with NUL, not newline')
+	if opt_nul_terminate {
+		if os.args[1] !in ['-0', '--null'] {
+			// GNU printenv has a quirk,
+			// where -0 when it is not the first option
+			// only changes the exit_code to 1, but does
+			// *NOT* affect the output
+			opt_nul_terminate = false
+			exit_code = 1
+		}
 	}
+	args := fp.remaining_parameters()
 
 	// Main functionality
 	if args.len == 0 {
@@ -56,11 +61,10 @@ fn main() {
 			}
 		}
 	} else {
-		mut code := 0 // exit code
 		for k in args {
 			mut v := os.getenv(k)
 			if v == '' {
-				code = 1 // at least one specified variable was not found
+				exit_code = 1 // at least one specified variable was not found
 				continue
 			}
 			if opt_nul_terminate {
@@ -70,6 +74,6 @@ fn main() {
 				println(v)
 			}
 		}
-		exit(code)
 	}
+	exit(exit_code)
 }
