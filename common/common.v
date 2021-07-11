@@ -34,3 +34,15 @@ pub fn exit_on_errors(errors int) {
 	}
 	exit(0)
 }
+
+// exit_with_error_message will exit with error code 1,
+// showing the passed error message, and directing the
+// user to use --help
+[noreturn]
+pub fn exit_with_error_message(tool_name string, error string) {
+	if error.len > 0 {
+		eprintln('$tool_name: $error')
+	}
+	eprintln("Try '$tool_name --help' for more information.")
+	exit(1)
+}

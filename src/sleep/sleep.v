@@ -1,21 +1,8 @@
 import os
-import flag
-import time { sleep, ticks }
+import common
+import time
 
 const cmd_ns = 'sleep'
-
-/*
-fn unrec(arg string) string {
-	return '$cmd_ns: unrecognized option $arg\nUse $cmd_ns --help to see options'
-}*/
-
-fn error_exit(error string) {
-	if error.len > 0 {
-		eprintln(error)
-	}
-	println("Try '$cmd_ns --help' for more information.")
-	exit(1)
-}
 
 // <stdlib.h>
 // str="-1.8e+308", ret = -inf, endptr => NULL
@@ -24,47 +11,40 @@ fn error_exit(error string) {
 // str="1.2s", ret = 1.2, endptr => "s"
 fn C.strtold(str &char, endptr &&char) f64
 
-// Exit status:
-// 0 indicates success
-// other indicates failure
-fn main() {
-	// Define options
-	mut fp := flag.new_flag_parser(os.args)
-	fp.application(cmd_ns)
-	fp.version('(V coreutils) 0.0.1')
-	fp.skip_executable()
-	fp.arguments_description('| NUMBER[smhd]...')
-	fp.description('Pause for NUMBER (integer ot floating-point number) seconds.\n' +
-		'"s" for seconds (the default), "m" for minutes, "h" for hours or "d" for days.\n' +
-		'Pause for the amount of time specified by the sum of arguments.\n')
-	args := fp.finalize() or {
-		error_exit(err.msg)
-		exit(1)
-	}
-
-	if args.len == 0 {
-		error_exit('$cmd_ns: missing operand')
-	}
-
-	// convert to seconds
-	apply_unit := fn (n f64, unit string) ?f64 {
-		match unit {
-			'', 's' {
-				return n
-			}
-			'm' {
-				return 60 * n
-			}
-			'h' {
-				return 3600 * n
-			}
-			'd' {
-				return 86400 * n
-			}
-			else {
-				return error('invalid time interval $n$unit')
-			}
+// apply_unit converts the passed number to seconds
+fn apply_unit(n f64, unit string) ?f64 {
+	match unit {
+		'', 's' {
+			return n
 		}
+		'm' {
+			return 60 * n
+		}
+		'h' {
+			return 3600 * n
+		}
+		'd' {
+			return 86400 * n
+		}
+		else {}
+	}
+	return error(invalid_time_interval(n, unit))
+}
+
+fn invalid_time_interval(n f64, unit string) string {
+	return '$cmd_ns: invalid time interval ‘$n$unit’'
+}
+
+fn main() {
+	mut fp := common.flag_parser(os.args)
+	fp.application(cmd_ns)
+	fp.arguments_description('| NUMBER[smhd]...')
+	fp.description('Pause for NUMBER (integer ot floating-point number) seconds.')
+	fp.description('"s" for seconds (the default), "m" for minutes, "h" for hours or "d" for days.')
+	fp.description('Pause for the amount of time specified by the sum of arguments.')
+	args := fp.remaining_parameters()
+	if args.len == 0 {
+		common.exit_with_error_message(cmd_ns, 'missing operand')
 	}
 
 	// Main functionality
@@ -75,7 +55,7 @@ fn main() {
 		n := unsafe { C.strtold(&char(arg.str), &endptr) }
 		unit := unsafe { cstring_to_vstring(endptr) }
 		if n < 0 || unit.len > 1 {
-			eprintln('invalid time interval $n$unit')
+			eprintln(invalid_time_interval(n, unit))
 			ok = false
 			continue
 		}
@@ -87,13 +67,13 @@ fn main() {
 		}
 	}
 	if !ok {
-		error_exit('') // print helping hint then exit
+		common.exit_with_error_message(cmd_ns, '')
 	}
 	// if seconds = +inf, it would not sleep
 	// but orginal `sleep` would sleep
-	t := ticks()
-	sleep(seconds * time.second) // in nanoseconds
-	$if debug {
-		println(ticks() - t)
+	t := time.ticks()
+	time.sleep(seconds * time.second)
+	$if trace_sleep_ticks ? {
+		println(time.ticks() - t)
 	}
 }
