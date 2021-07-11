@@ -29,12 +29,12 @@ Contributions are welcome!
 Please only contribute versions of the original utilities written in V.
 Contributions written in other langauges will likely be rejected.
 
-## Completed (12/109)
+## Completed (13/109)
 
 | Done    | Cmd       | Descripton                                       |
 | :-----: |-----------|--------------------------------------------------|
 |         | **[**     | Alternate form of `test`                         |
-|         | arch      | Print machine hardware name                      |
+| &check; | arch      | Print machine hardware name                      |
 |         | b2sum     | Print or check BLAKE2 digests                    |
 |         | base32    | Transform data into printable data               |
 |         | base64    | Transform data into printable data               |
