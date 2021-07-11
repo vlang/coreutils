@@ -1,92 +1,40 @@
-import os
+import common.testing
 
-const cmd_ns = 'printenv'
+const the_executable = testing.prepare_executable('printenv')
 
-fn test_help() {
-	result_v := os.execute('v -cg run src/$cmd_ns --help')
-	assert result_v.exit_code == 0
-}
+const cmd = testing.new_paired_command('printenv', the_executable)
 
-fn test_version() {
-	result_v := os.execute('v -cg run src/$cmd_ns --version')
-	assert result_v.exit_code == 0
+fn test_help_and_version() {
+	cmd.ensure_help_and_version_options_work()
 }
 
 fn test_unknown_option() {
-	result_v := os.execute('v -cg run src/$cmd_ns -x')
-	assert result_v.exit_code == 1
+	testing.command_fails('$the_executable -x')
 }
 
 fn test_print_all_default() {
-	result_origin := os.execute('$cmd_ns')
-	result_v := os.execute('v -cg run src/$cmd_ns')
-	assert result_v.exit_code == result_origin.exit_code
-	for line in result_v.output.split('\n') {
-		assert result_origin.output.contains(line) == true
-	}
+	cmd.same_results('')
 }
 
-fn v_run(what string, runargs string) os.Result {
-	cres := os.execute('v -cg $what')
-	assert cres.exit_code == 0
-	return os.execute('$what/$what $runargs')
-}
-
-// TODO: Fix the error when running with the `--null` option
-/*
 fn test_print_all_nul_terminate() {
-	mut result_origin := os.execute('$cmd_ns -0')
-	mut result_v :=os.execute('v -cg src/$cmd_ns -0')
-	assert result_v.exit_code == result_origin.exit_code
-	assert result_v.output.split_into_lines().len == result_origin.output.split_into_lines().len
-
-	result_origin = os.execute('$cmd_ns --null')
-	result_v =os.execute('v -cg src/$cmd_ns --null')
-	assert result_v.exit_code == result_origin.exit_code
-	assert result_v.output.split_into_lines().len == result_origin.output.split_into_lines().len
-}*/
+	cmd.same_results('-0')
+	cmd.same_results('--null')
+}
 
 fn test_print_one_exist_env() {
-	mut result_origin := os.execute('$cmd_ns LANGUAGE')
-	mut result_v := os.execute('v -cg run src/$cmd_ns LANGUAGE')
-	assert result_v.exit_code == result_origin.exit_code
-	assert result_v.output == result_origin.output
+	cmd.same_results('LANGUAGE')
+	cmd.same_results('USER')
 
-	result_origin = os.execute('$cmd_ns -0 LANGUAGE')
-	result_v = os.execute('v -cg run src/$cmd_ns -0 LANGUAGE')
-	assert result_v.exit_code == result_origin.exit_code
-	assert result_v.output == result_origin.output
-
-	result_origin = os.execute('$cmd_ns LANGUAGE  -0')
-	result_v = os.execute('v -cg run src/$cmd_ns LANGUAGE  -0')
-	assert result_v.exit_code == result_origin.exit_code // 1
-	assert result_v.output == result_origin.output
+	cmd.same_results('-0 LANGUAGE')
+	cmd.same_results('LANGUAGE  -0')
 }
 
 fn test_print_not_exist_env() {
-	mut result_origin := os.execute('$cmd_ns xxx')
-	mut result_v := os.execute('v -cg run src/$cmd_ns xxx')
-	assert result_v.exit_code == result_origin.exit_code
-	assert result_v.output == result_origin.output
-
-	result_origin = os.execute('$cmd_ns -0 xxx')
-	result_v = os.execute('v -cg run src/$cmd_ns -0 xxx')
-	assert result_v.exit_code == result_origin.exit_code
-	assert result_v.output == result_origin.output
+	cmd.same_results('xxx')
+	cmd.same_results('-0 xxx')
 }
 
-fn test_print_some_env() {
-	mut result_origin := os.execute('$cmd_ns LANGUAGE PWD')
-	mut result_v := os.execute('v -cg run src/$cmd_ns LANGUAGE PWD')
-	assert result_v.exit_code == result_origin.exit_code
-	assert result_v.output == result_origin.output
-
-	// TODO : resolve the issue about
-	// getting different output from `os.execute`
-	/*
-	result_origin = os.execute('$cmd_ns -0 LANGUAGE LOGNAME')
-	result_v = os.execute('v -cg run src/$cmd_ns -0 LANGUAGE LOGNAME')
-	assert result_v.exit_code == result_origin.exit_code
-	assert result_v.output == result_origin.output
-	*/
+fn test_print_several_env_variables() {
+	cmd.same_results('LANGUAGE PWD')
+	cmd.same_results('-0 LANGUAGE LOGNAME')
 }
