@@ -3,14 +3,10 @@ import common.testing
 
 const the_executable = testing.prepare_executable('factor')
 
-fn test_help() {
-	res := os.execute('$the_executable --help')
-	assert res.exit_code == 0
-}
+const cmd = testing.new_paired_command('factor', the_executable)
 
-fn test_version() {
-	res := os.execute('$the_executable --version')
-	assert res.exit_code == 0
+fn test_help_and_version() {
+	cmd.ensure_help_and_version_options_work()
 }
 
 fn test_abcd() {
@@ -23,10 +19,13 @@ fn expected_result(input string, output []string) {
 	res := os.execute('$the_executable $input')
 	assert res.exit_code == 0
 	assert res.output.split_into_lines() == output
+	testing.same_results('factor $input', '$the_executable $input')
 }
 
 fn test_expected() {
-	expected_result('0', ['0: '])
+	expected_result('0', ['0:'])
+	expected_result('1', ['1:'])
+	expected_result('23', ['23: 23'])
 	expected_result('45', ['45: 3 3 5'])
 	expected_result('45 99', ['45: 3 3 5', '99: 3 3 11'])
 }

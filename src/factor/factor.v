@@ -30,7 +30,11 @@ fn prime_factors(product u64) []u64 {
 fn output_of(arg string) ?string {
 	if product := strconv.parse_uint(arg, 10, 64) {
 		factors := prime_factors(product)
-		return '$product: ${factors.map(it.str()).join(' ')}'
+		if factors.len > 0 {
+			return '$product: ${factors.map(it.str()).join(' ')}'
+		} else {
+			return '$product:'
+		}
 	}
 	return error('factor: ‘$arg’ is not a valid positive integer')
 }
