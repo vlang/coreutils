@@ -8,8 +8,8 @@ const cmd = testing.new_paired_command('sleep', the_executable)
 
 const cmd_ns = 'sleep'
 
-fn test_help_and_version() {
-	cmd.ensure_help_and_version_options_work()
+fn test_help_and_version() ? {
+	cmd.ensure_help_and_version_options_work() ?
 }
 
 fn test_unknown_option() {
@@ -18,14 +18,14 @@ fn test_unknown_option() {
 }
 
 fn test_missing_arg() {
-	cmd.same_results('')
+	assert cmd.same_results('')
 }
 
 fn test_invalid_interval() {
-	cmd.same_results('-- -1')
-	cmd.same_results('1a')
-	cmd.same_results('1s0')
-	cmd.same_results('0.01 -- -1 0.01 1a 0.01 1s0')
+	assert cmd.same_results('-- -1')
+	assert cmd.same_results('1a')
+	assert cmd.same_results('1s0')
+	assert cmd.same_results('0.01 -- -1 0.01 1a 0.01 1s0')
 	res := os.execute('$the_executable -1.7e+308')
 	assert res.exit_code == 1
 }
