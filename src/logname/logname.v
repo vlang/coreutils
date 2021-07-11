@@ -48,17 +48,6 @@ fn flags_common(args []string, app_name string, free_args_min int, free_args_max
 
 	// println(exec)
 
-	// --help and --version are standard flags for coreutils programs
-	help := fp.bool('help', 0, false, 'display this help and exit')
-	version := fp.bool('version', 0, false, 'output version information and exit')
-
-	if help {
-		success_exit(fp.usage())
-	}
-	if version {
-		success_exit(version_str) // Needs to be modified
-	}
-
 	fp.skip_executable()
 
 	return fp, exec
@@ -88,7 +77,7 @@ logname
 
 fn main() {
 	// Exec is not needed
-	fp, _ := flags_common_no_args(os.args, 'logname')
+	mut fp, _ := flags_common_no_args(os.args, 'logname')
 
 	fp.finalize() or { error_exit(err.str(), fp.usage()) }
 
