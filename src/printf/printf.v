@@ -400,7 +400,7 @@ fn v_sprintf(str string, _pt []string) (string, int, bool) {
 					`q` { apply_posix_escape(pt[p_index]) }
 					else { '' }
 				}
-				s = s[..len]
+				s = if len < s.len { s[..len] } else { s }
 				p_index++
 				res.write_string(s)
 				if ctrl_c {
