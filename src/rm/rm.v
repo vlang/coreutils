@@ -1,10 +1,11 @@
 import os
 import flag
+import common
 
+/*** Constants and simple string substitution functions ***/
 const (
-	version_str         = 'V Coreutils 0.0.1'
+	name = 'rm'
 	interactive_yes     = ['y']
-	try_help            = "Try 'rm --help' for more information"
 	invalid_interactive = 'Invalid for interactive. Use either of [never, no, none], [once], [always, yes]'
 	valid_interactive   = [
 		['never', 'no', 'none'],
@@ -25,11 +26,11 @@ fn prompt_file(path string) string {
 }
 
 fn err_is_dir(path string) string {
-	return "rm: cannot remove '$path': Is a directory"
+	return "cannot remove '$path': Is a directory"
 }
 
 fn err_is_dir_empty(path string) string {
-	return "rm: cannot remove '$path': Directory not empty"
+	return "cannot remove '$path': Directory not empty"
 }
 
 fn prompt_descend(path string) string {
@@ -49,7 +50,8 @@ fn prompt_dir(path string) string {
 }
 
 fn rem_args(len int) string {
-	return 'Remove $len args? '
+	arg := if len == 1 { 'argument' } else { 'arguments' }
+	return 'Remove $len $arg? '
 }
 
 fn rem_recurse(len int) string {
@@ -57,10 +59,9 @@ fn rem_recurse(len int) string {
 	return 'rm: remove $len $arg recursively? '
 }
 
-fn not_exist(path string) string {
-	return 'rm: cannot remove $path: No such file or directory'
-}
+/*** End of constants and string substitution functions ***/
 
+/*** RmCommand struct to hold values ***/
 struct RmCommand {
 	recursive   bool
 	dir         bool
@@ -73,13 +74,13 @@ struct RmCommand {
 fn (r RmCommand) rm_dir(path string) {
 	if !r.recursive {
 		if !r.dir {
-			eprintln(err_is_dir(path))
+			error_message(name,err_is_dir(path))
 			return
 		}
 
 		// --dir flag set, so remove if empty dir
 		if !os.is_dir_empty(path) {
-			eprintln(err_is_dir_empty(path))
+			error_message(name,err_is_dir_empty(path))
 			return
 		}
 	}
@@ -152,30 +153,21 @@ fn (r RmCommand) rm_path(path string) {
 		return
 	}
 	if !r.interactive || r.force || r.int_yes(prompt_file(path)) {
-		os.rm(path) or { eprintln(err.str()) }
+		os.rm(path) or { 
+			error_message(name,err.msg)
+		}
 		if r.verbose {
 			println(rem(path))
 		}
 	}
 }
 
-/*
-The following block has been created in this file, but should be extracted to a common module for use by all utils
-*/
-// A default error exit, when code is not important
-fn error_exit(errors ...string) {
-	error_exit_code(1, ...errors)
-}
-
-// Use only if error code is important (some semantic meaning to particular codes)
-fn error_exit_code(code int, errors ...string) {
-	for error in errors {
-		eprintln(error)
+fn error_message(tool_name string, error string) {
+	if error.len > 0 {
+	eprintln('$tool_name: $error')
 	}
-	exit(code)
 }
 
-// Use if successful exit
 fn success_exit(messages ...string) {
 	for message in messages {
 		println(message)
@@ -183,44 +175,6 @@ fn success_exit(messages ...string) {
 	exit(0)
 }
 
-/*
-** Standard function to perform basic flag parsing an help and version processing
-** params: args - string array (should usually be os.args in main function)
-** returns: FlagParser object reference, exec name
-** logic: Creates a parser with given arguments. Checks if --help or --version flag are present, and prints and exits if yes
-*/
-
-fn flags_common(args []string, app_name string, free_args_min int, free_args_max int) (&flag.FlagParser, string) {
-	// Flags
-	mut fp := flag.new_flag_parser(os.args)
-	fp.application(app_name)
-	fp.limit_free_args(free_args_min, free_args_max)
-	fp.version(version_str) // Preferably take from common version constant, should be updated regularly
-	fp.description('Remove files as mentioned')
-	exec := fp.args[0]
-
-	// println(exec)
-
-	// --help and --version are standard flags for coreutils programs
-	help := fp.bool('help', 0, false, 'display this help and exit')
-	version := fp.bool('version', 0, false, 'output version information and exit')
-
-	if help {
-		success_exit(fp.usage())
-	}
-	if version {
-		success_exit(version_str)
-	}
-	// Needs to be modified
-
-	fp.skip_executable()
-
-	return fp, exec
-}
-
-/*
-End of common block
-*/
 
 enum Interactive {
 	no
@@ -237,9 +191,11 @@ fn check_interactive(interactive string) ?Interactive {
 	return error(invalid_interactive)
 }
 
-fn setup_command(mut fp flag.FlagParser) ?(RmCommand, []string) {
-	mut recursive := fp.bool('recursive', `r`, false, 'recursive')
-	recursive = recursive || fp.bool('', `R`, false, '')
+fn setup_rm_command(mut fp flag.FlagParser) ?(RmCommand, []string) {
+	fp.application('rm')
+	fp.limit_free_args_to_at_least(1)
+	mut recursive := fp.bool('', `R`, false, '')
+	recursive = recursive || fp.bool('recursive', `r`, false, 'recursive')
 	dir := fp.bool('dir', `d`, false, 'dir')
 	force := fp.bool('force', `f`, false, 'force')
 	interactive := fp.string('interactive', 0, '', 'interactive')
@@ -250,10 +206,19 @@ fn setup_command(mut fp flag.FlagParser) ?(RmCommand, []string) {
 		int_type = Interactive.no
 	}
 	interactive_all := fp.bool('', `i`, false, 'interactive always') || (int_type == .yes)
-	less_int := fp.bool('', `I`, false, 'less interactive') || (int_type == .once)
+	less_int := fp.bool('', `I`, false, 'interactive once') || (int_type == .once)
 
 	verbose := fp.bool('verbose', `v`, false, 'verbose')
 
+	help := fp.bool('help', 0, false, 'display this help and exit')
+	version := fp.bool('version', 0, false, 'output version information and exit')
+
+	if help {
+		success_exit(fp.usage())
+	}
+	if version {
+		success_exit('rm ${common.coreutils_version()}')
+	}
 	rm := RmCommand{
 		recursive: recursive
 		dir: dir
@@ -266,19 +231,11 @@ fn setup_command(mut fp flag.FlagParser) ?(RmCommand, []string) {
 	return rm, files
 }
 
-fn has_dir(files []string) bool {
-	mut ret := false
-	for file in files {
-		ret = ret || os.is_dir(file)
-	}
-	return ret
-}
-
 fn main() {
-	mut fp, _ := flags_common(os.args, 'rm', 1, flag.max_args_number)
+	mut fp := common.flag_parser(os.args)
 
-	rm, files := setup_command(mut fp) or {
-		error_exit(err.str(), try_help)
+	rm, files := setup_rm_command(mut fp) or {
+		common.exit_with_error_message(name, err.msg)
 		return
 	}
 
@@ -296,11 +253,7 @@ fn main() {
 		}
 	}
 	for file in files {
-		if !os.exists(file) {
-			eprintln(not_exist(file))
-		} else {
 			rm.rm_path(file)
-		}
 	}
 	success_exit()
 }
