@@ -5,7 +5,9 @@ import strings
 import strconv
 
 const appname = 'printf'
+
 const version = 'v0.0.1'
+
 const usage = '$appname $version
 ----------------------------------------------
 Usage: printf FORMAT [ARGUMENT]...
@@ -52,15 +54,15 @@ fn main() {
 	}
 }
 
-const control_ch = {
-	`a`: `\a`,
-	`b`: `\b`,
-	`e`: `\e`,
-	`f`: `\f`,
-	`n`: `\n`,
-	`r`: `\r`,
-	`t`: `\t`,
-	`v`: `\v`,
+const control_ch = map{
+	`a`: `\a`
+	`b`: `\b`
+	`e`: `\e`
+	`f`: `\f`
+	`n`: `\n`
+	`r`: `\r`
+	`t`: `\t`
+	`v`: `\v`
 }
 
 fn apply_controls(s string, zero_top bool) (string, bool) {
@@ -86,7 +88,7 @@ fn apply_controls(s string, zero_top bool) (string, bool) {
 					`c` {
 						return out.str(), true
 					}
-					`0` ... `7` {
+					`0`...`7` {
 						if zero_top && ch2 == `0` {
 							if idx >= s.len || !s[idx].is_oct_digit() {
 								out.write_b(`\0`)
@@ -96,7 +98,7 @@ fn apply_controls(s string, zero_top bool) (string, bool) {
 						}
 						mut out_ch := byte(0)
 						idx--
-						for _ in 0..3 {
+						for _ in 0 .. 3 {
 							num := s[idx] - `0`
 							out_ch *= 8
 							out_ch += num
@@ -113,11 +115,11 @@ fn apply_controls(s string, zero_top bool) (string, bool) {
 							continue
 						}
 						mut out_ch := byte(0)
-						for _ in 0..2 {
+						for _ in 0 .. 2 {
 							num := byte(match s[idx] {
-								`0` ... `9` { s[idx] - `0` }
-								`A` ... `F` { s[idx] - `A` + 10 }
-								`a` ... `f` { s[idx] - `a` + 10 }
+								`0`...`9` { s[idx] - `0` }
+								`A`...`F` { s[idx] - `A` + 10 }
+								`a`...`f` { s[idx] - `a` + 10 }
 								else { rune(0) }
 							})
 							out_ch *= 16
@@ -135,11 +137,11 @@ fn apply_controls(s string, zero_top bool) (string, bool) {
 							continue
 						}
 						mut out_ch := u32(0)
-						for _ in 0..4 {
+						for _ in 0 .. 4 {
 							num := u32(match s[idx] {
-								`0` ... `9` { s[idx] - `0` }
-								`A` ... `F` { s[idx] - `A` + 10 }
-								`a` ... `f` { s[idx] - `a` + 10 }
+								`0`...`9` { s[idx] - `0` }
+								`A`...`F` { s[idx] - `A` + 10 }
+								`a`...`f` { s[idx] - `a` + 10 }
 								else { rune(0) }
 							})
 							out_ch *= 16
@@ -157,11 +159,11 @@ fn apply_controls(s string, zero_top bool) (string, bool) {
 							continue
 						}
 						mut out_ch := u32(0)
-						for _ in 0..8 {
+						for _ in 0 .. 8 {
 							num := u32(match s[idx] {
-								`0` ... `9` { s[idx] - `0` }
-								`A` ... `F` { s[idx] - `A` + 10 }
-								`a` ... `f` { s[idx] - `a` + 10 }
+								`0`...`9` { s[idx] - `0` }
+								`A`...`F` { s[idx] - `A` + 10 }
+								`a`...`f` { s[idx] - `a` + 10 }
 								else { rune(0) }
 							})
 							out_ch *= 16
@@ -227,7 +229,7 @@ fn apply_posix_escape(s string) string {
 	mut upout := strings.new_builder(s.len)
 	for ch in s {
 		match ch {
-			0 ... 0x1f {
+			0...0x1f {
 				has_unprintable = true
 				upout.write_string(unprintables[ch])
 			}
@@ -240,25 +242,34 @@ fn apply_posix_escape(s string) string {
 			}
 		}
 	}
-	return if has_unprintable {
-		'\$\'$upout\''
-	} else {
-		s.replace_each([
-			'|', '\\|',
-			'&', '\\&',
-			';', '\\;',
-			'<', '\\<',
-			'>', '\\>',
-			'(', '\\(',
-			')', '\\)',
-			'\$', '\\\$',
-			'`', '\\`',
-			'\'', '\\'+'\'', // TODO: v must fix this
-			'\\', '\\\\',
-			'"', '\\"',
-			' ', '\\ ',
-		])
-	}
+	return if has_unprintable { '\$\'$upout\'' } else { s.replace_each([
+			'|',
+			'\\|',
+			'&',
+			'\\&',
+			';',
+			'\\;',
+			'<',
+			'\\<',
+			'>',
+			'\\>',
+			'(',
+			'\\(',
+			')',
+			'\\)',
+			'\$',
+			'\\\$',
+			'`',
+			'\\`',
+			"'",
+			'\\' + "'", // TODO: v must fix this
+			'\\',
+			'\\\\',
+			'"',
+			'\\"',
+			' ',
+			'\\ ',
+		]) }
 }
 
 // A code below is modded version of vlib/strconv/vprintf.v whose parameter to be an array of string
@@ -395,10 +406,20 @@ fn v_sprintf(str string, _pt []string) (string, int, bool) {
 				v_sprintf_panic(mut pt, p_index, pt.len)
 				mut ctrl_c := false
 				mut s := match fc_ch2 {
-					`s` { pt[p_index] }
-					`b` { ss, ctrl_c_ := apply_controls(pt[p_index], true) ctrl_c = ctrl_c_ ss }
-					`q` { apply_posix_escape(pt[p_index]) }
-					else { '' }
+					`s` {
+						pt[p_index]
+					}
+					`b` {
+						ss, ctrl_c_ := apply_controls(pt[p_index], true)
+						ctrl_c = ctrl_c_
+						ss
+					}
+					`q` {
+						apply_posix_escape(pt[p_index])
+					}
+					else {
+						''
+					}
 				}
 				s = if len < s.len { s[..len] } else { s }
 				p_index++
@@ -737,10 +758,20 @@ fn v_sprintf(str string, _pt []string) (string, int, bool) {
 				v_sprintf_panic(mut pt, p_index, pt.len)
 				mut ctrl_c := false
 				s1 := match ch {
-					`s` { pt[p_index] }
-					`b` { ss, ctrl_c_ := apply_controls(pt[p_index], true) ctrl_c = ctrl_c_ ss }
-					`q` { apply_posix_escape(pt[p_index]) }
-					else { '' }
+					`s` {
+						pt[p_index]
+					}
+					`b` {
+						ss, ctrl_c_ := apply_controls(pt[p_index], true)
+						ctrl_c = ctrl_c_
+						ss
+					}
+					`q` {
+						apply_posix_escape(pt[p_index])
+					}
+					else {
+						''
+					}
 				}
 				pad_ch = ` `
 				res.write_string(strconv.format_str(s1,
@@ -773,7 +804,7 @@ fn v_sprintf(str string, _pt []string) (string, int, bool) {
 fn v_sprintf_panic(mut pt []string, idx int, len int) {
 	if idx >= len {
 		pt << ''
-		//panic('${idx + 1} % conversion specifiers, but given only $len args')
+		// panic('${idx + 1} % conversion specifiers, but given only $len args')
 	}
 }
 
