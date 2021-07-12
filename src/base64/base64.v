@@ -118,34 +118,28 @@ fn decode_and_print(mut file os.File) {
 	mut out_buffer := []byte{len: buffer_size_decode}
 
 	// read the file in chunks for constant memory usage.
-	mut pos := u64(0)
 	for {
-		r_bytes := file.read_bytes_into(pos, mut in_buffer) or {
-			match err {
-				none {
-					0
-				}
-				else {
-					-1
-				}
-			}
-		}
-
-		match r_bytes {
-			0 {
-				break
-			}
-			-1 {
+		mut n_bytes := 0
+		// using slice magic to overwrite possible '\n' and fill the single
+		// buffer with pure base64 encoded data only.
+		for {
+			r_bytes := file.read_bytes_into_newline(mut in_buffer[n_bytes..]) or {
 				eprintln('$application_name: Cannot read file')
 				exit(1)
 			}
-			else {
-				pos += u64(r_bytes)
+			// edge case, when buffer is filled completely and last element it not \n
+			if r_bytes == 0 || ((n_bytes + r_bytes) == buffer_size_decode
+				&& in_buffer.last() != `\n`) {
+				break
 			}
+			n_bytes = n_bytes + r_bytes - 1 // overwrite newline
+		}
+		if n_bytes <= 0 {
+			break
 		}
 
 		unsafe {
-			base64_string := tos(in_buffer.data, r_bytes)
+			base64_string := tos(in_buffer.data, n_bytes)
 			e_bytes := base64.decode_in_buffer(base64_string, out_buffer.data)
 			std_out.write(out_buffer[..e_bytes]) or {
 				eprintln(err)
