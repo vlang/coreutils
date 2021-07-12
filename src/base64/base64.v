@@ -39,6 +39,8 @@ fn encode_and_print(mut file os.File, wrap int) {
 	mut in_buffer := []byte{len: chunk_size_encode}
 	mut out_buffer := []byte{len: buffer_size_encode}
 
+	// remember last column that was printed in the previous chunk.
+	mut last_column := 0
 	// read the file in chunks for constant memory usage.
 	mut pos := u64(0)
 	for {
@@ -72,7 +74,8 @@ fn encode_and_print(mut file os.File, wrap int) {
 		if wrap != 0 {
 			mut p_bytes := 0
 			for ((e_bytes - p_bytes) >= wrap) {
-				write_to := p_bytes + wrap
+				// Don't write further than wrap.
+				write_to := p_bytes + wrap - last_column
 				std_out.write(out_buffer[p_bytes..write_to]) or {
 					eprintln(err)
 					exit(1)
@@ -80,23 +83,28 @@ fn encode_and_print(mut file os.File, wrap int) {
 				// flushing is needed here, as otherwise all writes are cached.
 				std_out.flush()
 				print('\n')
-				p_bytes += wrap
+				p_bytes += wrap - last_column
+				// reset last_column as we have filled up the row.
+				last_column = 0
 			}
 			// print rest of the data.
-			l_bytes := std_out.write(out_buffer[p_bytes..e_bytes]) or {
+			std_out.write(out_buffer[p_bytes..e_bytes]) or {
 				eprintln(err)
 				exit(1)
 			}
 			std_out.flush()
-			if l_bytes != 0 {
-				print('\n')
-			}
+			// remember column for the next chunk.
+			last_column = e_bytes - p_bytes
 		} else {
 			std_out.write(out_buffer[..e_bytes]) or {
 				eprintln(err)
 				exit(1)
 			}
 		}
+	}
+	// print final \n only if there is no newline yet and wrapping is enabled.
+	if wrap != 0 && last_column != 0 {
+		print('\n')
 	}
 }
 
