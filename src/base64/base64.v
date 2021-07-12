@@ -14,8 +14,8 @@ const (
 	// multiple of 4 so we can decode the data in chunks and concatenate
 	chunk_size_decode  = 16 * 1024
 
-	// 3/4 of chunk_size_decode
-	buffer_size_decode = 3 * (16 / 4) * 1024
+	// more than 3/4 of chunk_size_decode
+	buffer_size_decode = 16 * 1024
 )
 
 fn get_file(args []string) os.File {
@@ -44,7 +44,7 @@ fn encode_and_print(mut file os.File, wrap int) {
 	// read the file in chunks for constant memory usage.
 	mut pos := u64(0)
 	for {
-		r_bytes := file.read_bytes_into(pos, mut in_buffer) or {
+		read_bytes := file.read_bytes_into(pos, mut in_buffer) or {
 			match err {
 				none {
 					0
@@ -55,7 +55,7 @@ fn encode_and_print(mut file os.File, wrap int) {
 			}
 		}
 
-		match r_bytes {
+		match read_bytes {
 			0 {
 				break
 			}
@@ -64,39 +64,39 @@ fn encode_and_print(mut file os.File, wrap int) {
 				exit(1)
 			}
 			else {
-				pos += u64(r_bytes)
+				pos += u64(read_bytes)
 			}
 		}
 
-		e_bytes := base64.encode_in_buffer(in_buffer[..r_bytes], out_buffer.data)
+		encoded_bytes := base64.encode_in_buffer(in_buffer[..read_bytes], out_buffer.data)
 
 		// print newlines after specified wrap.
 		if wrap != 0 {
-			mut p_bytes := 0
-			for ((e_bytes - p_bytes) >= wrap) {
+			mut printed_bytes := 0
+			for ((encoded_bytes - printed_bytes) >= wrap) {
 				// Don't write further than wrap.
-				write_to := p_bytes + wrap - last_column
-				std_out.write(out_buffer[p_bytes..write_to]) or {
+				write_to := printed_bytes + wrap - last_column
+				std_out.write(out_buffer[printed_bytes..write_to]) or {
 					eprintln(err)
 					exit(1)
 				}
 				// flushing is needed here, as otherwise all writes are cached.
 				std_out.flush()
 				print('\n')
-				p_bytes += wrap - last_column
+				printed_bytes += wrap - last_column
 				// reset last_column as we have filled up the row.
 				last_column = 0
 			}
 			// print rest of the data.
-			std_out.write(out_buffer[p_bytes..e_bytes]) or {
+			std_out.write(out_buffer[printed_bytes..encoded_bytes]) or {
 				eprintln(err)
 				exit(1)
 			}
 			std_out.flush()
 			// remember column for the next chunk.
-			last_column = e_bytes - p_bytes
+			last_column = encoded_bytes - printed_bytes
 		} else {
-			std_out.write(out_buffer[..e_bytes]) or {
+			std_out.write(out_buffer[..encoded_bytes]) or {
 				eprintln(err)
 				exit(1)
 			}
@@ -121,27 +121,28 @@ fn decode_and_print(mut file os.File) {
 	for {
 		mut n_bytes := 0
 		// using slice magic to overwrite possible '\n' and fill the single
-		// buffer with pure base64 encoded data only.
+		// buffer with base64 encoded data only.
 		for {
-			r_bytes := file.read_bytes_into_newline(mut in_buffer[n_bytes..]) or {
+			read_bytes := file.read_bytes_into_newline(mut in_buffer[n_bytes..]) or {
 				eprintln('$application_name: Cannot read file')
 				exit(1)
 			}
-			// edge case, when buffer is filled completely and last element it not \n
-			if r_bytes == 0 || ((n_bytes + r_bytes) == buffer_size_decode
-				&& in_buffer.last() != `\n`) {
+			// edge case, when buffer is filled completely and last element it not \n.
+			if read_bytes == 0 || ((n_bytes + read_bytes) == buffer_size_decode
+				&& in_buffer.last() != `\n`)
+				|| in_buffer[n_bytes + read_bytes - 1] != `\n` { // edge case, last read byte is not a newline.
+				n_bytes = n_bytes + read_bytes
 				break
 			}
-			n_bytes = n_bytes + r_bytes - 1 // overwrite newline
+			n_bytes = n_bytes + read_bytes - 1 // overwrite newline
 		}
 		if n_bytes <= 0 {
 			break
 		}
-
 		unsafe {
 			base64_string := tos(in_buffer.data, n_bytes)
-			e_bytes := base64.decode_in_buffer(base64_string, out_buffer.data)
-			std_out.write(out_buffer[..e_bytes]) or {
+			encoded_bytes := base64.decode_in_buffer(base64_string, out_buffer.data)
+			std_out.write(out_buffer[..encoded_bytes]) or {
 				eprintln(err)
 				exit(1)
 			}
