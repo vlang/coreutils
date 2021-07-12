@@ -78,7 +78,7 @@ fn error_message(tool_name string, error string) {
 	}
 }
 
-// Print messages and exit 
+// Print messages and exit
 fn success_exit(messages ...string) {
 	for message in messages {
 		println(message)
@@ -147,9 +147,7 @@ fn setup_rm_command(args []string) ?(RmCommand, []string) {
 // Entry point for all logic. Must be called from main
 pub fn run_rm(args []string) {
 	// Create command struct and accept flags and files
-	rm, files := rmutil.setup_rm_command(args) or {
-		common.exit_with_error_message(rmutil.name, err.msg)
-	}
+	rm, files := setup_rm_command(args) or { common.exit_with_error_message(rmutil.name, err.msg) }
 
 	// Take confirmation if necessary
 	if rm.confirm_int_once(files.len) {
