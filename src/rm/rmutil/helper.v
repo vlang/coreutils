@@ -86,13 +86,17 @@ fn success_exit(messages ...string) {
 	exit(0)
 }
 
-// Take user confirmation and check if it is considered yes
-fn int_yes(prompt string) bool {
+fn valid_yes(input string) bool{
 	mut is_yes := false
-	for yes in rmutil.interactive_yes {
-		is_yes = is_yes || os.input(prompt).to_lower().contains(yes)
+	low_input := input.to_lower()
+	for yes in interactive_yes {
+		is_yes = is_yes || low_input.starts_with(yes)
 	}
 	return is_yes
+}
+// Take user confirmation and check if it is considered yes
+fn int_yes(prompt string) bool {
+	return valid_yes(os.input(prompt))
 }
 
 // Check if value provided for interactive option is valid
@@ -138,9 +142,10 @@ fn setup_rm_command(args []string) ?(RmCommand, []string) {
 		success_exit('rm $common.coreutils_version()')
 	}
 
-	rm := RmCommand{recursive, dir, interactive, less_int, verbose, force}
+	rm := RmCommand{recursive, dir, interactive, verbose, force, less_int}
 
 	files := fp.finalize() ?
+	// println(rm)
 	return rm, files
 }
 

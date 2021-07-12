@@ -1,5 +1,3 @@
-module main
-
 import os
 import src.rm.rmutil
 
