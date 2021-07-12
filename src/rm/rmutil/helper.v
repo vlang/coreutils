@@ -43,6 +43,9 @@ fn err_is_dir_empty(path string) string {
 	return "cannot remove '$path': Directory not empty"
 }
 
+fn err_not_exist(path string) string {
+	return "failed to remove '$path: No such file or directory"
+}
 fn prompt_descend(path string) string {
 	return "rm: descend into directory '$path'? "
 }
