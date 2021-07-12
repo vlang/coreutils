@@ -1,7 +1,7 @@
 module main
 
 import os
-import rmutil
+import src.rm.rmutil
 
 fn main() {
 	rmutil.run_rm(os.args)
