@@ -101,11 +101,18 @@ fn (r RmCommand) rm_dir_verbose_inter(path string) bool {
 
 // Take user confirmation if necessary
 fn (r RmCommand) int_yes(prompt string) bool {
+	// println(r.interactive)
+	// println(r.force)
 	return !r.interactive || r.force || int_yes(prompt)
 }
 
 // Entry point into rm logic.
 fn (r RmCommand) rm_path(path string) {
+	if !os.exists(path) {
+		error_message(name,err_not_exist(path))
+		return
+	}
+	// println('here')
 	if os.is_dir(path) {
 		r.rm_dir(path)
 		return
