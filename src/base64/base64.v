@@ -6,10 +6,16 @@ const (
 	application_name   = 'base64'
 
 	// multiple of 3 so we can encode the data in chunks and concatenate
-	chunk_size         = 15 * 1024
+	chunk_size_encode  = 15 * 1024
 
-	// 4/3 of chunksize
+	// 4/3 of chunk_size_encode
 	buffer_size_encode = 4 * (15 / 3) * 1024
+
+	// multiple of 4 so we can decode the data in chunks and concatenate
+	chunk_size_decode  = 16 * 1024
+
+	// 3/4 of chunk_size_decode
+	buffer_size_decode = 3 * (16 / 4) * 1024
 )
 
 fn get_file(args []string) os.File {
@@ -30,7 +36,7 @@ fn encode_and_print(mut file os.File, wrap int) {
 		file.close()
 		std_out.close()
 	}
-	mut in_buffer := []byte{len: chunk_size}
+	mut in_buffer := []byte{len: chunk_size_encode}
 	mut out_buffer := []byte{len: buffer_size_encode}
 
 	// read the file in chunks for constant memory usage.
@@ -95,6 +101,50 @@ fn encode_and_print(mut file os.File, wrap int) {
 }
 
 fn decode_and_print(mut file os.File) {
+	mut std_out := os.stdout()
+	defer {
+		file.close()
+		std_out.close()
+	}
+	mut in_buffer := []byte{len: chunk_size_decode}
+	mut out_buffer := []byte{len: buffer_size_decode}
+
+	// read the file in chunks for constant memory usage.
+	mut pos := u64(0)
+	for {
+		r_bytes := file.read_bytes_into(pos, mut in_buffer) or {
+			match err {
+				none {
+					0
+				}
+				else {
+					-1
+				}
+			}
+		}
+
+		match r_bytes {
+			0 {
+				break
+			}
+			-1 {
+				eprintln('$application_name: Cannot read file')
+				exit(1)
+			}
+			else {
+				pos += u64(r_bytes)
+			}
+		}
+
+		unsafe {
+			base64_string := tos(in_buffer.data, r_bytes)
+			e_bytes := base64.decode_in_buffer(base64_string, out_buffer.data)
+			std_out.write(out_buffer[..e_bytes]) or {
+				eprintln(err)
+				exit(1)
+			}
+		}
+	}
 }
 
 fn main() {
@@ -107,7 +157,6 @@ fn main() {
 	fp.description('If no FILE is specified on the command line or FILE is -, read them from standard input.')
 
 	decode_opt := fp.bool('decode', `d`, false, 'decode data')
-	// ignore_garbage_opt := fp.bool('ignore-garbage', 0, false, 'when decoding, ignore non-alphabet characters')
 	wraping_opt := fp.int('wrap=', `w`, 76, 'wrap encoded lines after COLS character (default 76).\n\t\t\t\tUse 0 to disable line wrapping')
 	args := fp.finalize() or {
 		eprintln(err)
