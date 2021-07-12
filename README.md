@@ -34,7 +34,11 @@ Contributions are welcome!
 Please only contribute versions of the original utilities written in V.
 Contributions written in other languages will likely be rejected.
 
+<<<<<<< HEAD
 ## Completed (40/109)
+=======
+## Completed (14/109)
+>>>>>>> 10002e3 (Checked in README)
 
 |  Done   | Cmd       | Descripton                                       |
 | :-----: | --------- | ------------------------------------------------ |
@@ -107,7 +111,11 @@ Contributions written in other languages will likely be rejected.
 |         | readlink  | Print value of a symlink or canonical file name  |
 |         | realpath  | Print the resolved file name                     |
 | &check; | rm        | Remove files or directories                      |
+<<<<<<< HEAD
 | &check; | rmdir     | Remove empty directories                         |
+=======
+|         | rmdir     | Remove empty directories                         |
+>>>>>>> 10002e3 (Checked in README)
 |         | runcon    | Run a command in specified SELinux context       |
 | &check; | seq       | Print numeric sequences                          |
 | &check; | sha1sum   | Print or check SHA-1 digests                     |
