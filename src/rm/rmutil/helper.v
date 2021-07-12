@@ -46,6 +46,7 @@ fn err_is_dir_empty(path string) string {
 fn err_not_exist(path string) string {
 	return "failed to remove '$path: No such file or directory"
 }
+
 fn prompt_descend(path string) string {
 	return "rm: descend into directory '$path'? "
 }
@@ -89,14 +90,15 @@ fn success_exit(messages ...string) {
 	exit(0)
 }
 
-fn valid_yes(input string) bool{
+fn valid_yes(input string) bool {
 	mut is_yes := false
 	low_input := input.to_lower()
-	for yes in interactive_yes {
+	for yes in rmutil.interactive_yes {
 		is_yes = is_yes || low_input.starts_with(yes)
 	}
 	return is_yes
 }
+
 // Take user confirmation and check if it is considered yes
 fn int_yes(prompt string) bool {
 	return valid_yes(os.input(prompt))
