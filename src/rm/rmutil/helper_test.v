@@ -1,5 +1,6 @@
 module rmutil
-import os 
+
+import os
 
 fn test_valid_yes() {
 	assert valid_yes('y')
@@ -14,17 +15,18 @@ fn test_valid_yes() {
 	assert !valid_yes('n')
 	assert !valid_yes('no.. yes')
 }
-fn test_valid_setup_rm() ?{
-	args_no_flags := ['rm']
-	args_r := ['rm','-r','a']
-	args_r_i_v := ['rm','--recursive', '-i', '--verbose', 'a', 'b']
-	args_f_ic_v := ['rm','-f', '-I', '-v', 'a', 'b']
-	args_rc_f_i_ic := ['rm','--force', '--interactive=always', '-I', '-R', 'c']
 
-	rm1,files1 := setup_rm_command(args_no_flags) or {
-		rm2,files2 := setup_rm_command(args_r) ?
-		rm3,files3 := setup_rm_command(args_r_i_v) ?
-		rm4,files4 := setup_rm_command(args_f_ic_v) ?
+fn test_valid_setup_rm() ? {
+	args_no_flags := ['rm']
+	args_r := ['rm', '-r', 'a']
+	args_r_i_v := ['rm', '--recursive', '-i', '--verbose', 'a', 'b']
+	args_f_ic_v := ['rm', '-f', '-I', '-v', 'a', 'b']
+	args_rc_f_i_ic := ['rm', '--force', '--interactive=always', '-I', '-R', 'c']
+
+	rm1, files1 := setup_rm_command(args_no_flags) or {
+		rm2, files2 := setup_rm_command(args_r) ?
+		rm3, files3 := setup_rm_command(args_r_i_v) ?
+		rm4, files4 := setup_rm_command(args_f_ic_v) ?
 		rm5, files5 := setup_rm_command(args_rc_f_i_ic) ?
 
 		expect_rm2 := RmCommand{
@@ -35,12 +37,12 @@ fn test_valid_setup_rm() ?{
 			interactive: true
 			verbose: true
 		}
-		expect_rm4 := RmCommand {
+		expect_rm4 := RmCommand{
 			force: true
 			less_int: true
 			verbose: true
 		}
-		expect_rm5 := RmCommand {
+		expect_rm5 := RmCommand{
 			recursive: true
 			force: true
 			interactive: true
@@ -57,7 +59,7 @@ fn test_valid_setup_rm() ?{
 		assert rm5 == expect_rm5
 
 		expect_files2 := ['a']
-		expect_files3 := ['a','b']
+		expect_files3 := ['a', 'b']
 		expect_files4 := ['a', 'b']
 		expect_files5 := ['c']
 
@@ -71,21 +73,21 @@ fn test_valid_setup_rm() ?{
 	assert false
 }
 
-fn test_run_rm() ?{
-	path:='a'
+fn test_run_rm() ? {
+	path := 'a'
 	os.create(path) ?
 	assert os.exists(path)
-	args:=['rm',path]
+	args := ['rm', path]
 	run_rm(args)
 	assert !os.exists(path)
 
-	dir:='dir'
+	dir := 'dir'
 	os.mkdir(dir) ?
 	assert os.exists(dir)
-	args_dir:=['rm',dir]
+	args_dir := ['rm', dir]
 	run_rm(args_dir)
 	assert os.exists(dir)
-	args_dir_right:=['rm','-d',dir]
+	args_dir_right := ['rm', '-d', dir]
 	run_rm(args_dir_right)
 	assert !os.exists(dir)
 }

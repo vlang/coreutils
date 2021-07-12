@@ -109,7 +109,7 @@ fn (r RmCommand) int_yes(prompt string) bool {
 // Entry point into rm logic.
 fn (r RmCommand) rm_path(path string) {
 	if !os.exists(path) {
-		error_message(name,err_not_exist(path))
+		error_message(name, err_not_exist(path))
 		return
 	}
 	// println('here')
