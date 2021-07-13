@@ -4,17 +4,17 @@ import os
 
 //** RmCommand struct to hold values **
 struct RmCommand {
-	recursive   bool
+	recursive bool
 	// -r
-	dir         bool
+	dir bool
 	// -d
 	interactive bool
 	// -i, always
-	verbose     bool
+	verbose bool
 	// -v
-	force       bool
+	force bool
 	// -f
-	less_int    bool
+	less_int bool
 	// -I, once
 }
 
