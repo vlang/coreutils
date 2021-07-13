@@ -1,4 +1,8 @@
 // module rmutil
+<<<<<<< HEAD
+=======
+
+>>>>>>> cc59435 (Reorganized to avoid nesting)
 import os
 
 //** RmCommand struct to hold values **
@@ -45,7 +49,11 @@ fn (r RmCommand) rm_dir(path string) {
 			return
 		}
 
+<<<<<<< HEAD
 		os.rmdir(path) or { eprintln(err.msg()) }
+=======
+		os.rmdir(path) or { eprintln(err.msg) }
+>>>>>>> cc59435 (Reorganized to avoid nesting)
 		return
 	}
 
@@ -124,7 +132,11 @@ fn (r RmCommand) rm_path(path string) {
 		return
 	}
 	if r.int_yes(prompt_file(path)) {
+<<<<<<< HEAD
 		os.rm(path) or { error_message(name, err.msg()) }
+=======
+		os.rm(path) or { error_message(name, err.msg) }
+>>>>>>> cc59435 (Reorganized to avoid nesting)
 		if r.verbose {
 			println(rem(path))
 		}
