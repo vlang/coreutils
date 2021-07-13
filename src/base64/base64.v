@@ -142,8 +142,8 @@ fn decode_and_print(mut file os.File) {
 		}
 		unsafe {
 			base64_string := tos(in_buffer.data, n_bytes)
-			encoded_bytes := base64.decode_in_buffer(base64_string, out_buffer.data)
-			std_out.write(out_buffer[..encoded_bytes]) or {
+			decoded_bytes := base64.decode_in_buffer(base64_string, out_buffer.data)
+			std_out.write(out_buffer[..decoded_bytes]) or {
 				eprintln(err)
 				exit(1)
 			}

@@ -43,7 +43,7 @@ fn expected_result_decode(input string, output []string) {
 	testing.same_results('base64 $input', '$the_executable $input')
 }
 
-fn test_expected() ?{
+fn test_expected() ? {
 	mut f := os.open_file('textfile', 'w') ?
 	f.write_string('Hello World!\nHow are you?') ?
 	f.close()
