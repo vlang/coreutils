@@ -1,5 +1,5 @@
 import os
 fn main() {
-    path := os.getwd()
-    println(path)
+	path := os.getwd()
+	println(path)
 }
