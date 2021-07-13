@@ -29,7 +29,7 @@ Contributions are welcome!
 Please only contribute versions of the original utilities written in V.
 Contributions written in other langauges will likely be rejected.
 
-## Completed (13/109)
+## Completed (14/109)
 
 | Done    | Cmd       | Descripton                                       |
 | :-----: |-----------|--------------------------------------------------|
@@ -101,7 +101,7 @@ Contributions written in other langauges will likely be rejected.
 |         | pwd       | Print working directory                          |
 |         | readlink  | Print value of a symlink or canonical file name  |
 |         | realpath  | Print the resolved file name                     |
-|         | rm        | Remove files or directories                      |
+| &check; | rm        | Remove files or directories                      |
 |         | rmdir     | Remove empty directories                         |
 |         | runcon    | Run a command in specified SELinux context       |
 | &check; | seq       | Print numeric sequences                          |
