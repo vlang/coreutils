@@ -1,5 +1,4 @@
 module mvutil
 
-struct MvCommand{
-	
+struct MvCommand {
 }
