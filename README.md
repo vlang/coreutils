@@ -37,7 +37,7 @@ Contributions written in other langauges will likely be rejected.
 | &check; | arch      | Print machine hardware name                      |
 |         | b2sum     | Print or check BLAKE2 digests                    |
 |         | base32    | Transform data into printable data               |
-|         | base64    | Transform data into printable data               |
+| &check; | base64    | Transform data into printable data               |
 |         | basename  | Strip directory and suffix from a file name      |
 |         | basenc    | Transform data into printable data               |
 | &check; | cat       | Concatenate and write files                      |
