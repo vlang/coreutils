@@ -1,5 +1,3 @@
-module mvutil
-
 import common
 
 const (
@@ -7,7 +5,7 @@ const (
 )
 
 pub fn run_mv(args []string) {
-	mv := setup_mv_command(args) or { common.exit_with_error_message(mvutil.name, err.msg) }
+	mv := setup_mv_command(args) or { common.exit_with_error_message(name, err.msg) }
 	mv.run()
 }
 
