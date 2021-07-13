@@ -1,5 +1,4 @@
 // module rmutil
-
 import os
 import common
 

@@ -1,5 +1,4 @@
 // module rmutil
-
 import os
 
 fn test_valid_yes() {
