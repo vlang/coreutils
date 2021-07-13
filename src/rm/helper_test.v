@@ -1,8 +1,9 @@
-module rmutil
+// module rmutil
 
 import os
 
 fn test_valid_yes() {
+	// assert 1==2
 	assert valid_yes('y')
 	assert valid_yes('Y')
 	assert valid_yes('Yes')

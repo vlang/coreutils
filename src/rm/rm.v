@@ -1,6 +1,6 @@
 import os
-import src.rm.rmutil
+// import src.rm.rmutil
 
 fn main() {
-	rmutil.run_rm(os.args)
+	run_rm(os.args)
 }
