@@ -1,5 +1,6 @@
 import os
+import src.mv.mvutil
 
 fn main() {
-	run_mv(os.args)
+	mvutil.run_mv(os.args)
 }
