@@ -1,4 +1,5 @@
 module main
+
 import os
 
 fn test_valid_yes() {
