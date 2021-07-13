@@ -7,12 +7,13 @@ const (
 )
 
 pub fn run_mv(args []string) {
-	mv := setup_mv_command(args) or { common.exit_with_error_message(name,err.msg) }
+	mv := setup_mv_command(args) or { common.exit_with_error_message(mvutil.name, err.msg) }
 }
 
 fn setup_mv_command(args []string) ?MvCommand {
-	mut fp:= common.flag_parser(args)
+	mut fp := common.flag_parser(args)
 	fp.application('mv')
+	fp.limit_free_args_to_at_least(2)
 
 	help := fp.bool('help', 0, false, 'display this help and exit')
 	version := fp.bool('version', 0, false, 'output version information and exit')

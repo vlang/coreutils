@@ -4,12 +4,18 @@ import os
 
 //** RmCommand struct to hold values **
 struct RmCommand {
-	recursive   bool // -r
-	dir         bool // -d
-	interactive bool // -i, always
-	verbose     bool // -v
-	force       bool // -f
-	less_int    bool // -I, once
+	recursive   bool
+	// -r
+	dir         bool
+	// -d
+	interactive bool
+	// -i, always
+	verbose     bool
+	// -v
+	force       bool
+	// -f
+	less_int    bool
+	// -I, once
 }
 
 // If user confirmation needed at top, take it. Returns whether program can continue
@@ -112,6 +118,7 @@ fn (r RmCommand) rm_path(path string) {
 		error_message(name, err_not_exist(path))
 		return
 	}
+
 	// println('here')
 	if os.is_dir(path) {
 		r.rm_dir(path)

@@ -16,7 +16,6 @@ const (
 )
 
 // Enum for interactive level
-
 enum Interactive {
 	no
 	once
@@ -150,6 +149,7 @@ fn setup_rm_command(args []string) ?(RmCommand, []string) {
 	rm := RmCommand{recursive, dir, interactive, verbose, force, less_int}
 
 	files := fp.finalize() ?
+
 	// println(rm)
 	return rm, files
 }
