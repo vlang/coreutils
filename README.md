@@ -29,7 +29,7 @@ Contributions are welcome!
 Please only contribute versions of the original utilities written in V.
 Contributions written in other langauges will likely be rejected.
 
-## Completed (13/109)
+## Completed (14/109)
 
 | Done    | Cmd       | Descripton                                       |
 | :-----: |-----------|--------------------------------------------------|
@@ -131,7 +131,7 @@ Contributions written in other langauges will likely be rejected.
 |         | truncate  | Shrink or extend the size of a file              |
 |         | tsort     | Topological sort                                 |
 |         | tty       | Print file name of terminal on standard input    |
-|         | uname     | Print system information                         |
+| &check; | uname     | Print system information                         |
 |         | unexpand  | Convert spaces to tabs                           |
 |         | uniq      | Uniquify files                                   |
 |         | unlink    | Remove files via the unlink syscall              |

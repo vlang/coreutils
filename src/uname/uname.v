@@ -2,7 +2,6 @@ import os
 import common
 
 fn main() {
-	mut exit_code := 0
 	mut fp := common.flag_parser(os.args)
 	fp.application('uname')
 	fp.description('Print certain system information.')
@@ -55,13 +54,17 @@ fn main() {
 				`m` {
 					result << uname.machine
 				}
+				// the original gets processor & hardware platform from
+				// - `sysinfo()` in `sys/systeminfo.h`, or
+				// - `sysctl()` in  `sys/sysctl.h`
 				/*`p` {
-					result << '<processor>'
-				}
-				`i` {
-					result << '<hardware-platform>'
-				}
-				`o` {
+					result << uname.machine // Not sure
+				}*/
+				/*`i` {
+					result << uname.machine // Not sure
+				}*/
+				// the original prints `HOST_OPERATING_SYSTEM` which is in `config.h`
+				/*`o` {
 					result << '<operating-system>'
 				}*/
 				else {}
@@ -71,5 +74,4 @@ fn main() {
 	if result.len > 0 {
 		println(result.join(' '))
 	}
-	exit(exit_code)
 }
