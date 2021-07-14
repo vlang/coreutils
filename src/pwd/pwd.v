@@ -1,7 +1,7 @@
 import os
 
 fn main() {
-	args = os.args
+	args := os.args
 	path := os.getwd()
 	if os.user_os() == 'windows' {
 		if args[1] == '-L' {
