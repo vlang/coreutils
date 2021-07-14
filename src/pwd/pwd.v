@@ -11,6 +11,7 @@ fn main() {
 		}
 	} else {
 		if args[1] == '-L' {
+			PWD := os.getenv('PWD')
 			os.execute('echo $PWD')
 		} else if args[1] == '-P' {
 			println(path)
