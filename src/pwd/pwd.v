@@ -12,7 +12,7 @@ fn main() {
 				println('unknown option')
 			}
 		} else {
-			println(path)
+			os.execute('echo %cd%')
 		}
 	} else {
 		if os.args.len == 2 {
@@ -25,7 +25,8 @@ fn main() {
 				println('unknown option')
 			}
 		} else {
-			println(path)
+			pwd := os.getenv('PWD')
+			println(pwd)
 		}
 	}
 }
