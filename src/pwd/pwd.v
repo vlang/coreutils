@@ -5,9 +5,9 @@ fn main() {
 	if os.user_os() == 'windows' {
 		if os.args.len == 2 {
 			if os.args[1] == '-L' {
-				println(path)
-			} else if os.args[1] == '-P' {
 				os.execute('echo %cd%')
+			} else if os.args[1] == '-P' {
+				println(path)
 			} else {
 				println('unknown option')
 			}
@@ -17,11 +17,10 @@ fn main() {
 	} else {
 		if os.args.len == 2 {
 			if os.args[1] == '-L' {
-				println(path)
-			} else if os.args[1] == '-P' {
-				println(path)
 				pwd := os.getenv('PWD')
 				println(pwd)
+			} else if os.args[1] == '-P' {
+				println(path)
 			} else {
 				println('unknown option')
 			}
