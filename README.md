@@ -29,7 +29,7 @@ Contributions are welcome!
 Please only contribute versions of the original utilities written in V.
 Contributions written in other langauges will likely be rejected.
 
-## Completed (13/109)
+## Completed (16/109)
 
 | Done    | Cmd       | Descripton                                       |
 | :-----: |-----------|--------------------------------------------------|
@@ -37,7 +37,7 @@ Contributions written in other langauges will likely be rejected.
 | &check; | arch      | Print machine hardware name                      |
 |         | b2sum     | Print or check BLAKE2 digests                    |
 |         | base32    | Transform data into printable data               |
-|         | base64    | Transform data into printable data               |
+| &check; | base64    | Transform data into printable data               |
 |         | basename  | Strip directory and suffix from a file name      |
 |         | basenc    | Transform data into printable data               |
 | &check; | cat       | Concatenate and write files                      |
@@ -101,7 +101,7 @@ Contributions written in other langauges will likely be rejected.
 |         | pwd       | Print working directory                          |
 |         | readlink  | Print value of a symlink or canonical file name  |
 |         | realpath  | Print the resolved file name                     |
-|         | rm        | Remove files or directories                      |
+| &check; | rm        | Remove files or directories                      |
 |         | rmdir     | Remove empty directories                         |
 |         | runcon    | Run a command in specified SELinux context       |
 | &check; | seq       | Print numeric sequences                          |
@@ -131,7 +131,7 @@ Contributions written in other langauges will likely be rejected.
 |         | truncate  | Shrink or extend the size of a file              |
 |         | tsort     | Topological sort                                 |
 |         | tty       | Print file name of terminal on standard input    |
-|         | uname     | Print system information                         |
+| &check; | uname     | Print system information                         |
 |         | unexpand  | Convert spaces to tabs                           |
 |         | uniq      | Uniquify files                                   |
 |         | unlink    | Remove files via the unlink syscall              |
