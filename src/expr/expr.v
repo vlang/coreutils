@@ -276,8 +276,26 @@ fn (mut p Parser) primary() Value {
 			m := p.primary()
 			return match_str(s.str(), m.str())
 		}
-		'substr' { panic('unimplemented') }
-		'index' { panic('unimplemented') }
+		'substr' {
+			s := p.primary()
+			o := p.primary()
+			l := p.primary()
+
+			str := s.str()
+			pos := o.i64_opt() or { 0 }
+			len := l.i64_opt() or { 0 }
+			if pos < 1 || len < 1 {
+				return ''
+			}
+			start := if str.len < pos - 1 { i64(str.len) } else { pos - 1 }
+			end := if str.len < start + len { i64(str.len) } else { start + len }
+			return str[start..end]
+		}
+		'index' {
+			str := p.primary()
+			chr := p.primary()
+			return i64(str.str().index_any(chr.str()) + 1)
+		}
 		'length' {
 			val := p.primary()
 			return i64(val.str().len)
