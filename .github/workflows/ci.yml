@@ -23,7 +23,6 @@ jobs:
         cd -
     - name: V doctor
       run: v doctor
-
     - name: Ensure everything is formatted
       run: cd coreutils && make testfmt
 
