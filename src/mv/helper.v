@@ -7,6 +7,7 @@ const (
 	combine_t_no_t  = 'cannot combine --target-directory (-t) and --no-target-directory (-T)'
 )
 
+<<<<<<< HEAD
 fn prompt_file(path string) string {
 	return "overwrite '$path'? "
 }
@@ -71,6 +72,25 @@ fn setup_mv_command(args []string) ?(MvCommand, []string, string) {
 	no_clobber := fp.bool('no-clobber', `n`, false, 'do not overwrite')
 	update := fp.bool('update', `u`, false, 'update')
 	verbose := fp.bool('verbose', `v`, false, 'print each rename')
+=======
+pub fn run_mv(args []string) {
+	mv, sources, dest := setup_mv_command(args) or { common.exit_with_error_message(name, err.msg) }
+	println(sources)
+	println(dest)
+	mv.run()
+}
+
+fn setup_mv_command(args []string) ?(MvCommand, []string, string) {
+	mut fp := common.flag_parser(args)
+	fp.application('mv')
+	fp.limit_free_args_to_at_least(1)
+
+	force := fp.bool('force', `f`, false, 'force')
+	interactive := fp.bool('interactive', `i`, false, 'interactive')
+	no_clobber := fp.bool('no-clobber', `n`, false, 'no-clobber')
+	update := fp.bool('update', `u`, false, 'update')
+	verbose := fp.bool('verbose', `v`, false, 'verbose')
+>>>>>>> 1d918f5 (Main flags implemented)
 	target_directory := fp.string('target-directory', `t`, '', 'target-directory')
 	no_target_directory := fp.bool('no-target-directory', `T`, false, 'no-target-directory')
 
@@ -84,6 +104,7 @@ fn setup_mv_command(args []string) ?(MvCommand, []string, string) {
 	}
 
 	options := fp.finalize() or { common.exit_with_error_message(name, 'error') }
+<<<<<<< HEAD
 	overwrite := if force {
 		OverwriteMode.force
 	} else if no_clobber {
@@ -116,6 +137,11 @@ fn setup_mv_command(args []string) ?(MvCommand, []string, string) {
 				common.exit_with_error_message(name, no_dir_is_dir(options[1]))
 			}
 		}
+=======
+	len_options := options.len
+	if target_directory != '' && len_options < 2 {
+		common.exit_with_error_message(name, 'error')
+>>>>>>> 1d918f5 (Main flags implemented)
 	}
 	sources, dest := if target_directory != '' {
 		options, target_directory
@@ -124,21 +150,14 @@ fn setup_mv_command(args []string) ?(MvCommand, []string, string) {
 	}
 
 	return MvCommand{
-		overwrite: overwrite
+		force: force
+		interactive: interactive
+		no_clobber: no_clobber
 		update: update
 		verbose: verbose
 		target_directory: target_directory
 		no_target_directory: no_target_directory
 	}, sources, dest
-}
-
-// Print messages and exit with error
-[noreturn]
-fn error_exit(messages ...string) {
-	for message in messages {
-		eprintln(message)
-	}
-	exit(1)
 }
 
 // Print messages and exit
