@@ -10,8 +10,8 @@ fn main() {
 		}
 	} else {
 		if os.args[1] == '-L' {
-			PWD := os.getenv('PWD')
-			os.execute('echo $PWD')
+			pwd := os.getenv('PWD')
+			os.execute('echo $pwd')
 		} else if os.args[1] == '-P' {
 			println(path)
 		}
