@@ -315,7 +315,11 @@ fn (mut p Parser) primary() Value {
 		}
 		'length' {
 			val := p.primary().str()
-			return i64(if locale { utf8_str_len(val) } else { val.len })
+			return i64(if locale {
+				utf8_str_len(val)
+			} else {
+				val.len
+			})
 		}
 		else {
 			return tok
