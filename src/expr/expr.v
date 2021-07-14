@@ -63,19 +63,7 @@ fn main() {
 		string { result }
 		i64 { result.str() }
 	})
-	match result {
-		string {
-			if result == '' {
-				exit(1)
-			}
-		}
-		i64 {
-			if result == 0 {
-				exit(1)
-			}
-		}
-	}
-	exit(0)
+	exit(int(result.is_null()))
 }
 
 fn (mut p Parser) expr(prec int) Value {
@@ -99,10 +87,71 @@ const min_i64 = -max_i64 - 1
 
 fn calc_infix(operator string, left Value, right Value) Value {
 	match operator {
+		'|' {
+			return if left.is_null() {
+				right
+			} else {
+				left
+			}
+		}
+		'&' {
+			if left.is_null() || right.is_null() {
+				return i64(0)
+			}
+			return left
+		}
+		'<' {
+			if lnum := left.i64_opt() {
+				if rnum := right.i64_opt() {
+					return i64(lnum < rnum)
+				}
+			}
+			return i64(left.str() < right.str())
+		}
+		'<=' {
+			if lnum := left.i64_opt() {
+				if rnum := right.i64_opt() {
+					return i64(lnum <= rnum)
+				}
+			}
+			return i64(left.str() <= right.str())
+		}
+		'=' {
+			if lnum := left.i64_opt() {
+				if rnum := right.i64_opt() {
+					return i64(lnum == rnum)
+				}
+			}
+			return i64(left.str() == right.str())
+		}
+		'!=' {
+			if lnum := left.i64_opt() {
+				if rnum := right.i64_opt() {
+					return i64(lnum != rnum)
+				}
+			}
+			return i64(left.str() != right.str())
+		}
+		'>=' {
+			if lnum := left.i64_opt() {
+				if rnum := right.i64_opt() {
+					return i64(lnum >= rnum)
+				}
+			}
+			return i64(left.str() >= right.str())
+		}
+		'>' {
+			if lnum := left.i64_opt() {
+				if rnum := right.i64_opt() {
+					return i64(lnum > rnum)
+				}
+			}
+			return i64(left.str() > right.str())
+		}
 		'+' {
 			lnum := left.i64()
 			rnum := right.i64()
-			if (0 < left && max_i64 - left < right) || (0 > left && min_i64 - left > right) { // overflow check
+			if (0 < lnum && max_i64 - lnum < rnum) || (0 > lnum && min_i64 - lnum > rnum) { // overflow check
 				my_panic('result out of range', 2)
 			}
 			return lnum + rnum
@@ -110,13 +159,39 @@ fn calc_infix(operator string, left Value, right Value) Value {
 		'-' {
 			lnum := left.i64()
 			rnum := right.i64()
-			if (0 < right && min_i64 + right > left) || (0 > right && max_i64 + right < left) { // overflow check
+			if (0 < rnum && min_i64 + rnum > lnum) || (0 > rnum && max_i64 + rnum < lnum) { // overflow check
 				my_panic('result out of range', 2)
 			}
 			return lnum + rnum
 		}
+		'*' {
+			return left.i64() * right.i64()
+		}
+		'/' {
+			lnum := left.i64()
+			rnum := right.i64()
+			if rnum == 0 {
+				my_panic('division by 0', 2)
+			}
+			return lnum / rnum
+		}
+		'%' {
+			lnum := left.i64()
+			rnum := right.i64()
+			if rnum == 0 {
+				my_panic('division by 0', 2)
+			}
+			return lnum % rnum
+		}
+		':' {
+			return match_str(left.str(), right.str())
+		}
 		else { my_panic('expect operator', 2) }
 	}
+}
+
+fn match_str(s string, m string) Value {
+	return ''
 }
 
 fn (mut p Parser) primary() Value {
@@ -142,7 +217,11 @@ fn (mut p Parser) primary() Value {
 			}
 			my_panic('missing argument after `+`', 2)
 		}
-		'match' { panic('unimplemented') }
+		'match' {
+			s := p.primary()
+			m := p.primary()
+			return match_str(s.str(), m.str())
+		}
 		'substr' { panic('unimplemented') }
 		'index' { panic('unimplemented') }
 		'length' {
@@ -172,9 +251,32 @@ fn (v Value) str() string {
 
 fn (v Value) i64() i64 {
 	match v {
-		string { return strconv.common_parse_int(v, 0, 64, false, false) or { my_panic(err.msg, 2) } }
+		string { return strconv.parse_int(v, 0, 64) or { my_panic(err.msg, 2) } }
 		i64 { return v }
 	}
+}
+
+fn (v Value) i64_opt() ?i64 {
+	match v {
+		string { return strconv.parse_int(v, 0, 64) }
+		i64 { return v }
+	}
+}
+
+fn (v Value) is_null() bool {
+	match v {
+		string {
+			if v in ['', '0'] {
+				return true
+			}
+		}
+		i64 {
+			if v == 0 {
+				return true
+			}
+		}
+	}
+	return false
 }
 
 fn precedence(s string) int {
