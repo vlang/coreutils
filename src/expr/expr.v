@@ -18,7 +18,7 @@ Options:
   --help                   display this help and exit
   --version                output version information and exit'
 
-type Value = string | i64
+type Value = i64 | string
 
 struct Parser {
 	tokens []string
@@ -70,31 +70,24 @@ fn main() {
 
 fn (mut p Parser) expr(prec int) Value {
 	mut left := p.primary()
-	mut operator := p.get() or {
-		return left
-	}
+	mut operator := p.get() or { return left }
 	for prec < precedence(operator) {
 		p.idx++
 		right := p.expr(precedence(operator))
 		left = calc_infix(operator, left, right)
-		operator = p.get() or {
-			return left
-		}
+		operator = p.get() or { return left }
 	}
 	return left
 }
 
 const max_i64 = 9223372036854775807
+
 const min_i64 = -max_i64 - 1
 
 fn calc_infix(operator string, left Value, right Value) Value {
 	match operator {
 		'|' {
-			return if left.is_null() {
-				right
-			} else {
-				left
-			}
+			return if left.is_null() { right } else { left }
 		}
 		'&' {
 			if left.is_null() || right.is_null() {
@@ -188,13 +181,14 @@ fn calc_infix(operator string, left Value, right Value) Value {
 		':' {
 			return match_str(left.str(), right.str())
 		}
-		else { my_panic('expect operator', 2) }
+		else {
+			my_panic('expect operator', 2)
+		}
 	}
 }
 
 fn match_str(s string, _m string) Value {
 	m := replace_regex(_m)
-	println(m)
 	mut re := regex.regex_opt(m) or { my_panic('invalid regular expression', 2) }
 	re.flag |= regex.f_ms
 	start, end := re.match_string(s)
@@ -229,7 +223,7 @@ fn replace_regex(s string) string {
 				if is_escape {
 					out.write_b(i)
 				} else {
-					out.write_string('\\${[i].bytestr()}')
+					out.write_string('\\$[i].bytestr()')
 				}
 				is_escape = false
 			}
@@ -249,9 +243,7 @@ fn replace_regex(s string) string {
 }
 
 fn (mut p Parser) primary() Value {
-	tok := p.get() or {
-		my_panic('missing argument after `${p.tokens[p.idx - 1]}`', 2)
-	}
+	tok := p.get() or { my_panic('missing argument after `${p.tokens[p.idx - 1]}`', 2) }
 	p.idx++
 	match tok {
 		'(' {
