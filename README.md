@@ -29,7 +29,7 @@ Contributions are welcome!
 Please only contribute versions of the original utilities written in V.
 Contributions written in other langauges will likely be rejected.
 
-## Completed (17/109)
+## Completed (18/109)
 
 | Done    | Cmd       | Descripton                                       |
 | :-----: |-----------|--------------------------------------------------|
@@ -98,7 +98,7 @@ Contributions written in other langauges will likely be rejected.
 | &check; | printenv  | Print all or some environment variables          |
 | &check; | printf    | Format and print data                            |
 |         | ptx       | Produce permuted indexes                         |
-|         | pwd       | Print working directory                          |
+| &check; | pwd       | Print working directory                          |
 |         | readlink  | Print value of a symlink or canonical file name  |
 |         | realpath  | Print the resolved file name                     |
 | &check; | rm        | Remove files or directories                      |
