@@ -196,7 +196,8 @@ fn match_str(s string, _m string) Value {
 		if re.groups[0] == -1 {
 			return ''
 		} else {
-			return s[re.groups[0]..re.groups[1]]
+			ret := s[re.groups[0]..re.groups[1]]
+			return ret
 		}
 	} else {
 		return i64(if start == -1 {
@@ -223,7 +224,7 @@ fn replace_regex(s string) string {
 				if is_escape {
 					out.write_b(i)
 				} else {
-					out.write_string('\\$[i].bytestr()')
+					out.write_string('\\' + [i].bytestr())
 				}
 				is_escape = false
 			}
@@ -281,7 +282,8 @@ fn (mut p Parser) primary() Value {
 			}
 			start := if str.len < pos - 1 { i64(str.len) } else { pos - 1 }
 			end := if str.len < start + len { i64(str.len) } else { start + len }
-			return str[start..end]
+			ret := str[start..end]
+			return ret
 		}
 		'index' {
 			str := p.primary()
