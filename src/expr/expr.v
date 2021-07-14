@@ -18,6 +18,8 @@ Options:
   --help                   display this help and exit
   --version                output version information and exit'
 
+const locale = os.getenv('LANG').ends_with('UTF-8') || os.getenv('LANG').ends_with('utf8')
+
 type Value = i64 | string
 
 struct Parser {
@@ -202,6 +204,8 @@ fn match_str(s string, _m string) Value {
 	} else {
 		return i64(if start == -1 {
 			0
+		} else if locale {
+			utf8_str_len(s[start..end])
 		} else {
 			end - start
 		})
@@ -224,7 +228,7 @@ fn replace_regex(s string) string {
 				if is_escape {
 					out.write_b(i)
 				} else {
-					out.write_string('\\' + [i].bytestr())
+					out.write_string('\\' + i.ascii_str())
 				}
 				is_escape = false
 			}
@@ -280,19 +284,38 @@ fn (mut p Parser) primary() Value {
 			if pos < 1 || len < 1 {
 				return ''
 			}
-			start := if str.len < pos - 1 { i64(str.len) } else { pos - 1 }
-			end := if str.len < start + len { i64(str.len) } else { start + len }
-			ret := str[start..end]
-			return ret
+			if locale {
+				ustr := str.runes()
+				start := if ustr.len < pos - 1 { i64(ustr.len) } else { pos - 1 }
+				end := if ustr.len < start + len { i64(ustr.len) } else { start + len }
+				ret := ustr[start..end]
+				return ret.string()
+			} else {
+				start := if str.len < pos - 1 { i64(str.len) } else { pos - 1 }
+				end := if str.len < start + len { i64(str.len) } else { start + len }
+				ret := str[start..end]
+				return ret
+			}
 		}
 		'index' {
-			str := p.primary()
-			chr := p.primary()
-			return i64(str.str().index_any(chr.str()) + 1)
+			str := p.primary().str()
+			chr := p.primary().str()
+			if locale {
+				ustr := str.runes()
+				uchr := chr.runes()
+				for i, r in ustr {
+					if r in uchr {
+						return i64(i + 1)
+					}
+				}
+				return i64(0)
+			} else {
+				return i64(str.index_any(chr) + 1)
+			}
 		}
 		'length' {
-			val := p.primary()
-			return i64(val.str().len)
+			val := p.primary().str()
+			return i64(if locale { utf8_str_len(val) } else { val.len })
 		}
 		else {
 			return tok
