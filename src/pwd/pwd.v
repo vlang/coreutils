@@ -22,7 +22,7 @@ fn main() {
 			} else if os.args[1] == '-P' {
 				println(path)
 			} else {
-				println(path)
+				println('unknown option')
 			}
 		} else {
 			println(path)
