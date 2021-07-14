@@ -29,7 +29,7 @@ Contributions are welcome!
 Please only contribute versions of the original utilities written in V.
 Contributions written in other langauges will likely be rejected.
 
-## Completed (16/109)
+## Completed (17/109)
 
 | Done    | Cmd       | Descripton                                       |
 | :-----: |-----------|--------------------------------------------------|
@@ -62,7 +62,7 @@ Contributions written in other langauges will likely be rejected.
 | &check; | echo      | Print a line of text                             |
 |         | env       | Run a command in a modified environment          |
 |         | expand    | Convert tabs to spaces                           |
-|         | expr      | Evaluate expressions                             |
+| &check; | expr      | Evaluate expressions                             |
 | &check; | factor    | Print prime factors                              |
 | &check; | false     | Do nothing, unsuccessfully                       |
 |         | fmt       | Reformat paragraph text                          |
