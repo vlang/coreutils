@@ -3,7 +3,7 @@ import os
 fn main() {
 	path := os.getwd()
 	if os.user_os() == 'windows' {
-		if os.args.len == '2' {
+		if os.args.len == 2 {
 			if os.args[1] == '-L' {
 				os.execute('echo %cd%')
 			} else if os.args[1] == '-P' {
@@ -15,7 +15,7 @@ fn main() {
 			println(path)
 		}
 	} else {
-		if os.args.len == '2' {
+		if os.args.len == 2 {
 			if os.args[1] == '-L' {
 				pwd := os.getenv('PWD')
 				println(pwd)
