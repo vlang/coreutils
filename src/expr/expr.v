@@ -24,6 +24,12 @@ mut:
 	idx u64
 }
 
+[noreturn]
+fn my_panic(err string, code int) {
+	eprintln(err)
+	exit(code)
+}
+
 fn main() {
 	match os.args.len {
 		1 {
@@ -49,7 +55,10 @@ fn main() {
 	mut parser := Parser{
 		tokens: os.args[1..]
 	}
-	result := parser.expr()
+	result := parser.expr(-1)
+	if parser.idx < parser.tokens.len {
+		my_panic('unexpected argument `${parser.tokens[parser.idx]}`', 2)
+	}
 	println(match result {
 		string { result }
 		i64 { result.str() }
@@ -69,32 +78,69 @@ fn main() {
 	exit(0)
 }
 
-fn (mut p Parser) expr() Value {
-	return Value('')
+fn (mut p Parser) expr(prec int) Value {
+	mut left := p.primary()
+	mut operator := p.get() or {
+		return left
+	}
+	for prec < precedence(operator) {
+		p.idx++
+		right := p.expr(precedence(operator))
+		left = calc_infix(operator, left, right)
+		operator = p.get() or {
+			return left
+		}
+	}
+	return left
+}
+
+const max_i64 = 9223372036854775807
+const min_i64 = -max_i64 - 1
+
+fn calc_infix(operator string, left Value, right Value) Value {
+	match operator {
+		'+' {
+			lnum := left.i64()
+			rnum := right.i64()
+			if (0 < left && max_i64 - left < right) || (0 > left && min_i64 - left > right) { // overflow check
+				my_panic('result out of range', 2)
+			}
+			return lnum + rnum
+		}
+		'-' {
+			lnum := left.i64()
+			rnum := right.i64()
+			if (0 < right && min_i64 + right > left) || (0 > right && max_i64 + right < left) { // overflow check
+				my_panic('result out of range', 2)
+			}
+			return lnum + rnum
+		}
+		else { my_panic('expect operator', 2) }
+	}
 }
 
 fn (mut p Parser) primary() Value {
 	tok := p.get() or {
-		panic('missing argument after `${p.tokens[p.idx - 1]}`')
+		my_panic('missing argument after `${p.tokens[p.idx - 1]}`', 2)
 	}
+	p.idx++
 	match tok {
 		'(' {
-			p.idx++
-			val := p.expr()
+			val := p.expr(-1)
 			if tok2 := p.get() {
 				if tok2 == ')' {
 					p.idx++
 					return val
 				}
 			}
-			panic('expect `)` after `${p.tokens[p.idx - 1]}`')
+			my_panic('expect `)` after `${p.tokens[p.idx - 1]}`', 2)
 		}
 		'+' {
-			p.idx++
 			if tok2 := p.get() {
+				p.idx++
 				return tok2
 			}
-			panic('missing argument after `+`')
+			my_panic('missing argument after `+`', 2)
 		}
 		'match' { panic('unimplemented') }
 		'substr' { panic('unimplemented') }
@@ -126,7 +172,7 @@ fn (v Value) str() string {
 
 fn (v Value) i64() i64 {
 	match v {
-		string { return strconv.common_parse_int(v, 0, 64, false, false) or { panic(err) } }
+		string { return strconv.common_parse_int(v, 0, 64, false, false) or { my_panic(err.msg, 2) } }
 		i64 { return v }
 	}
 }
@@ -139,6 +185,6 @@ fn precedence(s string) int {
 		'+', '-' { 3 }
 		'*', '/', '%' { 4 }
 		':' { 5 }
-		else { panic('unexpected token `$s`') (-1) }
+		else { -1 }
 	}
 }
