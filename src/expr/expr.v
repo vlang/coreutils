@@ -1,7 +1,9 @@
 module main
 
 import os
+import strings
 import strconv
+import regex
 
 const appname = 'expr'
 
@@ -190,8 +192,60 @@ fn calc_infix(operator string, left Value, right Value) Value {
 	}
 }
 
-fn match_str(s string, m string) Value {
-	return ''
+fn match_str(s string, _m string) Value {
+	m := replace_regex(_m)
+	println(m)
+	mut re := regex.regex_opt(m) or { my_panic('invalid regular expression', 2) }
+	re.flag |= regex.f_ms
+	start, end := re.match_string(s)
+	if re.group_count > 0 {
+		if re.groups[0] == -1 {
+			return ''
+		} else {
+			return s[re.groups[0]..re.groups[1]]
+		}
+	} else {
+		return i64(if start == -1 {
+			0
+		} else {
+			end - start
+		})
+	}
+}
+
+// \( <=> (, \) <=> ), \+ <=> +, ...etc
+fn replace_regex(s string) string {
+	mut out := strings.new_builder(s.len)
+	mut is_escape := false
+	for i in s {
+		match i {
+			`\\` {
+				if is_escape {
+					out.write_string('\\\\')
+				}
+				is_escape = !is_escape
+			}
+			`(`, `)`, `{`, `}`, `+`, `?`, `|` {
+				if is_escape {
+					out.write_b(i)
+				} else {
+					out.write_string('\\${[i].bytestr()}')
+				}
+				is_escape = false
+			}
+			else {
+				if is_escape {
+					out.write_b(`\\`)
+				}
+				out.write_b(i)
+				is_escape = false
+			}
+		}
+	}
+	if is_escape {
+		my_panic('trailing backslash', 2)
+	}
+	return out.str()
 }
 
 fn (mut p Parser) primary() Value {
