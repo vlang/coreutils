@@ -7,7 +7,7 @@ fn help() {
 
 fn main() {
 	path := os.getwd()
-	arg = os.args[1]
+	arg := os.args[1]
 	if os.user_os() == 'windows' {
 		if os.args.len == 2 {
 			if arg == '-L' {
