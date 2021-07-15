@@ -7,7 +7,7 @@ fn help() {
 
 fn main() {
 	path := os.getwd()
-	arg := 'null'
+	mut arg := 'null'
 	if os.args.len == 2 {
 		arg = os.args[1]
 	}
