@@ -1,8 +1,8 @@
 import os
 
 fn help() {
-	println("Usage: pwd [-L | -P | -h]")
-	println("Only one flag can be given at a time. If more are given it will run with -L option.")
+	println('Usage: pwd [-L | -P | -h]')
+	println('Only one flag can be given at a time. If more are given it will run with -L option.')
 }
 
 fn main() {
