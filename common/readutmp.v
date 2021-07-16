@@ -4,6 +4,11 @@ module common
 #include <utmpx.h>
 #include <errno.h>
 
+struct C.timeval {
+	tv_sec  i64 // Seconds.
+	tv_usec i64 // Microseconds.
+}
+
 struct C.utmpx {
 	ut_type i16       // Type of login.
 	ut_pid  int       // Process ID of login process.
@@ -11,6 +16,7 @@ struct C.utmpx {
 	ut_id   [4]char   // Inittab ID.
 	ut_user [32]char  // Username.
 	ut_host [256]char // Hostname for remote login.
+	ut_tv   C.timeval
 }
 
 // sets the name of the utmp-format file for the other utmp functions to access.
