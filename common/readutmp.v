@@ -19,13 +19,14 @@ struct C.timeval {
 }
 
 struct C.utmpx {
-	ut_type i16       // Type of login.
-	ut_pid  int       // Process ID of login process.
-	ut_line [32]char  // Devicename.
-	ut_id   [4]char   // Inittab ID.
-	ut_user [32]char  // Username.
-	ut_host [256]char // Hostname for remote login.
-	ut_tv   C.timeval // TODO: Declare sub struct correctly
+	ut_type    i16       // Type of login.
+	ut_pid     int       // Process ID of login process.
+	ut_line    [32]char  // Devicename.
+	ut_id      [4]char   // Inittab ID.
+	ut_user    [32]char  // Username.
+	ut_host    [256]char // Hostname for remote login.
+	ut_tv      C.timeval // TODO: Declare sub struct correctly
+	ut_addr_v6 [4]int    // Internet address of remote host.
 }
 
 // sets the name of the utmp-format file for the other utmp functions to access.
