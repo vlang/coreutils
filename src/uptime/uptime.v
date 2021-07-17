@@ -110,24 +110,36 @@ fn uptime(filename &char, options common.ReadUtmpOptions) ? {
 fn main() {
 	mut fp := common.flag_parser(os.args)
 	fp.application('uptime')
-	fp.description('Tell how long the system has been running.')
-	fp.limit_free_args_to_exactly(0)
-	opt_pretty := fp.bool('pretty', `p`, false, 'show uptime in pretty format')
-	opt_since := fp.bool('since', `s`, false, 'system up since, in yyyy-mm-dd HH:MM:SS format')
-	fp.remaining_parameters()
+	fp.arguments_description('... [FILE]')
+	fp.description('Print the current time, the length of time the system')
+	fp.description('has been up, the number of users on the system, and the average')
+	fp.description('number of jobs in the run queue over the last 1, 5 and 15 minutes.')
+	fp.description('Processes in an uninterruptible sleep state also contribute to')
+	unsafe {
+		utmp_file_vstr := cstring_to_vstring(common.utmp_file_charptr)
+		wtmp_file_vstr := cstring_to_vstring(common.wtmp_file_charptr)
+		fp.description('the load average. If FILE is not specified, use ${utmp_file_vstr}.')
+		fp.description('$wtmp_file_vstr as FILE is common.')
+	}
+	fp.limit_free_args(0, 1)
+	// procps version
+	// fp.limit_free_args_to_exactly(0)
+	// opt_pretty := fp.bool('pretty', `p`, false, 'show uptime in pretty format')
+	// opt_since := fp.bool('since', `s`, false, 'system up since, in yyyy-mm-dd HH:MM:SS format')
+	args := fp.remaining_parameters()
 
 	// Main functionality
-	if opt_since {
-		// uptime (argv[optind], 0)
-		exit(0)
-	}
-
-	if opt_pretty {
-		// uptime (argv[optind], 0)
-		exit(0)
-	}
-
-	uptime(&char(C._PATH_UTMP), .check_pids) or {
-		common.exit_with_error_message(fp.application_name, err.msg)
+	match args.len {
+		0 {
+			uptime(common.utmp_file_charptr, .check_pids) or {
+				common.exit_with_error_message(fp.application_name, err.msg)
+			}
+		}
+		1 {
+			uptime(&char(args[0].str), .undefined) or {
+				common.exit_with_error_message(fp.application_name, err.msg)
+			}
+		}
+		else {}
 	}
 }

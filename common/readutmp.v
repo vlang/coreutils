@@ -4,9 +4,18 @@ module common
 #include <utmpx.h>
 #include <errno.h>
 
+// TODO: conflicts with `timeval` in <time.h>
+// <bits/types/struct_timeval.h>
+/*
 struct C.timeval {
 	tv_sec  i64 // Seconds.
 	tv_usec i64 // Microseconds.
+}*/
+
+// <time.h>
+struct C.timeval {
+	tv_sec  u64 // Seconds.
+	tv_usec u64 // Microseconds.
 }
 
 struct C.utmpx {
@@ -16,7 +25,7 @@ struct C.utmpx {
 	ut_id   [4]char   // Inittab ID.
 	ut_user [32]char  // Username.
 	ut_host [256]char // Hostname for remote login.
-	ut_tv   C.timeval
+	ut_tv   C.timeval // TODO: Declare sub struct correctly
 }
 
 // sets the name of the utmp-format file for the other utmp functions to access.
@@ -31,12 +40,13 @@ fn C.getutxent() &C.utmpx
 // closes the utmp file.
 fn C.endutxent()
 
-// fn C.xpalloc (voidptr, C.idx_t, C.idx_t, C.ptrdiff_t, C.idx_t) voidptr
+pub const utmp_file_charptr = &char(C._PATH_UTMP)
 
-// const utmp_file = cstring_to_vstring(&char(C.UTMPX_FILE))
+pub const wtmp_file_charptr = &char(C._PATH_WTMP)
 
 // Options for read_utmp.
 pub enum ReadUtmpOptions {
+	undefined = 0
 	check_pids = 1
 	user_process = 2
 }
@@ -66,6 +76,8 @@ pub fn read_utmp(file &char, mut utmp_buf []C.utmpx, options ReadUtmpOptions) {
 	mut u := C.getutxent()
 	for !isnil(u) {
 		if desirable_utmp_entry(u, options) {
+			// TODO : solve `cannot convert 'struct <anonymous>' to 'struct timeval'`
+			// println(u)
 			utmp_buf << *u
 		}
 		u = C.getutxent()
