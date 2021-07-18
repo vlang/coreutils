@@ -199,6 +199,9 @@ fn (mut p Parser) term() bool {
 			return is_neg != test_unary(tok[1], tok2)
 		}
 	}
+	if tok == '-t' {
+		return is_neg != test_unary(`t`, '1')
+	}
 	return is_neg != (tok != '') // this means is_neg ^ (tok != '')
 }
 
@@ -214,26 +217,24 @@ fn test_unary(option byte, arg string) bool {
 	match option {
 		`b` {}
 		`c` {}
-		`d` {}
-		`e` {}
-		`f` {}
+		`d` { return os.is_dir(arg) }
+		`e` { return os.exists(arg) }
+		`f` { return os.is_file(arg) }
 		`g` {}
-		`h` {}
-		`L` {}
+		`h`, `L` { return os.is_link(arg) }
 		`n` { return arg.len != 0 }
 		`p` {}
-		`r` {}
+		`r` { return os.is_readable(arg) }
 		`S` {}
-		`s` {}
-		`t` {}
+		`s` { return os.file_size(arg) > 0 }
+		`t` { return os.is_atty(arg.int()) == 1 }
 		`u` {}
-		`w` {}
-		`x` {}
+		`w` { return os.is_writable(arg) }
+		`x` { return os.is_executable(arg) }
 		`z` { return arg.len == 0 }
-		else {
-			my_panic('unexpected unary operator')
-		}
+		else {}
 	}
+	my_panic('unexpected unary operator')
 }
 
 struct C.stat {
