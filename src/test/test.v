@@ -54,29 +54,73 @@ fn main() {
 			exit(1)
 		}
 		2 {
-			exit(if os.args[1] == '' { 1 } else { 0 })
+			exit(if os.args[1] != '' { 0 } else { 1 })
 		}
 		3 {
-			if os.args[1] == '!' {
-				exit(if os.args[2] == '' { 0 } else { 1 })
-			}
-			if os.args[1] in unarys {
-				exit(if test_unary(os.args[1][1], os.args[2]) { 0 } else { 1 })
-			}
-			my_panic('expect unary operator')
+			exit(if two_args(os.args[1..]) { 0 } else { 1 })
 		}
-		else {
-			mut parser := Parser{
-				tokens: os.args[1..]
-				idx: 0
-			}
-			result := if parser.expr() { 0 } else { 1 }
-			if parser.idx + u64(is_lsb) < parser.tokens.len {
-				my_panic('unexpected argument `${parser.tokens[parser.idx]}`')
-			}
-			exit(result)
+		4 {
+			exit(if three_args(os.args[1..]) { 0 } else { 1 })
 		}
+		5 {
+			if result := four_args(os.args[1..]) {
+				exit(if result { 0 } else { 1 })
+			}
+		}
+		else {}
 	}
+	mut parser := Parser{
+		tokens: os.args[1..]
+		idx: 0
+	}
+	result := if parser.expr() { 0 } else { 1 }
+	if parser.idx + u64(is_lsb) < parser.tokens.len {
+		my_panic('unexpected argument `${parser.tokens[parser.idx]}`')
+	}
+	exit(result)
+}
+
+fn two_args(args []string) bool {
+	if args[0] == '!' {
+		return args[1] == ''
+	}
+	if args[0] in unarys {
+		return test_unary(args[0][1], args[1])
+	}
+	my_panic('expect unary operator')
+}
+
+fn three_args(args []string) bool {
+	return if args[0] == '!' {
+		!two_args(args[1..])
+	} else if args[1] == '-a' {
+		args[0] != '' && args[2] != ''
+	} else if args[1] == '-o' {
+		args[0] != '' || args[2] != ''
+	} else if args[1] in binarys {
+		test_binary(args[1], args[0], args[2])
+	} else if args[0] == '(' {
+		if args[2] != ')' {
+			my_panic('expect `)`') false // v magic
+		} else {
+			args[1] != ''
+		}
+	} else {
+		my_panic('expect binary operator') false // v magic
+	}
+}
+
+fn four_args(args []string) ?bool {
+	if args[0] == '!' {
+		return !three_args(args[1..])
+	}
+	if args[0] == '(' {
+		if args[3] != ')' {
+			my_panic('expect `)`')
+		}
+		return two_args(args[1..3])
+	}
+	return none
 }
 
 struct Parser {
@@ -140,3 +184,5 @@ fn (p Parser) get() ?string {
 }
 
 fn test_unary(option byte, arg string) bool { return true }
+
+fn test_binary(option string, arg1 string, arg2 string) bool { return true }
