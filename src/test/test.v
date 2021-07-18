@@ -183,12 +183,23 @@ fn (mut p Parser) term() bool {
 		}
 		my_panic('expect `)`')
 	}
+	if tok == '-l' {
+		tok2 := p.get() or { my_panic('expect string') }
+		tok = tok2.len.str()
+		p.idx++
+	}
 	if tok2 := p.get() {
 		if tok2 in binarys {
 			p.idx++
-			if tok3 := p.get() {
+			if _tok3 := p.get() {
+				mut tok3 := _tok3
 				if tok3 != ')' {
 					p.idx++
+					if tok3 == '-l' {
+						tok4 := p.get() or { my_panic('expect string') }
+						tok3 = tok4.len.str()
+						p.idx++
+					}
 					return is_neg != test_binary(tok2, tok, tok3)
 				}
 			}
