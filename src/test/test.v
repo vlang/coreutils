@@ -1,6 +1,7 @@
 module main
 
 import os
+import strconv
 
 const unarys = [
 	'-b',
@@ -209,6 +210,91 @@ fn (p Parser) get() ?string {
 	return none
 }
 
-fn test_unary(option byte, arg string) bool { return true }
+fn test_unary(option byte, arg string) bool {
+	match option {
+		`b` {}
+		`c` {}
+		`d` {}
+		`e` {}
+		`f` {}
+		`g` {}
+		`h` {}
+		`L` {}
+		`n` { return arg.len != 0 }
+		`p` {}
+		`r` {}
+		`S` {}
+		`s` {}
+		`t` {}
+		`u` {}
+		`w` {}
+		`x` {}
+		`z` { return arg.len == 0 }
+		else {
+			my_panic('unexpected unary operator')
+		}
+	}
+}
 
-fn test_binary(option string, arg1 string, arg2 string) bool { return true }
+struct C.stat {
+	st_dev size_t
+	st_ino size_t
+}
+
+fn test_binary(option string, arg1 string, arg2 string) bool {
+	match option {
+		'=', '==' { return arg1 == arg2 }
+		'!=' { return arg1 != arg2 }
+		'-eq' {
+			left := strconv.parse_int(arg1, 0, 64) or { my_panic('expect integer') }
+			right := strconv.parse_int(arg1, 0, 64) or { my_panic('expect integer') }
+			return left == right
+		}
+		'-ne' {
+			left := strconv.parse_int(arg1, 0, 64) or { my_panic('expect integer') }
+			right := strconv.parse_int(arg1, 0, 64) or { my_panic('expect integer') }
+			return left != right
+		}
+		'-gt' {
+			left := strconv.parse_int(arg1, 0, 64) or { my_panic('expect integer') }
+			right := strconv.parse_int(arg1, 0, 64) or { my_panic('expect integer') }
+			return left > right
+		}
+		'-ge' {
+			left := strconv.parse_int(arg1, 0, 64) or { my_panic('expect integer') }
+			right := strconv.parse_int(arg1, 0, 64) or { my_panic('expect integer') }
+			return left >= right
+		}
+		'-lt' {
+			left := strconv.parse_int(arg1, 0, 64) or { my_panic('expect integer') }
+			right := strconv.parse_int(arg1, 0, 64) or { my_panic('expect integer') }
+			return left < right
+		}
+		'-le' {
+			left := strconv.parse_int(arg1, 0, 64) or { my_panic('expect integer') }
+			right := strconv.parse_int(arg1, 0, 64) or { my_panic('expect integer') }
+			return left <= right
+		}
+		'-nt' {
+			if !os.exists(arg1) || !os.exists(arg2) { return false }
+			return os.file_last_mod_unix(arg1) > os.file_last_mod_unix(arg2)
+		}
+		'-ot' {
+			if !os.exists(arg1) || !os.exists(arg2) { return false }
+			return os.file_last_mod_unix(arg1) < os.file_last_mod_unix(arg2)
+		}
+		'-ef' {
+			if !os.exists(arg1) || !os.exists(arg2) { return false }
+			attr1 := C.stat{}
+			attr2 := C.stat{}
+			unsafe {
+				C.stat(&char(arg1.str), &attr1)
+				C.stat(&char(arg2.str), &attr2)
+			}
+			return attr1.st_dev == attr2.st_dev && attr1.st_ino == attr2.st_ino
+		}
+		else {
+			my_panic('unexpected binary operator')
+		}
+	}
+}
