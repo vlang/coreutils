@@ -17,6 +17,8 @@ const (
 
 	// more than 3/4 of chunk_size_decode
 	buffer_size_decode = 16 * 1024
+
+	newline            = []byte{len: 1, init: `\n`}
 )
 
 fn get_file(args []string) os.File {
@@ -73,7 +75,6 @@ fn encode_and_print(mut file os.File, wrap int) {
 
 		// print newlines after specified wrap.
 		if wrap != 0 {
-			newline := []byte{len: 1, init: `\n`}
 			mut printed_bytes := 0
 			for ((encoded_bytes - printed_bytes) >= wrap) {
 				// Don't write further than wrap.
