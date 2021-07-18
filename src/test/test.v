@@ -215,20 +215,34 @@ fn (p Parser) get() ?string {
 
 fn test_unary(option byte, arg string) bool {
 	match option {
-		`b` {}
-		`c` {}
+		`b` { return os.exists(arg) && FileType(os.inode(arg).typ) == .block_device }
+		`c` { return os.exists(arg) && FileType(os.inode(arg).typ) == .character_device }
 		`d` { return os.is_dir(arg) }
 		`e` { return os.exists(arg) }
 		`f` { return os.is_file(arg) }
-		`g` {}
+		`g` {
+			if !os.exists(arg) { return false }
+			attr := C.stat{}
+			unsafe {
+				C.stat(&char(arg.str), &attr)
+			}
+			return attr.st_mode & os.s_isgid > 0
+		}
 		`h`, `L` { return os.is_link(arg) }
 		`n` { return arg.len != 0 }
-		`p` {}
+		`p` { return os.exists(arg) && FileType(os.inode(arg).typ) == .fifo }
 		`r` { return os.is_readable(arg) }
-		`S` {}
+		`S` { return os.exists(arg) && FileType(os.inode(arg).typ) == .socket }
 		`s` { return os.file_size(arg) > 0 }
 		`t` { return os.is_atty(arg.int()) == 1 }
-		`u` {}
+		`u` {
+			if !os.exists(arg) { return false }
+			attr := C.stat{}
+			unsafe {
+				C.stat(&char(arg.str), &attr)
+			}
+			return attr.st_mode & os.s_isuid > 0
+		}
 		`w` { return os.is_writable(arg) }
 		`x` { return os.is_executable(arg) }
 		`z` { return arg.len == 0 }
@@ -238,8 +252,21 @@ fn test_unary(option byte, arg string) bool {
 }
 
 struct C.stat {
+	st_size u64
+	st_mode u32
+	st_mtime int
 	st_dev size_t
 	st_ino size_t
+}
+
+enum FileType {
+	regular
+	directory
+	character_device
+	block_device
+	fifo
+	symbolic_link
+	socket
 }
 
 fn test_binary(option string, arg1 string, arg2 string) bool {
