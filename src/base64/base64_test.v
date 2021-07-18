@@ -23,11 +23,11 @@ fn expected_result(input string, output string) {
 }
 
 fn test_expected() {
-	mut f := os.open_file('textfile', 'w') or { exit(1) }
+	mut f := os.open_file('textfile', 'w') or { panic(err) }
 	f.write_string('Hello World!\nHow are you?') or {}
 	f.close()
 
-	mut g := os.open_file('base64file', 'w') or { exit(1) }
+	mut g := os.open_file('base64file', 'w') or { panic(err) }
 	g.write_string('ViBjb3JldXRpbHMgaXMgYXdlc29tZSEK') or {}
 	g.close()
 
@@ -36,6 +36,6 @@ fn test_expected() {
 	expected_result('-w 1 textfile', 'S\nG\nV\ns\nb\nG\n8\ng\nV\n2\n9\ny\nb\nG\nQ\nh\nC\nk\nh\nv\nd\ny\nB\nh\nc\nm\nU\ng\ne\nW\n9\n1\nP\nw\n=\n=\n')
 	expected_result('-d base64file', 'V coreutils is awesome!\n')
 
-	os.rm('textfile') or {}
-	os.rm('base64file') or {}
+	os.rm('textfile') or { panic(err) }
+	os.rm('base64file') or { panic(err) }
 }
