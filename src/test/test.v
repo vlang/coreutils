@@ -102,12 +102,14 @@ fn three_args(args []string) bool {
 		test_binary(args[1], args[0], args[2])
 	} else if args[0] == '(' {
 		if args[2] != ')' {
-			my_panic('expect `)`') false // v magic
+			my_panic('expect `)`')
+			false // v magic
 		} else {
 			args[1] != ''
 		}
 	} else {
-		my_panic('expect binary operator') false // v magic
+		my_panic('expect binary operator')
+		false // v magic
 	}
 }
 
@@ -132,45 +134,33 @@ mut:
 
 fn (mut p Parser) expr() bool {
 	mut b := p.and()
-	mut tok := p.get() or {
-		return b
-	}
+	mut tok := p.get() or { return b }
 	for tok == '-o' {
 		p.idx++
 		b = b || p.and()
-		tok = p.get() or {
-			return b
-		}
+		tok = p.get() or { return b }
 	}
 	return b
 }
 
 fn (mut p Parser) and() bool {
 	mut b := p.term()
-	mut tok := p.get() or {
-		return b
-	}
+	mut tok := p.get() or { return b }
 	for tok == '-a' {
 		p.idx++
 		b = b && p.term()
-		tok = p.get() or {
-			return b
-		}
+		tok = p.get() or { return b }
 	}
 	return b
 }
 
 fn (mut p Parser) term() bool {
 	mut is_neg := false
-	mut tok := p.get() or {
-		my_panic('expect expression after `${p.tokens[p.idx - 1]}`')
-	}
+	mut tok := p.get() or { my_panic('expect expression after `${p.tokens[p.idx - 1]}`') }
 	for tok == '!' {
 		is_neg = !is_neg
 		p.idx++
-		tok = p.get() or {
-			my_panic('expect expression after `!`')
-		}
+		tok = p.get() or { my_panic('expect expression after `!`') }
 	}
 	p.idx++
 	if tok == '(' {
@@ -226,48 +216,82 @@ fn (p Parser) get() ?string {
 
 fn test_unary(option byte, arg string) bool {
 	match option {
-		`b` { return os.exists(arg) && FileType(os.inode(arg).typ) == .block_device }
-		`c` { return os.exists(arg) && FileType(os.inode(arg).typ) == .character_device }
-		`d` { return os.is_dir(arg) }
-		`e` { return os.exists(arg) }
-		`f` { return os.is_file(arg) }
+		`b` {
+			return os.exists(arg) && FileType(os.inode(arg).typ) == .block_device
+		}
+		`c` {
+			return os.exists(arg) && FileType(os.inode(arg).typ) == .character_device
+		}
+		`d` {
+			return os.is_dir(arg)
+		}
+		`e` {
+			return os.exists(arg)
+		}
+		`f` {
+			return os.is_file(arg)
+		}
 		`g` {
-			if !os.exists(arg) { return false }
+			if !os.exists(arg) {
+				return false
+			}
 			attr := C.stat{}
 			unsafe {
 				C.stat(&char(arg.str), &attr)
 			}
 			return attr.st_mode & os.s_isgid > 0
 		}
-		`h`, `L` { return os.is_link(arg) }
-		`n` { return arg.len != 0 }
-		`p` { return os.exists(arg) && FileType(os.inode(arg).typ) == .fifo }
-		`r` { return os.is_readable(arg) }
-		`S` { return os.exists(arg) && FileType(os.inode(arg).typ) == .socket }
-		`s` { return os.file_size(arg) > 0 }
-		`t` { return os.is_atty(arg.int()) == 1 }
+		`h`, `L` {
+			return os.is_link(arg)
+		}
+		`n` {
+			return arg.len != 0
+		}
+		`p` {
+			return os.exists(arg) && FileType(os.inode(arg).typ) == .fifo
+		}
+		`r` {
+			return os.is_readable(arg)
+		}
+		`S` {
+			return os.exists(arg) && FileType(os.inode(arg).typ) == .socket
+		}
+		`s` {
+			return os.file_size(arg) > 0
+		}
+		`t` {
+			return os.is_atty(arg.int()) == 1
+		}
 		`u` {
-			if !os.exists(arg) { return false }
+			if !os.exists(arg) {
+				return false
+			}
 			attr := C.stat{}
 			unsafe {
 				C.stat(&char(arg.str), &attr)
 			}
 			return attr.st_mode & os.s_isuid > 0
 		}
-		`w` { return os.is_writable(arg) }
-		`x` { return os.is_executable(arg) }
-		`z` { return arg.len == 0 }
+		`w` {
+			return os.is_writable(arg)
+		}
+		`x` {
+			return os.is_executable(arg)
+		}
+		`z` {
+			return arg.len == 0
+		}
 		else {}
 	}
 	my_panic('unexpected unary operator')
 }
 
 struct C.stat {
-	st_size u64
-	st_mode u32
+	st_size  u64
+	st_mode  u32
 	st_mtime int
-	st_dev size_t
-	st_ino size_t
+	st_dev   size_t
+	st_ino   size_t
 }
 
 enum FileType {
@@ -282,8 +306,12 @@ enum FileType {
 
 fn test_binary(option string, arg1 string, arg2 string) bool {
 	match option {
-		'=', '==' { return arg1 == arg2 }
-		'!=' { return arg1 != arg2 }
+		'=', '==' {
+			return arg1 == arg2
+		}
+		'!=' {
+			return arg1 != arg2
+		}
 		'-eq' {
 			left := strconv.parse_int(arg1, 0, 64) or { my_panic('expect integer') }
 			right := strconv.parse_int(arg1, 0, 64) or { my_panic('expect integer') }
@@ -315,15 +343,21 @@ fn test_binary(option string, arg1 string, arg2 string) bool {
 			return left <= right
 		}
 		'-nt' {
-			if !os.exists(arg1) || !os.exists(arg2) { return false }
+			if !os.exists(arg1) || !os.exists(arg2) {
+				return false
+			}
 			return os.file_last_mod_unix(arg1) > os.file_last_mod_unix(arg2)
 		}
 		'-ot' {
-			if !os.exists(arg1) || !os.exists(arg2) { return false }
+			if !os.exists(arg1) || !os.exists(arg2) {
+				return false
+			}
 			return os.file_last_mod_unix(arg1) < os.file_last_mod_unix(arg2)
 		}
 		'-ef' {
-			if !os.exists(arg1) || !os.exists(arg2) { return false }
+			if !os.exists(arg1) || !os.exists(arg2) {
+				return false
+			}
 			attr1 := C.stat{}
 			attr2 := C.stat{}
 			unsafe {
