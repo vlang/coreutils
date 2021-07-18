@@ -172,6 +172,32 @@ fn (mut p Parser) term() bool {
 		}
 	}
 	p.idx++
+	if tok == '(' {
+		result := is_neg != p.expr()
+		if tok2 := p.get() {
+			if tok2 == ')' {
+				p.idx++
+				return result
+			}
+		}
+		my_panic('expect `)`')
+	}
+	if tok2 := p.get() {
+		if tok2 in binarys {
+			p.idx++
+			if tok3 := p.get() {
+				if tok3 != ')' {
+					p.idx++
+					return is_neg != test_binary(tok2, tok, tok3)
+				}
+			}
+			p.idx--
+		}
+		if tok in unarys && tok2 != ')' {
+			p.idx++
+			return is_neg != test_unary(tok[1], tok2)
+		}
+	}
 	return is_neg != (tok != '') // this means is_neg ^ (tok != '')
 }
 
