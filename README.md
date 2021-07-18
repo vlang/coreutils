@@ -29,11 +29,11 @@ Contributions are welcome!
 Please only contribute versions of the original utilities written in V.
 Contributions written in other langauges will likely be rejected.
 
-## Completed (18/109)
+## Completed (21/109)
 
 | Done    | Cmd       | Descripton                                       |
 | :-----: |-----------|--------------------------------------------------|
-|         | **[**     | Alternate form of `test`                         |
+| &check; | **[**     | Alternate form of `test`                         |
 | &check; | arch      | Print machine hardware name                      |
 |         | b2sum     | Print or check BLAKE2 digests                    |
 |         | base32    | Transform data into printable data               |
@@ -123,7 +123,7 @@ Contributions written in other langauges will likely be rejected.
 |         | tac       | Concatenate and write files in reverse           |
 |         | tail      | Output the last part of files                    |
 |         | tee       | Redirect output to multiple files or processes   |
-|         | test      | Check file types and compare values              |
+| &check; | test      | Check file types and compare values              |
 |         | timeout   | Run a command with a time limit                  |
 |         | touch     | Change file timestamps                           |
 |         | tr        | Translate, squeeze, and/or delete characters     |
