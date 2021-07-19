@@ -23,6 +23,10 @@ jobs:
         cd -
     - name: V doctor
       run: v doctor
+    -name: Native utils diagnostics
+      run: |
+      sleep --version
+      uptime -V
     - name: Ensure everything is formatted
       run: cd coreutils && make testfmt
 
