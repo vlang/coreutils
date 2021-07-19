@@ -14,6 +14,5 @@ fn test_unknown_option() ? {
 
 fn test_print_uptime() {
 	assert cmd.same_results('')
-	// TODO: solve different user counts
-	// assert cmd.same_results('/var/log/wtmp')
+	assert cmd.same_results('/var/log/wtmp')
 }
