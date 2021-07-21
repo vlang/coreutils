@@ -157,11 +157,11 @@ const mb_tests = [
 	'substr \u03B1bc\u03B4ef 4 1',
 	'substr \u03B1bc\u03B4ef 4 2',
 	'substr \u03B1bc\u03B4ef 6 1',
-	'substr \u03B1bc\u03B4ef 7 1',
+	'substr \u03B1bc\u03B4ef 7 1'
 	// fail: multi; broken UTF-8 is treated in different way
 	//	"substr \u03B1bc\xB4ef 3 3",
 	'match abcdef ab',
-	'match abcdef "\\(ab\\)"',
+	'match abcdef "\\(ab\\)"'
 	// fail: single; this is a good news, regex in vlib supports UTF-8
 	//	"match \u03B1bc\u03B4ef .bc",
 	// fail: both; broken regex of vlib, see #10885
