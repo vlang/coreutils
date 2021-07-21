@@ -7,7 +7,6 @@ const (
 	combine_t_no_t  = 'cannot combine --target-directory (-t) and --no-target-directory (-T)'
 )
 
-<<<<<<< HEAD
 fn prompt_file(path string) string {
 	return "overwrite '$path'? "
 }
@@ -16,6 +15,7 @@ fn target_not_dir(path string) string {
 	return "target '$path' is not a directory"
 }
 
+<<<<<<< HEAD
 fn renamed(src string, dst string) string {
 	return "renamed '$src' -> '$dst'"
 }
@@ -72,12 +72,17 @@ fn setup_mv_command(args []string) ?(MvCommand, []string, string) {
 	no_clobber := fp.bool('no-clobber', `n`, false, 'do not overwrite')
 	update := fp.bool('update', `u`, false, 'update')
 	verbose := fp.bool('verbose', `v`, false, 'print each rename')
-=======
 pub fn run_mv(args []string) {
 	mv, sources, dest := setup_mv_command(args) or { common.exit_with_error_message(name, err.msg) }
 	println(sources)
 	println(dest)
-	mv.run()
+	if sources.len > 1 && !os.is_dir(dest) {
+		common.exit_with_error_message(name, target_not_dir(dest))
+	}
+	for source in sources {
+		mv.run(source, dest)
+	}
+	// mv.run(sources,dest)
 }
 
 fn setup_mv_command(args []string) ?(MvCommand, []string, string) {
@@ -90,7 +95,6 @@ fn setup_mv_command(args []string) ?(MvCommand, []string, string) {
 	no_clobber := fp.bool('no-clobber', `n`, false, 'no-clobber')
 	update := fp.bool('update', `u`, false, 'update')
 	verbose := fp.bool('verbose', `v`, false, 'verbose')
->>>>>>> 1d918f5 (Main flags implemented)
 	target_directory := fp.string('target-directory', `t`, '', 'target-directory')
 	no_target_directory := fp.bool('no-target-directory', `T`, false, 'no-target-directory')
 
@@ -104,7 +108,6 @@ fn setup_mv_command(args []string) ?(MvCommand, []string, string) {
 	}
 
 	options := fp.finalize() or { common.exit_with_error_message(name, 'error') }
-<<<<<<< HEAD
 	overwrite := if force {
 		OverwriteMode.force
 	} else if no_clobber {
@@ -137,11 +140,6 @@ fn setup_mv_command(args []string) ?(MvCommand, []string, string) {
 				common.exit_with_error_message(name, no_dir_is_dir(options[1]))
 			}
 		}
-=======
-	len_options := options.len
-	if target_directory != '' && len_options < 2 {
-		common.exit_with_error_message(name, 'error')
->>>>>>> 1d918f5 (Main flags implemented)
 	}
 	sources, dest := if target_directory != '' {
 		options, target_directory

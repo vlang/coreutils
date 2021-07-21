@@ -1,3 +1,6 @@
+import os
+import common
+
 struct MvCommand {
 	force               bool
 	interactive         bool
