@@ -38,7 +38,7 @@ fn main() {
 	match os.args.len {
 		1 {
 			eprintln(usage)
-			exit(1)
+			exit(2)
 		}
 		2 {
 			match os.args[1] {
@@ -82,7 +82,7 @@ fn (mut p Parser) expr(prec int) Value {
 	return left
 }
 
-const max_i64 = 9223372036854775807
+const max_i64 = i64(9223372036854775807)
 
 const min_i64 = -max_i64 - 1
 
@@ -159,7 +159,7 @@ fn calc_infix(operator string, left Value, right Value) Value {
 			if (0 < rnum && min_i64 + rnum > lnum) || (0 > rnum && max_i64 + rnum < lnum) { // overflow check
 				my_panic('result out of range', 2)
 			}
-			return lnum + rnum
+			return lnum - rnum
 		}
 		'*' {
 			return left.i64() * right.i64()
@@ -359,8 +359,13 @@ fn (v Value) i64_opt() ?i64 {
 fn (v Value) is_null() bool {
 	match v {
 		string {
-			if v in ['', '0'] {
+			if v == '' {
 				return true
+			}
+			if a := strconv.parse_int(v, 0, 64) {
+				if a == 0 {
+					return true
+				}
 			}
 		}
 		i64 {
