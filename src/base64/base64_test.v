@@ -15,48 +15,27 @@ fn test_abcd() {
 	assert res.output.trim_space() == 'base64: abcd: No such file or directory'
 }
 
-fn expected_result_no_wrap(input string, output []string) {
+fn expected_result(input string, output string) {
 	res := os.execute('$the_executable $input')
 	assert res.exit_code == 0
-	assert res.output.split_into_lines() == output
-	testing.same_results('base64 -w 0 $input', '$the_executable -w 0 $input')
-}
-
-fn expected_result_default_wrap(input string, output []string) {
-	res := os.execute('$the_executable $input')
-	assert res.exit_code == 0
-	assert res.output.split_into_lines() == output
+	assert res.output == output
 	testing.same_results('base64 $input', '$the_executable $input')
 }
 
-fn expected_result_1_char_wrap(input string, output []string) {
-	res := os.execute('$the_executable $input')
-	assert res.exit_code == 0
-	assert res.output.split_into_lines() == output
-	testing.same_results('base64 -w 1 $input', '$the_executable -w 1 $input')
-}
-
-fn expected_result_decode(input string, output []string) {
-	res := os.execute('$the_executable $input')
-	assert res.exit_code == 0
-	assert res.output.split_into_lines() == output
-	testing.same_results('base64 $input', '$the_executable $input')
-}
-
-fn test_expected() ? {
-	mut f := os.open_file('textfile', 'w') ?
-	f.write_string('Hello World!\nHow are you?') ?
+fn test_expected() {
+	mut f := os.open_file('textfile', 'w') or { panic(err) }
+	f.write_string('Hello World!\nHow are you?') or {}
 	f.close()
 
-	mut g := os.open_file('base64file', 'w') ?
-	g.write_string('ViBjb3JldXRpbHMgaXMgYXdlc29tZSEK') ?
+	mut g := os.open_file('base64file', 'w') or { panic(err) }
+	g.write_string('ViBjb3JldXRpbHMgaXMgYXdlc29tZSEK') or {}
 	g.close()
 
-	expected_result_no_wrap('textfile', ['SGVsbG8gV29ybGQhCkhvdyBhcmUgeW91Pw=='])
-	expected_result_default_wrap('textfile', ['SGVsbG8gV29ybGQhCkhvdyBhcmUgeW91Pw=='])
-	expected_result_1_char_wrap('textfile', ['SGVsbG8gV29ybGQhCkhvdyBhcmUgeW91Pw=='])
-	expected_result_decode('-d base64file', ['V coreutils is awesome!'])
+	expected_result('textfile', 'SGVsbG8gV29ybGQhCkhvdyBhcmUgeW91Pw==\n')
+	expected_result('-w 0 textfile', 'SGVsbG8gV29ybGQhCkhvdyBhcmUgeW91Pw==')
+	expected_result('-w 1 textfile', 'S\nG\nV\ns\nb\nG\n8\ng\nV\n2\n9\ny\nb\nG\nQ\nh\nC\nk\nh\nv\nd\ny\nB\nh\nc\nm\nU\ng\ne\nW\n9\n1\nP\nw\n=\n=\n')
+	expected_result('-d base64file', 'V coreutils is awesome!\n')
 
-	os.rm('textfile') ?
-	os.rm('base64file') ?
+	os.rm('textfile') or { panic(err) }
+	os.rm('base64file') or { panic(err) }
 }

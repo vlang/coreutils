@@ -29,11 +29,11 @@ Contributions are welcome!
 Please only contribute versions of the original utilities written in V.
 Contributions written in other langauges will likely be rejected.
 
-## Completed (16/109)
+## Completed (20/109)
 
 | Done    | Cmd       | Descripton                                       |
 | :-----: |-----------|--------------------------------------------------|
-|         | **[**     | Alternate form of `test`                         |
+| &check; | **[**     | Alternate form of `test`                         |
 | &check; | arch      | Print machine hardware name                      |
 |         | b2sum     | Print or check BLAKE2 digests                    |
 |         | base32    | Transform data into printable data               |
@@ -62,7 +62,7 @@ Contributions written in other langauges will likely be rejected.
 | &check; | echo      | Print a line of text                             |
 |         | env       | Run a command in a modified environment          |
 |         | expand    | Convert tabs to spaces                           |
-|         | expr      | Evaluate expressions                             |
+| &check; | expr      | Evaluate expressions                             |
 | &check; | factor    | Print prime factors                              |
 | &check; | false     | Do nothing, unsuccessfully                       |
 |         | fmt       | Reformat paragraph text                          |
@@ -98,7 +98,7 @@ Contributions written in other langauges will likely be rejected.
 | &check; | printenv  | Print all or some environment variables          |
 | &check; | printf    | Format and print data                            |
 |         | ptx       | Produce permuted indexes                         |
-|         | pwd       | Print working directory                          |
+| &check; | pwd       | Print working directory                          |
 |         | readlink  | Print value of a symlink or canonical file name  |
 |         | realpath  | Print the resolved file name                     |
 | &check; | rm        | Remove files or directories                      |
@@ -123,7 +123,7 @@ Contributions written in other langauges will likely be rejected.
 |         | tac       | Concatenate and write files in reverse           |
 |         | tail      | Output the last part of files                    |
 |         | tee       | Redirect output to multiple files or processes   |
-|         | test      | Check file types and compare values              |
+| &check; | test      | Check file types and compare values              |
 |         | timeout   | Run a command with a time limit                  |
 |         | touch     | Change file timestamps                           |
 |         | tr        | Translate, squeeze, and/or delete characters     |
