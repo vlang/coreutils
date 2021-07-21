@@ -1,14 +1,25 @@
+import os
 import common
 
 const (
 	name = 'mv'
 )
 
+fn target_not_dir(path string) string {
+	return "target '$path' is not a directory"
+}
+
 pub fn run_mv(args []string) {
 	mv, sources, dest := setup_mv_command(args) or { common.exit_with_error_message(name, err.msg) }
 	println(sources)
 	println(dest)
-	mv.run()
+	if sources.len > 1 && !os.is_dir(dest) {
+		common.exit_with_error_message(name, target_not_dir(dest))
+	}
+	for source in sources {
+		mv.run(source, dest)
+	}
+	// mv.run(sources,dest)
 }
 
 fn setup_mv_command(args []string) ?(MvCommand, []string, string) {
