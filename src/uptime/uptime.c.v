@@ -73,7 +73,7 @@ fn print_uptime(utmp_buf []C.utmpx) ? {
 	}
 
 	plural := fn (v u64) string {
-		if v > 1 {
+		if v != 1 {
 			return 's'
 		}
 		return ''
@@ -83,12 +83,12 @@ fn print_uptime(utmp_buf []C.utmpx) ? {
 		print('up ???? days ??:??,  ')
 	} else {
 		if 0 < updays {
-			print('up $updays day${plural(updays)}, ${uphours:2}:${upmins:02},  ')
+			print(' up $updays day${plural(updays)} ${uphours:2}:${upmins:02}')
 		} else {
-			print('up ${uphours:2}:${upmins:02},  ')
+			print(' up ${uphours:2}:${upmins:02}')
 		}
 	}
-	print('$entries user${plural(entries)}')
+	print(',  $entries user${plural(entries)}')
 
 	avg := [3]f64{}
 	loads := C.getloadavg(avg, 3)
@@ -122,10 +122,6 @@ fn main() {
 		fp.description('$wtmp_file_vstr as FILE is common.')
 	}
 	fp.limit_free_args(0, 1)
-	// procps version
-	// fp.limit_free_args_to_exactly(0)
-	// opt_pretty := fp.bool('pretty', `p`, false, 'show uptime in pretty format')
-	// opt_since := fp.bool('since', `s`, false, 'system up since, in yyyy-mm-dd HH:MM:SS format')
 	args := fp.remaining_parameters()
 
 	// Main functionality
