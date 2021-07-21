@@ -310,7 +310,12 @@ fn (mut p Parser) primary() Value {
 				}
 				return i64(0)
 			} else {
-				return i64(str.index_any(chr) + 1)
+				for i, r in str {
+					if chr.index_byte(r) != -1 {
+						return i64(i + 1)
+					}
+				}
+				return i64(0)
 			}
 		}
 		'length' {

@@ -17,6 +17,7 @@ const tests = [
 	r'100 % 6',
 	r'3 + -2',
 	r'-2 + -2'
+	// empty option is not supported for now
 	//	r'-- -11 + 12',
 	//	r'-11 + 12',
 	//	r'-- -1 + 2',
@@ -30,12 +31,16 @@ const tests = [
 	r'00 \< 0!',
 	r'00',
 	r'-0'
+	// make expr() return an optional
 	//	r'0 \& 1 / 0',
 	//	r'1 \| 1 / 0',
+	// why does this have to return 0, not an empty string? I don't know
 	//	r'"" \| ""',
 	r'3 + -',
 	r'-2417851639229258349412352 \< 2417851639229258349412352'
+	// regex of vlib cannot process \\$
 	//	r"'a\nb' : 'a\$'",
+	// the tests below may fails due to the spec of regex in vlib
 	r'"abc" : "a\\(b\\)c"',
 	r'"a(" : "a("',
 	r'_ : "a\\("',
@@ -99,6 +104,7 @@ const tests = [
 	//	r'"acd" : "a\\(b\\)?c\\1d"',
 	r'"-5" : "-\\{0,1\\}[0-9]*\$"',
 	r''
+	// big number is not supported for now
 	//	r'98782897298723498732987928734 + 1',
 	//	r'98782897298723498732987928734 + 98782897298723498732987928735',
 	//	r'98782897298723498732987928735 - 1',
@@ -117,6 +123,60 @@ const tests = [
 fn test_results() ? {
 	mut failed := []string{}
 	for test in tests {
+		res := cmd.same_results(test)
+		if !res {
+			if os.execute('$cmd.original $test').exit_code == 2
+				&& os.execute('$cmd.deputy $test').exit_code == 2 {
+				continue
+			}
+			failed << test
+		}
+	}
+	println(failed.join('\n'))
+	assert failed.len == 0
+}
+
+const mb_tests = [
+	'length abcdef',
+	'length \u03B1bcdef',
+	'length abc\u03B4ef',
+	'length fedcb\u03B1',
+	'length \xB1aaa',
+	'length aaa\xCE',
+	'length \u1F14\u03BA\u03C6\u03C1\u03B1\u03C3\u03B9\u03C2',
+	'index abcdef fb',
+	'index \u03B1bc\u03B4ef b',
+	'index \u03B1bc\u03B4ef f',
+	'index \u03B1bc\u03B4ef \u03B4',
+	'index \xCEbc\u03B4ef \u03B4',
+	'index \u03B1bc\u03B4ef \xB4',
+	'index \u03B1bc\xB4ef \xB4',
+	'substr abcdef 2 3',
+	'substr \u03B1bc\u03B4ef 1 1',
+	'substr \u03B1bc\u03B4ef 3 2',
+	'substr \u03B1bc\u03B4ef 4 1',
+	'substr \u03B1bc\u03B4ef 4 2',
+	'substr \u03B1bc\u03B4ef 6 1',
+	'substr \u03B1bc\u03B4ef 7 1',
+	// fail: multi; broken UTF-8 is treated in different way
+	//	"substr \u03B1bc\xB4ef 3 3",
+	'match abcdef ab',
+	'match abcdef "\\(ab\\)"',
+	// fail: single; this is a good news, regex in vlib supports UTF-8
+	//	"match \u03B1bc\u03B4ef .bc",
+	// fail: both; broken regex of vlib, see #10885
+	//	"match \u03B1bc\u03B4ef ..bc",
+	// fail: single; this is a good news, regex in vlib supports UTF-8
+	//	"match \u03B1bc\u03B4ef '\\(.b\\)c'",
+	// fail: multi; broken UTF-8 is treated in different way
+	//	"match \xCEbc\u03B4ef '\\(.\\)'",
+	// fail: single; this is a good news, regex in vlib supports UTF-8
+	//	"match \u03B1bc\u03B4e '\\([\u03B1]\\)'",
+]
+
+fn test_multi_byte_results() ? {
+	mut failed := []string{}
+	for test in mb_tests {
 		res := cmd.same_results(test)
 		if !res {
 			if os.execute('$cmd.original $test').exit_code == 2
