@@ -92,14 +92,14 @@ fn two_args(args []string) bool {
 }
 
 fn three_args(args []string) bool {
-	return if args[0] == '!' {
+	return if args[1] in binarys {
+		test_binary(args[1], args[0], args[2])
+	} else if args[0] == '!' {
 		!two_args(args[1..])
 	} else if args[1] == '-a' {
 		args[0] != '' && args[2] != ''
 	} else if args[1] == '-o' {
 		args[0] != '' || args[2] != ''
-	} else if args[1] in binarys {
-		test_binary(args[1], args[0], args[2])
 	} else if args[0] == '(' {
 		if args[2] != ')' {
 			my_panic('expect `)`')
@@ -314,32 +314,32 @@ fn test_binary(option string, arg1 string, arg2 string) bool {
 		}
 		'-eq' {
 			left := strconv.parse_int(arg1, 0, 64) or { my_panic('expect integer') }
-			right := strconv.parse_int(arg1, 0, 64) or { my_panic('expect integer') }
+			right := strconv.parse_int(arg2, 0, 64) or { my_panic('expect integer') }
 			return left == right
 		}
 		'-ne' {
 			left := strconv.parse_int(arg1, 0, 64) or { my_panic('expect integer') }
-			right := strconv.parse_int(arg1, 0, 64) or { my_panic('expect integer') }
+			right := strconv.parse_int(arg2, 0, 64) or { my_panic('expect integer') }
 			return left != right
 		}
 		'-gt' {
 			left := strconv.parse_int(arg1, 0, 64) or { my_panic('expect integer') }
-			right := strconv.parse_int(arg1, 0, 64) or { my_panic('expect integer') }
+			right := strconv.parse_int(arg2, 0, 64) or { my_panic('expect integer') }
 			return left > right
 		}
 		'-ge' {
 			left := strconv.parse_int(arg1, 0, 64) or { my_panic('expect integer') }
-			right := strconv.parse_int(arg1, 0, 64) or { my_panic('expect integer') }
+			right := strconv.parse_int(arg2, 0, 64) or { my_panic('expect integer') }
 			return left >= right
 		}
 		'-lt' {
 			left := strconv.parse_int(arg1, 0, 64) or { my_panic('expect integer') }
-			right := strconv.parse_int(arg1, 0, 64) or { my_panic('expect integer') }
+			right := strconv.parse_int(arg2, 0, 64) or { my_panic('expect integer') }
 			return left < right
 		}
 		'-le' {
 			left := strconv.parse_int(arg1, 0, 64) or { my_panic('expect integer') }
-			right := strconv.parse_int(arg1, 0, 64) or { my_panic('expect integer') }
+			right := strconv.parse_int(arg2, 0, 64) or { my_panic('expect integer') }
 			return left <= right
 		}
 		'-nt' {
