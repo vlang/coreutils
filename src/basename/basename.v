@@ -23,8 +23,12 @@ fn main() {
 		}
 	} else {
 		match args.len {
-			1 { basename(args[0], '', is_zero) }
-			2 { basename(args[0], args[1], is_zero) }
+			1 {
+				basename(args[0], '', is_zero)
+			}
+			2 {
+				basename(args[0], args[1], is_zero)
+			}
 			else {
 				common.exit_with_error_message(os.args[0], 'extra args `${args[2]}`')
 			}
