@@ -29,7 +29,7 @@ Contributions are welcome!
 Please only contribute versions of the original utilities written in V.
 Contributions written in other langauges will likely be rejected.
 
-## Completed (20/109)
+## Completed (21/109)
 
 | Done    | Cmd       | Descripton                                       |
 | :-----: |-----------|--------------------------------------------------|
@@ -38,7 +38,7 @@ Contributions written in other langauges will likely be rejected.
 |         | b2sum     | Print or check BLAKE2 digests                    |
 |         | base32    | Transform data into printable data               |
 | &check; | base64    | Transform data into printable data               |
-|         | basename  | Strip directory and suffix from a file name      |
+| &check; | basename  | Strip directory and suffix from a file name      |
 |         | basenc    | Transform data into printable data               |
 | &check; | cat       | Concatenate and write files                      |
 |         | chcon     | Change SELinux context of file                   |
