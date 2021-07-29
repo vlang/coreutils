@@ -32,7 +32,7 @@ fn apply_unit(n f64, unit string) ?f64 {
 }
 
 fn invalid_time_interval(n f64, unit string) string {
-	return '$cmd_ns: invalid time interval ‘$n$unit’'
+	return "$cmd_ns: invalid time interval '$n$unit'"
 }
 
 fn main() {
