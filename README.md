@@ -29,7 +29,7 @@ Contributions are welcome!
 Please only contribute versions of the original utilities written in V.
 Contributions written in other langauges will likely be rejected.
 
-## Completed (27/109)
+## Completed (28/109)
 
 | Done    | Cmd       | Descripton                                       |
 | :-----: |-----------|--------------------------------------------------|
@@ -84,7 +84,7 @@ Contributions written in other langauges will likely be rejected.
 |         | mkfifo    | Make FIFOs (named pipes)                         |
 |         | mknod     | Make block or character special files            |
 |         | mktemp    | Create temporary file or directory               |
-|         | mv        | Move (rename) files                              |
+| &check; | mv        | Move (rename) files                              |
 |         | nice      | Run a command with modified niceness             |
 |         | nl        | Number lines and write files                     |
 |         | nohup     | Run a command immune to hangups                  |
