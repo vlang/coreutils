@@ -17,8 +17,7 @@ pub fn sum(args []string, sum_name string, sum_type string, num_chars_in_sum int
 	tag := fp.bool('tag', 0, false, 'create a BSD-style checksum')
 	_ := fp.bool('text', `t`, false, 'read in text mode (default)') // accepted but ignored, just like GNU
 	// yes, the spaces are needed in the next line, to make the 'help' output line up
-	zero := fp.bool('zero', `z`, false,
-		'end each output line with NUL, not newline,\n                            and disable file name escaping')
+	zero := fp.bool('zero', `z`, false, 'end each output line with NUL, not newline,\n                            and disable file name escaping')
 
 	ignore_missing := fp.bool('ignore-missing', 0, false, "(only with -c) don't fail or report status for missing files")
 	quiet := fp.bool('quiet', 0, false, "(only with -c) don't print OK for each successfully verified file")
@@ -98,7 +97,7 @@ pub fn sum(args []string, sum_name string, sum_type string, num_chars_in_sum int
 					bad_sum_line++
 
 					if warn {
-						eprintln('${args[0]}: $file: ${i+1}: improperly formatted $sum_type checksum line')
+						eprintln('${args[0]}: $file: ${i + 1}: improperly formatted $sum_type checksum line')
 					}
 
 					continue
@@ -168,7 +167,11 @@ pub fn sum(args []string, sum_name string, sum_type string, num_chars_in_sum int
 
 			if bad_sum > 0 {
 				if !status {
-					plural_msg := if bad_sum == 1 { 'computed checksum' } else { 'computed checksums' }
+					plural_msg := if bad_sum == 1 {
+						'computed checksum'
+					} else {
+						'computed checksums'
+					}
 					eprintln('${args[0]}: WARNING: $bad_sum $plural_msg did NOT match')
 				}
 
@@ -191,9 +194,9 @@ pub fn sum(args []string, sum_name string, sum_type string, num_chars_in_sum int
 			sum := sum_fn(bytes)
 
 			if tag {
-				print('$sum_type ($file) = ${sum.hex()}$eol')
+				print('$sum_type ($file) = $sum.hex()$eol')
 			} else {
-				print('${sum.hex()} $prefix$file$eol')
+				print('$sum.hex() $prefix$file$eol')
 			}
 		}
 	}
