@@ -25,7 +25,7 @@ fn C.getloadavg(loadavg [3]f64, nelem int) int
 
 fn print_uptime(utmp_buf []C.utmpx) ? {
 	// Get uptime
-	mut uptime := u64(0)
+	mut uptime := i64(0)
 	fp := C.fopen(&char('/proc/uptime'.str), &char('r'.str))
 	if !isnil(fp) {
 		buf := []byte{len: 4096}
@@ -36,7 +36,7 @@ fn print_uptime(utmp_buf []C.utmpx) ? {
 				upsecs := C.strtod(&buf[0], &endptr)
 				if buf.bytestr() != endptr.vstring() {
 					if 0 <= upsecs && upsecs < math.max_f64 {
-						uptime = u64(upsecs)
+						uptime = i64(upsecs)
 					} else {
 						uptime = -1
 					}
@@ -60,7 +60,7 @@ fn print_uptime(utmp_buf []C.utmpx) ? {
 		if boot_time == 0 {
 			return error("couldn't get boot time")
 		}
-		uptime = u64(time_now) - boot_time
+		uptime = time_now - i64(boot_time)
 	}
 	updays := uptime / 86400
 	uphours := (uptime - (updays * 86400)) / 3600
@@ -72,7 +72,7 @@ fn print_uptime(utmp_buf []C.utmpx) ? {
 		print(' ??:????  ')
 	}
 
-	plural := fn (v u64) string {
+	plural := fn (v i64) string {
 		if v != 1 {
 			return 's'
 		}
@@ -88,7 +88,7 @@ fn print_uptime(utmp_buf []C.utmpx) ? {
 			print(' up ${uphours:2}:${upmins:02}')
 		}
 	}
-	print(',  $entries user${plural(entries)}')
+	print(',  $entries user${plural(i64(entries))}')
 
 	avg := [3]f64{}
 	loads := C.getloadavg(avg, 3)
