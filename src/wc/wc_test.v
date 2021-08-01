@@ -19,7 +19,9 @@ fn test_default() {
 	mut f := os.open_file('textfile', 'w') or { panic(err) }
 	f.write_string('Hello World!\nHow are you?') or {}
 	f.close()
-	defer { os.rm('textfile') or { panic(err) } }
+	defer {
+		os.rm('textfile') or { panic(err) }
+	}
 
 	res := os.execute('$the_executable textfile')
 	assert res.exit_code == 0
@@ -30,7 +32,9 @@ fn test_max_line_length() {
 	mut f := os.open_file('textfile', 'w') or { panic(err) }
 	f.write_string('Hello World!\nHow are you?') or {}
 	f.close()
-	defer { os.rm('textfile') or { panic(err) } }
+	defer {
+		os.rm('textfile') or { panic(err) }
+	}
 
 	res := os.execute('$the_executable -L textfile')
 	assert res.exit_code == 0
@@ -41,7 +45,9 @@ fn test_char_count() {
 	mut f := os.open_file('textfile', 'w') or { panic(err) }
 	f.write_string('Hello World!\nHow are you?') or {}
 	f.close()
-	defer { os.rm('textfile') or { panic(err) } }
+	defer {
+		os.rm('textfile') or { panic(err) }
+	}
 
 	res := os.execute('$the_executable -m textfile')
 	assert res.exit_code == 0

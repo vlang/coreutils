@@ -10,14 +10,14 @@ import runtime
 // https://github.com/ajeetdsouza/blog-wc-go
 
 const (
-	application_name   = 'wc'
-	buffer_size     = 16 * 1024
-	new_line        = `\n`
-	space           = ` `
-	tab             = `\t`
-	carriage_return = `\r`
-	vertical_tab    = `\v`
-	form_feed       = `\f`
+	application_name = 'wc'
+	buffer_size      = 16 * 1024
+	new_line         = `\n`
+	space            = ` `
+	tab              = `\t`
+	carriage_return  = `\r`
+	vertical_tab     = `\v`
+	form_feed        = `\f`
 )
 
 struct FileChunk {
@@ -28,16 +28,16 @@ mut:
 
 struct Count {
 mut:
-	name string
-	line_count u32
-	word_count u32
-	byte_count u32
-	char_count u32
+	name            string
+	line_count      u32
+	word_count      u32
+	byte_count      u32
+	char_count      u32
 	max_line_length u32
 }
 
 fn get_count(chunk FileChunk) Count {
-	mut count := Count{"", 0, 0, 0, 0, 0}
+	mut count := Count{'', 0, 0, 0, 0, 0}
 	mut prev_char_is_space := chunk.prev_char_is_space
 	mut line_length := u32(0)
 
@@ -94,7 +94,7 @@ fn (mut file_reader FileReader) read_chunk(mut buffer []byte) ?FileChunk {
 
 fn file_reader_counter(mut file_reader FileReader, counts chan Count) {
 	mut buffer := []byte{len: buffer_size}
-	mut total_count := Count{"", 0, 0, 0, 0, 0}
+	mut total_count := Count{'', 0, 0, 0, 0, 0}
 
 	for {
 		chunk := file_reader.read_chunk(mut buffer) or {
@@ -137,7 +137,7 @@ fn count_file(mut file os.File) Count {
 		go file_reader_counter(mut file_reader, counts)
 	}
 
-	mut total_count := Count{"", 0, 0, 0, 0, 0}
+	mut total_count := Count{'', 0, 0, 0, 0, 0}
 
 	for i := 0; i < num_workers; i++ {
 		count := <-counts
@@ -156,9 +156,11 @@ fn count_file(mut file os.File) Count {
 
 fn get_files(args []string) map[string]os.File {
 	if args.len == 0 || args[0] == '-' {
-		return map{'-': os.stdin()}
+		return map{
+			'-': os.stdin()
+		}
 	} else {
-		mut files := map[string]os.File
+		mut files := map[string]os.File{}
 		for file_path in args {
 			files[file_path] = os.open(file_path) or {
 				eprintln('$application_name: $file_path: No such file or directory')
@@ -184,10 +186,9 @@ fn main() {
 	fp.description('Print newline, word, and byte counts for each FILE, and a total line if more than one FILE is specified.')
 	fp.description('A word is a non-zero-length sequence of characters delimited by white space.')
 	fp.description('')
-    fp.description('With no FILE, or when FILE is -, read standard input.')
+	fp.description('With no FILE, or when FILE is -, read standard input.')
 	fp.description('')
-    fp.description('The options below may be used to select which counts are printed, always in the following order: newline, word, character, byte, maximum line length.')
-
+	fp.description('The options below may be used to select which counts are printed, always in the following order: newline, word, character, byte, maximum line length.')
 
 	mut bytes_opt := fp.bool('bytes', `c`, false, 'print the byte counts')
 	chars_opt := fp.bool('chars', `m`, false, 'print the character counts')
@@ -265,5 +266,4 @@ fn main() {
 		}
 		print(' total\n')
 	}
-
 }
