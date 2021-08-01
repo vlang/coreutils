@@ -138,7 +138,7 @@ Contributions written in other langauges will likely be rejected.
 |         | uptime    | Print system uptime and load                     |
 |         | users     | Print login names of users currently logged in   |
 |         | vdir      | Verbosely list directory contents                |
-|         | wc        | Print newline, word, and byte counts             |
+| &check; | wc        | Print newline, word, and byte counts             |
 |         | who       | Print who is currently logged in                 |
 | &check; | whoami    | Print effective user ID                          |
 | &check; | yes       | Print a string until interrupted                 |
