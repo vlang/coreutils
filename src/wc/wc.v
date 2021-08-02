@@ -172,8 +172,10 @@ fn get_files(args []string) map[string]os.File {
 }
 
 fn rjust(s string, width int) string {
-	res := ' '.repeat(width - s.len + 2)
-	return res + s
+	if width == 0 {
+		return s
+	}
+	return ' '.repeat(width - s.len) + s
 }
 
 fn main() {
@@ -229,41 +231,71 @@ fn main() {
 		}
 	}
 
+	mut col_size := int(0)
+	if byte(bytes_opt) + byte(chars_opt) + byte(lines_opt) + byte(words_opt) + byte(maxline_opt) == 1 {
+		col_size = 0
+	} else {
+		if total_line_count.str().len > col_size {
+			col_size = total_line_count.str().len
+		}
+		if total_word_count.str().len > col_size {
+			col_size = total_word_count.str().len
+		}
+		if total_byte_count.str().len > col_size {
+			col_size = total_byte_count.str().len
+		}
+		if total_char_count.str().len > col_size {
+			col_size = total_char_count.str().len
+		}
+		if max_line_length.str().len > col_size {
+			col_size = max_line_length.str().len
+		}
+	}
+
+	mut cols := []string{}
 	for res in results {
+		cols = []string{}
 		if lines_opt {
-			print(rjust(res.line_count.str(), total_line_count.str().len))
+			cols << rjust(res.line_count.str(), col_size)
 		}
 		if words_opt {
-			print(rjust(res.word_count.str(), total_word_count.str().len))
+			cols << rjust(res.word_count.str(), col_size)
 		}
 		if bytes_opt {
-			print(rjust(res.byte_count.str(), total_byte_count.str().len))
+			cols << rjust(res.byte_count.str(), col_size)
 		}
 		if chars_opt {
-			print(rjust(res.char_count.str(), total_char_count.str().len))
+			cols << rjust(res.char_count.str(), col_size)
 		}
 		if maxline_opt {
-			print(rjust(res.max_line_length.str(), max_line_length.str().len))
+			cols << rjust(res.max_line_length.str(), col_size)
 		}
-		print(' $res.name\n')
+		if res.name != '-' {
+			cols << res.name
+		}
+		print(cols.join(' '))
+		print('\n')
 	}
 
 	if results.len > 1 {
+		cols = []string{}
 		if lines_opt {
-			print(rjust(total_line_count.str(), total_line_count.str().len))
+			cols << rjust(total_line_count.str(), total_line_count.str().len)
 		}
 		if words_opt {
-			print(rjust(total_word_count.str(), total_word_count.str().len))
+			cols << rjust(total_word_count.str(), total_word_count.str().len)
 		}
 		if bytes_opt {
-			print(rjust(total_byte_count.str(), total_byte_count.str().len))
+			cols << rjust(total_byte_count.str(), total_byte_count.str().len)
 		}
 		if chars_opt {
-			print(rjust(total_char_count.str(), total_char_count.str().len))
+			cols << rjust(total_char_count.str(), total_char_count.str().len)
 		}
 		if maxline_opt {
-			print(rjust(max_line_length.str(), max_line_length.str().len))
+			cols << rjust(max_line_length.str(), max_line_length.str().len)
 		}
-		print(' total\n')
+		cols << 'total'
+		print(cols.join(' '))
+		print('\n')
 	}
 }
