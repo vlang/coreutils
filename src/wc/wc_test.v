@@ -25,7 +25,7 @@ fn test_default() {
 
 	res := os.execute('$the_executable textfile')
 	assert res.exit_code == 0
-	assert res.output == '  1  5  25 textfile\n'
+	assert res.output == ' 1  5 25 textfile\n'
 }
 
 fn test_max_line_length() {
@@ -38,7 +38,7 @@ fn test_max_line_length() {
 
 	res := os.execute('$the_executable -L textfile')
 	assert res.exit_code == 0
-	assert res.output == '  12 textfile\n'
+	assert res.output == '12 textfile\n'
 }
 
 fn test_char_count() {
@@ -51,5 +51,5 @@ fn test_char_count() {
 
 	res := os.execute('$the_executable -m textfile')
 	assert res.exit_code == 0
-	assert res.output == '  25 textfile\n'
+	assert res.output == '25 textfile\n'
 }
