@@ -4,6 +4,7 @@ import os
 import strings
 import strconv
 import regex
+import common
 
 const appname = 'expr'
 
@@ -18,7 +19,7 @@ Options:
   --help                   display this help and exit
   --version                output version information and exit'
 
-const locale = os.getenv('LANG').ends_with('UTF-8') || os.getenv('LANG').ends_with('utf8')
+const locale = common.is_utf8()
 
 type Value = i64 | string
 
