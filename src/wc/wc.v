@@ -245,7 +245,10 @@ fn main() {
 		if maxline_opt {
 			print(rjust(res.max_line_length.str(), max_line_length.str().len))
 		}
-		print(' $res.name\n')
+		if res.name != '-' {
+			print(' $res.name')
+		}
+		print('\n')
 	}
 
 	if results.len > 1 {
