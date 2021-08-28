@@ -156,7 +156,7 @@ fn count_file(mut file os.File) Count {
 
 fn get_files(args []string) map[string]os.File {
 	if args.len == 0 || args[0] == '-' {
-		return map{
+		return {
 			'-': os.stdin()
 		}
 	} else {
