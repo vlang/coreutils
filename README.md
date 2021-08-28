@@ -111,7 +111,7 @@ Contributions written in other langauges will likely be rejected.
 | &check; | sha384sum | Print or check SHA-2 384 bit digests             |
 | &check; | sha512sum | Print or check SHA-2 512 bit digests             |
 |         | shred     | Remove files more securely                       |
-|         | shuf      | Shuffling text                                   |
+| &check; | shuf      | Shuffling text                                   |
 | &check; | sleep     | Delay for a specified time                       |
 |         | sort      | Sort text files                                  |
 |         | split     | Split a file into pieces                         |
