@@ -18,6 +18,11 @@ Each command has it's own separate subdirectory under `src`, in case the
 implementor wishes to create multiple `.v` files to implement a command, or add
 a README.md specifically for that command.
 
+## Developing
+
+Please use the `common` module for command line/help handling.  This will make
+the command input/output consistent across the tools.
+
 ## Building
 
 Running `make` or `v run build.vsh` will build all the programs in `bin/`.
