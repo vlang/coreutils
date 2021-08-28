@@ -1,13 +1,12 @@
 module main
 
-import flag
 import os
 import io
 import rand
+import common
 
 const (
 	app_name        = 'shuf'
-	app_version     = 'v0.0.1'
 	app_description = 'Shuffles its input by outputting a random permutation of its input lines'
 )
 
@@ -177,11 +176,9 @@ fn register_lines_by_file(lines []string, fname string, zero_terminated bool) []
 
 // args
 fn args() Settings {
-	mut fp := flag.new_flag_parser(os.args)
+	mut fp := common.flag_parser(os.args)
 	fp.application(app_name)
-	fp.version(app_version)
 	fp.description(app_description)
-	fp.skip_executable()
 
 	echo := fp.bool('echo', `e`, false, 'Treat each command-line operand as an input line')
 	input_range := fp.string('input-range', `i`, '', 'Act as if input came from a file containing the range of unsigned decimal integers lo…hi, one per line')
@@ -191,11 +188,7 @@ fn args() Settings {
 	repeat := fp.bool('repeat', `r`, false, 'Repeat output values')
 	zero_terminated := fp.bool('zero-terminated', `z`, false, 'Delimit items with a zero byte rather than a newline')
 
-	fnames := fp.finalize() or {
-		eprintln(err)
-		println(fp.usage())
-		exit(1)
-	}
+	fnames := fp.remaining_parameters()
 
 	return Settings{echo, input_range, head_count, output, random_source, repeat, zero_terminated, fnames}
 }
