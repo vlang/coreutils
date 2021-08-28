@@ -29,7 +29,7 @@ Contributions are welcome!
 Please only contribute versions of the original utilities written in V.
 Contributions written in other langauges will likely be rejected.
 
-## Completed (29/109)
+## Completed (30/109)
 
 | Done    | Cmd       | Descripton                                       |
 | :-----: |-----------|--------------------------------------------------|
@@ -111,7 +111,7 @@ Contributions written in other langauges will likely be rejected.
 | &check; | sha384sum | Print or check SHA-2 384 bit digests             |
 | &check; | sha512sum | Print or check SHA-2 512 bit digests             |
 |         | shred     | Remove files more securely                       |
-|         | shuf      | Shuffling text                                   |
+| &check; | shuf      | Shuffling text                                   |
 | &check; | sleep     | Delay for a specified time                       |
 |         | sort      | Sort text files                                  |
 |         | split     | Split a file into pieces                         |
