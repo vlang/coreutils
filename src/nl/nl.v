@@ -8,10 +8,10 @@ import strconv
 import regex
 
 //// Compile options for compatibility ////
-// all_line_separator := false		// false:GNU, true:BSD  
-// remove_delimiter_line := false	// false:GNU, true:BSD 
+// all_line_separator := false		// false:GNU, true:BSD
+// remove_delimiter_line := false	// false:GNU, true:BSD
 // one_delimiter_posix := false		// false:GNU, true:BSD
-// fixed_width := false				// false:GNU, true:BSD 
+// fixed_width := false				// false:GNU, true:BSD
 
 const (
 	app_name        = 'nl'
@@ -40,16 +40,16 @@ enum Style {
 
 struct Settings {
 mut:
-	ini_lno		i64		// -v
-	inc_lno		i64		// -i
-	width		int		// -w
-	separator   string	// -s
-	reset_lno	bool	// -p
-	join_blank  int		// -l
-	format		Format	// -n
-	styles		map[Section]Style		// -b, -h, -f
-	delimiters	map[Section]string		// -d
-	res			map[Section]regex.RE	// -b pRE, -h pRE, -f pRE
+	ini_lno    i64    // -v
+	inc_lno    i64    // -i
+	width      int    // -w
+	separator  string // -s
+	reset_lno  bool   // -p
+	join_blank int    // -l
+	format     Format // -n
+	styles     map[Section]Style    // -b, -h, -f
+	delimiters map[Section]string   // -d
+	res        map[Section]regex.RE // -b pRE, -h pRE, -f pRE
 }
 
 ///===================================================================///
@@ -69,13 +69,13 @@ fn nl(settings Settings, streams []os.File) {
 	mut blanks := 0
 	mut skip := false
 	mut prefix := ''
-	
+
 	f_lno := format_lineno(settings.format, settings.width)
 
 	//// Compile options, default is GNU-compatible behavior ////
 	// In BSD, a separator is added to all lines. This is not POSIX compatible.
 	mut skip_prefix := '' // Why? The variable declaration in ifdef blocks is compile errors.
-	$if all_line_separator? {
+	$if all_line_separator ? {
 		skip_prefix = strings.repeat(` `, settings.width) + settings.separator
 	} $else {
 		skip_prefix = strings.repeat(` `, settings.width + settings.separator.len)
@@ -93,40 +93,42 @@ fn nl(settings Settings, streams []os.File) {
 				.header, .body, .footer {
 					section = next
 					blanks = 0
-					
+
 					if settings.reset_lno {
 						lineno = settings.ini_lno
 					}
 
 					//// Compile options, default is GNU-compatible behavior ////
 					// In BSD, delimiter lines are deleted.
-					$if remove_delimiter_line? { } $else { println('') }
-
+					$if remove_delimiter_line ? {
+					} $else {
+						println('')
+					}
 				}
 				.text {
-					if _unlikely_(overflow) { 
+					if _unlikely_(overflow) {
 						common.exit_with_error_message(app_name, 'Line number overflow')
 					}
 
 					skip, blanks = check_skip_line(settings.styles[section], settings.res[section],
-											settings.join_blank, blanks, line)
-					
+						settings.join_blank, blanks, line)
+
 					if skip {
 						prefix = skip_prefix
 					} else {
-						prefix = strconv.v_sprintf(f_lno, lineno) 
+						prefix = strconv.v_sprintf(f_lno, lineno)
 
 						//// Compile options, default is GNU-compatible behavior ////
 						// In BSD, the upper digits are truncated in case of overflow.
-						$if fixed_width? {
-							i := prefix.len - settings.width					
-							if i > 0 { 
+						$if fixed_width ? {
+							i := prefix.len - settings.width
+							if i > 0 {
 								prefix = prefix[i..]
-							 }
+							}
 						}
 
 						prefix += settings.separator
-						overflow = is_overflow_add_i64(lineno, settings.inc_lno) 
+						overflow = is_overflow_add_i64(lineno, settings.inc_lno)
 						lineno += settings.inc_lno
 						blanks = 0
 					}
@@ -137,7 +139,6 @@ fn nl(settings Settings, streams []os.File) {
 		}
 	}
 }
-
 
 ///===================================================================///
 ///                        Helper Functions                           ///
@@ -156,9 +157,7 @@ fn open_stream(args_fn []string) []os.File {
 			// handle stdin like files
 			streams << os.stdin()
 		} else {
-			streams << os.open(fname) or {
-				common.exit_with_error_message(app_name, err.msg)
-			}
+			streams << os.open(fname) or { common.exit_with_error_message(app_name, err.msg) }
 		}
 	}
 
@@ -227,9 +226,8 @@ fn check_section_delimiter(settings Settings, line string) Section {
 [inline]
 fn is_overflow_add_i64(a i64, b i64) bool {
 	// Warning! Unspecified behavior.
-	return _unlikely_((a < 0 && b < 0 && (a + b) > 0) || (a > 0 && b > 0 && (a + b) < 0))	
+	return _unlikely_((a < 0 && b < 0 && (a + b) > 0) || (a > 0 && b > 0 && (a + b) < 0))
 }
-
 
 ///===================================================================///
 ///                                Args                               ///
@@ -244,24 +242,24 @@ fn args() ?(Settings, []string) {
 
 	// -b
 	b_style := fp.string('body-numbering', `b`, 't', 'Select the numbering style for lines in the body section (a:all, n:none, t:only no blank, pRE: match for the regular expression)')
-	settings.styles[Section.body] = get_style(b_style) or { 
+	settings.styles[Section.body] = get_style(b_style) or {
 		common.exit_with_error_message(app_name, err.msg)
 	}
 	if settings.styles[Section.body] == .regex {
-		settings.res[Section.body] = get_style_regex(b_style) or { 
+		settings.res[Section.body] = get_style_regex(b_style) or {
 			common.exit_with_error_message(app_name, err.msg)
 		}
 	}
 
 	// -d
 	mut delimiter := fp.string('section-delimiter', `d`, '\\:', 'Set the section delimiter')
-	
+
 	//// Compile options, default is GNU-compatible behavior ////
-	// POSIX does not allow a single-character delimiter; 
+	// POSIX does not allow a single-character delimiter;
 	// if it is specified, the second character remains `:`.
 	// Instead of this confusing specification,
 	// it should conform to the legacy GNU extension.
-	$if one_delimiter_posix? {
+	$if one_delimiter_posix ? {
 		if delimiter.len == 1 {
 			delimiter += ':'
 		}
@@ -273,27 +271,27 @@ fn args() ?(Settings, []string) {
 
 	// -f
 	f_style := fp.string('footer-numbering', `f`, 'n', 'Select the numbering style for lines in the footer section')
-	settings.styles[Section.footer] = get_style(f_style) or { 
+	settings.styles[Section.footer] = get_style(f_style) or {
 		common.exit_with_error_message(app_name, err.msg)
 	}
 	if settings.styles[Section.footer] == .regex {
-		settings.res[Section.footer] = get_style_regex(f_style) or { 
+		settings.res[Section.footer] = get_style_regex(f_style) or {
 			common.exit_with_error_message(app_name, err.msg)
 		}
 	}
 
 	// -h
 	h_style := fp.string('header-numbering', `h`, 'n', 'Select the numbering style for lines in the header section')
-	settings.styles[Section.header] = get_style(h_style) or { 
+	settings.styles[Section.header] = get_style(h_style) or {
 		common.exit_with_error_message(app_name, err.msg)
 	}
 	if settings.styles[Section.header] == .regex {
-		settings.res[Section.header] = get_style_regex(h_style) or { 
+		settings.res[Section.header] = get_style_regex(h_style) or {
 			common.exit_with_error_message(app_name, err.msg)
 		}
 	}
 
-	// -i 
+	// -i
 	settings.inc_lno = fp.string('line-increment', `i`, '1', 'Increment line numbers by number').i64()
 
 	// -l
@@ -301,13 +299,11 @@ fn args() ?(Settings, []string) {
 
 	// -n
 	format := fp.string('number-format', `n`, 'rn', 'Select the line numbering format (ln:left-justified, rn:right-justified, rz:leading-zeros)')
-	settings.format = get_format(format) or { 
-		common.exit_with_error_message(app_name, err.msg)
-	}
+	settings.format = get_format(format) or { common.exit_with_error_message(app_name, err.msg) }
 
 	// -p
 	no_renumber := fp.bool('no-renumber', `p`, false, 'Do not reset the line number at the start of each logical page')
-	settings.reset_lno = !(no_renumber)	
+	settings.reset_lno = !no_renumber
 
 	// -s
 	settings.separator = fp.string('number-separator', `s`, '\t', 'Set strings of separator between the line number and the text line')
@@ -316,12 +312,10 @@ fn args() ?(Settings, []string) {
 	settings.ini_lno = fp.string('starting-line-number', `v`, '1', 'Set the initial line number on each logical page').i64()
 
 	// -w
-	settings.width = fp.int('number-width', `w`, 6, 'Set number digits for line numbers')	
+	settings.width = fp.int('number-width', `w`, 6, 'Set number digits for line numbers')
 
 	// files
-	fnames = fp.finalize() or { 
-		common.exit_with_error_message(app_name, err.msg)
-	}
+	fnames = fp.finalize() or { common.exit_with_error_message(app_name, err.msg) }
 
 	return settings, fnames
 }
@@ -337,9 +331,15 @@ fn get_format(str string) ?Format {
 
 fn get_style(str string) ?Style {
 	match str {
-		'a' { return Style.all }
-		't' { return Style.nonempty }
-		'n' { return Style.nonumber }
+		'a' {
+			return Style.all
+		}
+		't' {
+			return Style.nonempty
+		}
+		'n' {
+			return Style.nonumber
+		}
 		else {
 			if str.len > 1 && str[0] == `p` {
 				return Style.regex
@@ -351,7 +351,5 @@ fn get_style(str string) ?Style {
 }
 
 fn get_style_regex(str string) ?regex.RE {
-	return regex.regex_opt(str[1..]) or {
-		return error('Invalid line numbering style: $str')
-	}
+	return regex.regex_opt(str[1..]) or { return error('Invalid line numbering style: $str') }
 }
