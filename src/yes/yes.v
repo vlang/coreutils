@@ -1,19 +1,16 @@
 module main
 
-import flag
+import common
 import os
 
 const (
-	app_name    = 'yes'
-	app_version = 'v0.0.1'
+	app_name = 'yes'
 )
 
 fn yes() {
-	mut fp := flag.new_flag_parser(os.args)
+	mut fp := common.flag_parser(os.args)
 	fp.application(app_name)
-	fp.version(app_version)
 	fp.description('')
-	fp.skip_executable()
 
 	additional_args := fp.finalize() or {
 		eprintln(err)
