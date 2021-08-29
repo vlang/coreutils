@@ -1,12 +1,11 @@
 module main
 
-import flag
+import common
 import os
 import io
 
 const (
 	app_name        = 'cat'
-	app_version     = 'v0.0.1'
 	app_description = 'concatenate files and print on the standard output'
 )
 
@@ -152,11 +151,9 @@ fn format(content string, settings Settings) string {
 ///                                Args                               ///
 ///===================================================================///
 fn args() Settings {
-	mut fp := flag.new_flag_parser(os.args)
+	mut fp := common.flag_parser(os.args)
 	fp.application(app_name)
-	fp.version(app_version)
 	fp.description(app_description)
-	fp.skip_executable()
 
 	show_all := fp.bool('show-all', `A`, false, 'equivalent to -vET')
 	number_nonblanks := fp.bool('number-nonblank', `b`, false, "Number the lines, but don't count blank lines, override -n")
