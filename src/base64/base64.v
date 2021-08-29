@@ -1,5 +1,4 @@
 import os
-import flag
 import common
 import encoding.base64
 
@@ -157,11 +156,8 @@ fn decode_and_print(mut file os.File) {
 }
 
 fn main() {
-	mut fp := flag.new_flag_parser(os.args)
+	mut fp := common.flag_parser(os.args)
 	fp.application(application_name)
-	fp.version(common.coreutils_version())
-	fp.footer(common.coreutils_footer())
-	fp.skip_executable()
 	fp.usage_example('[OPTION]... [FILE]')
 	fp.description('Base64 encode or decode FILE, or standard input, to standard output.')
 	fp.description('If no FILE is specified on the command line or FILE is -, read them from standard input.')
