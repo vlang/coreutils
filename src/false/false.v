@@ -4,7 +4,7 @@ import common
 import os
 
 const (
-	app_name    = 'false'
+	app_name = 'false'
 )
 
 fn false_fn() {
