@@ -1,6 +1,6 @@
 module main
 
-import flag
+import common
 import os
 import io
 import strings
@@ -15,7 +15,6 @@ import regex
 
 const (
 	app_name        = 'nl'
-	app_version     = 'v0.0.1'
 	app_description = 'Line numbering filter'
 )
 
@@ -106,8 +105,7 @@ fn nl(settings Settings, streams []os.File) {
 				}
 				.text {
 					if _unlikely_(overflow) { 
-						eprintln('$app_name: Line number overflow')
-						exit(1)
+						common.exit_with_error_message(app_name, 'Line number overflow')
 					}
 
 					skip, blanks = check_skip_line(settings.styles[section], settings.res[section],
@@ -159,8 +157,7 @@ fn open_stream(args_fn []string) []os.File {
 			streams << os.stdin()
 		} else {
 			streams << os.open(fname) or {
-				eprintln('$app_name: $fname: No such file or directory')
-				exit(1)
+				common.exit_with_error_message(app_name, err.msg)
 			}
 		}
 	}
@@ -241,22 +238,18 @@ fn args() ?(Settings, []string) {
 	mut settings := Settings{}
 	mut fnames := ['-']
 
-	mut fp := flag.new_flag_parser(os.args)
+	mut fp := common.flag_parser(os.args)
 	fp.application(app_name)
-	fp.version(app_version)
 	fp.description(app_description)
-	fp.skip_executable()
 
 	// -b
 	b_style := fp.string('body-numbering', `b`, 't', 'Select the numbering style for lines in the body section (a:all, n:none, t:only no blank, pRE: match for the regular expression)')
 	settings.styles[Section.body] = get_style(b_style) or { 
-		eprintln('$app_name: $err') 
-		exit(1)
+		common.exit_with_error_message(app_name, err.msg)
 	}
 	if settings.styles[Section.body] == .regex {
 		settings.res[Section.body] = get_style_regex(b_style) or { 
-			eprintln('$app_name: $err') 
-			exit(1)
+			common.exit_with_error_message(app_name, err.msg)
 		}
 	}
 
@@ -281,26 +274,22 @@ fn args() ?(Settings, []string) {
 	// -f
 	f_style := fp.string('footer-numbering', `f`, 'n', 'Select the numbering style for lines in the footer section')
 	settings.styles[Section.footer] = get_style(f_style) or { 
-		eprintln('$app_name: $err') 
-		exit(1)
+		common.exit_with_error_message(app_name, err.msg)
 	}
 	if settings.styles[Section.footer] == .regex {
 		settings.res[Section.footer] = get_style_regex(f_style) or { 
-			eprintln('$app_name: $err')
-			exit(1)
+			common.exit_with_error_message(app_name, err.msg)
 		}
 	}
 
 	// -h
 	h_style := fp.string('header-numbering', `h`, 'n', 'Select the numbering style for lines in the header section')
 	settings.styles[Section.header] = get_style(h_style) or { 
-		eprintln('$app_name: $err') 
-		exit(1)
+		common.exit_with_error_message(app_name, err.msg)
 	}
 	if settings.styles[Section.header] == .regex {
 		settings.res[Section.header] = get_style_regex(h_style) or { 
-			eprintln('$app_name: $err') 
-			exit(1)
+			common.exit_with_error_message(app_name, err.msg)
 		}
 	}
 
@@ -313,8 +302,7 @@ fn args() ?(Settings, []string) {
 	// -n
 	format := fp.string('number-format', `n`, 'rn', 'Select the line numbering format (ln:left-justified, rn:right-justified, rz:leading-zeros)')
 	settings.format = get_format(format) or { 
-		eprintln('$app_name: $err') 
-		exit(1)
+		common.exit_with_error_message(app_name, err.msg)
 	}
 
 	// -p
@@ -332,9 +320,7 @@ fn args() ?(Settings, []string) {
 
 	// files
 	fnames = fp.finalize() or { 
-		eprintln('$app_name: $err') 
-		eprintln('Try \'$app_name --help\' for more information.')
-		exit(1)
+		common.exit_with_error_message(app_name, err.msg)
 	}
 
 	return settings, fnames
