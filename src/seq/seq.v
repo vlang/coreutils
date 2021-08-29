@@ -1,12 +1,11 @@
 module main
 
-import flag
+import common
 import os
 import strconv
 
 const (
 	app_name        = 'seq'
-	app_version     = 'v0.0.1'
 	app_description = 'print a sequence of numbers'
 )
 
@@ -113,11 +112,9 @@ fn check_settings(set Settings) ? {
 ///===================================================================///
 
 fn args() ?Settings {
-	mut fp := flag.new_flag_parser(os.args)
+	mut fp := common.flag_parser(os.args)
 	fp.application(app_name)
-	fp.version(app_version)
 	fp.description(app_description)
-	fp.skip_executable()
 
 	// need to change this
 	format := fp.string('format', `f`, '', 'use printf style floating-point FORMAT')
