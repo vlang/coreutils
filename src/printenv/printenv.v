@@ -1,5 +1,4 @@
 import os
-import flag
 import common
 
 const zero_byte = byte(0).ascii_str()
