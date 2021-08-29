@@ -1,5 +1,4 @@
 import os
-import flag
 import common
 import sync
 import runtime
@@ -179,11 +178,8 @@ fn rjust(s string, width int) string {
 }
 
 fn main() {
-	mut fp := flag.new_flag_parser(os.args)
+	mut fp := common.flag_parser(os.args)
 	fp.application(application_name)
-	fp.version(common.coreutils_version())
-	fp.footer(common.coreutils_footer())
-	fp.skip_executable()
 	fp.usage_example('[OPTION]... [FILE]...')
 	fp.description('Print newline, word, and byte counts for each FILE, and a total line if more than one FILE is specified.')
 	fp.description('A word is a non-zero-length sequence of characters delimited by white space.')
