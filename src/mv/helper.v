@@ -22,9 +22,11 @@ fn renamed(src string, dst string) string {
 fn missing_dest(path string) string {
 	return "missing destination file operand after '$path'"
 }
+
 fn no_dir_is_dir(path string) string {
 	return "cannot overwrite directory '$path' with non-directory"
 }
+
 fn not_exist(path string) string {
 	return "$name: cannot stat '$path': No such file or directory"
 }
