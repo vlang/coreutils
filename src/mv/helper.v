@@ -15,7 +15,6 @@ fn target_not_dir(path string) string {
 	return "target '$path' is not a directory"
 }
 
-<<<<<<< HEAD
 fn renamed(src string, dst string) string {
 	return "renamed '$src' -> '$dst'"
 }
@@ -72,14 +71,16 @@ fn setup_mv_command(args []string) ?(MvCommand, []string, string) {
 	no_clobber := fp.bool('no-clobber', `n`, false, 'do not overwrite')
 	update := fp.bool('update', `u`, false, 'update')
 	verbose := fp.bool('verbose', `v`, false, 'print each rename')
+=======
+>>>>>>> e5db1d2 (Added prompt funcs, definition of move)
 pub fn run_mv(args []string) {
 	mv, sources, dest := setup_mv_command(args) or { common.exit_with_error_message(name, err.msg) }
-	println(sources)
-	println(dest)
+	// print(sources)
 	if sources.len > 1 && !os.is_dir(dest) {
 		common.exit_with_error_message(name, target_not_dir(dest))
 	}
 	for source in sources {
+		// println(source)
 		mv.run(source, dest)
 	}
 	// mv.run(sources,dest)
@@ -90,11 +91,11 @@ fn setup_mv_command(args []string) ?(MvCommand, []string, string) {
 	fp.application('mv')
 	fp.limit_free_args_to_at_least(1)
 
-	force := fp.bool('force', `f`, false, 'force')
-	interactive := fp.bool('interactive', `i`, false, 'interactive')
-	no_clobber := fp.bool('no-clobber', `n`, false, 'no-clobber')
+	force := fp.bool('force', `f`, false, 'ignore interactive and no-clobber')
+	interactive := fp.bool('interactive', `i`, false, 'ask for each overwrite')
+	no_clobber := fp.bool('no-clobber', `n`, false, 'do not overwrite')
 	update := fp.bool('update', `u`, false, 'update')
-	verbose := fp.bool('verbose', `v`, false, 'verbose')
+	verbose := fp.bool('verbose', `v`, false, 'print each rename')
 	target_directory := fp.string('target-directory', `t`, '', 'target-directory')
 	no_target_directory := fp.bool('no-target-directory', `T`, false, 'no-target-directory')
 
@@ -148,14 +149,21 @@ fn setup_mv_command(args []string) ?(MvCommand, []string, string) {
 	}
 
 	return MvCommand{
-		force: force
-		interactive: interactive
-		no_clobber: no_clobber
+		overwrite: overwrite
 		update: update
 		verbose: verbose
 		target_directory: target_directory
 		no_target_directory: no_target_directory
 	}, sources, dest
+}
+
+// Print messages and exit with error
+[noreturn]
+fn error_exit(messages ...string) {
+	for message in messages {
+		eprintln(message)
+	}
+	exit(1)
 }
 
 // Print messages and exit
