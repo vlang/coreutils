@@ -7,7 +7,7 @@ fn main() {
 	fp.description('Print certain system information.')
 	fp.description('With no `options`, same as `-s`.')
 	opt_all := fp.bool('all', `a`, false, 'print all information, except omit -p and -i if unknown')
-	mut opt_map := map{
+	mut opt_map := {
 		`s`: fp.bool('kernel-name', `s`, false, 'print the kernel name')
 		`n`: fp.bool('nodename', `n`, false, 'print the network node hostname')
 		`r`: fp.bool('kernel-release', `r`, false, 'print the kernel release')

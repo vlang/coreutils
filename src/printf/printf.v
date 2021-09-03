@@ -54,7 +54,7 @@ fn main() {
 	}
 }
 
-const control_ch = map{
+const control_ch = {
 	`a`: `\a`
 	`b`: `\b`
 	`e`: `\e`
@@ -390,7 +390,7 @@ fn v_sprintf(str string, _pt []string) (string, int, bool) {
 				}
 				i++
 				continue
-			} else if ch == `\'` {
+			} else if ch == `'` {
 				i++
 				continue
 			} else if ch == `.` && fc_ch1 >= `1` && fc_ch1 <= `9` {

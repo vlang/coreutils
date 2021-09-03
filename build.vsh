@@ -7,7 +7,7 @@ const (
 vargs := if os.args.len > 1 { os.args[1..] } else { []string{} }
 
 curdir := getwd()
-chdir('src')
+chdir('src') ?
 
 dirs := ls('.') ?.filter(is_dir(it))
 
@@ -34,4 +34,4 @@ for dir in dirs {
 	execute_or_panic(cmd)
 }
 
-chdir(curdir)
+chdir(curdir) ?

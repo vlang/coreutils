@@ -18,6 +18,11 @@ Each command has it's own separate subdirectory under `src`, in case the
 implementor wishes to create multiple `.v` files to implement a command, or add
 a README.md specifically for that command.
 
+## Developing
+
+Please use the `common` module for command line/help handling.  This will make
+the command input/output consistent across the tools.
+
 ## Building
 
 Running `make` or `v run build.vsh` will build all the programs in `bin/`.
@@ -29,7 +34,7 @@ Contributions are welcome!
 Please only contribute versions of the original utilities written in V.
 Contributions written in other langauges will likely be rejected.
 
-## Completed (21/109)
+## Completed (31/109)
 
 | Done    | Cmd       | Descripton                                       |
 | :-----: |-----------|--------------------------------------------------|
@@ -79,14 +84,14 @@ Contributions written in other langauges will likely be rejected.
 |         | ln        | Make links between files                         |
 | &check; | logname   | Print current login name                         |
 |         | ls        | List directory contents                          |
-|         | md5sum    | Print or check MD5 digests                       |
+| &check; | md5sum    | Print or check MD5 digests                       |
 |         | mkdir     | Make directories                                 |
 |         | mkfifo    | Make FIFOs (named pipes)                         |
 |         | mknod     | Make block or character special files            |
 |         | mktemp    | Create temporary file or directory               |
-|         | mv        | Move (rename) files                              |
+| &check; | mv        | Move (rename) files                              |
 |         | nice      | Run a command with modified niceness             |
-|         | nl        | Number lines and write files                     |
+| &check; | nl        | Number lines and write files                     |
 |         | nohup     | Run a command immune to hangups                  |
 |         | nproc     | Print the number of available processors         |
 |         | numfmt    | Reformat numbers                                 |
@@ -105,13 +110,13 @@ Contributions written in other langauges will likely be rejected.
 |         | rmdir     | Remove empty directories                         |
 |         | runcon    | Run a command in specified SELinux context       |
 | &check; | seq       | Print numeric sequences                          |
-|         | sha1sum   | Print or check SHA-1 digests                     |
-|         | sha224sum | Print or check SHA-2 224 bit digests             |
-|         | sha256sum | Print or check SHA-2 256 bit digests             |
-|         | sha384sum | Print or check SHA-2 384 bit digests             |
-|         | sha512sum | Print or check SHA-2 512 bit digests             |
+| &check; | sha1sum   | Print or check SHA-1 digests                     |
+| &check; | sha224sum | Print or check SHA-2 224 bit digests             |
+| &check; | sha256sum | Print or check SHA-2 256 bit digests             |
+| &check; | sha384sum | Print or check SHA-2 384 bit digests             |
+| &check; | sha512sum | Print or check SHA-2 512 bit digests             |
 |         | shred     | Remove files more securely                       |
-|         | shuf      | Shuffling text                                   |
+| &check; | shuf      | Shuffling text                                   |
 | &check; | sleep     | Delay for a specified time                       |
 |         | sort      | Sort text files                                  |
 |         | split     | Split a file into pieces                         |
@@ -138,8 +143,7 @@ Contributions written in other langauges will likely be rejected.
 |         | uptime    | Print system uptime and load                     |
 |         | users     | Print login names of users currently logged in   |
 |         | vdir      | Verbosely list directory contents                |
-|         | wc        | Print newline, word, and byte counts             |
+| &check; | wc        | Print newline, word, and byte counts             |
 |         | who       | Print who is currently logged in                 |
 | &check; | whoami    | Print effective user ID                          |
 | &check; | yes       | Print a string until interrupted                 |
-

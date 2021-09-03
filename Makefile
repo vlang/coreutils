@@ -10,7 +10,7 @@ fmt:
 	v fmt -w .
 
 test:
-	v test .	
+	LANG=C v test .	
 
 testfmt:
 	v fmt -verify .
