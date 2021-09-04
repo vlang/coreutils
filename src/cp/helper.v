@@ -74,6 +74,7 @@ fn success_exit(messages ...string) {
 fn setup_cp_command(args []string) ?(CpCommand, []string, string) {
 	mut fp := common.flag_parser(args)
 	fp.application('cp')
+<<<<<<< HEAD
 	fp.limit_free_args_to_at_least(1)?
 
 	force := fp.bool('force', `f`, false, 'ignore interactive and no-clobber')
@@ -84,6 +85,9 @@ fn setup_cp_command(args []string) ?(CpCommand, []string, string) {
 	target_directory := fp.string('target-directory', `t`, '', 'target-directory')
 	no_target_directory := fp.bool('no-target-directory', `T`, false, 'no-target-directory')
 	recursive := fp.bool('recursive', `r`, false, 'recursive')
+=======
+	fp.limit_free_args_to_at_least(1)
+>>>>>>> 4197c8e (Basic structure of cp prepared)
 
 	help := fp.bool('help', 0, false, 'display this help and exit')
 	version := fp.bool('version', 0, false, 'output version information and exit')
@@ -94,6 +98,7 @@ fn setup_cp_command(args []string) ?(CpCommand, []string, string) {
 		success_exit('$name $common.coreutils_version()')
 	}
 
+<<<<<<< HEAD
 	options := fp.finalize() or { common.exit_with_error_message(name, 'error') }
 	overwrite := if force {
 		OverwriteMode.force
@@ -154,4 +159,14 @@ fn run_cp(args []string) {
 	for source in sources {
 		cp.run(source, dest)
 	}
+=======
+	sources := []string{}
+	dest := ''
+	return CpCommand{}, sources, dest
+}
+
+fn run_cp(args []string) {
+	cp, sources, dest := setup_cp_command(args) or { common.exit_with_error_message(name, err.msg) }
+	// println('running cp')
+>>>>>>> 4197c8e (Basic structure of cp prepared)
 }
