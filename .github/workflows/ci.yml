@@ -6,37 +6,41 @@ jobs:
   ubuntu:
     runs-on: ubuntu-latest
     steps:
-    - name: Checkout Latest V
-      uses: actions/checkout@v2
-      with:
-        repository: vlang/v
-        path: v
-    - name: Checkout Coreutils
-      uses: actions/checkout@v2
-      with:
-        path: coreutils
-    - name: Build V
-      run: |
-        cd v
-        make
-        sudo ./v symlink
-        cd -
-    - name: V doctor
-      run: v doctor
+      - name: Checkout Latest V
+        uses: actions/checkout@v2
+        with:
+          repository: vlang/v
+          path: v
+      - name: Checkout Coreutils
+        uses: actions/checkout@v2
+        with:
+          path: coreutils
+      - name: Setup the original GNU coreutils for comparison
+        uses: ShenTengTu/setup-gnu-coreutils-action@v1
+        run: |
+          uptime --version
+      - name: Build V
+        run: |
+          cd v
+          make
+          sudo ./v symlink
+          cd -
+      - name: V doctor
+        run: v doctor
 
-    - name: Native utils diagnostics
-      run: |
-        sleep --version
-        uptime -V
+      - name: Native utils diagnostics
+        run: |
+          sleep --version
+          uptime -V
 
-    - name: Ensure everything is formatted
-      run: cd coreutils && make testfmt
+      - name: Ensure everything is formatted
+        run: cd coreutils && make testfmt
 
-    - name: Run tests
-      run: cd coreutils && make test
+      - name: Run tests
+        run: cd coreutils && make test
 
-    - name: Build all
-      run: cd coreutils && v run build.vsh
+      - name: Build all
+        run: cd coreutils && v run build.vsh
 
-    - name: Build all with -prod
-      run: cd coreutils && v run build.vsh -prod
+      - name: Build all with -prod
+        run: cd coreutils && v run build.vsh -prod
