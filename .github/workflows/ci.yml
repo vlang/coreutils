@@ -17,8 +17,8 @@ jobs:
           path: coreutils
       - name: Setup the original GNU coreutils for comparison
         uses: ShenTengTu/setup-gnu-coreutils-action@v1
-        run: |
-          uptime --version
+      - name: Test GNU coreutils uptime
+        run: uptime --version
       - name: Build V
         run: |
           cd v
