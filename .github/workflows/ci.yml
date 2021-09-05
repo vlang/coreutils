@@ -31,7 +31,7 @@ jobs:
       - name: Native utils diagnostics
         run: |
           sleep --version
-          uptime -V
+          uptime --version
 
       - name: Ensure everything is formatted
         run: cd coreutils && make testfmt
