@@ -1,5 +1,4 @@
 import os
-// import common
 
 enum OverwriteMode {
 	force
@@ -9,9 +8,6 @@ enum OverwriteMode {
 
 struct MvCommand {
 	overwrite OverwriteMode
-	// force               bool
-	// interactive         bool
-	// no_clobber          bool
 	update              bool
 	verbose             bool
 	target_directory    string
@@ -25,11 +21,9 @@ fn (m MvCommand) run(source string, dest string) {
 	}
 	if m.verbose || m.overwrite != .force {
 		m.move(source, dest)
-		// m.mv(source,dest)
+	} else {
+		os.mv(source, dest) or { error_exit(name, err.msg) }
 	}
-	os.mv(source, dest) or { error_exit(name, err.msg) }
-	// if os.is_dir()
-	// println(name)
 }
 
 fn (m MvCommand) move(src string, dst string) {

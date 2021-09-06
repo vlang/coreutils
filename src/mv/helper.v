@@ -51,15 +51,12 @@ fn int_yes(prompt string) bool {
 
 pub fn run_mv(args []string) {
 	mv, sources, dest := setup_mv_command(args) or { common.exit_with_error_message(name, err.msg) }
-	// print(sources)
 	if sources.len > 1 && !os.is_dir(dest) {
 		common.exit_with_error_message(name, target_not_dir(dest))
 	}
 	for source in sources {
-		// println(source)
 		mv.run(source, dest)
 	}
-	// mv.run(sources,dest)
 }
 
 fn setup_mv_command(args []string) ?(MvCommand, []string, string) {
