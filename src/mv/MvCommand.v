@@ -1,5 +1,4 @@
 import os
-// import common
 
 enum OverwriteMode {
 	force
@@ -9,9 +8,6 @@ enum OverwriteMode {
 
 struct MvCommand {
 	overwrite OverwriteMode
-	// force               bool
-	// interactive         bool
-	// no_clobber          bool
 	update              bool
 	verbose             bool
 	target_directory    string
