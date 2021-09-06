@@ -7,7 +7,7 @@ enum OverwriteMode {
 }
 
 struct MvCommand {
-	overwrite OverwriteMode
+	overwrite           OverwriteMode
 	update              bool
 	verbose             bool
 	target_directory    string
