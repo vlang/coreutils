@@ -34,7 +34,7 @@ Contributions are welcome!
 Please only contribute versions of the original utilities written in V.
 Contributions written in other langauges will likely be rejected.
 
-## Completed (31/109)
+## Completed (32/109)
 
 | Done    | Cmd       | Descripton                                       |
 | :-----: |-----------|--------------------------------------------------|
@@ -54,7 +54,7 @@ Contributions written in other langauges will likely be rejected.
 |         | cksum     | Print CRC checksum and byte counts               |
 |         | comm      | Compare two sorted files line by line            |
 |         | coreutils | Multi-call program                               |
-|         | cp        | Copy files and directories                       |
+| &check; | cp        | Copy files and directories                       |
 |         | csplit    | Split a file into context-determined pieces      |
 |         | cut       | Print selected parts of lines                    |
 |         | date      | Print or set system date and time                |

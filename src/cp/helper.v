@@ -2,7 +2,7 @@ import os
 import common
 
 const (
-	name            = 'mv'
+	name            = 'cp'
 	interactive_yes = ['y']
 	combine_t_no_t  = 'cannot combine --target-directory (-t) and --no-target-directory (-T)'
 )
@@ -49,19 +49,31 @@ fn int_yes(prompt string) bool {
 	return valid_yes(os.input(prompt))
 }
 
-pub fn run_mv(args []string) {
-	mv, sources, dest := setup_mv_command(args) or { common.exit_with_error_message(name, err.msg) }
-	if sources.len > 1 && !os.is_dir(dest) {
-		common.exit_with_error_message(name, target_not_dir(dest))
-	}
-	for source in sources {
-		mv.run(source, dest)
-	}
+fn not_recursive(path string) string {
+	return "$name: -r not specified; omitting directory '$path'"
 }
 
-fn setup_mv_command(args []string) ?(MvCommand, []string, string) {
+// Print messages and exit with error
+[noreturn]
+fn error_exit(messages ...string) {
+	for message in messages {
+		eprintln(message)
+	}
+	exit(1)
+}
+
+// Print messages and exit
+[noreturn]
+fn success_exit(messages ...string) {
+	for message in messages {
+		println(message)
+	}
+	exit(0)
+}
+
+fn setup_cp_command(args []string) ?(CpCommand, []string, string) {
 	mut fp := common.flag_parser(args)
-	fp.application('mv')
+	fp.application('cp')
 	fp.limit_free_args_to_at_least(1)
 
 	force := fp.bool('force', `f`, false, 'ignore interactive and no-clobber')
@@ -71,6 +83,7 @@ fn setup_mv_command(args []string) ?(MvCommand, []string, string) {
 	verbose := fp.bool('verbose', `v`, false, 'print each rename')
 	target_directory := fp.string('target-directory', `t`, '', 'target-directory')
 	no_target_directory := fp.bool('no-target-directory', `T`, false, 'no-target-directory')
+	recursive := fp.bool('recursive', `r`, false, 'recursive')
 
 	help := fp.bool('help', 0, false, 'display this help and exit')
 	version := fp.bool('version', 0, false, 'output version information and exit')
@@ -78,7 +91,7 @@ fn setup_mv_command(args []string) ?(MvCommand, []string, string) {
 		success_exit(fp.usage())
 	}
 	if version {
-		success_exit('rm $common.coreutils_version()')
+		success_exit('$name $common.coreutils_version()')
 	}
 
 	options := fp.finalize() or { common.exit_with_error_message(name, 'error') }
@@ -121,29 +134,22 @@ fn setup_mv_command(args []string) ?(MvCommand, []string, string) {
 		options[0..len_options - 1], options[len_options - 1]
 	}
 
-	return MvCommand{
+	return CpCommand{
 		overwrite: overwrite
 		update: update
 		verbose: verbose
 		target_directory: target_directory
 		no_target_directory: no_target_directory
+		recursive: recursive
 	}, sources, dest
 }
 
-// Print messages and exit with error
-[noreturn]
-fn error_exit(messages ...string) {
-	for message in messages {
-		eprintln(message)
+fn run_cp(args []string) {
+	cp, sources, dest := setup_cp_command(args) or { common.exit_with_error_message(name, err.msg) }
+	if sources.len > 1 && !os.is_dir(dest) {
+		common.exit_with_error_message(name, target_not_dir(dest))
 	}
-	exit(1)
-}
-
-// Print messages and exit
-[noreturn]
-fn success_exit(messages ...string) {
-	for message in messages {
-		println(message)
+	for source in sources {
+		cp.run(source, dest)
 	}
-	exit(0)
 }

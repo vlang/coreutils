@@ -6,27 +6,32 @@ enum OverwriteMode {
 	no_clobber
 }
 
-struct MvCommand {
+struct CpCommand {
 	overwrite           OverwriteMode
 	update              bool
 	verbose             bool
 	target_directory    string
 	no_target_directory bool
+	recursive           bool
 }
 
-fn (m MvCommand) run(source string, dest string) {
+fn (c CpCommand) run(source string, dest string) {
 	if !os.exists(source) {
 		eprintln(not_exist(source))
 		return
 	}
-	if m.verbose || m.overwrite != .force {
-		m.move(source, dest)
+	if c.verbose || c.overwrite != .force {
+		c.copy(source, dest)
 	} else {
-		os.mv(source, dest) or { error_exit(name, err.msg) }
+		if os.is_dir(source) && !c.recursive {
+			eprintln(not_recursive(source))
+			return
+		}
+		os.cp(source, dest) or { error_exit(name, err.msg) }
 	}
 }
 
-fn (m MvCommand) move(src string, dst string) {
+fn (c CpCommand) copy(src string, dst string) {
 	ndst := if os.is_dir(dst) {
 		os.join_path(dst.trim_right(os.path_separator), os.file_name(src.trim_right(os.path_separator)))
 	} else {
@@ -34,18 +39,18 @@ fn (m MvCommand) move(src string, dst string) {
 	}
 
 	rdst := $if windows { ndst.replace('/', '\\') } $else { ndst }
-	if !m.int_yes(rdst) {
+	if !c.int_yes(rdst) {
 		return
 	}
-	os.mv(src, rdst) or { return }
-	if m.verbose {
+	os.cp(src, rdst) or { return }
+	if c.verbose {
 		println(renamed(src, dst))
 	}
 }
 
-fn (m MvCommand) int_yes(path string) bool {
+fn (c CpCommand) int_yes(path string) bool {
 	if os.exists(path) {
-		match m.overwrite {
+		match c.overwrite {
 			.no_clobber { return false }
 			.interactive { return int_yes(prompt_file(path)) }
 			.force { return true }
