@@ -1,3 +1,4 @@
+module cp
 import os
 import common
 
@@ -144,6 +145,7 @@ fn setup_cp_command(args []string) ?(CpCommand, []string, string) {
 	}, sources, dest
 }
 
+<<<<<<< HEAD
 fn run_cp(args []string) {
 	cp, sources, dest := setup_cp_command(args) or {
 		common.exit_with_error_message(name, err.msg())
@@ -157,6 +159,9 @@ fn run_cp(args []string) {
 }
 
 fn run_cp(args []string) {
+=======
+pub fn run_cp(args []string) {
+>>>>>>> e94acd3 (Rearranged modules to make the main executable of module main)
 	cp, sources, dest := setup_cp_command(args) or { common.exit_with_error_message(name, err.msg) }
 	if sources.len > 1 && !os.is_dir(dest) {
 		common.exit_with_error_message(name, target_not_dir(dest))

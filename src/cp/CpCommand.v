@@ -1,3 +1,4 @@
+module cp
 import os
 
 enum OverwriteMode {

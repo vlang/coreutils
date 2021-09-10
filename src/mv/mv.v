@@ -1,5 +1,7 @@
+module main
 import os
+import mv
 
 fn main() {
-	run_mv(os.args)
+	mv.run_mv(os.args)
 }
