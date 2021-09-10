@@ -290,8 +290,8 @@ struct C.stat {
 	st_size  u64
 	st_mode  u32
 	st_mtime int
-	st_dev   size_t
-	st_ino   size_t
+	st_dev   usize
+	st_ino   usize
 }
 
 enum FileType {
