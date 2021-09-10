@@ -1,4 +1,5 @@
 module cp
+
 import os
 import common
 
@@ -29,7 +30,7 @@ fn no_dir_is_dir(path string) string {
 }
 
 fn not_exist(path string) string {
-	return "$name: cannot stat '$path': No such file or directory"
+	return "$cp.name: cannot stat '$path': No such file or directory"
 }
 
 fn extra_operand(operand string) string {
@@ -39,7 +40,7 @@ fn extra_operand(operand string) string {
 fn valid_yes(input string) bool {
 	mut is_yes := false
 	low_input := input.to_lower()
-	for yes in interactive_yes {
+	for yes in cp.interactive_yes {
 		is_yes = is_yes || low_input.starts_with(yes)
 	}
 	return is_yes
@@ -51,7 +52,7 @@ fn int_yes(prompt string) bool {
 }
 
 fn not_recursive(path string) string {
-	return "$name: -r not specified; omitting directory '$path'"
+	return "$cp.name: -r not specified; omitting directory '$path'"
 }
 
 // Print messages and exit with error
@@ -92,10 +93,10 @@ fn setup_cp_command(args []string) ?(CpCommand, []string, string) {
 		success_exit(fp.usage())
 	}
 	if version {
-		success_exit('$name $common.coreutils_version()')
+		success_exit('$cp.name $common.coreutils_version()')
 	}
 
-	options := fp.finalize() or { common.exit_with_error_message(name, 'error') }
+	options := fp.finalize() or { common.exit_with_error_message(cp.name, 'error') }
 	overwrite := if force {
 		OverwriteMode.force
 	} else if no_clobber {
@@ -108,24 +109,24 @@ fn setup_cp_command(args []string) ?(CpCommand, []string, string) {
 	len_options := options.len
 	if target_directory != '' {
 		if no_target_directory {
-			common.exit_with_error_message(name, combine_t_no_t)
+			common.exit_with_error_message(cp.name, cp.combine_t_no_t)
 		}
 		if !os.exists(target_directory) {
-			common.exit_with_error_message(name, not_exist(target_directory))
+			common.exit_with_error_message(cp.name, not_exist(target_directory))
 		}
 		if !os.is_dir(target_directory) {
-			common.exit_with_error_message(name, target_not_dir(target_directory))
+			common.exit_with_error_message(cp.name, target_not_dir(target_directory))
 		}
 	} else {
 		if len_options < 2 {
-			common.exit_with_error_message(name, missing_dest(options[0]))
+			common.exit_with_error_message(cp.name, missing_dest(options[0]))
 		}
 		if no_target_directory {
 			if len_options > 2 {
-				common.exit_with_error_message(name, extra_operand(options[2]))
+				common.exit_with_error_message(cp.name, extra_operand(options[2]))
 			}
 			if os.is_dir(options[1]) {
-				common.exit_with_error_message(name, no_dir_is_dir(options[1]))
+				common.exit_with_error_message(cp.name, no_dir_is_dir(options[1]))
 			}
 		}
 	}
@@ -146,9 +147,11 @@ fn setup_cp_command(args []string) ?(CpCommand, []string, string) {
 }
 
 pub fn run_cp(args []string) {
-	cp, sources, dest := setup_cp_command(args) or { common.exit_with_error_message(name, err.msg) }
+	cp, sources, dest := setup_cp_command(args) or {
+		common.exit_with_error_message(cp.name, err.msg)
+	}
 	if sources.len > 1 && !os.is_dir(dest) {
-		common.exit_with_error_message(name, target_not_dir(dest))
+		common.exit_with_error_message(cp.name, target_not_dir(dest))
 	}
 	for source in sources {
 		cp.run(source, dest)

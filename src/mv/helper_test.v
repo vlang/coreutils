@@ -1,4 +1,5 @@
 module mv
+
 fn test_valid_yes() {
 	// assert 1==2
 	assert valid_yes('y')
