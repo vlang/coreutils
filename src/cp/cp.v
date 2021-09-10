@@ -1,6 +1,8 @@
 module main
+
 import os
-import cp
+import src.cp
+
 fn main() {
 <<<<<<< HEAD
 	run_cp(os.args)
