@@ -1,4 +1,4 @@
-module main
+module rm
 
 import os
 

@@ -1,4 +1,4 @@
-// module rmutil
+module rm
 import os
 import common
 

@@ -1,5 +1,6 @@
+module main
 import os
-
+import cp
 fn main() {
-	run_cp(os.args)
+	cp.run_cp(os.args)
 }
