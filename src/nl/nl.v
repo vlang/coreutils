@@ -145,12 +145,9 @@ fn nl(settings Settings, streams []os.File) {
 ///===================================================================///
 fn open_stream(args_fn []string) []os.File {
 	mut streams := []os.File{}
-	mut fnames := ['-']
 
 	// if there are no files, read from stdin
-	if args_fn.len > 0 {
-		fnames = &args_fn
-	}
+	fnames := if args_fn.len > 0 { args_fn } else { ['-'] }
 
 	for fname in fnames {
 		if fname == '-' {
