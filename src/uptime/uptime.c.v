@@ -83,9 +83,9 @@ fn print_uptime(utmp_buf []C.utmpx) ? {
 		print('up ???? days ??:??,  ')
 	} else {
 		if 0 < updays {
-			print(' up $updays day${plural(updays)} ${uphours:2}:${upmins:02}')
+			print(' up  $updays day${plural(updays)} ${uphours:2}:${upmins:02}')
 		} else {
-			print(' up ${uphours:2}:${upmins:02}')
+			print(' up  ${uphours:2}:${upmins:02}')
 		}
 	}
 	print(',  $entries user${plural(i64(entries))}')
