@@ -78,7 +78,7 @@ fn setup_mv_command(args []string) ?(MvCommand, []string, string) {
 		success_exit(fp.usage())
 	}
 	if version {
-		success_exit('rm $common.coreutils_version()')
+		success_exit('$name $common.coreutils_version()')
 	}
 
 	options := fp.finalize() or { common.exit_with_error_message(name, 'error') }
