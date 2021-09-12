@@ -34,7 +34,7 @@ Contributions are welcome!
 Please only contribute versions of the original utilities written in V.
 Contributions written in other langauges will likely be rejected.
 
-## Completed (32/109)
+## Completed (33/109)
 
 | Done    | Cmd       | Descripton                                       |
 | :-----: |-----------|--------------------------------------------------|
@@ -140,7 +140,7 @@ Contributions written in other langauges will likely be rejected.
 |         | unexpand  | Convert spaces to tabs                           |
 |         | uniq      | Uniquify files                                   |
 |         | unlink    | Remove files via the unlink syscall              |
-|         | uptime    | Print system uptime and load                     |
+| &check; | uptime    | Print system uptime and load                     |
 |         | users     | Print login names of users currently logged in   |
 |         | vdir      | Verbosely list directory contents                |
 | &check; | wc        | Print newline, word, and byte counts             |
