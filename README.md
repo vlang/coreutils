@@ -34,7 +34,7 @@ Contributions are welcome!
 Please only contribute versions of the original utilities written in V.
 Contributions written in other langauges will likely be rejected.
 
-## Completed (32/109)
+## Completed (33/109)
 
 | Done    | Cmd       | Descripton                                       |
 | :-----: |-----------|--------------------------------------------------|
