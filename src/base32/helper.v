@@ -1,44 +1,45 @@
 import os
-import bitfield		
+import bitfield
 import strings
 import common
 
 const (
-	name       = 'base32'
-	block_size = 5
-	group_size  = 5
+	name         = 'base32'
+	block_size   = 5
+	group_size   = 5
 	bits_in_byte = 8
-	char_set = [`A`, `B`, `C`, `D`, `E`, `F`, `G`, `H`, `I`, `J`, `K`, `L`, `M`, `N`, `O`, `P`, `Q`, `R`, `S`, `T`, `U`, `V`, `W`, `X`, `Y`, `Z`, `2`, `3`,`4`, `5`, `6`, `7`, `=`]
+	char_set     = [`A`, `B`, `C`, `D`, `E`, `F`, `G`, `H`, `I`, `J`, `K`, `L`, `M`, `N`, `O`,
+		`P`, `Q`, `R`, `S`, `T`, `U`, `V`, `W`, `X`, `Y`, `Z`, `2`, `3`, `4`, `5`, `6`, `7`, `=`]
 )
 
 fn decode_and_output(file os.File, wrap int) {
-	
 }
 
 // IMP: This code assumes that each group_size <= 8 bits (1 byte).
 // If using groups without this property, change the return type
-fn get_groups(block[]byte, num byte) []byte{
+fn get_groups(block []byte, num byte) []byte {
 	// bits := (byte(1)<<bits_size) - 1
 	full_block := bitfield.from_bytes(block)
 	mut groups := []byte{}
 	num_blocks := block_size * bits_in_byte / group_size
 	// for i := num_blocks - 1 ; i >= 0; i-- {
-		// shift := groups_size * i
-		// groups << group
+	// shift := groups_size * i
+	// groups << group
 	// }
-	for i in 0..num_blocks {
-		groups << byte(full_block.extract(i*group_size,group_size))
-	} 
-	for i in 0..num {
-		groups[groups.len-i-1] = byte(1)<<group_size
+	for i in 0 .. num_blocks {
+		groups << byte(full_block.extract(i * group_size, group_size))
+	}
+	for i in 0 .. num {
+		groups[groups.len - i - 1] = byte(1) << group_size
 	}
 	return groups
 }
+
 fn encode_and_output(file os.File, wrap int) {
 	mut block := []byte{len: block_size}
 	mut i := u64(0)
 	mut done := false
-	for !done{
+	for !done {
 		num := file.read_bytes_into(i, mut block) or {
 			// println('here')
 			common.exit_with_error_message(name, err.msg)
@@ -54,14 +55,14 @@ fn encode_and_output(file os.File, wrap int) {
 		}
 
 		num_equal := match num {
-			1 {6}
-			2{4}
-			3{3}
-			4{1}
-			else {0}
+			1 { 6 }
+			2 { 4 }
+			3 { 3 }
+			4 { 1 }
+			else { 0 }
 		}
-		groups := get_groups(block,byte(num_equal))
-		mut result := strings.new_builder(groups.len) 
+		groups := get_groups(block, byte(num_equal))
+		mut result := strings.new_builder(groups.len)
 		for group in groups {
 			result.write_b(char_set[group])
 		}
