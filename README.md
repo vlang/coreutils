@@ -34,14 +34,14 @@ Contributions are welcome!
 Please only contribute versions of the original utilities written in V.
 Contributions written in other langauges will likely be rejected.
 
-## Completed (33/109)
+## Completed (34/109)
 
 | Done    | Cmd       | Descripton                                       |
 | :-----: |-----------|--------------------------------------------------|
 | &check; | **[**     | Alternate form of `test`                         |
 | &check; | arch      | Print machine hardware name                      |
 |         | b2sum     | Print or check BLAKE2 digests                    |
-|         | base32    | Transform data into printable data               |
+| &check; | base32    | Transform data into printable data               |
 | &check; | base64    | Transform data into printable data               |
 | &check; | basename  | Strip directory and suffix from a file name      |
 |         | basenc    | Transform data into printable data               |
