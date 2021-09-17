@@ -19,22 +19,21 @@ fn yes() {
 		exit(1)
 	}
 
-	mut str := 'y'
+	mut expletive := 'y'
 
 	if additional_args.len > 0 {
-		str = additional_args.join(' ')
+		expletive = additional_args.join(' ')
 	}
-	str += '\n'
-	expletive := voidptr(&(str.bytes())[0])
+	expletive += '\n'
 
 	mut yes_buf := unsafe { malloc(buf_size) }
 	mut buf_used := 0
 
-	for buf_used + str.len <= buf_size {
+	for buf_used + expletive.len <= buf_size {
 		unsafe {
-			vmemcpy(yes_buf + buf_used, expletive, str.len)
+			vmemcpy(yes_buf + buf_used, expletive.str, expletive.len)
 		}
-		buf_used += str.len
+		buf_used += expletive.len
 	}
 
 	mut out := os.stdout()
