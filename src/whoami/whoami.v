@@ -14,7 +14,7 @@ fn main() {
 	fp.application('whoami')
 	fp.description('Print the user name associated with the current effective user ID.')
 	fp.description('Same as id -un.')
-	fp.limit_free_args_to_exactly(0)
+	fp.limit_free_args_to_exactly(0) ?
 	fp.remaining_parameters()
 	uid := os.geteuid()
 	if uid == -1 {

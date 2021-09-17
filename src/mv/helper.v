@@ -62,7 +62,7 @@ pub fn run_mv(args []string) {
 fn setup_mv_command(args []string) ?(MvCommand, []string, string) {
 	mut fp := common.flag_parser(args)
 	fp.application('mv')
-	fp.limit_free_args_to_at_least(1)
+	fp.limit_free_args_to_at_least(1) ?
 
 	force := fp.bool('force', `f`, false, 'ignore interactive and no-clobber')
 	interactive := fp.bool('interactive', `i`, false, 'ask for each overwrite')
