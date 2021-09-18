@@ -5,6 +5,7 @@ import os
 
 const (
 	app_name = 'yes'
+	buf_size = 8192
 )
 
 fn yes() {
@@ -18,14 +19,28 @@ fn yes() {
 		exit(1)
 	}
 
-	mut str := 'y'
+	mut expletive := 'y'
 
 	if additional_args.len > 0 {
-		str = additional_args.join(' ')
+		expletive = additional_args.join(' ')
+	}
+	expletive += '\n'
+
+	mut yes_buf := unsafe { malloc(buf_size) }
+	mut buf_used := 0
+
+	for buf_used + expletive.len <= buf_size {
+		unsafe {
+			vmemcpy(yes_buf + buf_used, expletive.str, expletive.len)
+		}
+		buf_used += expletive.len
 	}
 
-	for {
-		println(str)
+	mut out := os.stdout()
+	unsafe {
+		for {
+			out.write_ptr(yes_buf, buf_used)
+		}
 	}
 }
 
