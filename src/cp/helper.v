@@ -74,7 +74,7 @@ fn success_exit(messages ...string) {
 fn setup_cp_command(args []string) ?(CpCommand, []string, string) {
 	mut fp := common.flag_parser(args)
 	fp.application('cp')
-	fp.limit_free_args_to_at_least(1)
+	fp.limit_free_args_to_at_least(1) ?
 
 	force := fp.bool('force', `f`, false, 'ignore interactive and no-clobber')
 	interactive := fp.bool('interactive', `i`, false, 'ask for each overwrite')

@@ -116,7 +116,7 @@ fn check_interactive(interactive string) ?Interactive {
 fn setup_rm_command(args []string) ?(RmCommand, []string) {
 	mut fp := common.flag_parser(args)
 	fp.application('rm')
-	fp.limit_free_args_to_at_least(1)
+	fp.limit_free_args_to_at_least(1) ?
 
 	dir := fp.bool('dir', `d`, false, 'dir')
 	force := fp.bool('force', `f`, false, 'force')

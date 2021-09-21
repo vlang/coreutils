@@ -8,7 +8,7 @@ fn main() {
 	mut fp := common.flag_parser(os.args)
 	fp.application('arch')
 	fp.description('Print machine architecture.')
-	fp.limit_free_args_to_exactly(0)
+	fp.limit_free_args_to_exactly(0) ?
 	fp.remaining_parameters()
 	// Main functionality
 	println(os.uname().machine)

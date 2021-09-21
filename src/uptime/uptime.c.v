@@ -121,7 +121,7 @@ fn main() {
 		fp.description('the load average. If FILE is not specified, use ${utmp_file_vstr}.')
 		fp.description('$wtmp_file_vstr as FILE is common.')
 	}
-	fp.limit_free_args(0, 1)
+	fp.limit_free_args(0, 1) ?
 	args := fp.remaining_parameters()
 
 	// Main functionality
