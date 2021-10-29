@@ -1,5 +1,5 @@
-import os
+// import os
 
-fn main() {
-	run_rmdir(os.args)
-}
+// fn main() {
+	// run_rmdir(os.args)
+// }
