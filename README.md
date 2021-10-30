@@ -20,7 +20,7 @@ a README.md specifically for that command.
 
 ## Developing
 
-Please use the `common` module for command line/help handling.  This will make
+Please use the `common` module for command line/help handling. This will make
 the command input/output consistent across the tools.
 
 ## Building
@@ -34,10 +34,10 @@ Contributions are welcome!
 Please only contribute versions of the original utilities written in V.
 Contributions written in other langauges will likely be rejected.
 
-## Completed (34/109)
+## Completed (35/109)
 
-| Done    | Cmd       | Descripton                                       |
-| :-----: |-----------|--------------------------------------------------|
+|  Done   | Cmd       | Descripton                                       |
+| :-----: | --------- | ------------------------------------------------ |
 | &check; | **[**     | Alternate form of `test`                         |
 | &check; | arch      | Print machine hardware name                      |
 |         | b2sum     | Print or check BLAKE2 digests                    |
@@ -107,7 +107,7 @@ Contributions written in other langauges will likely be rejected.
 |         | readlink  | Print value of a symlink or canonical file name  |
 |         | realpath  | Print the resolved file name                     |
 | &check; | rm        | Remove files or directories                      |
-|         | rmdir     | Remove empty directories                         |
+| &check; | rmdir     | Remove empty directories                         |
 |         | runcon    | Run a command in specified SELinux context       |
 | &check; | seq       | Print numeric sequences                          |
 | &check; | sha1sum   | Print or check SHA-1 digests                     |
