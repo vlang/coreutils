@@ -1,4 +1,7 @@
+import common
+
 const (
+	name              = 'rmdir'
 	valid_interactive = [
 		['never', 'no', 'none'],
 		['once'],
@@ -6,8 +9,12 @@ const (
 	]
 )
 
-fn setup_rm_command(args []string) ?(RmdirCommand,[]string) {
+fn success_exit(msg string) {
+	println(msg)
+	exit(0)
+}
 
+fn setup_rmdir_command(args []string) ?(RmdirCommand, []string) {
 	mut fp := common.flag_parser(args)
 	fp.application('rm')
 	fp.limit_free_args_to_at_least(1) ?
@@ -29,8 +36,9 @@ fn setup_rm_command(args []string) ?(RmdirCommand,[]string) {
 
 	return rmdir, dirs
 }
+
 fn run_rmdir(args []string) {
-	rmdir, dirs := setup_rmdir_command(args) or {common.exit_with_error_message(name,err.msg)}
+	rmdir, dirs := setup_rmdir_command(args) or { common.exit_with_error_message(name, err.msg) }
 	for dir in dirs {
 		rmdir.remove_dir(dir)
 	}
