@@ -12,8 +12,7 @@ const (
 	end_byte          = `=`
 	char_set          = [`A`, `B`, `C`, `D`, `E`, `F`, `G`, `H`, `I`, `J`, `K`, `L`, `M`, `N`,
 		`O`, `P`, `Q`, `R`, `S`, `T`, `U`, `V`, `W`, `X`, `Y`, `Z`, `2`, `3`, `4`, `5`, `6`, `7`,
-		`=`,
-	]
+		`=`]
 	invalid           = 'invalid input'
 )
 
