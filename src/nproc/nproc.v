@@ -17,19 +17,13 @@ fn main() {
 	mut fp := common.flag_parser(os.args)
 	fp.application('nproc')
 	fp.description('Print the number of processing units available to the current process.')
-	fp.limit_free_args_to_at_least(1) ?
 
 	// Get arguments
-	print_help := fp.bool('help', 0, false, 'Print help')
-	print_version := fp.bool('version', 0, false, 'Print version')
 	all_flag := fp.bool('all', 0, false, 'Print the number of detected processor(s)')
 	ignored_cpus := fp.int('ignore', 0, 0, 'Exclude N processing units if possible')
 
-	// If the help / version is asked print the help and stop here
-	if print_help || print_version {
-		println(fp.usage())
-		exit(0)
-	}
+	// Other flags
+	fp.remaining_parameters()
 
 	// Check if ignored CPUs is > 0
 	if ignored_cpus < 0 {
