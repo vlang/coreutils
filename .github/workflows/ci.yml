@@ -3,7 +3,7 @@ name: Build and Test
 on: [push, pull_request]
 
 jobs:
-  ubuntu:
+  ubuntu-fast-build:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Latest V
@@ -11,25 +11,55 @@ jobs:
         with:
           repository: vlang/v
           path: v
-
       - name: Build V
         run: cd v && make && sudo ./v symlink && cd -
-      - name: V doctor
-        run: v doctor
-
       - name: Checkout Coreutils (for tests)
         uses: actions/checkout@v2
         with:
           path: coreutils
 
+      - name: V doctor
+        run: v doctor
       - name: Ensure everything is formatted
         run: cd coreutils && make testfmt
-
       - name: Build all
         run: cd coreutils && v run build.vsh
 
+  ubuntu-prod-build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Latest V
+        uses: actions/checkout@v2
+        with:
+          repository: vlang/v
+          path: v
+      - name: Build V
+        run: cd v && make && sudo ./v symlink && cd -
+      - name: Checkout Coreutils (for tests)
+        uses: actions/checkout@v2
+        with:
+          path: coreutils
+
       - name: Build all with -prod
         run: cd coreutils && v run build.vsh -prod
+
+  ubuntu-gnu-coreutils:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Latest V
+        uses: actions/checkout@v2
+        with:
+          repository: vlang/v
+          path: v
+      - name: Build V
+        run: cd v && make && sudo ./v symlink && cd -
+      - name: Checkout Coreutils (for tests)
+        uses: actions/checkout@v2
+        with:
+          path: coreutils
+
+      - name: Build all
+        run: cd coreutils && v run build.vsh
 
       - name: Native utils diagnostics (before GNU coreutils)
         run: |
