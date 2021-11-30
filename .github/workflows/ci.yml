@@ -14,9 +14,13 @@ jobs:
 
       - name: Build V
         run: cd v && make && sudo ./v symlink && cd -
-
       - name: V doctor
         run: v doctor
+
+      - name: Checkout Coreutils (for tests)
+        uses: actions/checkout@v2
+        with:
+          path: coreutils
 
       - name: Ensure everything is formatted
         run: cd coreutils && make testfmt
@@ -31,10 +35,6 @@ jobs:
         run: |
           sleep --version
           uptime --version
-      - name: Checkout Coreutils (for tests)
-        uses: actions/checkout@v2
-        with:
-          path: coreutils
       - name: Setup the original GNU coreutils for comparison
         uses: ShenTengTu/setup-gnu-coreutils-action@v1
       - name: Test GNU coreutils uptime
