@@ -1,4 +1,4 @@
-include runtime
+import runtime
 
 /*
 ** Installed_processors
