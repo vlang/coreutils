@@ -11,7 +11,27 @@ jobs:
         with:
           repository: vlang/v
           path: v
-      - name: Checkout Coreutils
+
+      - name: Build V
+        run: cd v && make && sudo ./v symlink && cd -
+
+      - name: V doctor
+        run: v doctor
+
+      - name: Ensure everything is formatted
+        run: cd coreutils && make testfmt
+
+      - name: Build all
+        run: cd coreutils && v run build.vsh
+
+      - name: Build all with -prod
+        run: cd coreutils && v run build.vsh -prod
+
+      - name: Native utils diagnostics (before GNU coreutils)
+        run: |
+          sleep --version
+          uptime --version
+      - name: Checkout Coreutils (for tests)
         uses: actions/checkout@v2
         with:
           path: coreutils
@@ -19,28 +39,6 @@ jobs:
         uses: ShenTengTu/setup-gnu-coreutils-action@v1
       - name: Test GNU coreutils uptime
         run: uptime --version
-      - name: Build V
-        run: |
-          cd v
-          make
-          sudo ./v symlink
-          cd -
-      - name: V doctor
-        run: v doctor
-
-      - name: Native utils diagnostics
-        run: |
-          sleep --version
-          uptime --version
-
-      - name: Ensure everything is formatted
-        run: cd coreutils && make testfmt
 
       - name: Run tests
         run: cd coreutils && make test
-
-      - name: Build all
-        run: cd coreutils && v run build.vsh
-
-      - name: Build all with -prod
-        run: cd coreutils && v run build.vsh -prod
