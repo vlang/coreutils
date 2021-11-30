@@ -32,7 +32,10 @@ fn main() {
 	}
 
 	// Get number of CPUs
-	mut cpus := runtime.nr_cpus()
+	// If "all" flag is set, get the number of CPU configured by the system
+	// else, return the number of CPU usable (which can be different).
+	// ONLINE (Available) != CONFIGURED (OS)
+	mut cpus := if all_flag { nb_configured_processors() } else { runtime.nr_cpus() }
 
 	// Check number of CPU "ignored" and if "ignored" > CPU set it to 1
 	if ignored_cpus >= cpus {
