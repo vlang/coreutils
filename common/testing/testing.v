@@ -114,8 +114,7 @@ pub fn same_results(cmd1 string, cmd2 string) bool {
 	if cmd1.contains('printenv') && cmd2.contains('printenv.exe') {
 		return cmd1_res.exit_code == cmd2_res.exit_code
 	}
-	if (cmd1 == 'uptime /var/log/wtmp' && cmd2.ends_with('uptime.exe /var/log/wtmp'))
-		|| (cmd1 == 'uptime' && cmd2.ends_with('uptime.exe')) {
+	if cmd1 == 'uptime' || cmd1 == 'uptime /var/log/wtmp' {
 		after1 := cmd1_res.output.all_after('load average:')
 		after2 := cmd2_res.output.all_after('load average:')
 		dump(after1.len)
