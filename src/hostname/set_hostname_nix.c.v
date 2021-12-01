@@ -2,14 +2,6 @@
 
 fn C.sethostname(&char, int) int
 
-// Error enum
-pub enum HostnameErrno {
-	invalid_address
-	invalid_value
-	missing_permissions
-	unknown
-}
-
 // Set hostname on linux hosts
 // return 0 if success
 fn set_hostname(hostname string) int {
@@ -29,11 +21,11 @@ fn set_hostname(hostname string) int {
 }
 
 // Fancy wrapper for error codes if set_hostname returns -1
-fn errno_get_hostname() HostnameErrno {
+fn errno_get_hostname() HostnameError {
 	return match C.errno {
-		C.EFAULT { HostnameErrno.invalid_address }
-		C.EINVAL { HostnameErrno.invalid_value }
-		C.EPERM { HostnameErrno.missing_permissions }
-		else { HostnameErrno.unknown }
+		C.EFAULT { HostnameError.invalid_address }
+		C.EINVAL { HostnameError.invalid_value }
+		C.EPERM { HostnameError.missing_permissions }
+		else { HostnameError.unknown }
 	}
 }

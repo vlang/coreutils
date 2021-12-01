@@ -14,6 +14,15 @@ const (
 ** Original author: Benoît <SheatNoisette> Malhomme
 */
 
+// Error enum for set hostname
+pub enum HostnameError {
+	invalid_address
+	invalid_value
+	missing_permissions
+	unsupported
+	unknown
+}
+
 // Set the hostname, return true if success
 // SUSv2 guarantees that ‘Host names are limited to 255 bytes’
 // For linux targets, vlib hardcode 256 bytes for getting hostnames
@@ -26,8 +35,9 @@ fn hst_set_hostname(hostname string) {
 		// Fancy error printing
 		message := match errno_get_hostname() {
 			.invalid_address { 'The hostname defined is an invalid address.' }
-			.invalid_value { 'The hostname name is invalid.' }
-			.missing_permissions { 'An error occured while changing hostname, are you root ?' }
+			.invalid_value { 'The host name is invalid.' }
+			.missing_permissions { 'An error occured while changing host name, are you root ?' }
+			.unsupported { 'Setting hostname is not currently supported on your OS.' }
 			else { 'An unknown error occured' }
 		}
 		common.exit_with_error_message(app_name, message)
