@@ -25,7 +25,7 @@ jobs:
       - name: Build all
         run: cd coreutils && v run build.vsh
       - name: Debug uptime_test.v
-        run: v -d trace_same_results -stats src/uptime/uptime_test.v
+        run: cd coreutils && v -d trace_same_results -stats src/uptime/uptime_test.v
       - name: Run tests
         run: cd coreutils && make test
 
