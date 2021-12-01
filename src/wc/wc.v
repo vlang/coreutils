@@ -114,7 +114,7 @@ fn file_reader_counter(mut file_reader FileReader, counts chan Count) {
 		total_count.line_count += count.line_count
 		total_count.word_count += count.word_count
 		total_count.byte_count += u32(chunk.buffer.len)
-		total_count.char_count += u32(string(chunk.buffer).runes().len)
+		total_count.char_count += u32(chunk.buffer.bytestr().runes().len)
 		if count.max_line_length > total_count.max_line_length {
 			total_count.max_line_length = count.max_line_length
 		}
