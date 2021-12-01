@@ -116,8 +116,13 @@ pub fn same_results(cmd1 string, cmd2 string) bool {
 	}
 	if (cmd1 == 'uptime /var/log/wtmp' && cmd2.ends_with('uptime.exe /var/log/wtmp'))
 		|| (cmd1 == 'uptime' && cmd2.ends_with('uptime.exe')) {
-		return cmd1_res.exit_code == cmd2_res.exit_code
-			&& cmd1_res.output.all_after('load average:') == cmd2_res.output.all_after('load average:')
+		after1 := cmd1_res.output.all_after('load average:')
+		after2 := cmd2_res.output.all_after('load average:')
+		dump(after1.len)
+		dump(after2.len)
+		dump('|$after1|')
+		dump('|$after2|')
+		return cmd1_res.exit_code == cmd2_res.exit_code && after1 == after2
 	}
 	// in all other cases, compare the normalised output (less strict):
 	return cmd1_res.exit_code == cmd2_res.exit_code && noutput1 == noutput2
