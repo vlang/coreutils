@@ -85,18 +85,43 @@ pub fn command_fails(cmd string) ?os.Result {
 	return res
 }
 
+const gnu_coreutils_installed = os.getenv('GNU_COREUTILS_INSTALLED').int() == 1
+
 // same_results/2 executes the given commands, and ensures that
 // their results are exactly the same, both for their exit codes,
 // and for their output.
 pub fn same_results(cmd1 string, cmd2 string) bool {
 	mut cmd1_res := os.execute(cmd1)
 	mut cmd2_res := os.execute(cmd2)
+	noutput1 := normalise(cmd1_res.output)
+	noutput2 := normalise(cmd2_res.output)
 	$if trace_same_results ? {
 		eprintln('------------------------------------')
 		eprintln('>> same_results cmd1: $cmd1')
 		eprintln('>> same_results cmd2: $cmd2')
-		eprintln('                cmd1_res.output.len: $cmd1_res.output.len | $cmd1_res.output')
-		eprintln('                cmd2_res.output.len: $cmd2_res.output.len | $cmd2_res.output')
+		eprintln('                cmd1_res.exit_code: $cmd1_res.exit_code')
+		eprintln('                cmd2_res.exit_code: $cmd2_res.exit_code')
+		eprintln('                cmd1_res.output.len: $cmd1_res.output.len | $noutput1')
+		eprintln('                cmd2_res.output.len: $cmd2_res.output.len | $noutput2')
+		eprintln('              > cmd1_res.output.len: $cmd1_res.output.len | $cmd1_res.output')
+		eprintln('              > cmd2_res.output.len: $cmd2_res.output.len | $cmd2_res.output')
 	}
-	return cmd1_res.exit_code == cmd2_res.exit_code && cmd1_res.output == cmd2_res.output
+	if testing.gnu_coreutils_installed {
+		// aim for 1:1 output compatibility:
+		return cmd1_res.exit_code == cmd2_res.exit_code && cmd1_res.output == cmd2_res.output
+	}
+	// relax the strict matching for well known exceptions:
+	if cmd1.contains('printenv') && cmd2.contains('printenv.exe') {
+		return cmd1_res.exit_code == cmd2_res.exit_code
+	}
+	if cmd1 == 'uptime /var/log/wtmp' && cmd2.contains('uptime.exe /var/log/wtmp') {
+		return cmd1_res.exit_code == cmd2_res.exit_code
+	}
+	// in all other cases, compare the normalised output (less strict):
+	return cmd1_res.exit_code == cmd2_res.exit_code && noutput1 == noutput2
+}
+
+fn normalise(s string) string {
+	return s.replace_each(['‘', "'", '’', "'"]).replace('  ', ' ').replace('  ', ' ').replace('  ',
+		' ').replace(', ', ' ')
 }
