@@ -41,6 +41,9 @@ pub fn new_paired_command(original string, deputy string) CommandPair {
 // same_results - given some options, execute both the original
 // and the deputy commands, and ensure that their results match
 pub fn (p CommandPair) same_results(options string) bool {
+	if options.len == 0 {
+		return same_results(p.original, p.deputy)
+	}
 	return same_results('$p.original $options', '$p.deputy $options')
 }
 
@@ -97,14 +100,14 @@ pub fn same_results(cmd1 string, cmd2 string) bool {
 	noutput2 := normalise(cmd2_res.output)
 	$if trace_same_results ? {
 		eprintln('------------------------------------')
-		eprintln('>> same_results cmd1: $cmd1')
-		eprintln('>> same_results cmd2: $cmd2')
+		eprintln('>> same_results cmd1: "$cmd1"')
+		eprintln('>> same_results cmd2: "$cmd2"')
 		eprintln('                cmd1_res.exit_code: $cmd1_res.exit_code')
 		eprintln('                cmd2_res.exit_code: $cmd2_res.exit_code')
-		eprintln('                cmd1_res.output.len: $cmd1_res.output.len | $noutput1')
-		eprintln('                cmd2_res.output.len: $cmd2_res.output.len | $noutput2')
-		eprintln('              > cmd1_res.output.len: $cmd1_res.output.len | $cmd1_res.output')
-		eprintln('              > cmd2_res.output.len: $cmd2_res.output.len | $cmd2_res.output')
+		eprintln('                cmd1_res.output.len: $cmd1_res.output.len | "$noutput1"')
+		eprintln('                cmd2_res.output.len: $cmd2_res.output.len | "$noutput2"')
+		eprintln('              > cmd1_res.output.len: $cmd1_res.output.len | "$cmd1_res.output"')
+		eprintln('              > cmd2_res.output.len: $cmd2_res.output.len | "$cmd2_res.output"')
 	}
 	if testing.gnu_coreutils_installed {
 		// aim for 1:1 output compatibility:
@@ -117,10 +120,10 @@ pub fn same_results(cmd1 string, cmd2 string) bool {
 	if cmd1 == 'uptime' || cmd1 == 'uptime /var/log/wtmp' {
 		after1 := cmd1_res.output.all_after('load average:')
 		after2 := cmd2_res.output.all_after('load average:')
-		dump(after1.len)
-		dump(after2.len)
-		dump('|$after1|')
-		dump('|$after2|')
+		$if trace_same_results ? {
+			eprintln('                after1.len: $after1.len | "$after1"')
+			eprintln('                after2.len: $after2.len | "$after2"')
+		}
 		return cmd1_res.exit_code == cmd2_res.exit_code && after1 == after2
 	}
 	// in all other cases, compare the normalised output (less strict):
