@@ -75,7 +75,7 @@ Contributions written in other languages will likely be rejected.
 |         | groups    | Print group names a user is in                   |
 |         | head      | Output the first part of files                   |
 |         | hostid    | Print numeric host identifier                    |
-|         | hostname  | Print or set system name                         |
+| &check; | hostname  | Print or set system name                         |
 |         | id        | Print user identity                              |
 |         | install   | Copy files and set attributes                    |
 |         | join      | Join lines on a common field                     |
