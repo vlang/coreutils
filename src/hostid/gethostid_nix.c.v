@@ -1,4 +1,3 @@
-
 #include <unistd.h>
 
 fn C.gethostid() int

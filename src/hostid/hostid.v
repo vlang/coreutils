@@ -21,7 +21,7 @@ fn main() {
 	hostid := hd_get_hostid() & 0xffffffff
 
 	// Print as hexadecimal
-	println("${hostid.hex()}")
+	println('$hostid.hex()')
 
 	// Other flags
 	fp.remaining_parameters()
