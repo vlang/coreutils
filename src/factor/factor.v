@@ -52,7 +52,7 @@ fn main() {
 		for {
 			println(output_of(os.input_opt('') or { common.exit_on_errors(errors) }) or {
 				errors++
-				eprintln(err.msg)
+				eprintln(err.msg())
 				continue
 			})
 		}
@@ -60,7 +60,7 @@ fn main() {
 		for arg in args {
 			println(output_of(arg) or {
 				errors++
-				eprintln(err.msg)
+				eprintln(err.msg())
 				continue
 			})
 		}
