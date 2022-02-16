@@ -22,7 +22,7 @@ fn (m MvCommand) run(source string, dest string) {
 	if m.verbose || m.overwrite != .force {
 		m.move(source, dest)
 	} else {
-		os.mv(source, dest) or { error_exit(name, err.msg) }
+		os.mv(source, dest) or { error_exit(name, err.msg()) }
 	}
 }
 

@@ -6,18 +6,45 @@ import os
 // so that they can be used as more specific errors,
 // in place of `return error(message)`
 struct DidNotFailError {
+	Error
 	msg  string
 	code int
+}
+
+pub fn (err DidNotFailError) msg() string {
+	return err.msg
+}
+
+pub fn (err DidNotFailError) code() int {
+	return err.code
 }
 
 struct DoesNotWorkError {
+	Error
 	msg  string
 	code int
 }
 
+pub fn (err DoesNotWorkError) msg() string {
+	return err.msg
+}
+
+pub fn (err DoesNotWorkError) code() int {
+	return err.code
+}
+
 struct ExitCodesDifferError {
+	Error
 	msg  string
 	code int
+}
+
+pub fn (err ExitCodesDifferError) msg() string {
+	return err.msg
+}
+
+pub fn (err ExitCodesDifferError) code() int {
+	return err.code
 }
 
 // CommandPair remembers what original command we are trying to test against
@@ -53,14 +80,23 @@ pub fn (p CommandPair) same_results(options string) bool {
 pub fn (p CommandPair) expected_failure(options string) ?os.Result {
 	ores := os.execute('$p.original $options')
 	if ores.exit_code == 0 {
-		return IError(DidNotFailError{'$p.original $options', 1})
+		return IError(DidNotFailError{
+			msg: '$p.original $options'
+			code: 1
+		})
 	}
 	dres := os.execute('$p.deputy $options')
 	if dres.exit_code == 0 {
-		return IError(DidNotFailError{'$p.deputy $options', 2})
+		return IError(DidNotFailError{
+			msg: '$p.deputy $options'
+			code: 2
+		})
 	}
 	if ores.exit_code != dres.exit_code {
-		return IError(ExitCodesDifferError{'original.exit_code: $ores.exit_code != deputy.exit_code: dres.exit_code', 1})
+		return IError(ExitCodesDifferError{
+			msg: 'original.exit_code: $ores.exit_code != deputy.exit_code: dres.exit_code'
+			code: 1
+		})
 	}
 	return dres
 }
@@ -69,10 +105,16 @@ pub fn (p CommandPair) ensure_help_and_version_options_work() ? {
 	// For now, assume that the original has --version and --help
 	// and that they already work correctly.
 	if os.execute('$p.deputy --help').exit_code != 0 {
-		return IError(DoesNotWorkError{'--help', 1})
+		return IError(DoesNotWorkError{
+			msg: '--help'
+			code: 1
+		})
 	}
 	if os.execute('$p.deputy --version').exit_code != 0 {
-		return IError(DoesNotWorkError{'--version', 2})
+		return IError(DoesNotWorkError{
+			msg: '--version'
+			code: 2
+		})
 	}
 }
 
@@ -83,7 +125,10 @@ pub fn (p CommandPair) ensure_help_and_version_options_work() ? {
 pub fn command_fails(cmd string) ?os.Result {
 	res := os.execute(cmd)
 	if res.exit_code == 0 {
-		return IError(DidNotFailError{cmd, 3})
+		return IError(DidNotFailError{
+			msg: cmd
+			code: 3
+		})
 	}
 	return res
 }
