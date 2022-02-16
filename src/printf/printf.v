@@ -74,16 +74,16 @@ fn apply_controls(s string, zero_top bool) (string, bool) {
 			`\\` {
 				idx += 2
 				if idx > s.len {
-					out.write_b(ch)
+					out.write_byte(ch)
 					break
 				}
 				ch2 := s[idx - 1]
 				match ch2 {
 					`"`, `\\` {
-						out.write_b(ch2)
+						out.write_byte(ch2)
 					}
 					`a`, `b`, `e`, `f`, `n`, `r`, `t`, `v` {
-						out.write_b(control_ch[ch2])
+						out.write_byte(control_ch[ch2])
 					}
 					`c` {
 						return out.str(), true
@@ -91,7 +91,7 @@ fn apply_controls(s string, zero_top bool) (string, bool) {
 					`0`...`7` {
 						if zero_top && ch2 == `0` {
 							if idx >= s.len || !s[idx].is_oct_digit() {
-								out.write_b(`\0`)
+								out.write_byte(`\0`)
 								continue
 							}
 							idx++
@@ -107,7 +107,7 @@ fn apply_controls(s string, zero_top bool) (string, bool) {
 								break
 							}
 						}
-						out.write_b(out_ch)
+						out.write_byte(out_ch)
 					}
 					`x` {
 						if idx >= s.len || !s[idx].is_hex_digit() {
@@ -129,7 +129,7 @@ fn apply_controls(s string, zero_top bool) (string, bool) {
 								break
 							}
 						}
-						out.write_b(out_ch)
+						out.write_byte(out_ch)
 					}
 					`u` {
 						if idx >= s.len || !s[idx].is_hex_digit() {
@@ -181,7 +181,7 @@ fn apply_controls(s string, zero_top bool) (string, bool) {
 				}
 			}
 			else {
-				out.write_b(ch)
+				out.write_byte(ch)
 				idx++
 			}
 		}
@@ -238,7 +238,7 @@ fn apply_posix_escape(s string) string {
 				upout.write_string('\\177')
 			}
 			else {
-				upout.write_b(ch)
+				upout.write_byte(ch)
 			}
 		}
 	}
@@ -328,7 +328,7 @@ fn v_sprintf(str string, _pt []string) (string, int, bool) {
 
 		ch := str[i]
 		if ch != `%` && status == .norm_char {
-			res.write_b(ch)
+			res.write_byte(ch)
 			i++
 			continue
 		}
@@ -342,7 +342,7 @@ fn v_sprintf(str string, _pt []string) (string, int, bool) {
 		if ch == `c` && status == .field_char {
 			v_sprintf_panic(mut pt, p_index, pt.len)
 			d1 := byte(pt[p_index].u16())
-			res.write_b(d1)
+			res.write_byte(d1)
 			status = .reset_params
 			p_index++
 			i++
@@ -361,7 +361,7 @@ fn v_sprintf(str string, _pt []string) (string, int, bool) {
 		}
 
 		if ch == `%` && status == .field_char {
-			res.write_b(`%`)
+			res.write_byte(`%`)
 			status = .reset_params
 			i++
 			continue
@@ -842,11 +842,11 @@ fn format_fl_old(f f64, p strconv.BF_param) string {
 		if p.pad_ch == `0` {
 			if p.positive {
 				if p.sign_flag {
-					res.write_b(`+`)
+					res.write_byte(`+`)
 					sign_len_diff = -1
 				}
 			} else {
-				res.write_b(`-`)
+				res.write_byte(`-`)
 				sign_len_diff = -1
 			}
 			tmp := s
@@ -874,13 +874,13 @@ fn format_fl_old(f f64, p strconv.BF_param) string {
 
 		if p.allign == .right {
 			for i1 := 0; i1 < dif; i1++ {
-				res.write_b(p.pad_ch)
+				res.write_byte(p.pad_ch)
 			}
 		}
 		res.write_string(s)
 		if p.allign == .left {
 			for i1 := 0; i1 < dif; i1++ {
-				res.write_b(p.pad_ch)
+				res.write_byte(p.pad_ch)
 			}
 		}
 
@@ -906,11 +906,11 @@ fn format_es_old(f f64, p strconv.BF_param) string {
 		if p.pad_ch == `0` {
 			if p.positive {
 				if p.sign_flag {
-					res.write_b(`+`)
+					res.write_byte(`+`)
 					sign_len_diff = -1
 				}
 			} else {
-				res.write_b(`-`)
+				res.write_byte(`-`)
 				sign_len_diff = -1
 			}
 			tmp := s
@@ -937,13 +937,13 @@ fn format_es_old(f f64, p strconv.BF_param) string {
 		dif := p.len0 - s.len + sign_len_diff
 		if p.allign == .right {
 			for i1 := 0; i1 < dif; i1++ {
-				res.write_b(p.pad_ch)
+				res.write_byte(p.pad_ch)
 			}
 		}
 		res.write_string(s)
 		if p.allign == .left {
 			for i1 := 0; i1 < dif; i1++ {
-				res.write_b(p.pad_ch)
+				res.write_byte(p.pad_ch)
 			}
 		}
 		s.free()
@@ -1002,11 +1002,11 @@ fn format_dec_old(d u64, p strconv.BF_param) string {
 	if p.pad_ch == `0` {
 		if p.positive {
 			if p.sign_flag {
-				res.write_b(`+`)
+				res.write_byte(`+`)
 				sign_len_diff = -1
 			}
 		} else {
-			res.write_b(`-`)
+			res.write_byte(`-`)
 			sign_len_diff = -1
 		}
 		s = d.str()
@@ -1025,13 +1025,13 @@ fn format_dec_old(d u64, p strconv.BF_param) string {
 
 	if p.allign == .right {
 		for i1 := 0; i1 < dif; i1++ {
-			res.write_b(p.pad_ch)
+			res.write_byte(p.pad_ch)
 		}
 	}
 	res.write_string(s)
 	if p.allign == .left {
 		for i1 := 0; i1 < dif; i1++ {
-			res.write_b(p.pad_ch)
+			res.write_byte(p.pad_ch)
 		}
 	}
 	return res.str()

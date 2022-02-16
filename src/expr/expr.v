@@ -227,7 +227,7 @@ fn replace_regex(s string) string {
 			}
 			`(`, `)`, `{`, `}`, `+`, `?`, `|` {
 				if is_escape {
-					out.write_b(i)
+					out.write_byte(i)
 				} else {
 					out.write_string('\\' + i.ascii_str())
 				}
@@ -235,9 +235,9 @@ fn replace_regex(s string) string {
 			}
 			else {
 				if is_escape {
-					out.write_b(`\\`)
+					out.write_byte(`\\`)
 				}
-				out.write_b(i)
+				out.write_byte(i)
 				is_escape = false
 			}
 		}
