@@ -56,7 +56,7 @@ fn basename(name string, suffix string, is_zero bool) {
 				out = name_noslash
 			}
 			if out != suffix {
-				out = out.trim_suffix(suffix)
+				out = out.trim_string_right(suffix)
 			}
 		}
 	}
