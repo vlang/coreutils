@@ -31,7 +31,7 @@ pub fn sum(args []string, sum_name string, sum_type string, num_chars_in_sum int
 	}
 
 	prefix := if binary { '*' } else { ' ' }
-	eol := if zero { '\x0' } else { '\n' }
+	eol := if zero { '\u0000' } else { '\n' }
 	mut bytes := []byte{}
 
 	if files.len < 1 {
