@@ -37,7 +37,7 @@ fn unescape(str string) string {
 		idx++
 		if c == `\\` {
 			c = str[idx] or {
-				res.write_b(`\\`)
+				res.write_byte(`\\`)
 				return res.str()
 			}
 			idx++
@@ -83,7 +83,7 @@ fn unescape(str string) string {
 							}
 						}
 					} else {
-						res.write_b(`\\`)
+						res.write_byte(`\\`)
 					}
 				}
 				`x` {
@@ -97,15 +97,15 @@ fn unescape(str string) string {
 							c = c * 16 + hex_to_byte(ch)
 						}
 					} else {
-						res.write_b(`\\`)
+						res.write_byte(`\\`)
 					}
 				}
 				else {
-					res.write_b(`\\`)
+					res.write_byte(`\\`)
 				}
 			}
 		}
-		res.write_b(c)
+		res.write_byte(c)
 	}
 
 	return res.str()

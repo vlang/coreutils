@@ -154,7 +154,7 @@ fn open_stream(args_fn []string) []os.File {
 			// handle stdin like files
 			streams << os.stdin()
 		} else {
-			streams << os.open(fname) or { common.exit_with_error_message(app_name, err.msg) }
+			streams << os.open(fname) or { common.exit_with_error_message(app_name, err.msg()) }
 		}
 	}
 
@@ -240,11 +240,11 @@ fn args() ?(Settings, []string) {
 	// -b
 	b_style := fp.string('body-numbering', `b`, 't', 'Select the numbering style for lines in the body section (a:all, n:none, t:only no blank, pRE: match for the regular expression)')
 	settings.styles[Section.body] = get_style(b_style) or {
-		common.exit_with_error_message(app_name, err.msg)
+		common.exit_with_error_message(app_name, err.msg())
 	}
 	if settings.styles[Section.body] == .regex {
 		settings.res[Section.body] = get_style_regex(b_style) or {
-			common.exit_with_error_message(app_name, err.msg)
+			common.exit_with_error_message(app_name, err.msg())
 		}
 	}
 
@@ -269,22 +269,22 @@ fn args() ?(Settings, []string) {
 	// -f
 	f_style := fp.string('footer-numbering', `f`, 'n', 'Select the numbering style for lines in the footer section')
 	settings.styles[Section.footer] = get_style(f_style) or {
-		common.exit_with_error_message(app_name, err.msg)
+		common.exit_with_error_message(app_name, err.msg())
 	}
 	if settings.styles[Section.footer] == .regex {
 		settings.res[Section.footer] = get_style_regex(f_style) or {
-			common.exit_with_error_message(app_name, err.msg)
+			common.exit_with_error_message(app_name, err.msg())
 		}
 	}
 
 	// -h
 	h_style := fp.string('header-numbering', `h`, 'n', 'Select the numbering style for lines in the header section')
 	settings.styles[Section.header] = get_style(h_style) or {
-		common.exit_with_error_message(app_name, err.msg)
+		common.exit_with_error_message(app_name, err.msg())
 	}
 	if settings.styles[Section.header] == .regex {
 		settings.res[Section.header] = get_style_regex(h_style) or {
-			common.exit_with_error_message(app_name, err.msg)
+			common.exit_with_error_message(app_name, err.msg())
 		}
 	}
 
@@ -296,7 +296,7 @@ fn args() ?(Settings, []string) {
 
 	// -n
 	format := fp.string('number-format', `n`, 'rn', 'Select the line numbering format (ln:left-justified, rn:right-justified, rz:leading-zeros)')
-	settings.format = get_format(format) or { common.exit_with_error_message(app_name, err.msg) }
+	settings.format = get_format(format) or { common.exit_with_error_message(app_name, err.msg()) }
 
 	// -p
 	no_renumber := fp.bool('no-renumber', `p`, false, 'Do not reset the line number at the start of each logical page')
@@ -312,7 +312,7 @@ fn args() ?(Settings, []string) {
 	settings.width = fp.int('number-width', `w`, 6, 'Set number digits for line numbers')
 
 	// files
-	fnames = fp.finalize() or { common.exit_with_error_message(app_name, err.msg) }
+	fnames = fp.finalize() or { common.exit_with_error_message(app_name, err.msg()) }
 
 	return settings, fnames
 }

@@ -32,9 +32,9 @@ Running `make` or `v run build.vsh` will build all the programs in `bin/`.
 Contributions are welcome!
 
 Please only contribute versions of the original utilities written in V.
-Contributions written in other langauges will likely be rejected.
+Contributions written in other languages will likely be rejected.
 
-## Completed (35/109)
+## Completed (38/109)
 
 |  Done   | Cmd       | Descripton                                       |
 | :-----: | --------- | ------------------------------------------------ |
@@ -74,8 +74,8 @@ Contributions written in other langauges will likely be rejected.
 |         | fold      | Wrap input lines to fit in specified width       |
 |         | groups    | Print group names a user is in                   |
 |         | head      | Output the first part of files                   |
-|         | hostid    | Print numeric host identifier                    |
-|         | hostname  | Print or set system name                         |
+| &check; | hostid    | Print numeric host identifier                    |
+| &check; | hostname  | Print or set system name                         |
 |         | id        | Print user identity                              |
 |         | install   | Copy files and set attributes                    |
 |         | join      | Join lines on a common field                     |
@@ -93,7 +93,7 @@ Contributions written in other langauges will likely be rejected.
 |         | nice      | Run a command with modified niceness             |
 | &check; | nl        | Number lines and write files                     |
 |         | nohup     | Run a command immune to hangups                  |
-|         | nproc     | Print the number of available processors         |
+| &check; | nproc     | Print the number of available processors         |
 |         | numfmt    | Reformat numbers                                 |
 |         | od        | Write files in octal or other formats            |
 |         | paste     | Merge lines of files                             |

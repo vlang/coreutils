@@ -27,7 +27,7 @@ fn (c CpCommand) run(source string, dest string) {
 			eprintln(not_recursive(source))
 			return
 		}
-		os.cp(source, dest) or { error_exit(name, err.msg) }
+		os.cp(source, dest) or { error_exit(name, err.msg()) }
 	}
 }
 
