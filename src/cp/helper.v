@@ -145,7 +145,9 @@ fn setup_cp_command(args []string) ?(CpCommand, []string, string) {
 }
 
 fn run_cp(args []string) {
-	cp, sources, dest := setup_cp_command(args) or { common.exit_with_error_message(name, err.msg) }
+	cp, sources, dest := setup_cp_command(args) or {
+		common.exit_with_error_message(name, err.msg())
+	}
 	if sources.len > 1 && !os.is_dir(dest) {
 		common.exit_with_error_message(name, target_not_dir(dest))
 	}

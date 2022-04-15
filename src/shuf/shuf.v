@@ -160,7 +160,7 @@ fn register_lines_by_file(lines []string, fname string, zero_terminated bool) []
 			exit(1)
 		}
 
-		new_lines << string(bytes)
+		new_lines << bytes.bytestr()
 	} else {
 		mut br := io.new_buffered_reader(io.BufferedReaderConfig{ reader: file })
 		for {
