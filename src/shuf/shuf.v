@@ -101,14 +101,18 @@ fn shuffle_lines(lines []string, settings Settings) []string {
 
 		for i in 0 .. new_lines.len {
 			tmp := new_lines[i]
-			random := rand.intn(new_lines.len)
+			random := rand.intn(new_lines.len) or {
+				common.exit_with_error_message(app_name, err.msg())
+			}
 			new_lines[i] = new_lines[random]
 			new_lines[random] = tmp
 		}
 	} else {
 		for i in 0 .. new_lines.len {
 			tmp := new_lines[i]
-			random := rand.intn(new_lines.len)
+			random := rand.intn(new_lines.len) or {
+				common.exit_with_error_message(app_name, err.msg())
+			}
 			new_lines[i] = new_lines[random]
 			new_lines[random] = tmp
 		}
