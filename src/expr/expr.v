@@ -312,7 +312,7 @@ fn (mut p Parser) primary() Value {
 				return i64(0)
 			} else {
 				for i, r in str {
-					if chr.index_byte(r) != -1 {
+					if chr.index_u8(r) != -1 {
 						return i64(i + 1)
 					}
 				}

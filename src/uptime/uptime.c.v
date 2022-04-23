@@ -28,7 +28,7 @@ fn print_uptime(utmp_buf []C.utmpx) ? {
 	mut uptime := i64(0)
 	fp := C.fopen(&char('/proc/uptime'.str), &char('r'.str))
 	if !isnil(fp) {
-		buf := []byte{len: 4096}
+		buf := []u8{len: 4096}
 		unsafe {
 			b := C.fgets(&buf[0], 4096, fp)
 			if !isnil(b) {

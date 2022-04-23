@@ -38,8 +38,8 @@ fn encode_and_print(mut file os.File, wrap int) {
 		file.close()
 		std_out.close()
 	}
-	mut in_buffer := []byte{len: chunk_size_encode}
-	mut out_buffer := []byte{len: buffer_size_encode}
+	mut in_buffer := []u8{len: chunk_size_encode}
+	mut out_buffer := []u8{len: buffer_size_encode}
 
 	// remember last column that was printed in the previous chunk.
 	mut last_column := 0
@@ -119,8 +119,8 @@ fn decode_and_print(mut file os.File) {
 		file.close()
 		std_out.close()
 	}
-	mut in_buffer := []byte{len: chunk_size_decode}
-	mut out_buffer := []byte{len: buffer_size_decode}
+	mut in_buffer := []u8{len: chunk_size_decode}
+	mut out_buffer := []u8{len: buffer_size_decode}
 
 	// read the file in chunks for constant memory usage.
 	for {

@@ -22,7 +22,7 @@ const (
 struct FileChunk {
 mut:
 	prev_char_is_space bool
-	buffer             []byte
+	buffer             []u8	
 }
 
 struct Count {
@@ -79,7 +79,7 @@ mut:
 	mutex              sync.Mutex
 }
 
-fn (mut file_reader FileReader) read_chunk(mut buffer []byte) ?FileChunk {
+fn (mut file_reader FileReader) read_chunk(mut buffer []u8) ?FileChunk {
 	file_reader.mutex.@lock()
 	defer {
 		file_reader.mutex.unlock()
@@ -92,7 +92,7 @@ fn (mut file_reader FileReader) read_chunk(mut buffer []byte) ?FileChunk {
 }
 
 fn file_reader_counter(mut file_reader FileReader, counts chan Count) {
-	mut buffer := []byte{len: buffer_size}
+	mut buffer := []u8{len: buffer_size}
 	mut total_count := Count{'', 0, 0, 0, 0, 0}
 
 	for {

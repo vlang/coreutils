@@ -96,7 +96,7 @@ fn apply_controls(s string, zero_top bool) (string, bool) {
 							}
 							idx++
 						}
-						mut out_ch := byte(0)
+						mut out_ch := u8(0)
 						idx--
 						for _ in 0 .. 3 {
 							num := s[idx] - `0`
@@ -114,9 +114,9 @@ fn apply_controls(s string, zero_top bool) (string, bool) {
 							out.write_string('\\x')
 							continue
 						}
-						mut out_ch := byte(0)
+						mut out_ch := u8(0)
 						for _ in 0 .. 2 {
-							num := byte(match s[idx] {
+							num := u8(match s[idx] {
 								`0`...`9` { s[idx] - `0` }
 								`A`...`F` { s[idx] - `A` + 10 }
 								`a`...`f` { s[idx] - `a` + 10 }
@@ -341,7 +341,7 @@ fn v_sprintf(str string, _pt []string) (string, int, bool) {
 		// single char, manage it here
 		if ch == `c` && status == .field_char {
 			v_sprintf_panic(mut pt, p_index, pt.len)
-			d1 := byte(pt[p_index].u16())
+			d1 := u8(pt[p_index].u16())
 			res.write_byte(d1)
 			status = .reset_params
 			p_index++
@@ -587,7 +587,7 @@ fn v_sprintf(str string, _pt []string) (string, int, bool) {
 					// hh fot 8 bit unsigned int
 					`h` {
 						if ch2 == `h` {
-							d1 = u64(byte(pt[p_index].u16()))
+							d1 = u64(u8(pt[p_index].u16()))
 						} else {
 							d1 = u64(pt[p_index].u16())
 						}
