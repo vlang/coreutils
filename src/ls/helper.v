@@ -1,4 +1,6 @@
-const ()
+const (
+	name = 'ls'
+)
 
 // Based on the exit status of actual ls
 enum EXIT_STATUS {
