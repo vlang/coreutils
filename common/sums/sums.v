@@ -4,7 +4,7 @@ import common
 import os
 
 // sum is the common routine for *sum commands: md5sum, sha1sum, sha224sum, ...
-pub fn sum(args []string, sum_name string, sum_type string, num_chars_in_sum int, sum_fn fn (data []byte) []byte) {
+pub fn sum(args []string, sum_name string, sum_type string, num_chars_in_sum int, sum_fn fn (data []u8) []u8) {
 	mut fp := common.flag_parser(args)
 	fp.application(sum_name)
 	fp.arguments_description('[OPTION]... [FILE]...')
@@ -32,7 +32,7 @@ pub fn sum(args []string, sum_name string, sum_type string, num_chars_in_sum int
 
 	prefix := if binary { '*' } else { ' ' }
 	eol := if zero { '\u0000' } else { '\n' }
-	mut bytes := []byte{}
+	mut bytes := []u8{}
 
 	if files.len < 1 {
 		files << '-'

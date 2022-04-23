@@ -16,30 +16,30 @@ const (
 	invalid           = 'invalid input'
 )
 
-fn get_blocks(groups []byte) []byte {
+fn get_blocks(groups []u8) []u8 {
 	mut full_block := bitfield.new(block_size * bits_in_byte)
 	mut i := 0
 	for group in groups {
 		byte_val := if `A` <= group && group <= `Z` {
-			byte(group - `A`)
+			u8(group - `A`)
 		} else if `2` <= group && group <= `7` {
-			byte(26 + group - `2`)
+			u8(26 + group - `2`)
 		} else {
-			byte(1 << group_size)
+			u8(1 << group_size)
 		}
 		full_block.insert(i, group_size, byte_val)
 		i += group_size
 	}
 	size := full_block.get_size()
-	mut res := []byte{}
+	mut res := []u8{}
 	for i = 0; i < size; i += bits_in_byte {
-		res << byte(full_block.extract(i, bits_in_byte))
+		res << u8(full_block.extract(i, bits_in_byte))
 	}
 	return res
 }
 
 fn decode_and_output(file os.File, wrap int) {
-	mut groups := []byte{len: block_size * bits_in_byte / group_size}
+	mut groups := []u8{len: block_size * bits_in_byte / group_size}
 	mut builder := strings.new_builder(init_builder_size)
 	mut i := u64(0)
 	for {
@@ -59,12 +59,12 @@ fn decode_and_output(file os.File, wrap int) {
 
 // IMP: This code assumes that each group_size <= 8 bits (1 byte).
 // If using groups without this property, change the return type
-fn get_groups(block []byte, num byte) []byte {
+fn get_groups(block []u8, num u8) []u8 {
 	full_block := bitfield.from_bytes(block)
-	mut groups := []byte{}
+	mut groups := []u8{}
 	num_blocks := block_size * bits_in_byte / group_size
 	for i in 0 .. num_blocks {
-		byte_val := byte(full_block.extract(i * group_size, group_size))
+		byte_val := u8(full_block.extract(i * group_size, group_size))
 		groups << if byte_val < 26 { byte_val + `A` } else { byte_val - 26 + `2` }
 	}
 	for i in 0 .. num {
@@ -74,7 +74,7 @@ fn get_groups(block []byte, num byte) []byte {
 }
 
 fn encode_and_output(file os.File, wrap int) {
-	mut block := []byte{len: block_size}
+	mut block := []u8{len: block_size}
 	mut i := u64(0)
 	mut done := false
 	for !done {
@@ -105,7 +105,7 @@ fn encode_and_output(file os.File, wrap int) {
 			4 { 1 }
 			else { 0 }
 		}
-		groups := get_groups(block, byte(num_equal))
+		groups := get_groups(block, u8(num_equal))
 		mut result := strings.new_builder(groups.len)
 		result.write(groups) or { common.exit_with_error_message(name, err.msg()) }
 		print(result.str())

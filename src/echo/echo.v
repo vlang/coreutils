@@ -1,7 +1,7 @@
 import os
 import strings
 
-fn is_hex_char(c byte) bool {
+fn is_hex_char(c u8) bool {
 	return match c {
 		`0`...`9`, `a`...`f`, `A`...`F` { true }
 		else { false }
