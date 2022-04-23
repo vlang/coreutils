@@ -22,7 +22,7 @@ const (
 struct FileChunk {
 mut:
 	prev_char_is_space bool
-	buffer             []u8	
+	buffer             []u8
 }
 
 struct Count {
