@@ -1,2 +1,3 @@
-*.vsh linguist-language=V text=auto eol=lf
-v.mod linguist-language=Text eol=lf
+* eol=lf
+*.vsh linguist-language=V text=auto
+v.mod linguist-language=Text
