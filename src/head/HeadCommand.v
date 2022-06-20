@@ -42,6 +42,7 @@ fn write_bytes(file_ptr os.File, num_bytes int) {
 			c := reading_buf[i]
 			output_buf.write_u8(c)
 			m_bytes_to_write--
+			if m_bytes_to_write == 0 { break }
 		}
 	}
 }
@@ -65,8 +66,42 @@ fn write_lines(file_ptr os.File, num_lines int, delim_char u8) {
 		for i := 0; i < read_bytes_num; i++ {
 			c := reading_buf[i]
 			output_buf.write_u8(c)
-			if c == newline_char {
+			if c == delim_char {
 				m_lines_to_write--
+				if m_lines_to_write == 0 { break }
+			}
+		}
+	}
+}
+
+fn write_lines_upto_max(file_ptr os.File, num_lines int, delim_char u8) {
+	mut output_buf := strings.new_builder(buf_size)
+	mut reading_buf := []u8{len: buf_size}
+	mut cursor := u64(0)
+	mut lines_count := 0
+	mut read_cursor := 0
+	mut delim_positions := []int{}
+
+	defer {
+		mut back_to_lookup := delim_positions.len+(num_lines-1)
+		if back_to_lookup >= delim_positions.len { back_to_lookup = delim_positions.len }
+		if back_to_lookup < 0 { output_buf.clear() } else { output_buf.go_back_to(delim_positions[back_to_lookup]) }
+		print(output_buf.str())
+	}
+
+	for {
+		read_bytes_num := file_ptr.read_bytes_into(cursor, mut reading_buf) or { return }
+		cursor += u64(read_bytes_num)
+
+		if read_bytes_num == 0 { break } // reached end of file
+
+		for i := 0; i < read_bytes_num; i++ {
+			read_cursor++
+			c := reading_buf[i]
+			output_buf.write_u8(c)
+			if c == delim_char {
+				lines_count++
+				delim_positions << read_cursor
 			}
 		}
 	}
@@ -90,7 +125,12 @@ fn (c HeadCommand) write_header(is_stdin bool, name string, multiple_files bool,
 }
 
 fn (c HeadCommand) write_lines(file_ptr os.File) {
-	write_lines(file_ptr, c.lines_to_read, if c.zero_terminated { nul_char } else { newline_char })
+	delim := if c.zero_terminated { nul_char } else { newline_char }
+	if c.lines_to_read < 0 {
+		write_lines_upto_max(file_ptr, c.lines_to_read, delim)
+		return
+	}
+	write_lines(file_ptr, c.lines_to_read, delim)
 }
 
 fn (c HeadCommand) write_bytes(file_ptr os.File) {
@@ -98,7 +138,7 @@ fn (c HeadCommand) write_bytes(file_ptr os.File) {
 }
 
 fn (c HeadCommand) write(file_ptr os.File) {
-	if c.lines_to_read > 0 && c.bytes_to_read == 0 {
+	if c.lines_to_read != 0 && c.bytes_to_read == 0 {
 		c.write_lines(file_ptr)
 		return
 	}
@@ -113,5 +153,6 @@ fn (c HeadCommand) run(mut files []InputFile) {
 		}
 		c.write_header(file.is_stdin, file.name, files.len > 1, i == 0)
 		c.write(file.file_ptr)
+		file.close()
 	}
 }
