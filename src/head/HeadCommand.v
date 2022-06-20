@@ -22,47 +22,51 @@ fn write_header(name string, first_file bool) {
 }
 
 fn write_bytes(file_ptr os.File, num_bytes int) {
+	mut m_bytes_to_write := num_bytes
 	adj_buf_size := if num_bytes < buf_size { num_bytes } else { buf_size }
 	mut output_buf := strings.new_builder(adj_buf_size)
 	mut reading_buf := []u8{len: adj_buf_size}
 	mut cursor := u64(0)
-	mut bytes_written := 0
 
 	defer {
 		print(output_buf.str())
 	}
 
-	for bytes_written < num_bytes {
+	for m_bytes_to_write != 0 {
 		read_bytes_num := file_ptr.read_bytes_into(cursor, mut reading_buf) or { return }
 		cursor += u64(read_bytes_num)
+
+		if read_bytes_num == 0 { m_bytes_to_write = 0 } // reached end of file
 
 		for i := 0; i < read_bytes_num; i++ {
 			c := reading_buf[i]
 			output_buf.write_u8(c)
-			bytes_written++
+			m_bytes_to_write--
 		}
 	}
 }
 
 fn write_lines(file_ptr os.File, num_lines int, delim_char u8) {
+	mut m_lines_to_write := num_lines
 	mut output_buf := strings.new_builder(buf_size)
 	mut reading_buf := []u8{len: buf_size}
 	mut cursor := u64(0)
-	mut lines_written := 0
 
 	defer {
 		print(output_buf.str())
 	}
 
-	for lines_written < num_lines {
+	for m_lines_to_write != 0 {
 		read_bytes_num := file_ptr.read_bytes_into(cursor, mut reading_buf) or { return }
 		cursor += u64(read_bytes_num)
+
+		if read_bytes_num == 0 { m_lines_to_write = 0 } // reached end of file
 
 		for i := 0; i < read_bytes_num; i++ {
 			c := reading_buf[i]
 			output_buf.write_u8(c)
 			if c == newline_char {
-				lines_written++
+				m_lines_to_write--
 			}
 		}
 	}
