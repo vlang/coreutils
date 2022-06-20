@@ -4,6 +4,7 @@ import strings
 const (
 	buf_size     = 256
 	newline_char = u8(10)
+	nul_char = u8(0)
 	space_char   = u8(32)
 )
 
@@ -27,6 +28,8 @@ fn write_bytes(file_ptr os.File, num_bytes int) {
 	mut cursor := u64(0)
 	mut bytes_written := 0
 
+	defer { print(output_buf.str()) }
+
 	for {
 		if bytes_written < num_bytes {
 			read_bytes_num := file_ptr.read_bytes_into(cursor, mut reading_buf) or { return }
@@ -37,8 +40,6 @@ fn write_bytes(file_ptr os.File, num_bytes int) {
 				output_buf.write_u8(c)
 				bytes_written++
 				if bytes_written == num_bytes {
-					print(output_buf.str())
-					output_buf.clear()
 					return
 				}
 			}
@@ -48,11 +49,13 @@ fn write_bytes(file_ptr os.File, num_bytes int) {
 	}
 }
 
-fn write_lines(file_ptr os.File, num_lines int) {
+fn write_lines(file_ptr os.File, num_lines int, delim_char u8) {
 	mut output_buf := strings.new_builder(buf_size)
 	mut reading_buf := []u8{len: buf_size}
 	mut cursor := u64(0)
 	mut lines_written := 0
+
+	defer { print(output_buf.str()) }
 
 	for {
 		if lines_written < num_lines {
@@ -64,8 +67,6 @@ fn write_lines(file_ptr os.File, num_lines int) {
 				output_buf.write_u8(c)
 				if c == newline_char {
 					lines_written++
-					print(output_buf.str())
-					output_buf.clear()
 					if lines_written == num_lines { return }
 				}
 			}
@@ -76,11 +77,11 @@ fn write_lines(file_ptr os.File, num_lines int) {
 }
 
 fn (c HeadCommand) write_header(is_stdin bool, name string, multiple_files bool, first_file bool) {
-	if is_stdin {
+	if is_stdin || c.silent {
 		return
 	}
 
-	if c.verbose && !c.silent {
+	if c.verbose {
 		write_header(name, first_file)
 		return
 	}
@@ -93,7 +94,7 @@ fn (c HeadCommand) write_header(is_stdin bool, name string, multiple_files bool,
 }
 
 fn (c HeadCommand) write_lines(file_ptr os.File) {
-	write_lines(file_ptr, c.lines_to_read)
+	write_lines(file_ptr, c.lines_to_read, if c.zero_terminated { nul_char } else { newline_char })
 }
 
 fn (c HeadCommand) write_bytes(file_ptr os.File) {
