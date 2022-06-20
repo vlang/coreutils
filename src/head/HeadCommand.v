@@ -4,7 +4,7 @@ import strings
 const (
 	buf_size     = 256
 	newline_char = u8(10)
-	nul_char = u8(0)
+	nul_char     = u8(0)
 	space_char   = u8(32)
 )
 
@@ -28,23 +28,18 @@ fn write_bytes(file_ptr os.File, num_bytes int) {
 	mut cursor := u64(0)
 	mut bytes_written := 0
 
-	defer { print(output_buf.str()) }
+	defer {
+		print(output_buf.str())
+	}
 
-	for {
-		if bytes_written < num_bytes {
-			read_bytes_num := file_ptr.read_bytes_into(cursor, mut reading_buf) or { return }
-			cursor += u64(read_bytes_num)
+	for bytes_written < num_bytes {
+		read_bytes_num := file_ptr.read_bytes_into(cursor, mut reading_buf) or { return }
+		cursor += u64(read_bytes_num)
 
-			for i := 0; i < read_bytes_num; i++ {
-				c := reading_buf[i]
-				output_buf.write_u8(c)
-				bytes_written++
-				if bytes_written == num_bytes {
-					return
-				}
-			}
-		} else {
-			break
+		for i := 0; i < read_bytes_num; i++ {
+			c := reading_buf[i]
+			output_buf.write_u8(c)
+			bytes_written++
 		}
 	}
 }
@@ -55,23 +50,20 @@ fn write_lines(file_ptr os.File, num_lines int, delim_char u8) {
 	mut cursor := u64(0)
 	mut lines_written := 0
 
-	defer { print(output_buf.str()) }
+	defer {
+		print(output_buf.str())
+	}
 
-	for {
-		if lines_written < num_lines {
-			read_bytes_num := file_ptr.read_bytes_into(cursor, mut reading_buf) or { return }
-			cursor += u64(read_bytes_num)
+	for lines_written < num_lines {
+		read_bytes_num := file_ptr.read_bytes_into(cursor, mut reading_buf) or { return }
+		cursor += u64(read_bytes_num)
 
-			for i := 0; i < read_bytes_num; i++ {
-				c := reading_buf[i]
-				output_buf.write_u8(c)
-				if c == newline_char {
-					lines_written++
-					if lines_written == num_lines { return }
-				}
+		for i := 0; i < read_bytes_num; i++ {
+			c := reading_buf[i]
+			output_buf.write_u8(c)
+			if c == newline_char {
+				lines_written++
 			}
-		} else {
-			break
 		}
 	}
 }
@@ -111,7 +103,10 @@ fn (c HeadCommand) write(file_ptr os.File) {
 
 fn (c HeadCommand) run(mut files []InputFile) {
 	for i, mut file in files {
-		file.open() or { eprintln('$name: $err.msg()') continue }
+		file.open() or {
+			eprintln('$name: $err.msg()')
+			continue
+		}
 		c.write_header(file.is_stdin, file.name, files.len > 1, i == 0)
 		c.write(file.file_ptr)
 	}
