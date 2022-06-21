@@ -17,14 +17,16 @@ fn success_exit(messages ...string) {
 
 struct InputFile {
 	is_stdin bool
-	name string
+	name     string
 mut:
-	is_open bool
+	is_open  bool
 	file_ptr os.File
 }
 
 fn (mut f InputFile) open() ? {
-	if f.is_stdin { return }
+	if f.is_stdin {
+		return
+	}
 	f.file_ptr = os.open(f.name) or { return err }
 	f.is_open = true
 }
@@ -37,12 +39,19 @@ fn (mut f InputFile) close() {
 fn get_files(file_args []string) []InputFile {
 	mut files := []InputFile{}
 	if file_args.len == 0 || file_args[0] == '-' {
-		files << InputFile{is_stdin:true, name: 'stdin', file_ptr:os.stdin()}
+		files << InputFile{
+			is_stdin: true
+			name: 'stdin'
+			file_ptr: os.stdin()
+		}
 		return files
 	}
 
 	for _, fa in file_args {
-		files << InputFile{is_stdin:false, name: fa}
+		files << InputFile{
+			is_stdin: false
+			name: fa
+		}
 	}
 	return files
 }
@@ -78,8 +87,10 @@ fn setup_command(args []string) ?(HeadCommand, []InputFile) {
 	fp.description('Wrap input lines in each FILE, writing to standard output.')
 	fp.description('With no FILE, or when FILE is -, read standard input.')
 
-	bytes := fp.int('bytes', `c`, 0, wrap_long_command_description("print the first NUM bytes of each file: with the leading '-', print all but the last NUM bytes of each file", 45))
-	lines := fp.int('lines', `n`, 10, wrap_long_command_description("print the first NUM lines instead of the first 10: with the leading '-' print all but the last NUM lines of each file", 48))
+	bytes := fp.int('bytes', `c`, 0, wrap_long_command_description("print the first NUM bytes of each file: with the leading '-', print all but the last NUM bytes of each file",
+		45))
+	lines := fp.int('lines', `n`, 10, wrap_long_command_description("print the first NUM lines instead of the first 10: with the leading '-' print all but the last NUM lines of each file",
+		48))
 	verbose := fp.bool('verbose', `v`, false, 'always print headers giving file names')
 	silent := fp.bool('silent', `q`, false, 'never print headers giving file names')
 	zero_terminated := fp.bool('zero-terminated', `z`, false, 'line delimiter is NUL, not newline')
@@ -105,9 +116,7 @@ fn setup_command(args []string) ?(HeadCommand, []InputFile) {
 }
 
 fn run_head(args []string) {
-	head, mut files := setup_command(args) or {
-		common.exit_with_error_message(name, err.msg())
-	}
+	head, mut files := setup_command(args) or { common.exit_with_error_message(name, err.msg()) }
 
 	head.run(mut files)
 }

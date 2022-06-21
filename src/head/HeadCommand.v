@@ -36,15 +36,23 @@ fn write_bytes(file_ptr os.File, num_bytes int) {
 		read_bytes_num := file_ptr.read_bytes_into(cursor, mut reading_buf) or { return }
 		cursor += u64(read_bytes_num)
 
-		if read_bytes_num == 0 { m_bytes_to_write = 0 } // reached end of file
+		if read_bytes_num == 0 {
+			m_bytes_to_write = 0
+		}
+		// reached end of file
 
 		for i := 0; i < read_bytes_num; i++ {
 			c := reading_buf[i]
 			output_buf.write_u8(c)
 			m_bytes_to_write--
-			if m_bytes_to_write == 0 { break }
+			if m_bytes_to_write == 0 {
+				break
+			}
 		}
 	}
+}
+
+fn write_bytes_upto_max(file_ptr os.File, num_bytes int) {
 }
 
 fn write_lines(file_ptr os.File, num_lines int, delim_char u8) {
@@ -61,14 +69,19 @@ fn write_lines(file_ptr os.File, num_lines int, delim_char u8) {
 		read_bytes_num := file_ptr.read_bytes_into(cursor, mut reading_buf) or { return }
 		cursor += u64(read_bytes_num)
 
-		if read_bytes_num == 0 { m_lines_to_write = 0 } // reached end of file
+		if read_bytes_num == 0 {
+			m_lines_to_write = 0
+		}
+		// reached end of file
 
 		for i := 0; i < read_bytes_num; i++ {
 			c := reading_buf[i]
 			output_buf.write_u8(c)
 			if c == delim_char {
 				m_lines_to_write--
-				if m_lines_to_write == 0 { break }
+				if m_lines_to_write == 0 {
+					break
+				}
 			}
 		}
 	}
@@ -83,9 +96,15 @@ fn write_lines_upto_max(file_ptr os.File, num_lines int, delim_char u8) {
 	mut delim_positions := []int{}
 
 	defer {
-		mut back_to_lookup := delim_positions.len+(num_lines-1)
-		if back_to_lookup >= delim_positions.len { back_to_lookup = delim_positions.len }
-		if back_to_lookup < 0 { output_buf.clear() } else { output_buf.go_back_to(delim_positions[back_to_lookup]) }
+		mut back_to_lookup := delim_positions.len + (num_lines - 1)
+		if back_to_lookup >= delim_positions.len {
+			back_to_lookup = delim_positions.len
+		}
+		if back_to_lookup < 0 {
+			output_buf.clear()
+		} else {
+			output_buf.go_back_to(delim_positions[back_to_lookup])
+		}
 		print(output_buf.str())
 	}
 
@@ -93,7 +112,10 @@ fn write_lines_upto_max(file_ptr os.File, num_lines int, delim_char u8) {
 		read_bytes_num := file_ptr.read_bytes_into(cursor, mut reading_buf) or { return }
 		cursor += u64(read_bytes_num)
 
-		if read_bytes_num == 0 { break } // reached end of file
+		if read_bytes_num == 0 {
+			break
+		}
+		// reached end of file
 
 		for i := 0; i < read_bytes_num; i++ {
 			read_cursor++
