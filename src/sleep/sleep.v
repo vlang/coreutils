@@ -9,7 +9,6 @@ const cmd_ns = 'sleep'
 // str="1.8e+308", ret = +inf, endptr => NULL
 // str="A1", ret = 0, endptr => "A1"
 // str="1.2s", ret = 1.2, endptr => "s"
-fn C.strtold(str &char, endptr &&char) f64
 
 // apply_unit converts the passed number to seconds
 fn apply_unit(n f64, unit string) ?f64 {
@@ -51,9 +50,8 @@ fn main() {
 	mut ok := true
 	mut seconds := f64(0)
 	for arg in args {
-		endptr := &char(0)
-		n := unsafe { C.strtold(&char(arg.str), &endptr) }
-		unit := unsafe { cstring_to_vstring(endptr) }
+		n := arg.f64() // unsafe { C.strtold(&char(arg.str), &endptr) }
+		unit := if arg.len > '$n'.len { arg['$n'.len..] } else { '' }
 		if n < 0 || unit.len > 1 {
 			eprintln(invalid_time_interval(n, unit))
 			ok = false

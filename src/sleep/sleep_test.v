@@ -38,6 +38,6 @@ fn test_interval() {
 	delta_ms := x2 - x1
 	assert result_v.exit_code == 0
 	// ensure there is some tolerance for CI slowness
-	assert delta_ms > 52
+	assert delta_ms > 4
 	assert delta_ms < 80
 }
