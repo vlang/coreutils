@@ -53,6 +53,35 @@ fn write_bytes(file_ptr os.File, num_bytes int) {
 }
 
 fn write_bytes_upto_max(file_ptr os.File, num_bytes int) {
+	mut output_buf := strings.new_builder(buf_size)
+	mut reading_buf := []u8{len: buf_size}
+	mut cursor := u64(0)
+
+	defer {
+		mut back_to_lookup := output_buf.len + num_bytes
+		println(back_to_lookup)
+		if back_to_lookup < 0 {
+			output_buf.clear()
+		} else {
+			output_buf.go_back_to(back_to_lookup)
+		}
+		print(output_buf.str())
+	}
+
+	for {
+		read_bytes_num := file_ptr.read_bytes_into(cursor, mut reading_buf) or { return }
+		cursor += u64(read_bytes_num)
+
+		if read_bytes_num == 0 {
+			break
+		}
+		// reached end of file
+
+		for i := 0; i < read_bytes_num; i++ {
+			c := reading_buf[i]
+			output_buf.write_u8(c)
+		}
+	}
 }
 
 fn write_lines(file_ptr os.File, num_lines int, delim_char u8) {
@@ -156,6 +185,10 @@ fn (c HeadCommand) write_lines(file_ptr os.File) {
 }
 
 fn (c HeadCommand) write_bytes(file_ptr os.File) {
+	if c.bytes_to_read < 0 {
+		write_bytes_upto_max(file_ptr, c.bytes_to_read)
+		return
+	}
 	write_bytes(file_ptr, c.bytes_to_read)
 }
 
