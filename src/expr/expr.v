@@ -206,7 +206,7 @@ fn match_str(s string, _m string) Value {
 		return i64(if start == -1 {
 			0
 		} else if locale {
-			utf8_str_len(s[start..end])
+			s[start..end].len_utf8()
 		} else {
 			end - start
 		})
@@ -322,7 +322,7 @@ fn (mut p Parser) primary() Value {
 		'length' {
 			val := p.primary().str()
 			return i64(if locale {
-				utf8_str_len(val)
+				val.len_utf8()
 			} else {
 				val.len
 			})
