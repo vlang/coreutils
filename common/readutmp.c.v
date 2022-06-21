@@ -7,18 +7,18 @@ module common
 // TODO: conflicts with `timeval` in <time.h>
 // <bits/types/struct_timeval.h>
 /*
-struct C.timeval {
+pub struct C.timeval {
 	tv_sec  i64 // Seconds.
 	tv_usec i64 // Microseconds.
 }*/
 
 // <time.h>
-struct C.timeval {
+pub struct C.timeval {
 	tv_sec  u64 // Seconds.
 	tv_usec u64 // Microseconds.
 }
 
-struct C.utmpx {
+pub struct C.utmpx {
 	ut_type    i16       // Type of login.
 	ut_pid     int       // Process ID of login process.
 	ut_line    [32]char  // Devicename.
