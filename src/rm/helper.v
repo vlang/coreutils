@@ -116,7 +116,7 @@ fn check_interactive(interactive string) ?Interactive {
 fn setup_rm_command(args []string) ?(RmCommand, []string) {
 	mut fp := common.flag_parser(args)
 	fp.application('rm')
-	fp.limit_free_args_to_at_least(1) ?
+	fp.limit_free_args_to_at_least(1)?
 
 	dir := fp.bool('dir', `d`, false, 'dir')
 	force := fp.bool('force', `f`, false, 'force')
@@ -130,7 +130,7 @@ fn setup_rm_command(args []string) ?(RmCommand, []string) {
 	interactive_str := fp.string('interactive', 0, '', 'interactive')
 	mut int_type := Interactive.no
 	if interactive_str != '' {
-		int_type = check_interactive(interactive_str) ?
+		int_type = check_interactive(interactive_str)?
 	} else {
 		int_type = Interactive.no
 	}
@@ -147,7 +147,7 @@ fn setup_rm_command(args []string) ?(RmCommand, []string) {
 
 	rm := RmCommand{recursive, dir, interactive, verbose, force, less_int}
 
-	files := fp.finalize() ?
+	files := fp.finalize()?
 
 	// println(rm)
 	return rm, files

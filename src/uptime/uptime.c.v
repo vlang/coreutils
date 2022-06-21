@@ -104,7 +104,7 @@ fn print_uptime(utmp_buf []C.utmpx) ? {
 fn uptime(filename &char, options common.ReadUtmpOptions) ? {
 	mut utmp_buf := []C.utmpx{}
 	common.read_utmp(filename, mut utmp_buf, options)
-	print_uptime(utmp_buf) ?
+	print_uptime(utmp_buf)?
 }
 
 fn main() {
@@ -121,7 +121,7 @@ fn main() {
 		fp.description('the load average. If FILE is not specified, use ${utmp_file_vstr}.')
 		fp.description('$wtmp_file_vstr as FILE is common.')
 	}
-	fp.limit_free_args(0, 1) ?
+	fp.limit_free_args(0, 1)?
 	args := fp.remaining_parameters()
 
 	// Main functionality

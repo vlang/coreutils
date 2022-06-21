@@ -25,10 +25,10 @@ fn test_valid_setup_rm() ? {
 	args_rc_f_i_ic := ['rm', '--force', '--interactive=always', '-I', '-R', 'c']
 
 	rm1, files1 := setup_rm_command(args_no_flags) or {
-		rm2, files2 := setup_rm_command(args_r) ?
-		rm3, files3 := setup_rm_command(args_r_i_v) ?
-		rm4, files4 := setup_rm_command(args_f_ic_v) ?
-		rm5, files5 := setup_rm_command(args_rc_f_i_ic) ?
+		rm2, files2 := setup_rm_command(args_r)?
+		rm3, files3 := setup_rm_command(args_r_i_v)?
+		rm4, files4 := setup_rm_command(args_f_ic_v)?
+		rm5, files5 := setup_rm_command(args_rc_f_i_ic)?
 
 		expect_rm2 := RmCommand{
 			recursive: true
@@ -76,14 +76,14 @@ fn test_valid_setup_rm() ? {
 
 fn test_run_rm() ? {
 	path := 'a'
-	os.create(path) ?
+	os.create(path)?
 	assert os.exists(path)
 	args := ['rm', path]
 	run_rm(args)
 	assert !os.exists(path)
 
 	dir := 'dir'
-	os.mkdir(dir) ?
+	os.mkdir(dir)?
 	assert os.exists(dir)
 	args_dir := ['rm', dir]
 	run_rm(args_dir)

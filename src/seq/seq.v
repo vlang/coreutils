@@ -23,7 +23,7 @@ struct Settings {
 ///===================================================================///
 
 fn main() {
-	settings := args() ?
+	settings := args()?
 
 	// sanitize settings
 	check_settings(settings) or {

@@ -85,7 +85,7 @@ fn (mut file_reader FileReader) read_chunk(mut buffer []u8) ?FileChunk {
 		file_reader.mutex.unlock()
 	}
 
-	nbytes := file_reader.file.read(mut buffer) ? // Propagate error. Either EOF or read error.
+	nbytes := file_reader.file.read(mut buffer)? // Propagate error. Either EOF or read error.
 	chunk := FileChunk{file_reader.last_char_is_space, buffer[..nbytes]}
 	file_reader.last_char_is_space = is_space(buffer[nbytes - 1])
 	return chunk

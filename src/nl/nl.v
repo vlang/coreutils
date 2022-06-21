@@ -57,7 +57,7 @@ mut:
 ///===================================================================///
 
 fn main() {
-	settings, fnames := args() ?
+	settings, fnames := args()?
 	streams := open_stream(fnames)
 	nl(settings, streams)
 }

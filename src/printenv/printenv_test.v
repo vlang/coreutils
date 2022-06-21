@@ -5,11 +5,11 @@ const the_executable = testing.prepare_executable('printenv')
 const cmd = testing.new_paired_command('printenv', the_executable)
 
 fn test_help_and_version() ? {
-	cmd.ensure_help_and_version_options_work() ?
+	cmd.ensure_help_and_version_options_work()?
 }
 
 fn test_unknown_option() ? {
-	testing.command_fails('$the_executable -x') ?
+	testing.command_fails('$the_executable -x')?
 }
 
 fn test_print_all_default() {

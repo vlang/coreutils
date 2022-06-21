@@ -1,4 +1,5 @@
 #!/bin/env v
+
 import os // v has a bug that you can't use args
 
 const (

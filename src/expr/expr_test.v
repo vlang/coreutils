@@ -6,7 +6,7 @@ const the_executable = testing.prepare_executable('expr')
 const cmd = testing.new_paired_command('expr', the_executable)
 
 fn test_help_and_version() ? {
-	cmd.ensure_help_and_version_options_work() ?
+	cmd.ensure_help_and_version_options_work()?
 }
 
 const tests = [
