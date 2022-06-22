@@ -206,15 +206,18 @@ fn (c HeadCommand) write(file_ptr os.File) {
 }
 
 fn (c HeadCommand) run(mut files []InputFile) {
+	mut open_fails_num := 0
 	for i, mut file in files {
 		file.open() or {
 			eprintln('$name: $err.msg()')
+			open_fails_num++
 			continue
 		}
 		c.write_header(file.is_stdin, file.name, files.len > 1, i == 0)
 		c.write(file.file_ptr)
 		file.close()
 	}
+	if open_fails_num == files.len { exit(1) }
 }
 
 // Print messages and exit
