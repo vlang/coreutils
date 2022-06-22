@@ -21,6 +21,7 @@ fn write_header(name string, first_file bool) {
 	print('$prefix==> $name <==\n')
 }
 
+[direct_array_access]
 fn write_bytes(file_ptr os.File, num_bytes int) {
 	mut m_bytes_to_write := num_bytes
 	adj_buf_size := if num_bytes < buf_size { num_bytes } else { buf_size }
@@ -84,6 +85,7 @@ fn write_bytes_upto_max(file_ptr os.File, num_bytes int) {
 	}
 }
 
+[direct_array_access]
 fn write_lines(file_ptr os.File, num_lines int, delim_char u8) {
 	mut m_lines_to_write := num_lines
 	mut output_buf := strings.new_builder(buf_size)
