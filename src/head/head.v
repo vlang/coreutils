@@ -31,12 +31,8 @@ fn write_bytes(file_ptr os.File, num_bytes int) {
 	mut reading_buf := []u8{len: adj_buf_size}
 	mut cursor := u64(0)
 
-	defer {
-		print(output_buf.str())
-	}
-
 	for m_bytes_to_write != 0 {
-		read_bytes_num := file_ptr.read_bytes_into(cursor, mut reading_buf) or { return }
+		read_bytes_num := file_ptr.read_bytes_into(cursor, mut reading_buf) or { break }
 		cursor += u64(read_bytes_num)
 
 		if read_bytes_num == 0 {
@@ -53,6 +49,8 @@ fn write_bytes(file_ptr os.File, num_bytes int) {
 			}
 		}
 	}
+
+	print(output_buf.str())
 }
 
 fn write_bytes_upto_max(file_ptr os.File, num_bytes int) {
@@ -60,18 +58,8 @@ fn write_bytes_upto_max(file_ptr os.File, num_bytes int) {
 	mut reading_buf := []u8{len: buf_size}
 	mut cursor := u64(0)
 
-	defer {
-		mut back_to_lookup := output_buf.len + num_bytes
-		if back_to_lookup < 0 {
-			output_buf.clear()
-		} else {
-			output_buf.go_back_to(back_to_lookup)
-		}
-		print(output_buf.str())
-	}
-
 	for {
-		read_bytes_num := file_ptr.read_bytes_into(cursor, mut reading_buf) or { return }
+		read_bytes_num := file_ptr.read_bytes_into(cursor, mut reading_buf) or { break }
 		cursor += u64(read_bytes_num)
 
 		if read_bytes_num == 0 {
@@ -84,6 +72,14 @@ fn write_bytes_upto_max(file_ptr os.File, num_bytes int) {
 			output_buf.write_u8(c)
 		}
 	}
+
+	mut back_to_lookup := output_buf.len + num_bytes
+	if back_to_lookup < 0 {
+		output_buf.clear()
+	} else {
+		output_buf.go_back_to(back_to_lookup)
+	}
+	print(output_buf.str())
 }
 
 [direct_array_access]
