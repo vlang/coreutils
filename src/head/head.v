@@ -217,7 +217,9 @@ fn (c HeadCommand) run(mut files []InputFile) {
 		c.write(file.file_ptr)
 		file.close()
 	}
-	if open_fails_num == files.len { exit(1) }
+	if open_fails_num == files.len {
+		exit(1)
+	}
 }
 
 // Print messages and exit

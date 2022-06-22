@@ -22,7 +22,7 @@ fn test_non_existent_files() {
 }
 
 const testtxtcontent = [
-	'[0] Line in test text file'
+	'[0] Line in test text file',
 	'[1] Line in test text file',
 	'[2] Line in test text file',
 	'[3] Line in test text file',
@@ -43,12 +43,14 @@ fn test_default() {
 		f.write_string('$l\n') or {}
 	}
 	f.close()
-	defer { os.rm('textfile') or { panic(err) } }
+	defer {
+		os.rm('textfile') or { panic(err) }
+	}
 
 	res := os.execute('$executable_under_test textfile')
 	assert res.exit_code == 0
 	assert res.output.split('\n').filter(it != '') == [
-		'[0] Line in test text file'
+		'[0] Line in test text file',
 		'[1] Line in test text file',
 		'[2] Line in test text file',
 		'[3] Line in test text file',
@@ -67,12 +69,14 @@ fn test_max_lines_option() {
 		f.write_string('$l\n') or {}
 	}
 	f.close()
-	defer { os.rm('textfile') or { panic(err) } }
+	defer {
+		os.rm('textfile') or { panic(err) }
+	}
 
 	res := os.execute('$executable_under_test textfile -n 4')
 	assert res.exit_code == 0
 	assert res.output.split('\n').filter(it != '') == [
-		'[0] Line in test text file'
+		'[0] Line in test text file',
 		'[1] Line in test text file',
 		'[2] Line in test text file',
 		'[3] Line in test text file',
@@ -85,12 +89,14 @@ fn test_max_lines_from_end_option() {
 		f.write_string('$l\n') or {}
 	}
 	f.close()
-	defer { os.rm('textfile') or { panic(err) } }
+	defer {
+		os.rm('textfile') or { panic(err) }
+	}
 
 	res := os.execute('$executable_under_test textfile -n -4')
 	assert res.exit_code == 0
 	assert res.output.split('\n').filter(it != '') == [
-		'[0] Line in test text file'
+		'[0] Line in test text file',
 		'[1] Line in test text file',
 		'[2] Line in test text file',
 		'[3] Line in test text file',
@@ -108,12 +114,14 @@ fn test_upto_max_bytes() {
 		f.write_string('$l\n') or {}
 	}
 	f.close()
-	defer { os.rm('textfile') or { panic(err) } }
+	defer {
+		os.rm('textfile') or { panic(err) }
+	}
 
 	res := os.execute('$executable_under_test textfile -c 223')
 	assert res.exit_code == 0
 	assert res.output.split('\n').filter(it != '') == [
-		'[0] Line in test text file'
+		'[0] Line in test text file',
 		'[1] Line in test text file',
 		'[2] Line in test text file',
 		'[3] Line in test text file',
@@ -131,12 +139,14 @@ fn test_upto_max_bytes_from_end_option() {
 		f.write_string('$l\n') or {}
 	}
 	f.close()
-	defer { os.rm('textfile') or { panic(err) } }
+	defer {
+		os.rm('textfile') or { panic(err) }
+	}
 
 	res := os.execute('$executable_under_test textfile -c -312')
 	assert res.exit_code == 0
 	assert res.output.split('\n').filter(it != '') == [
-		'[0] Line in test text file'
+		'[0] Line in test text file',
 		'[1] Line in tes',
 	]
 }
