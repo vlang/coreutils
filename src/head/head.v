@@ -3,7 +3,7 @@ import common
 import strings
 
 const (
-	name = 'head'
+	name         = 'head'
 	buf_size     = 256
 	newline_char = u8(10)
 	nul_char     = u8(0)
@@ -325,7 +325,6 @@ fn run_head(args []string) {
 
 	head.run(mut files)
 }
-
 
 fn main() {
 	run_head(os.args)
