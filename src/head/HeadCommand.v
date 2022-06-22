@@ -60,7 +60,6 @@ fn write_bytes_upto_max(file_ptr os.File, num_bytes int) {
 
 	defer {
 		mut back_to_lookup := output_buf.len + num_bytes
-		println(back_to_lookup)
 		if back_to_lookup < 0 {
 			output_buf.clear()
 		} else {
