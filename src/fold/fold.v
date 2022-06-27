@@ -17,9 +17,13 @@ const (
 
 struct FoldCommand {
 	max_col_width int
+	break_at_spaces bool
+	count_bytes_ignore_control_chars bool
 }
 
-fn adjust_column(column int, c u8) int {
+fn adjust_column(column int, c u8, count_bytes bool) int {
+	if count_bytes { return column + 1 }
+
 	return match c {
 		back_char {
 			if column > 0 {
@@ -40,18 +44,15 @@ fn adjust_column(column int, c u8) int {
 	}
 }
 
-fn fold_content_to_fit_within_width(file_ptr os.File, width int) {
-	mut reading_buf := []u8{len: buf_size}
-	mut rcursor := u64(0)
+fn fold_content_to_fit_within_width(file_ptr os.File, width int, count_bytes bool) {
 	mut output_buf := strings.new_builder(buf_size)
 
 	defer {
 		println(output_buf.str())
 	}
 
-	mut b_reader := common.new_file_byte_reader(file_ptr)
-
 	mut column := 0
+	mut b_reader := common.new_file_byte_reader(file_ptr)
 	for b_reader.has_next() {
 		c := b_reader.next() or {
 			eprintln(err.msg())
@@ -59,12 +60,13 @@ fn fold_content_to_fit_within_width(file_ptr os.File, width int) {
 		}
 
 		if c == newline_char {
+			if !b_reader.has_next() { continue } // don't output trailing new line as last char
 			output_buf.write_u8(c)
 			column = 0
 			continue
 		}
 
-		adjusted_column := adjust_column(column, c)
+		adjusted_column := adjust_column(column, c, count_bytes)
 		if adjusted_column > width {
 			output_buf.write_u8(newline_char)
 			output_buf.write_u8(c)
@@ -85,7 +87,7 @@ fn (c FoldCommand) run(mut files []InputFile) {
 			open_fails_num++
 			continue
 		}
-		fold_content_to_fit_within_width(file.file_ptr, c.max_col_width)
+		fold_content_to_fit_within_width(file.file_ptr, c.max_col_width, c.count_bytes_ignore_control_chars)
 		file.close()
 	}
 	if open_fails_num == files.len {
@@ -175,7 +177,7 @@ fn setup_command(args []string) ?(FoldCommand, []InputFile) {
 	fp.description('With no FILE, or when FILE is -, read standard input.')
 
 	bytes := fp.bool('bytes', `b`, false, 'count bytes rather than columns')
-	spaces := fp.int('spaces', `s`, 0, 'break at spaces')
+	spaces := fp.bool('spaces', `s`, false, 'break at spaces')
 	width := fp.int('width', `w`, 80, 'use WIDTH columns instead of 80')
 
 	help := fp.bool('help', 0, false, 'display this help and exit')
@@ -191,6 +193,8 @@ fn setup_command(args []string) ?(FoldCommand, []InputFile) {
 
 	return FoldCommand{
 		max_col_width: width
+		break_at_spaces: spaces
+		count_bytes_ignore_control_chars: bytes
 	}, get_files(file_args)
 }
 
