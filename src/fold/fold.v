@@ -6,8 +6,11 @@ import strings
 const (
 	name         = 'fold'
 	buf_size     = 256
-	newline_char = u8(10)
-	nul_char     = u8(0)
+	newline_char = `\n`
+	nul_char     = `\0`
+	back_char    = `\b`
+	return_char  = `\r`
+	tab_char     = `\t`
 	space_char   = u8(32)
 	tab_width    = 8
 )
@@ -18,17 +21,17 @@ struct FoldCommand {
 
 fn adjust_column(column int, c u8) int {
 	return match c {
-		`\b` {
+		back_char {
 			if column > 0 {
 				column - 1
 			} else {
 				0
 			}
 		}
-		`\r` {
+		return_char {
 			0
 		}
-		`\t` {
+		tab_char {
 			column + tab_width - column % tab_width
 		}
 		else {
