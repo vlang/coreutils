@@ -46,6 +46,7 @@ fn adjust_column(column int, c u8, count_bytes bool) int {
 
 fn fold_content_to_fit_within_width(file_ptr os.File, width int, count_bytes bool) {
 	mut output_buf := strings.new_builder(buf_size)
+	mut pending_output := []u8{}
 
 	defer {
 		println(output_buf.str())
@@ -61,20 +62,24 @@ fn fold_content_to_fit_within_width(file_ptr os.File, width int, count_bytes boo
 
 		if c == newline_char {
 			if !b_reader.has_next() { continue } // don't output trailing new line as last char
-			output_buf.write_u8(c)
+			pending_output << c
+			output_buf.write(pending_output) or { panic('should not happen') }
+			pending_output.clear()
 			column = 0
 			continue
 		}
 
 		adjusted_column := adjust_column(column, c, count_bytes)
 		if adjusted_column > width {
-			output_buf.write_u8(newline_char)
-			output_buf.write_u8(c)
+			pending_output << newline_char
+			pending_output << c
+			output_buf.write(pending_output) or { panic('should not happen') }
+			pending_output.clear()
 			column = 1
 			continue
 		}
 
-		output_buf.write_u8(c)
+		pending_output << c
 		column = adjusted_column
 	}
 }
