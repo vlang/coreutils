@@ -50,7 +50,6 @@ fn fold_content_to_fit_within_width(file_ptr os.File, width int) {
 
 	mut column := 0
 	for b_reader.has_next() {
-		println('WIDTH: $width, COLUMN: $column')
 		c := b_reader.next() or {
 			eprintln(err.msg())
 			continue
