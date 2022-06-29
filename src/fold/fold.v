@@ -210,7 +210,7 @@ fn get_files(file_args []string) []InputFile {
 	return files
 }
 
-fn setup_command(args []string) ?(FoldCommand, []InputFile) {
+fn run_fold(args []string) {
 	mut fp := common.flag_parser(args)
 	fp.application(name)
 	fp.usage_example('[OPTION]... [FILE]...')
@@ -232,17 +232,13 @@ fn setup_command(args []string) ?(FoldCommand, []InputFile) {
 
 	file_args := fp.finalize() or { common.exit_with_error_message(name, err.msg()) }
 
-	return FoldCommand{
+	cmd := FoldCommand{
 		max_col_width: width
 		break_at_spaces: spaces
 		count_bytes_ignore_control_chars: bytes
-	}, get_files(file_args)
-}
+	}
 
-fn run_fold(args []string) {
-	fold, mut files := setup_command(args) or { common.exit_with_error_message(name, err.msg()) }
-
-	fold.run(mut files)
+	cmd.run(mut get_files(file_args))
 }
 
 fn main() {
