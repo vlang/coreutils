@@ -1,12 +1,10 @@
-module common
-
 import os
 
 pub const eof = -1
 
 const read_buf_size = 256
 
-pub struct FileByteReader {
+struct FileByteReader {
 	file     os.File
 	buf_size int
 mut:
@@ -18,15 +16,15 @@ mut:
 	buf          []u8
 }
 
-pub fn new_file_byte_reader(fp os.File) FileByteReader {
+fn new_file_byte_reader(fp os.File) FileByteReader {
 	return FileByteReader{
 		file: fp
-		buf_size: common.read_buf_size
-		buf: []u8{len: common.read_buf_size}
+		buf_size: read_buf_size
+		buf: []u8{len: read_buf_size}
 	}
 }
 
-pub fn (mut r FileByteReader) has_next() bool {
+fn (mut r FileByteReader) has_next() bool {
 	if r.reached_end && r.returned_eof {
 		return false
 	}
@@ -45,10 +43,10 @@ pub fn (mut r FileByteReader) has_next() bool {
 	return r.buf_index < r.buf_data_len
 }
 
-pub fn (mut r FileByteReader) next() int {
+fn (mut r FileByteReader) next() int {
 	if r.buf_index + 1 > r.buf_data_len {
 		r.returned_eof = true
-		return common.eof
+		return eof
 	}
 	c := r.buf[r.buf_index]
 	r.buf_index++

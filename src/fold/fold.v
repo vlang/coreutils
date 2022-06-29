@@ -1,11 +1,10 @@
 import os
-import common
 import strings
+import common
 
 const (
 	name         = 'fold'
 	buf_size     = 256
-	eof          = -1
 	newline_char = `\n`
 	nul_char     = `\0`
 	back_char    = `\b`
@@ -35,7 +34,7 @@ fn new_folder(width int, count_bytes bool, break_at_spaces bool) Folder {
 }
 
 fn (mut f Folder) write_char(c int) ? {
-	if c == common.eof {
+	if c == eof {
 		f.flush()?
 		return
 	}
@@ -135,7 +134,7 @@ fn fold_content_to_fit_within_width(file os.File, width int, count_bytes bool, b
 		println(folder.str())
 	}
 
-	mut b_reader := common.new_file_byte_reader(file)
+	mut b_reader := new_file_byte_reader(file)
 	for b_reader.has_next() {
 		c := b_reader.next()
 
