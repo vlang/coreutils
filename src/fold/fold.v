@@ -16,13 +16,13 @@ const (
 )
 
 struct Folder {
-	max_width int
-	count_bytes bool
+	max_width       int
+	count_bytes     bool
 	break_at_spaces bool
 mut:
-	output_buf strings.Builder
+	output_buf     strings.Builder
 	pending_output []u8
-	column int
+	column         int
 }
 
 fn new_folder(width int, count_bytes bool, break_at_spaces bool) Folder {
@@ -60,13 +60,16 @@ fn (mut f Folder) write_char(c int) ? {
 
 fn (mut f Folder) break_on_last_space() ? {
 	mut last_found_space := 0
-	for i := f.pending_output.len-1; i >= 0; i-- {
-		if f.pending_output[i] == space_char { last_found_space = i break }
+	for i := f.pending_output.len - 1; i >= 0; i-- {
+		if f.pending_output[i] == space_char {
+			last_found_space = i
+			break
+		}
 	}
 
 	pending_output_cpy := f.pending_output.clone()
 	pre_space := pending_output_cpy[..last_found_space]
-	post_space := pending_output_cpy[last_found_space+1..]
+	post_space := pending_output_cpy[last_found_space + 1..]
 	f.pending_output = pre_space
 
 	f.flush()?
@@ -95,13 +98,15 @@ fn (mut f Folder) str() string {
 }
 
 struct FoldCommand {
-	max_col_width int
-	break_at_spaces bool
+	max_col_width                    int
+	break_at_spaces                  bool
 	count_bytes_ignore_control_chars bool
 }
 
 fn adjust_column(column int, c u8, count_bytes bool) int {
-	if count_bytes { return column + 1 }
+	if count_bytes {
+		return column + 1
+	}
 
 	return match c {
 		back_char {
@@ -146,7 +151,8 @@ fn (c FoldCommand) run(mut files []InputFile) {
 			open_fails_num++
 			continue
 		}
-		fold_content_to_fit_within_width(file.file_ptr, c.max_col_width, c.count_bytes_ignore_control_chars, c.break_at_spaces)
+		fold_content_to_fit_within_width(file.file_ptr, c.max_col_width, c.count_bytes_ignore_control_chars,
+			c.break_at_spaces)
 		file.close()
 	}
 	if open_fails_num == files.len {
