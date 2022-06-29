@@ -210,30 +210,6 @@ fn get_files(file_args []string) []InputFile {
 	return files
 }
 
-fn wrap_long_command_description(description string, max_cols int) string {
-	mut buf := strings.new_builder(buf_size)
-	if description.len <= max_cols {
-		return description
-	}
-
-	mut last_c := u8(0)
-	mut pending_split := false
-	for i, c in description {
-		if i > 1 && i % max_cols == 0 {
-			pending_split = true
-		}
-
-		if pending_split && last_c == space_char {
-			buf.write_string('\n\t\t\t\t')
-			pending_split = false
-		}
-		buf.write_u8(c)
-		last_c = c
-	}
-
-	return buf.str()
-}
-
 fn setup_command(args []string) ?(FoldCommand, []InputFile) {
 	mut fp := common.flag_parser(args)
 	fp.application(name)
