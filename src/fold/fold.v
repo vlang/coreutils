@@ -173,8 +173,8 @@ struct InputFile {
 	is_stdin bool
 	name     string
 mut:
-	is_open  bool
-	file os.File
+	is_open bool
+	file    os.File
 }
 
 fn (mut f InputFile) open() ? {

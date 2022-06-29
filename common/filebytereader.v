@@ -7,11 +7,11 @@ pub const eof = -1
 const read_buf_size = 256
 
 pub struct FileByteReader {
-	file os.File
+	file     os.File
 	buf_size int
 mut:
 	reached_end  bool
-	returned_eof  bool
+	returned_eof bool
 	buf_index    int
 	buf_data_len int
 	cursor       u64
