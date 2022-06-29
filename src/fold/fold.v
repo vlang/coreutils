@@ -247,5 +247,4 @@ fn run_fold(args []string) {
 
 fn main() {
 	run_fold(os.args)
-	//
 }
