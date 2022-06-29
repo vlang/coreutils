@@ -11,7 +11,7 @@ pub struct FileByteReader {
 	buf_size int
 mut:
 	reached_end  bool
-	written_eof  bool
+	returned_eof  bool
 	buf_index    int
 	buf_data_len int
 	cursor       u64
@@ -27,7 +27,7 @@ pub fn new_file_byte_reader(fp os.File) FileByteReader {
 }
 
 pub fn (mut r FileByteReader) has_next() bool {
-	if r.reached_end && r.written_eof {
+	if r.reached_end && r.returned_eof {
 		return false
 	}
 
@@ -47,7 +47,7 @@ pub fn (mut r FileByteReader) has_next() bool {
 
 pub fn (mut r FileByteReader) next() int {
 	if r.buf_index + 1 > r.buf_data_len {
-		r.written_eof = true
+		r.returned_eof = true
 		return common.eof
 	}
 	c := r.buf[r.buf_index]
