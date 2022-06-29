@@ -10,10 +10,10 @@ const (
 )
 
 struct Settings {
-	mode 		 int
-	parents		 bool
-	verbose		 bool
-	dirnames           []string
+	mode     int
+	parents  bool
+	verbose  bool
+	dirnames []string
 }
 
 ///===================================================================///
@@ -28,9 +28,9 @@ fn mkdir(settings Settings) {
 	mut dirnames := settings.dirnames
 
 	for dirname in dirnames {
-		if settings.parents{
+		if settings.parents {
 			os.mkdir_all(dirname) or {
-				eprintln('$app_name: $dirname: '+err.msg())
+				eprintln('$app_name: $dirname: ' + err.msg())
 				continue
 			}
 		} else {
@@ -39,16 +39,18 @@ fn mkdir(settings Settings) {
 					eprintln('$app_name: cannot create directory \'$dirname\': File exists ')
 					continue
 				}
-			}else{
+			} else {
 				eprintln('$app_name: cannot create directory \'$dirname\': No such file or directory ')
 				continue
 			}
 		}
-		if settings.verbose {println('$app_name: created directory \'$dirname\'')}
-		os.chmod(dirname,settings.mode) or {
-		//os.chmod(dirname,0o7777) or {
+		if settings.verbose {
+			println('$app_name: created directory \'$dirname\'')
+		}
+		os.chmod(dirname, settings.mode) or {
+			// os.chmod(dirname,0o7777) or {
 
-			eprintln('$app_name: $dirname: '+err.msg())
+			eprintln('$app_name: $dirname: ' + err.msg())
 		}
 	}
 }
@@ -70,10 +72,10 @@ fn args() Settings {
 		println(fp.usage())
 		exit(1)
 	}
-	if dirnames.len==0 {
+	if dirnames.len == 0 {
 		eprintln('$app_name: missing operand')
 		eprintln("Try '$app_name --help' for more information.")
 		exit(1)
 	}
-	return Settings{mode,parents,verbose,dirnames}
+	return Settings{mode, parents, verbose, dirnames}
 }
