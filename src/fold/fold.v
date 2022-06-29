@@ -16,6 +16,7 @@ const (
 
 struct Folder {
 	max_width int
+	count_bytes bool
 	break_at_spaces bool
 mut:
 	output_buf strings.Builder
@@ -23,16 +24,16 @@ mut:
 	column int
 }
 
-fn new_folder(width int, break_at_spaces bool) Folder {
+fn new_folder(width int, count_bytes bool, break_at_spaces bool) Folder {
 	return Folder{
 		max_width: width
+		count_bytes: count_bytes
 		break_at_spaces: break_at_spaces
 		output_buf: strings.new_builder(buf_size)
 	}
 }
 
 fn (mut f Folder) write_char(c u8) ? {
-	f.column = adjust_column(f.column, c, false)
 	f.pending_output << c
 
 	if c == newline_char {
@@ -40,6 +41,7 @@ fn (mut f Folder) write_char(c u8) ? {
 		return
 	}
 
+	f.column = adjust_column(f.column, c, f.count_bytes)
 	if f.column > f.max_width {
 		if f.break_at_spaces {
 			f.break_on_last_space()?
@@ -51,9 +53,10 @@ fn (mut f Folder) write_char(c u8) ? {
 
 fn (mut f Folder) break_on_last_space() ? {
 	mut last_found_space := 0
-	for i, c in f.pending_output {
-		if c == space_char { last_found_space = i break }
+	for i := f.pending_output.len-1; i >= 0; i-- {
+		if f.pending_output[i] == space_char { last_found_space = i break }
 	}
+
 	pending_output_cpy := f.pending_output.clone()
 	pre_space := pending_output_cpy[..last_found_space]
 	post_space := pending_output_cpy[last_found_space+1..]
@@ -114,7 +117,7 @@ fn adjust_column(column int, c u8, count_bytes bool) int {
 }
 
 fn fold_content_to_fit_within_width(file_ptr os.File, width int, count_bytes bool, break_at_spaces bool) {
-	mut folder := new_folder(width, break_at_spaces)
+	mut folder := new_folder(width, count_bytes, break_at_spaces)
 
 	defer {
 		println(folder.str())
