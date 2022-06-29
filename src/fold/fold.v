@@ -15,6 +15,52 @@ const (
 	tab_width    = 8
 )
 
+struct Folder {
+	max_width int
+mut:
+	output_buf strings.Builder
+	pending_output []u8
+	column int
+}
+
+fn new_folder(width int) Folder {
+	return Folder{
+		max_width: width
+		output_buf: strings.new_builder(buf_size)
+	}
+}
+
+fn (mut f Folder) write_char(c u8) ? {
+	f.column++
+	f.pending_output << c
+
+	if c == newline_char {
+		f.flush()?
+		return
+	}
+
+	if f.column > f.max_width {
+		f.move_last_c_to_newline()?
+	}
+}
+
+fn (mut f Folder) move_last_c_to_newline() ? {
+	last_written_c := f.pending_output.pop()
+	f.pending_output << newline_char
+	f.flush()?
+	f.write_char(last_written_c)?
+}
+
+fn (mut f Folder) flush() ? {
+	f.output_buf.write(f.pending_output)?
+	f.pending_output.clear()
+	f.column = 0
+}
+
+fn (mut f Folder) str() string {
+	return f.output_buf.str()
+}
+
 struct FoldCommand {
 	max_col_width int
 	break_at_spaces bool
@@ -45,14 +91,12 @@ fn adjust_column(column int, c u8, count_bytes bool) int {
 }
 
 fn fold_content_to_fit_within_width(file_ptr os.File, width int, count_bytes bool) {
-	mut output_buf := strings.new_builder(buf_size)
-	mut pending_output := []u8{}
+	mut folder := new_folder(width)
 
 	defer {
-		println(output_buf.str())
+		println(folder.str())
 	}
 
-	mut column := 0
 	mut b_reader := common.new_file_byte_reader(file_ptr)
 	for b_reader.has_next() {
 		c := b_reader.next() or {
@@ -60,27 +104,29 @@ fn fold_content_to_fit_within_width(file_ptr os.File, width int, count_bytes boo
 			continue
 		}
 
-		if c == newline_char {
-			if !b_reader.has_next() { continue } // don't output trailing new line as last char
-			pending_output << c
-			output_buf.write(pending_output) or { panic('should not happen') }
-			pending_output.clear()
-			column = 0
-			continue
-		}
+		folder.write_char(c) or { panic('unable to write $c') }
 
-		adjusted_column := adjust_column(column, c, count_bytes)
-		if adjusted_column > width {
-			pending_output << newline_char
-			pending_output << c
-			output_buf.write(pending_output) or { panic('should not happen') }
-			pending_output.clear()
-			column = 1
-			continue
-		}
+		// if c == newline_char {
+		// 	if !b_reader.has_next() { continue } // don't output trailing new line as last char
+		// 	pending_output << c
+		// 	output_buf.write(pending_output) or { panic('should not happen') }
+		// 	pending_output.clear()
+		// 	column = 0
+		// 	continue
+		// }
 
-		pending_output << c
-		column = adjusted_column
+		// adjusted_column := adjust_column(column, c, count_bytes)
+		// if adjusted_column > width {
+		// 	pending_output << newline_char
+		// 	pending_output << c
+		// 	output_buf.write(pending_output) or { panic('should not happen') }
+		// 	pending_output.clear()
+		// 	column = 1
+		// 	continue
+		// }
+
+		// pending_output << c
+		// column = adjusted_column
 	}
 }
 
