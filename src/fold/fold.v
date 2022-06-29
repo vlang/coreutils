@@ -5,6 +5,7 @@ import strings
 const (
 	name         = 'fold'
 	buf_size     = 256
+	eof          = -1
 	newline_char = `\n`
 	nul_char     = `\0`
 	back_char    = `\b`
@@ -33,15 +34,21 @@ fn new_folder(width int, count_bytes bool, break_at_spaces bool) Folder {
 	}
 }
 
-fn (mut f Folder) write_char(c u8) ? {
-	f.pending_output << c
-
-	if c == newline_char {
+fn (mut f Folder) write_char(c int) ? {
+	if c == common.eof {
 		f.flush()?
 		return
 	}
 
-	f.column = adjust_column(f.column, c, f.count_bytes)
+	u_c := u8(c)
+	f.pending_output << u_c
+
+	if u_c == newline_char {
+		f.flush()?
+		return
+	}
+
+	f.column = adjust_column(f.column, u_c, f.count_bytes)
 	if f.column > f.max_width {
 		if f.break_at_spaces {
 			f.break_on_last_space()?
@@ -64,7 +71,7 @@ fn (mut f Folder) break_on_last_space() ? {
 
 	f.flush()?
 
-	f.write_char(newline_char)?
+	f.write_char(int(newline_char))?
 	for c in post_space {
 		f.write_char(c)?
 	}
@@ -125,10 +132,7 @@ fn fold_content_to_fit_within_width(file_ptr os.File, width int, count_bytes boo
 
 	mut b_reader := common.new_file_byte_reader(file_ptr)
 	for b_reader.has_next() {
-		c := b_reader.next() or {
-			eprintln(err.msg())
-			continue
-		}
+		c := b_reader.next()
 
 		folder.write_char(c) or { panic('unable to write $c') }
 	}
