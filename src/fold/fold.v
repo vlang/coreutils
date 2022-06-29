@@ -128,14 +128,14 @@ fn adjust_column(column int, c u8, count_bytes bool) int {
 	}
 }
 
-fn fold_content_to_fit_within_width(file_ptr os.File, width int, count_bytes bool, break_at_spaces bool) {
+fn fold_content_to_fit_within_width(file os.File, width int, count_bytes bool, break_at_spaces bool) {
 	mut folder := new_folder(width, count_bytes, break_at_spaces)
 
 	defer {
 		println(folder.str())
 	}
 
-	mut b_reader := common.new_file_byte_reader(file_ptr)
+	mut b_reader := common.new_file_byte_reader(file)
 	for b_reader.has_next() {
 		c := b_reader.next()
 
@@ -151,7 +151,7 @@ fn (c FoldCommand) run(mut files []InputFile) {
 			open_fails_num++
 			continue
 		}
-		fold_content_to_fit_within_width(file.file_ptr, c.max_col_width, c.count_bytes_ignore_control_chars,
+		fold_content_to_fit_within_width(file.file, c.max_col_width, c.count_bytes_ignore_control_chars,
 			c.break_at_spaces)
 		file.close()
 	}
@@ -174,19 +174,19 @@ struct InputFile {
 	name     string
 mut:
 	is_open  bool
-	file_ptr os.File
+	file os.File
 }
 
 fn (mut f InputFile) open() ? {
 	if f.is_stdin {
 		return
 	}
-	f.file_ptr = os.open(f.name) or { return err }
+	f.file = os.open(f.name) or { return err }
 	f.is_open = true
 }
 
 fn (mut f InputFile) close() {
-	f.file_ptr.close()
+	f.file.close()
 	f.is_open = false
 }
 
@@ -196,7 +196,7 @@ fn get_files(file_args []string) []InputFile {
 		files << InputFile{
 			is_stdin: true
 			name: 'stdin'
-			file_ptr: os.stdin()
+			file: os.stdin()
 		}
 		return files
 	}

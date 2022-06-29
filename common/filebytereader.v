@@ -7,7 +7,7 @@ pub const eof = -1
 const read_buf_size = 256
 
 pub struct FileByteReader {
-	file_ptr os.File
+	file os.File
 	buf_size int
 mut:
 	reached_end  bool
@@ -20,7 +20,7 @@ mut:
 
 pub fn new_file_byte_reader(fp os.File) FileByteReader {
 	return FileByteReader{
-		file_ptr: fp
+		file: fp
 		buf_size: common.read_buf_size
 		buf: []u8{len: common.read_buf_size}
 	}
@@ -33,7 +33,7 @@ pub fn (mut r FileByteReader) has_next() bool {
 
 	if r.buf_index == r.buf_data_len {
 		r.buf_index = 0
-		r.buf_data_len = r.file_ptr.read_bytes_into(r.cursor, mut r.buf) or { 0 }
+		r.buf_data_len = r.file.read_bytes_into(r.cursor, mut r.buf) or { 0 }
 		r.cursor += u64(r.buf_data_len)
 	}
 
