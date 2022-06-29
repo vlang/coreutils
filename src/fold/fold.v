@@ -1,6 +1,5 @@
 import os
 import common
-import io
 import strings
 
 const (
@@ -17,21 +16,23 @@ const (
 
 struct Folder {
 	max_width int
+	break_at_spaces bool
 mut:
 	output_buf strings.Builder
 	pending_output []u8
 	column int
 }
 
-fn new_folder(width int) Folder {
+fn new_folder(width int, break_at_spaces bool) Folder {
 	return Folder{
 		max_width: width
+		break_at_spaces: break_at_spaces
 		output_buf: strings.new_builder(buf_size)
 	}
 }
 
 fn (mut f Folder) write_char(c u8) ? {
-	f.column++
+	f.column = adjust_column(f.column, c, false)
 	f.pending_output << c
 
 	if c == newline_char {
@@ -40,7 +41,29 @@ fn (mut f Folder) write_char(c u8) ? {
 	}
 
 	if f.column > f.max_width {
+		if f.break_at_spaces {
+			f.break_on_last_space()?
+			return
+		}
 		f.move_last_c_to_newline()?
+	}
+}
+
+fn (mut f Folder) break_on_last_space() ? {
+	mut last_found_space := 0
+	for i, c in f.pending_output {
+		if c == space_char { last_found_space = i break }
+	}
+	pending_output_cpy := f.pending_output.clone()
+	pre_space := pending_output_cpy[..last_found_space]
+	post_space := pending_output_cpy[last_found_space+1..]
+	f.pending_output = pre_space
+
+	f.flush()?
+
+	f.write_char(newline_char)?
+	for c in post_space {
+		f.write_char(c)?
 	}
 }
 
@@ -90,8 +113,8 @@ fn adjust_column(column int, c u8, count_bytes bool) int {
 	}
 }
 
-fn fold_content_to_fit_within_width(file_ptr os.File, width int, count_bytes bool) {
-	mut folder := new_folder(width)
+fn fold_content_to_fit_within_width(file_ptr os.File, width int, count_bytes bool, break_at_spaces bool) {
+	mut folder := new_folder(width, break_at_spaces)
 
 	defer {
 		println(folder.str())
@@ -105,40 +128,18 @@ fn fold_content_to_fit_within_width(file_ptr os.File, width int, count_bytes boo
 		}
 
 		folder.write_char(c) or { panic('unable to write $c') }
-
-		// if c == newline_char {
-		// 	if !b_reader.has_next() { continue } // don't output trailing new line as last char
-		// 	pending_output << c
-		// 	output_buf.write(pending_output) or { panic('should not happen') }
-		// 	pending_output.clear()
-		// 	column = 0
-		// 	continue
-		// }
-
-		// adjusted_column := adjust_column(column, c, count_bytes)
-		// if adjusted_column > width {
-		// 	pending_output << newline_char
-		// 	pending_output << c
-		// 	output_buf.write(pending_output) or { panic('should not happen') }
-		// 	pending_output.clear()
-		// 	column = 1
-		// 	continue
-		// }
-
-		// pending_output << c
-		// column = adjusted_column
 	}
 }
 
 fn (c FoldCommand) run(mut files []InputFile) {
 	mut open_fails_num := 0
-	for i, mut file in files {
+	for mut file in files {
 		file.open() or {
 			eprintln('$name: $err.msg()')
 			open_fails_num++
 			continue
 		}
-		fold_content_to_fit_within_width(file.file_ptr, c.max_col_width, c.count_bytes_ignore_control_chars)
+		fold_content_to_fit_within_width(file.file_ptr, c.max_col_width, c.count_bytes_ignore_control_chars, c.break_at_spaces)
 		file.close()
 	}
 	if open_fails_num == files.len {
