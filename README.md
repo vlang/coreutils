@@ -34,7 +34,7 @@ Contributions are welcome!
 Please only contribute versions of the original utilities written in V.
 Contributions written in other languages will likely be rejected.
 
-## Completed (39/109)
+## Completed (40/109)
 
 |  Done   | Cmd       | Descripton                                       |
 | :-----: | --------- | ------------------------------------------------ |
@@ -71,7 +71,7 @@ Contributions written in other languages will likely be rejected.
 | &check; | factor    | Print prime factors                              |
 | &check; | false     | Do nothing, unsuccessfully                       |
 |         | fmt       | Reformat paragraph text                          |
-|         | fold      | Wrap input lines to fit in specified width       |
+| &check; | fold      | Wrap input lines to fit in specified width       |
 |         | groups    | Print group names a user is in                   |
 | &check; | head      | Output the first part of files                   |
 | &check; | hostid    | Print numeric host identifier                    |
