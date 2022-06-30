@@ -136,7 +136,7 @@ fn fold_content_to_fit_within_width(file os.File, width int, count_bytes bool, b
 	}
 
 	mut f_reader := io.new_buffered_reader(io.BufferedReaderConfig{
-		reader: file,
+		reader: file
 	})
 
 	mut single_char_buf := []u8{len: 1}
