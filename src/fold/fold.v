@@ -124,9 +124,7 @@ fn adjust_column(column int, c u8, count_bytes bool) int {
 }
 
 fn fold_content_to_fit_within_width(file os.File, width int, count_bytes bool, break_at_spaces bool) {
-	mut f_reader := io.new_buffered_reader(io.BufferedReaderConfig{
-		reader: file
-	})
+	mut f_reader := io.new_buffered_reader(reader: file)
 
 	mut folder := new_folder(width, count_bytes, break_at_spaces)
 	mut single_char_buf := []u8{len: 1}
