@@ -1,6 +1,7 @@
 import os
 import strings
 import common
+import io
 
 const (
 	name         = 'fold'
@@ -134,10 +135,14 @@ fn fold_content_to_fit_within_width(file os.File, width int, count_bytes bool, b
 		println(folder.str())
 	}
 
-	mut b_reader := new_file_byte_reader(file)
-	for b_reader.has_next() {
-		c := b_reader.next()
+	mut f_reader := io.new_buffered_reader(io.BufferedReaderConfig{
+		reader: file,
+	})
 
+	mut single_char_buf := []u8{len: 1}
+	for {
+		f_reader.read(mut single_char_buf) or { break }
+		c := single_char_buf[0]
 		folder.write_char(c) or { panic('unable to write $c') }
 	}
 }
