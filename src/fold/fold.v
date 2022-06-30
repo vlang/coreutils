@@ -35,11 +35,6 @@ fn new_folder(width int, count_bytes bool, break_at_spaces bool) Folder {
 }
 
 fn (mut f Folder) write_char(c int) ? {
-	if c == eof {
-		f.flush()?
-		return
-	}
-
 	u_c := u8(c)
 	f.pending_output << u_c
 
@@ -129,22 +124,20 @@ fn adjust_column(column int, c u8, count_bytes bool) int {
 }
 
 fn fold_content_to_fit_within_width(file os.File, width int, count_bytes bool, break_at_spaces bool) {
-	mut folder := new_folder(width, count_bytes, break_at_spaces)
-
-	defer {
-		println(folder.str())
-	}
-
 	mut f_reader := io.new_buffered_reader(io.BufferedReaderConfig{
 		reader: file
 	})
 
+	mut folder := new_folder(width, count_bytes, break_at_spaces)
 	mut single_char_buf := []u8{len: 1}
 	for {
 		f_reader.read(mut single_char_buf) or { break }
 		c := single_char_buf[0]
 		folder.write_char(c) or { panic('unable to write $c') }
 	}
+
+	folder.flush() or { panic('unable to flush folder into output buf') }
+	println(folder.str())
 }
 
 fn (c FoldCommand) run(mut files []InputFile) {
