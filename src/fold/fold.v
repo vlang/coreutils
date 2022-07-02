@@ -86,6 +86,8 @@ fn (mut f Folder) flush() ? {
 	f.output_buf.write(f.pending_output)?
 	f.pending_output.clear()
 	f.column = 0
+	print(f.str())
+	f.output_buf.clear()
 }
 
 fn (mut f Folder) str() string {
