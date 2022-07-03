@@ -1,6 +1,7 @@
 import os
 import common
 import strings
+import io
 
 const (
 	name         = 'head'
@@ -31,10 +32,6 @@ fn write_bytes(file_ptr os.File, num_bytes int) {
 	mut reading_buf := []u8{len: adj_buf_size}
 	mut cursor := u64(0)
 
-	defer {
-		print(output_buf.str())
-	}
-
 	for m_bytes_to_write != 0 {
 		read_bytes_num := file_ptr.read_bytes_into(cursor, mut reading_buf) or { break }
 		cursor += u64(read_bytes_num)
@@ -48,21 +45,21 @@ fn write_bytes(file_ptr os.File, num_bytes int) {
 			c := reading_buf[i]
 			output_buf.write_u8(c)
 			m_bytes_to_write--
+			print(output_buf.str())
+			output_buf.clear()
 			if m_bytes_to_write == 0 {
 				break
 			}
 		}
 	}
+
+	print(output_buf.str())
 }
 
 fn write_bytes_upto_max(file_ptr os.File, num_bytes int) {
 	mut output_buf := strings.new_builder(buf_size)
 	mut reading_buf := []u8{len: buf_size}
 	mut cursor := u64(0)
-
-	defer {
-		print(output_buf.str())
-	}
 
 	for {
 		read_bytes_num := file_ptr.read_bytes_into(cursor, mut reading_buf) or { break }
@@ -85,23 +82,22 @@ fn write_bytes_upto_max(file_ptr os.File, num_bytes int) {
 	} else {
 		output_buf.go_back_to(back_to_lookup)
 	}
+
+	print(output_buf.str())
 }
 
 [direct_array_access]
-fn write_lines(file_ptr os.File, num_lines int, delim_char u8) {
+fn write_lines(file os.File, num_lines int, delim_char u8) {
 	mut m_lines_to_write := num_lines
+	mut f_reader := io.new_buffered_reader(reader: file)
 	mut output_buf := strings.new_builder(buf_size)
 	mut reading_buf := []u8{len: buf_size}
-	mut cursor := u64(0)
-
-	defer {
-		print(output_buf.str())
-	}
 
 	for m_lines_to_write != 0 {
-		read_bytes_num := file_ptr.read_bytes_into(cursor, mut reading_buf) or { return }
-		cursor += u64(read_bytes_num)
-
+		read_bytes_num := f_reader.read(mut reading_buf) or {
+			m_lines_to_write = 0
+			continue
+		}
 		if read_bytes_num == 0 {
 			m_lines_to_write = 0
 		}
@@ -112,12 +108,16 @@ fn write_lines(file_ptr os.File, num_lines int, delim_char u8) {
 			output_buf.write_u8(c)
 			if c == delim_char {
 				m_lines_to_write--
+				print(output_buf.str())
+				output_buf.clear()
 				if m_lines_to_write == 0 {
 					break
 				}
 			}
 		}
 	}
+
+	output_buf.str()
 }
 
 fn write_lines_upto_max(file_ptr os.File, num_lines int, delim_char u8) {
