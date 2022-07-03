@@ -94,7 +94,10 @@ fn write_lines(file os.File, num_lines int, delim_char u8) {
 	mut reading_buf := []u8{len: buf_size}
 
 	for m_lines_to_write != 0 {
-		read_bytes_num := f_reader.read(mut reading_buf) or { m_lines_to_write = 0 continue }
+		read_bytes_num := f_reader.read(mut reading_buf) or {
+			m_lines_to_write = 0
+			continue
+		}
 		if read_bytes_num == 0 {
 			m_lines_to_write = 0
 		}
