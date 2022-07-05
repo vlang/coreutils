@@ -2,15 +2,15 @@ import os
 import common
 
 const (
-	name = 'mkdir'
+	name         = 'mkdir'
 	buf_size     = 256
 	space_char   = u8(32)
 	default_mode = u32(0o777)
 )
 
 struct Options {
-	mode u32
-	parent bool
+	mode    u32
+	parent  bool
 	verbose bool
 }
 
@@ -24,11 +24,13 @@ fn success_exit(messages ...string) {
 }
 
 fn mkdir_cmd(opts &Options, files []string) {
-	params := os.MkdirParams{mode: opts.mode}
+	params := os.MkdirParams{
+		mode: opts.mode
+	}
 	for f in files {
 		if opts.parent {
 			os.mkdir_all(f, params) or {
-				eprintln('$name: $f: ${err.msg()}')
+				eprintln('$name: $f: $err.msg()')
 				continue
 			}
 			announce_creation(f, true, opts.verbose)
