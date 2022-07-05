@@ -3,7 +3,6 @@ import common
 
 const (
 	name         = 'mkdir'
-	buf_size     = 256
 	space_char   = u8(32)
 	default_mode = u32(0o777)
 )
