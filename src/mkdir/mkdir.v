@@ -22,13 +22,10 @@ fn success_exit(messages ...string) {
 	exit(0)
 }
 
-fn mkdir_cmd(opts &Options, files []string) {
-	params := os.MkdirParams{
-		mode: opts.mode
-	}
+fn mkdir_cmd(files []string, opts &Options) {
 	for f in files {
 		if opts.parent {
-			os.mkdir_all(f, params) or {
+			os.mkdir_all(f, mode: opts.mode) or {
 				eprintln('$name: $f: $err.msg()')
 				continue
 			}
@@ -43,7 +40,7 @@ fn mkdir_cmd(opts &Options, files []string) {
 		}
 
 		// It shouldn't be possible to get true and no error here...
-		created := os.mkdir(f, params) or {
+		created := os.mkdir(f, mode: opts.mode) or {
 			eprintln("$name: cannot create directory '$f': File exists")
 			continue
 		}
@@ -88,7 +85,7 @@ fn run_mkdir(args []string) {
 		exit(1)
 	}
 
-	mkdir_cmd(&opts, file_args)
+	mkdir_cmd(file_args, &opts)
 }
 
 fn main() {
