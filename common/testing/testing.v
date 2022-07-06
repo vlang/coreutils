@@ -179,3 +179,7 @@ fn normalise(s string) string {
 	return s.replace_each(['‘', "'", '’', "'"]).replace('  ', ' ').replace('  ', ' ').replace('  ',
 		' ').replace(', ', ' ')
 }
+
+pub fn check_dir_exists(d string) bool {
+	return os.exists(d) && os.is_dir(d)
+}
