@@ -29,6 +29,7 @@ fn testsuite_end() {
 }
 
 const executable_under_test = testing.prepare_executable('mkdir')
+
 const cmd = testing.new_paired_command('mkdir', executable_under_test)
 
 fn test_help_and_version() ? {
@@ -53,8 +54,12 @@ fn test_default_create_multiple_dirs() {
 	assert res.output.trim_space() == ''
 	assert os.exists(first_test_dir_to_make)
 	assert os.is_dir(second_test_dir_to_make)
-	os.rmdir_all(first_test_dir_to_make) or { eprintln("failed to remove '$first_test_dir_to_make'") }
-	os.rmdir_all(second_test_dir_to_make) or { eprintln("failed to remove '$second_test_dir_to_make'") }
+	os.rmdir_all(first_test_dir_to_make) or {
+		eprintln("failed to remove '$first_test_dir_to_make'")
+	}
+	os.rmdir_all(second_test_dir_to_make) or {
+		eprintln("failed to remove '$second_test_dir_to_make'")
+	}
 }
 
 fn test_default_create_multiple_dirs_with_verbose() {
@@ -65,8 +70,12 @@ fn test_default_create_multiple_dirs_with_verbose() {
 	assert res.output.trim_space() == "mkdir: created directory 'testdir'\nmkdir: created directory 'secondtestdir'"
 	assert os.exists(first_test_dir_to_make)
 	assert os.is_dir(second_test_dir_to_make)
-	os.rmdir_all(first_test_dir_to_make) or { eprintln("failed to remove '$first_test_dir_to_make'") }
-	os.rmdir_all(second_test_dir_to_make) or { eprintln("failed to remove '$second_test_dir_to_make'") }
+	os.rmdir_all(first_test_dir_to_make) or {
+		eprintln("failed to remove '$first_test_dir_to_make'")
+	}
+	os.rmdir_all(second_test_dir_to_make) or {
+		eprintln("failed to remove '$second_test_dir_to_make'")
+	}
 }
 
 fn test_create_dir_with_parents_and_flag() {
