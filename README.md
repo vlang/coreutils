@@ -34,7 +34,7 @@ Contributions are welcome!
 Please only contribute versions of the original utilities written in V.
 Contributions written in other languages will likely be rejected.
 
-## Completed (40/109)
+## Completed (41/109)
 
 |  Done   | Cmd       | Descripton                                       |
 | :-----: | --------- | ------------------------------------------------ |
@@ -85,7 +85,7 @@ Contributions written in other languages will likely be rejected.
 | &check; | logname   | Print current login name                         |
 |         | ls        | List directory contents                          |
 | &check; | md5sum    | Print or check MD5 digests                       |
-|         | mkdir     | Make directories                                 |
+| &check; | mkdir     | Make directories                                 |
 |         | mkfifo    | Make FIFOs (named pipes)                         |
 |         | mknod     | Make block or character special files            |
 |         | mktemp    | Create temporary file or directory               |
