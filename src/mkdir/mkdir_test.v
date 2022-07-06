@@ -2,7 +2,7 @@ import os
 import common.testing
 
 // A lot of the following has been lifted directly from os_test.v in vlib,
-// since it is a good demonstration of the ideal/carnonical method of testing
+// since it is a good demonstration of the ideal/canonical method of testing
 // functionality that interacts with the file sys.
 
 const (
