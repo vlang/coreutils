@@ -23,9 +23,11 @@ fn success_exit(messages ...string) {
 }
 
 fn mkdir_cmd(files []string, opts &Options) {
+	mut num_fails := 0
 	for f in files {
 		if opts.parent {
 			os.mkdir_all(f, mode: opts.mode) or {
+				num_fails++
 				eprintln('$name: $f: $err.msg()')
 				continue
 			}
@@ -36,16 +38,22 @@ fn mkdir_cmd(files []string, opts &Options) {
 		// Ensure that the target dir to create's parent dir exists.
 		if !os.exists(os.dir(f)) {
 			eprintln("$name: cannot create directory '$f': No such file or directory")
+			num_fails++
 			continue
 		}
 
 		// It shouldn't be possible to get true and no error here...
 		created := os.mkdir(f, mode: opts.mode) or {
 			eprintln("$name: cannot create directory '$f': File exists")
+			num_fails++
 			continue
 		}
 
 		announce_creation(f, created, opts.verbose)
+	}
+
+	if num_fails == files.len {
+		exit(1)
 	}
 }
 
