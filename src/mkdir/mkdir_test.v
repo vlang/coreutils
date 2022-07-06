@@ -41,8 +41,7 @@ fn test_default_create_single_dir() {
 	res := os.execute('$executable_under_test $test_dir_to_make')
 	assert res.exit_code == 0
 	assert res.output.trim_space() == ''
-	assert os.exists(test_dir_to_make)
-	assert os.is_dir(test_dir_to_make)
+	assert testing.check_dir_exists(test_dir_to_make)
 	os.rmdir_all(test_dir_to_make) or { eprintln("failed to remove '$test_dir_to_make'") }
 }
 
@@ -52,8 +51,9 @@ fn test_default_create_multiple_dirs() {
 	res := os.execute('$executable_under_test $first_test_dir_to_make $second_test_dir_to_make')
 	assert res.exit_code == 0
 	assert res.output.trim_space() == ''
-	assert os.exists(first_test_dir_to_make)
-	assert os.is_dir(second_test_dir_to_make)
+	assert testing.check_dir_exists(first_test_dir_to_make)
+	assert testing.check_dir_exists(second_test_dir_to_make)
+
 	os.rmdir_all(first_test_dir_to_make) or {
 		eprintln("failed to remove '$first_test_dir_to_make'")
 	}
@@ -68,8 +68,9 @@ fn test_default_create_multiple_dirs_with_verbose() {
 	res := os.execute('$executable_under_test -v $first_test_dir_to_make $second_test_dir_to_make')
 	assert res.exit_code == 0
 	assert res.output.trim_space() == "mkdir: created directory 'testdir'\nmkdir: created directory 'secondtestdir'"
-	assert os.exists(first_test_dir_to_make)
-	assert os.is_dir(second_test_dir_to_make)
+	assert testing.check_dir_exists(first_test_dir_to_make)
+	assert testing.check_dir_exists(second_test_dir_to_make)
+
 	os.rmdir_all(first_test_dir_to_make) or {
 		eprintln("failed to remove '$first_test_dir_to_make'")
 	}
@@ -83,8 +84,7 @@ fn test_create_dir_with_parents_and_flag() {
 	res := os.execute('$executable_under_test -p $test_dir_to_make')
 	assert res.exit_code == 0
 	assert res.output.trim_space() == ''
-	assert os.exists(test_dir_to_make)
-	assert os.is_dir(test_dir_to_make)
+	assert testing.check_dir_exists(test_dir_to_make)
 	os.rmdir_all(test_dir_to_make) or { eprintln("failed to remove '$test_dir_to_make'") }
 }
 
@@ -93,6 +93,6 @@ fn test_create_dir_with_parents_without_flag_fails() {
 	res := os.execute('$executable_under_test $test_dir_to_make')
 	assert res.exit_code == 1
 	assert res.output.trim_space() == "mkdir: cannot create directory 'parent-two/child-two/last-child': No such file or directory"
-	assert !os.exists(test_dir_to_make)
+	assert !testing.check_dir_exists(test_dir_to_make)
 	os.rmdir_all(test_dir_to_make) or { eprintln("failed to remove '$test_dir_to_make'") }
 }
