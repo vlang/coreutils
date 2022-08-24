@@ -29,7 +29,7 @@ fn main() {
 }
 
 fn cat(settings Settings) {
-	mut fnames := settings.fnames
+	mut fnames := settings.fnames.clone()
 
 	// if there are no files, read from stdin
 	if fnames.len < 1 {
