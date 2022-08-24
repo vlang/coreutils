@@ -123,7 +123,7 @@ fn shuffle_lines(lines []string, settings Settings) []string {
 
 fn set_lines(lines []string, settings Settings) []string {
 	mut new_lines := lines.clone()
-	mut fnames := settings.fnames
+	mut fnames := settings.fnames.clone()
 	input_range := settings.input_range.split('-')
 	if input_range.len == 2 {
 		for i in input_range[0].int() .. input_range[1].int() + 1 {
