@@ -34,7 +34,7 @@ Contributions are welcome!
 Please only contribute versions of the original utilities written in V.
 Contributions written in other languages will likely be rejected.
 
-## Completed (41/109)
+## Completed (39/109)
 
 |  Done   | Cmd       | Descripton                                       |
 | :-----: | --------- | ------------------------------------------------ |
@@ -91,7 +91,7 @@ Contributions written in other languages will likely be rejected.
 |         | mktemp    | Create temporary file or directory               |
 | &check; | mv        | Move (rename) files                              |
 |         | nice      | Run a command with modified niceness             |
-| &check; | nl        | Number lines and write files                     |
+|    ?    | nl        | Number lines and write files                     |
 |         | nohup     | Run a command immune to hangups                  |
 | &check; | nproc     | Print the number of available processors         |
 |         | numfmt    | Reformat numbers                                 |
@@ -109,7 +109,7 @@ Contributions written in other languages will likely be rejected.
 | &check; | rm        | Remove files or directories                      |
 | &check; | rmdir     | Remove empty directories                         |
 |         | runcon    | Run a command in specified SELinux context       |
-| &check; | seq       | Print numeric sequences                          |
+|    ?    | seq       | Print numeric sequences                          |
 | &check; | sha1sum   | Print or check SHA-1 digests                     |
 | &check; | sha224sum | Print or check SHA-2 224 bit digests             |
 | &check; | sha256sum | Print or check SHA-2 256 bit digests             |
