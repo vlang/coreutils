@@ -106,7 +106,7 @@ fn int_yes(prompt string) bool {
 fn check_interactive(interactive string) ?Interactive {
 	for i in int(Interactive.no) .. int(Interactive.yes) + 1 {
 		if interactive in valid_interactive[i] {
-			return Interactive(i)
+			return unsafe { Interactive(i) }
 		}
 	}
 	return error(invalid_interactive)
