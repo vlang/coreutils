@@ -34,7 +34,7 @@ Contributions are welcome!
 Please only contribute versions of the original utilities written in V.
 Contributions written in other languages will likely be rejected.
 
-## Completed (39/109)
+## Completed (40/109)
 
 |  Done   | Cmd       | Descripton                                       |
 | :-----: | --------- | ------------------------------------------------ |
@@ -109,7 +109,7 @@ Contributions written in other languages will likely be rejected.
 | &check; | rm        | Remove files or directories                      |
 | &check; | rmdir     | Remove empty directories                         |
 |         | runcon    | Run a command in specified SELinux context       |
-|    ?    | seq       | Print numeric sequences                          |
+| &check; | seq       | Print numeric sequences                          |
 | &check; | sha1sum   | Print or check SHA-1 digests                     |
 | &check; | sha224sum | Print or check SHA-2 224 bit digests             |
 | &check; | sha256sum | Print or check SHA-2 256 bit digests             |
