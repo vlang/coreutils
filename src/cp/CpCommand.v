@@ -2,14 +2,14 @@ module cp
 
 import os
 
-enum OverwriteMode {
+enum OverWriteMode {
 	force
 	interactive
 	no_clobber
 }
 
 struct CpCommand {
-	overwrite           OverwriteMode
+	overwrite           OverWriteMode
 	update              bool
 	verbose             bool
 	target_directory    string

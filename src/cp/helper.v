@@ -98,13 +98,13 @@ fn setup_cp_command(args []string) ?(CpCommand, []string, string) {
 
 	options := fp.finalize() or { common.exit_with_error_message(cp.name, 'error') }
 	overwrite := if force {
-		OverwriteMode.force
+		OverWriteMode.force
 	} else if no_clobber {
-		OverwriteMode.no_clobber
+		OverWriteMode.no_clobber
 	} else if interactive {
-		OverwriteMode.interactive
+		OverWriteMode.interactive
 	} else {
-		OverwriteMode.force
+		OverWriteMode.force
 	}
 	len_options := options.len
 	if target_directory != '' {
