@@ -117,7 +117,7 @@ fn check_interactive(interactive string) ?Interactive {
 fn setup_rm_command(args []string) ?(RmCommand, []string) {
 	mut fp := common.flag_parser(args)
 	fp.application('rm')
-	fp.limit_free_args_to_at_least(1)
+	fp.limit_free_args_to_at_least(1) or { common.exit_with_error_message(rm.name, err.msg()) }
 
 	dir := fp.bool('dir', `d`, false, 'dir')
 	force := fp.bool('force', `f`, false, 'force')
@@ -131,7 +131,7 @@ fn setup_rm_command(args []string) ?(RmCommand, []string) {
 	interactive_str := fp.string('interactive', 0, '', 'interactive')
 	mut int_type := Interactive.no
 	if interactive_str != '' {
-		int_type = check_interactive(interactive_str) ?
+		int_type = check_interactive(interactive_str)?
 	} else {
 		int_type = Interactive.no
 	}
@@ -148,7 +148,7 @@ fn setup_rm_command(args []string) ?(RmCommand, []string) {
 
 	rm := RmCommand{recursive, dir, interactive, verbose, force, less_int}
 
-	files := fp.finalize() ?
+	files := fp.finalize()?
 
 	// println(rm)
 	return rm, files
@@ -157,7 +157,7 @@ fn setup_rm_command(args []string) ?(RmCommand, []string) {
 // Entry point for all logic. Must be called from main
 pub fn run_rm(args []string) {
 	// Create command struct and accept flags and files
-	rm, files := setup_rm_command(args) or { common.exit_with_error_message(rm.name, err.msg) }
+	rm, files := setup_rm_command(args) or { common.exit_with_error_message(rm.name, err.msg()) }
 
 	// Take confirmation if necessary
 	if rm.confirm_int_once(files.len) {
