@@ -1,5 +1,3 @@
-module rm
-
 import os
 
 fn test_valid_yes() {

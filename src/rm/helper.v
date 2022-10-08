@@ -1,5 +1,3 @@
-module rm
-
 import os
 import common
 
@@ -92,7 +90,7 @@ fn success_exit(messages ...string) {
 fn valid_yes(input string) bool {
 	mut is_yes := false
 	low_input := input.to_lower()
-	for yes in rm.interactive_yes {
+	for yes in interactive_yes {
 		is_yes = is_yes || low_input.starts_with(yes)
 	}
 	return is_yes
@@ -106,18 +104,18 @@ fn int_yes(prompt string) bool {
 // Check if value provided for interactive option is valid
 fn check_interactive(interactive string) ?Interactive {
 	for i in int(Interactive.no) .. int(Interactive.yes) + 1 {
-		if interactive in rm.valid_interactive[i] {
+		if interactive in valid_interactive[i] {
 			return Interactive(i)
 		}
 	}
-	return error(rm.invalid_interactive)
+	return error(invalid_interactive)
 }
 
 // Parse flags, create command struct and get all options (files)
 fn setup_rm_command(args []string) ?(RmCommand, []string) {
 	mut fp := common.flag_parser(args)
 	fp.application('rm')
-	fp.limit_free_args_to_at_least(1) or { common.exit_with_error_message(rm.name, err.msg()) }
+	fp.limit_free_args_to_at_least(1) or { common.exit_with_error_message(name, err.msg()) }
 
 	dir := fp.bool('dir', `d`, false, 'dir')
 	force := fp.bool('force', `f`, false, 'force')
@@ -157,7 +155,7 @@ fn setup_rm_command(args []string) ?(RmCommand, []string) {
 // Entry point for all logic. Must be called from main
 pub fn run_rm(args []string) {
 	// Create command struct and accept flags and files
-	rm, files := setup_rm_command(args) or { common.exit_with_error_message(rm.name, err.msg()) }
+	rm, files := setup_rm_command(args) or { common.exit_with_error_message(name, err.msg()) }
 
 	// Take confirmation if necessary
 	if rm.confirm_int_once(files.len) {

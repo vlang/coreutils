@@ -1,5 +1,3 @@
-module cp
-
 import os
 
 enum OverWriteMode {
