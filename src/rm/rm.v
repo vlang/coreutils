@@ -1,7 +1,7 @@
 module main
 
 import os
-import src.rm
+import rm
 
 fn main() {
 	rm.run_rm(os.args)
