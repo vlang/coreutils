@@ -1,4 +1,3 @@
-// module rmutil
 import os
 
 //** RmCommand struct to hold values **

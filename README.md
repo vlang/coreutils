@@ -91,7 +91,7 @@ Contributions written in other languages will likely be rejected.
 |         | mktemp    | Create temporary file or directory               |
 | &check; | mv        | Move (rename) files                              |
 |         | nice      | Run a command with modified niceness             |
-|    ?    | nl        | Number lines and write files                     |
+| ?       | nl        | Number lines and write files                     |
 |         | nohup     | Run a command immune to hangups                  |
 | &check; | nproc     | Print the number of available processors         |
 |         | numfmt    | Reformat numbers                                 |

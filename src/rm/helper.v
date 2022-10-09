@@ -1,4 +1,3 @@
-// module rmutil
 import os
 import common
 
@@ -106,7 +105,9 @@ fn int_yes(prompt string) bool {
 fn check_interactive(interactive string) ?Interactive {
 	for i in int(Interactive.no) .. int(Interactive.yes) + 1 {
 		if interactive in valid_interactive[i] {
-			return unsafe { Interactive(i) }
+			unsafe {
+				return Interactive(i)
+			}
 		}
 	}
 	return error(invalid_interactive)
@@ -116,7 +117,7 @@ fn check_interactive(interactive string) ?Interactive {
 fn setup_rm_command(args []string) ?(RmCommand, []string) {
 	mut fp := common.flag_parser(args)
 	fp.application('rm')
-	fp.limit_free_args_to_at_least(1)?
+	fp.limit_free_args_to_at_least(1) or { common.exit_with_error_message(name, err.msg()) }
 
 	dir := fp.bool('dir', `d`, false, 'dir')
 	force := fp.bool('force', `f`, false, 'force')
