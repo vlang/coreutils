@@ -1,13 +1,13 @@
 import os
 
-enum OverWriteMode {
+enum OverwriteMode {
 	force
 	interactive
 	no_clobber
 }
 
 struct CpCommand {
-	overwrite           OverWriteMode
+	overwrite           OverwriteMode
 	update              bool
 	verbose             bool
 	target_directory    string
