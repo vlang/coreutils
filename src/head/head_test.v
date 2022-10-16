@@ -5,6 +5,20 @@ const executable_under_test = testing.prepare_executable('head')
 
 const cmd = testing.new_paired_command('head', executable_under_test)
 
+const test_txt_path = os.join_path(testing.temp_folder, 'test.txt')
+
+fn testsuite_begin() {
+	mut f := os.open_file(test_txt_path, 'w')!
+	for l in testtxtcontent {
+		f.write_string('$l\n')!
+	}
+	f.close()
+}
+
+fn testsuite_end() {
+	os.rm(test_txt_path)!
+}
+
 fn test_help_and_version() {
 	cmd.ensure_help_and_version_options_work()!
 }
@@ -38,16 +52,7 @@ const testtxtcontent = [
 ]
 
 fn test_default() {
-	mut f := os.open_file('textfile', 'w') or { panic(err) }
-	for l in testtxtcontent {
-		f.write_string('$l\n') or {}
-	}
-	f.close()
-	defer {
-		os.rm('textfile') or { panic(err) }
-	}
-
-	res := os.execute('$executable_under_test textfile')
+	res := os.execute('$executable_under_test $test_txt_path')
 	assert res.exit_code == 0
 	assert res.output.split('\n').filter(it != '') == [
 		'[0] Line in test text file',
@@ -64,16 +69,7 @@ fn test_default() {
 }
 
 fn test_max_lines_option() {
-	mut f := os.open_file('textfile', 'w') or { panic(err) }
-	for l in testtxtcontent {
-		f.write_string('$l\n') or {}
-	}
-	f.close()
-	defer {
-		os.rm('textfile') or { panic(err) }
-	}
-
-	res := os.execute('$executable_under_test textfile -n 4')
+	res := os.execute('$executable_under_test $test_txt_path -n 4')
 	assert res.exit_code == 0
 	assert res.output.split('\n').filter(it != '') == [
 		'[0] Line in test text file',
@@ -84,16 +80,7 @@ fn test_max_lines_option() {
 }
 
 fn test_max_lines_from_end_option() {
-	mut f := os.open_file('textfile', 'w') or { panic(err) }
-	for l in testtxtcontent {
-		f.write_string('$l\n') or {}
-	}
-	f.close()
-	defer {
-		os.rm('textfile') or { panic(err) }
-	}
-
-	res := os.execute('$executable_under_test textfile -n -4')
+	res := os.execute('$executable_under_test $test_txt_path -n -4')
 	assert res.exit_code == 0
 	assert res.output.split('\n').filter(it != '') == [
 		'[0] Line in test text file',
@@ -109,16 +96,7 @@ fn test_max_lines_from_end_option() {
 }
 
 fn test_upto_max_bytes() {
-	mut f := os.open_file('textfile', 'w') or { panic(err) }
-	for l in testtxtcontent {
-		f.write_string('$l\n') or {}
-	}
-	f.close()
-	defer {
-		os.rm('textfile') or { panic(err) }
-	}
-
-	res := os.execute('$executable_under_test textfile -c 223')
+	res := os.execute('$executable_under_test $test_txt_path -c 223')
 	assert res.exit_code == 0
 	assert res.output.split('\n').filter(it != '') == [
 		'[0] Line in test text file',
@@ -134,16 +112,7 @@ fn test_upto_max_bytes() {
 }
 
 fn test_upto_max_bytes_from_end_option() {
-	mut f := os.open_file('textfile', 'w') or { panic(err) }
-	for l in testtxtcontent {
-		f.write_string('$l\n') or {}
-	}
-	f.close()
-	defer {
-		os.rm('textfile') or { panic(err) }
-	}
-
-	res := os.execute('$executable_under_test textfile -c -312')
+	res := os.execute('$executable_under_test $test_txt_path -c -312')
 	assert res.exit_code == 0
 	assert res.output.split('\n').filter(it != '') == [
 		'[0] Line in test text file',
