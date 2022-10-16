@@ -334,11 +334,11 @@ fn (mut p Parser) primary() Value {
 }
 
 [inline]
-fn (p Parser) get() !string {
+fn (p Parser) get() ?string {
 	if p.idx < p.tokens.len {
 		return p.tokens[p.idx]
 	}
-	return error('none')
+	return none
 }
 
 fn (v Value) str() string {
@@ -357,7 +357,7 @@ fn (v Value) i64() i64 {
 
 fn (v Value) i64_opt() !i64 {
 	match v {
-		string { return strconv.parse_int(v, 0, 64) or { return none } }
+		string { return strconv.parse_int(v, 0, 64)! }
 		i64 { return v }
 	}
 }
