@@ -14,10 +14,10 @@ fn success_exit(msg string) {
 	exit(0)
 }
 
-fn setup_rmdir_command(args []string) ?(RmdirCommand, []string) {
+fn setup_rmdir_command(args []string) !(RmdirCommand, []string) {
 	mut fp := common.flag_parser(args)
 	fp.application('rm')
-	fp.limit_free_args_to_at_least(1)?
+	fp.limit_free_args_to_at_least(1)!
 
 	parents := fp.bool('parents', `p`, false, 'parents')
 	verbose := fp.bool('verbose', `v`, false, 'verbose')
@@ -32,7 +32,7 @@ fn setup_rmdir_command(args []string) ?(RmdirCommand, []string) {
 	}
 	rmdir := RmdirCommand{verbose, parents}
 
-	dirs := fp.finalize()?
+	dirs := fp.finalize()!
 
 	return rmdir, dirs
 }
