@@ -3,19 +3,16 @@ import common.testing
 
 const shuf = testing.prepare_executable('shuf')
 
+const test_txt_path = os.join_path(testing.temp_folder, 'test.txt')
+
 fn test_echo() {
 	res := os.execute('$shuf -e aa bb')
 	assert (res.output == 'aa\nbb\n') || (res.output == 'bb\naa\n')
 }
 
 fn test_file() {
-	filename := './test.txt'
-	hello := 'hello\nworld!'
-	mut file := os.open_file(filename, 'w+', 0o666) or { panic(err) }
-	file.write_string(hello) or { panic(err) }
-	file.close()
-
-	res := os.execute('$shuf test.txt')
+	os.write_file(test_txt_path, 'hello\nworld!')!
+	res := os.execute('$shuf $test_txt_path')
 	assert (res.output == 'hello\nworld!\n') || (res.output == 'world!\nhello\n')
 }
 
@@ -25,13 +22,8 @@ fn test_zero_terminated_echo() {
 }
 
 fn test_zero_terminated_file() {
-	filename := './test.txt'
-	hello := 'hello\nworld!'
-	mut file := os.open_file(filename, 'w+', 0o666) or { panic(err) }
-	file.write_string(hello) or { panic(err) }
-	file.close()
-
-	res := os.execute('$shuf -z test.txt')
+	os.write_file(test_txt_path, 'hello\nworld!')!
+	res := os.execute('$shuf -z $test_txt_path')
 	assert res.output == 'hello\nworld!'
 }
 
@@ -47,13 +39,8 @@ fn test_input_range() {
 }
 
 fn test_random_source() {
-	filename := './test.txt'
-	hello := 'hello\nworld!'
-	mut file := os.open_file(filename, 'w+', 0o666) or { panic(err) }
-	file.write_string(hello) or { panic(err) }
-	file.close()
-
-	res := os.execute('$shuf -i 1-5 --random-source test.txt')
+	os.write_file(test_txt_path, 'hello\nworld!')!
+	res := os.execute('$shuf -i 1-5 --random-source $test_txt_path')
 	assert res.output == '1\n4\n5\n2\n3\n'
 }
 

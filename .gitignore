@@ -1,13 +1,10 @@
 # Binaries for programs and plugins
 main
+bin/
+.DS_Store
+build
 *.exe
 *.exe~
 *.so
 *.dylib
 *.dll
-bin/
-.DS_Store
-**/*
-!*/
-!**/*.v
-!**/*.md

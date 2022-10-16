@@ -9,11 +9,17 @@ mut:
 	paths []string
 }
 
+// temp_folder - all temporary files for the tests should be stored here.
+// The folder `testing.temp_folder` will be removed automatically after all the tests are run.
+pub const temp_folder = os.join_path(os.temp_dir(), 'v', 'coreutils', os.getpid().str())
+
 fn init() {
+	os.mkdir_all(testing.temp_folder) or { panic(err) }
 	C.atexit(fn () {
 		for p in testing.prepared_executables.paths {
 			os.rm(p) or {}
 		}
+		os.rmdir_all(testing.temp_folder) or {}
 	})
 }
 
