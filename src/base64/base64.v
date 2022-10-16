@@ -47,28 +47,13 @@ fn encode_and_print(mut file os.File, wrap int) {
 	mut pos := u64(0)
 	for {
 		read_bytes := file.read_bytes_into(pos, mut in_buffer) or {
-			match err {
-				none {
-					0
-				}
-				else {
-					-1
-				}
-			}
-		}
-
-		match read_bytes {
-			0 {
+			if err is os.Eof {
 				break
 			}
-			-1 {
-				eprintln('$application_name: Cannot read file')
-				exit(1)
-			}
-			else {
-				pos += u64(read_bytes)
-			}
+			eprintln('$application_name: Cannot read file')
+			exit(1)
 		}
+		pos += u64(read_bytes)
 
 		encoded_bytes := base64.encode_in_buffer(in_buffer[..read_bytes], out_buffer.data)
 
