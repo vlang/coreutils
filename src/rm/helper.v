@@ -102,7 +102,7 @@ fn int_yes(prompt string) bool {
 }
 
 // Check if value provided for interactive option is valid
-fn check_interactive(interactive string) ?Interactive {
+fn check_interactive(interactive string) !Interactive {
 	for i in int(Interactive.no) .. int(Interactive.yes) + 1 {
 		if interactive in valid_interactive[i] {
 			unsafe {
@@ -114,7 +114,7 @@ fn check_interactive(interactive string) ?Interactive {
 }
 
 // Parse flags, create command struct and get all options (files)
-fn setup_rm_command(args []string) ?(RmCommand, []string) {
+fn setup_rm_command(args []string) !(RmCommand, []string) {
 	mut fp := common.flag_parser(args)
 	fp.application('rm')
 	fp.limit_free_args_to_at_least(1) or { common.exit_with_error_message(name, err.msg()) }
@@ -131,7 +131,7 @@ fn setup_rm_command(args []string) ?(RmCommand, []string) {
 	interactive_str := fp.string('interactive', 0, '', 'interactive')
 	mut int_type := Interactive.no
 	if interactive_str != '' {
-		int_type = check_interactive(interactive_str)?
+		int_type = check_interactive(interactive_str)!
 	} else {
 		int_type = Interactive.no
 	}
@@ -148,7 +148,7 @@ fn setup_rm_command(args []string) ?(RmCommand, []string) {
 
 	rm := RmCommand{recursive, dir, interactive, verbose, force, less_int}
 
-	files := fp.finalize()?
+	files := fp.finalize()!
 
 	// println(rm)
 	return rm, files

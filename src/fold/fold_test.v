@@ -5,8 +5,8 @@ const executable_under_test = testing.prepare_executable('fold')
 
 const cmd = testing.new_paired_command('fold', executable_under_test)
 
-fn test_help_and_version() ? {
-	cmd.ensure_help_and_version_options_work()?
+fn test_help_and_version() {
+	cmd.ensure_help_and_version_options_work()!
 }
 
 fn test_non_existent_file() {

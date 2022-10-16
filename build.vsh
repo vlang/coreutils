@@ -9,19 +9,19 @@ const (
 vargs := if os.args.len > 1 { os.args[1..] } else { []string{} }
 
 curdir := getwd()
-chdir('src')?
+chdir('src')!
 
-dirs := ls('.')?.filter(is_dir(it))
+dirs := ls('.')!.filter(is_dir(it))
 
 if !exists('$curdir/bin') {
-	mkdir('$curdir/bin')?
+	mkdir('$curdir/bin')!
 }
 
 for dir in dirs {
 	if dir in ignore_dirs {
 		continue
 	}
-	if !ls(dir)?.any(it.ends_with('.v')) {
+	if !ls(dir)!.any(it.ends_with('.v')) {
 		continue
 	}
 
@@ -36,4 +36,4 @@ for dir in dirs {
 	execute_or_panic(cmd)
 }
 
-chdir(curdir)?
+chdir(curdir)!

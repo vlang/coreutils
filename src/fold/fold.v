@@ -34,26 +34,26 @@ fn new_folder(width int, count_bytes bool, break_at_spaces bool) Folder {
 	}
 }
 
-fn (mut f Folder) write_char(c int) ? {
+fn (mut f Folder) write_char(c int) ! {
 	u_c := u8(c)
 	f.pending_output << u_c
 
 	if u_c == newline_char {
-		f.flush()?
+		f.flush()!
 		return
 	}
 
 	f.column = adjust_column(f.column, u_c, f.count_bytes)
 	if f.column > f.max_width {
 		if f.break_at_spaces {
-			f.break_on_last_space()?
+			f.break_on_last_space()!
 			return
 		}
-		f.move_last_c_to_newline()?
+		f.move_last_c_to_newline()!
 	}
 }
 
-fn (mut f Folder) break_on_last_space() ? {
+fn (mut f Folder) break_on_last_space() ! {
 	mut last_found_space := 0
 	for i := f.pending_output.len - 1; i >= 0; i-- {
 		if f.pending_output[i] == space_char {
@@ -67,23 +67,23 @@ fn (mut f Folder) break_on_last_space() ? {
 	post_space := pending_output_cpy[last_found_space + 1..]
 	f.pending_output = pre_space
 
-	f.flush()?
+	f.flush()!
 
-	f.write_char(int(newline_char))?
+	f.write_char(int(newline_char))!
 	for c in post_space {
-		f.write_char(c)?
+		f.write_char(c)!
 	}
 }
 
-fn (mut f Folder) move_last_c_to_newline() ? {
+fn (mut f Folder) move_last_c_to_newline() ! {
 	last_written_c := f.pending_output.pop()
 	f.pending_output << newline_char
-	f.flush()?
-	f.write_char(last_written_c)?
+	f.flush()!
+	f.write_char(last_written_c)!
 }
 
-fn (mut f Folder) flush() ? {
-	f.output_buf.write(f.pending_output)?
+fn (mut f Folder) flush() ! {
+	f.output_buf.write(f.pending_output)!
 	f.pending_output.clear()
 	f.column = 0
 	print(f.str())
@@ -174,7 +174,7 @@ mut:
 	file    os.File
 }
 
-fn (mut f InputFile) open() ? {
+fn (mut f InputFile) open() ! {
 	if f.is_stdin {
 		return
 	}

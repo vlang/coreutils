@@ -11,7 +11,7 @@ const cmd_ns = 'sleep'
 // str="1.2s", ret = 1.2, endptr => "s"
 
 // apply_unit converts the passed number to seconds
-fn apply_unit(n f64, unit string) ?f64 {
+fn apply_unit(n f64, unit string) !f64 {
 	match unit {
 		'', 's' {
 			return n
