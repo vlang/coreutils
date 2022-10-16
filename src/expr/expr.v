@@ -357,7 +357,7 @@ fn (v Value) i64() i64 {
 
 fn (v Value) i64_opt() !i64 {
 	match v {
-		string { return strconv.parse_int(v, 0, 64) }
+		string { return strconv.parse_int(v, 0, 64) or { return none } }
 		i64 { return v }
 	}
 }

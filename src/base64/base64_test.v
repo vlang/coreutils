@@ -16,7 +16,14 @@ fn test_abcd() {
 }
 
 fn expected_result(input string, output string) {
-	res := os.execute('$the_executable $input')
+	c := '$the_executable $input'
+	res := os.execute(c)
+	eprintln('>>>> cmd: `$c`')
+	if res.exit_code != 0 || res.output != output {
+		eprintln('>>>> res.exit_code: $res.exit_code')
+		eprintln('>>>> res.output   : `$res.output`')
+		eprintln('>>>> expected     : `$output`')
+	}
 	assert res.exit_code == 0
 	assert res.output == output
 	testing.same_results('base64 $input', '$the_executable $input')
