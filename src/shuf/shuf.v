@@ -23,10 +23,10 @@ struct Settings {
 
 // main
 fn main() {
-	shuf(args())
+	shuf(args())!
 }
 
-fn shuf(settings Settings) {
+fn shuf(settings Settings) ! {
 	mut lines := []string{}
 
 	lines = set_lines(lines.clone(), settings)
@@ -34,9 +34,9 @@ fn shuf(settings Settings) {
 
 	if settings.repeat {
 		if settings.output.len > 0 {
-			mut file := os.open_file(settings.output, 'w+', 0o666) or { panic(err) }
+			mut file := os.open_file(settings.output, 'w+', 0o666)!
 			for {
-				output_lines_file(lines, settings, mut file)
+				output_lines_file(lines, settings, mut file)!
 			}
 			file.close()
 		} else {
@@ -46,8 +46,8 @@ fn shuf(settings Settings) {
 		}
 	} else {
 		if settings.output.len > 0 {
-			mut file := os.open_file(settings.output, 'w+', 0o666) or { panic(err) }
-			output_lines_file(lines, settings, mut file)
+			mut file := os.open_file(settings.output, 'w+', 0o666)!
+			output_lines_file(lines, settings, mut file)!
 			file.close()
 		} else {
 			output_lines(lines, settings)
@@ -68,15 +68,15 @@ fn output_lines(lines []string, settings Settings) {
 	}
 }
 
-fn output_lines_file(lines []string, settings Settings, mut file os.File) {
+fn output_lines_file(lines []string, settings Settings, mut file os.File) ! {
 	for i in 0 .. lines.len {
 		if settings.head_count > 0 && i >= settings.head_count {
 			break
 		}
 		if settings.zero_terminated {
-			file.write_string('${lines[i]}') or { panic(err) }
+			file.write_string('${lines[i]}')!
 		} else {
-			file.write_string('${lines[i]}\n') or { panic(err) }
+			file.write_string('${lines[i]}\n')!
 		}
 	}
 }
