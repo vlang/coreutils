@@ -48,7 +48,7 @@ fn encode_and_print(mut file os.File, wrap int) {
 	for {
 		read_bytes := file.read_bytes_into(pos, mut in_buffer) or {
 			match err {
-				none {
+				IError(os.Eof{}) {
 					0
 				}
 				else {
