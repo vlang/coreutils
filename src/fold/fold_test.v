@@ -5,8 +5,22 @@ const executable_under_test = testing.prepare_executable('fold')
 
 const cmd = testing.new_paired_command('fold', executable_under_test)
 
+const test_txt_path = os.join_path(testing.temp_folder, 'test.txt')
+
 fn test_help_and_version() {
 	cmd.ensure_help_and_version_options_work()!
+}
+
+fn testsuite_begin() {
+	mut f := os.open_file(test_txt_path, 'w')!
+	for l in testtxtcontent {
+		f.write_string('$l\n') or {}
+	}
+	f.close()
+}
+
+fn testsuite_end() {
+	os.rm(test_txt_path)!
 }
 
 fn test_non_existent_file() {
@@ -35,16 +49,7 @@ const testtxtcontent = [
 ]
 
 fn test_wrap_default() {
-	mut f := os.open_file('textfile', 'w') or { panic(err) }
-	for l in testtxtcontent {
-		f.write_string('$l\n') or {}
-	}
-	f.close()
-	defer {
-		os.rm('textfile') or { panic(err) }
-	}
-
-	res := os.execute('$executable_under_test textfile')
+	res := os.execute('$executable_under_test $test_txt_path')
 	assert res.exit_code == 0
 	assert res.output.split('\n').filter(it != '') == [
 		'[0] Example test line',
@@ -61,16 +66,7 @@ fn test_wrap_default() {
 }
 
 fn test_wrap_multiline_file_with_width_10() {
-	mut f := os.open_file('textfile', 'w') or { panic(err) }
-	for l in testtxtcontent {
-		f.write_string('$l\n') or {}
-	}
-	f.close()
-	defer {
-		os.rm('textfile') or { panic(err) }
-	}
-
-	res := os.execute('$executable_under_test textfile -w 10')
+	res := os.execute('$executable_under_test $test_txt_path -w 10')
 	assert res.exit_code == 0
 	assert res.output.split('\n').filter(it != '') == [
 		'[0] Exampl',
@@ -107,22 +103,8 @@ fn test_wrap_multiline_file_with_width_10() {
 }
 
 fn test_wrap_multiline_file_with_width_3() {
-	mut f := os.open_file('textfile', 'w') or { panic(err) }
-	for l in testtxtcontent {
-		f.write_string('$l\n') or {}
-	}
-	f.close()
-	defer {
-		os.rm('textfile') or { panic(err) }
-	}
-
-	res := os.execute('$executable_under_test textfile -w 3')
+	res := os.execute('$executable_under_test $test_txt_path -w 3')
 	assert res.exit_code == 0
-	for line in res.output.split('\n') {
-		if line.len > 0 {
-			println("'$line',")
-		}
-	}
 	assert res.output.split('\n').filter(it != '') == [
 		'[0]',
 		' Ex',
