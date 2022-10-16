@@ -5,8 +5,8 @@ const the_executable = testing.prepare_executable('expr')
 
 const cmd = testing.new_paired_command('expr', the_executable)
 
-fn test_help_and_version() ? {
-	cmd.ensure_help_and_version_options_work()?
+fn test_help_and_version() {
+	cmd.ensure_help_and_version_options_work()!
 }
 
 const tests = [
@@ -120,7 +120,7 @@ const tests = [
 	r"'(' 2 a",
 ]
 
-fn test_results() ? {
+fn test_results() {
 	mut failed := []string{}
 	for test in tests {
 		res := cmd.same_results(test)
@@ -174,7 +174,7 @@ const mb_tests = [
 	//	"match \u03B1bc\u03B4e '\\([\u03B1]\\)'",
 ]
 
-fn test_multi_byte_results() ? {
+fn test_multi_byte_results() {
 	mut failed := []string{}
 	for test in mb_tests {
 		res := cmd.same_results(test)

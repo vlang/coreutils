@@ -4,14 +4,14 @@ const the_executable = testing.prepare_executable('uname')
 
 const cmd = testing.new_paired_command('uname', the_executable)
 
-fn test_help_and_version() ? {
-	cmd.ensure_help_and_version_options_work()?
+fn test_help_and_version() {
+	cmd.ensure_help_and_version_options_work()!
 }
 
-fn test_unknown_option() ? {
-	testing.command_fails('$the_executable -x')?
-	testing.command_fails('$the_executable -sm -vx')?
-	testing.command_fails('$the_executable -sm a')?
+fn test_unknown_option() {
+	testing.command_fails('$the_executable -x')!
+	testing.command_fails('$the_executable -sm -vx')!
+	testing.command_fails('$the_executable -sm a')!
 }
 
 fn test_print_system_info() {

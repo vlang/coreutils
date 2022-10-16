@@ -101,7 +101,7 @@ pub fn (p CommandPair) expected_failure(options string) ?os.Result {
 	return dres
 }
 
-pub fn (p CommandPair) ensure_help_and_version_options_work() ? {
+pub fn (p CommandPair) ensure_help_and_version_options_work() ! {
 	// For now, assume that the original has --version and --help
 	// and that they already work correctly.
 	if os.execute('$p.deputy --help').exit_code != 0 {
@@ -122,7 +122,7 @@ pub fn (p CommandPair) ensure_help_and_version_options_work() ? {
 // that its exit code is not 0 (i.e. the command failed)
 // It also returns the actual result of the execution,
 // so that you can inspect it further for more details.
-pub fn command_fails(cmd string) ?os.Result {
+pub fn command_fails(cmd string) !os.Result {
 	res := os.execute(cmd)
 	if res.exit_code == 0 {
 		return IError(DidNotFailError{

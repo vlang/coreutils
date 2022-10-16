@@ -15,7 +15,7 @@ fn main() {
 	fp.application(app_name)
 	fp.description(app_description)
 
-	fp.limit_free_args(0, 0)?
+	fp.limit_free_args(0, 0)!
 
 	// Get hostid using wrapper
 	hostid := hd_get_hostid() & 0xffffffff

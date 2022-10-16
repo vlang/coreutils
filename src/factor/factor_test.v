@@ -5,8 +5,8 @@ const the_executable = testing.prepare_executable('factor')
 
 const cmd = testing.new_paired_command('factor', the_executable)
 
-fn test_help_and_version() ? {
-	cmd.ensure_help_and_version_options_work()?
+fn test_help_and_version() {
+	cmd.ensure_help_and_version_options_work()!
 }
 
 fn test_abcd() {

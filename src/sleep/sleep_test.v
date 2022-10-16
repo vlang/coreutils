@@ -8,8 +8,8 @@ const cmd = testing.new_paired_command('sleep', the_executable)
 
 const cmd_ns = 'sleep'
 
-fn test_help_and_version() ? {
-	cmd.ensure_help_and_version_options_work()?
+fn test_help_and_version() {
+	cmd.ensure_help_and_version_options_work()!
 }
 
 fn test_unknown_option() {
