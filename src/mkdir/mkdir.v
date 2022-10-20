@@ -31,7 +31,7 @@ fn mkdir_cmd(files []string, opts &Options) {
 				eprintln('$name: $f: $err.msg()')
 				continue
 			}
-			announce_creation(f, true, opts.verbose)
+			announce_creation(f, opts.verbose)
 			continue
 		}
 
@@ -42,14 +42,12 @@ fn mkdir_cmd(files []string, opts &Options) {
 			continue
 		}
 
-		// It shouldn't be possible to get true and no error here...
-		created := os.mkdir(f, mode: opts.mode) or {
+		os.mkdir(f, mode: opts.mode) or {
 			eprintln("$name: cannot create directory '$f': File exists")
 			num_fails++
 			continue
 		}
-
-		announce_creation(f, created, opts.verbose)
+		announce_creation(f, opts.verbose)
 	}
 
 	if num_fails == files.len {
@@ -57,9 +55,8 @@ fn mkdir_cmd(files []string, opts &Options) {
 	}
 }
 
-fn announce_creation(f string, created bool, verbose bool) {
-	// NOTE(tauraamui): Should we do something different if not created?
-	if created && verbose {
+fn announce_creation(f string, verbose bool) {
+	if verbose {
 		println("$name: created directory '$f'")
 	}
 }
