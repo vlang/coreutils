@@ -30,8 +30,12 @@ fn apply_unit(n f64, unit string) !f64 {
 	return error(invalid_time_interval(n, unit))
 }
 
+fn f64_to_normal_string(n f64) string {
+	return '$n'.trim_right('.0')
+}
+
 fn invalid_time_interval(n f64, unit string) string {
-	return "$cmd_ns: invalid time interval '$n$unit'"
+	return "$cmd_ns: invalid time interval '${f64_to_normal_string(n)}$unit'"
 }
 
 fn main() {
@@ -51,7 +55,8 @@ fn main() {
 	mut seconds := f64(0)
 	for arg in args {
 		n := arg.f64() // unsafe { C.strtold(&char(arg.str), &endptr) }
-		unit := if arg.len > '$n'.len { arg['$n'.len..] } else { '' }
+		sn := f64_to_normal_string(n)
+		unit := if arg.len > sn.len { arg[sn.len..] } else { '' }
 		if n < 0 || unit.len > 1 {
 			eprintln(invalid_time_interval(n, unit))
 			ok = false
