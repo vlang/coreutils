@@ -1,4 +1,4 @@
-.PHONY: all prod fmt test testfmt
+.PHONY: all prod fmt test testfmt clean
 
 all:
 	@v run build.vsh
@@ -10,7 +10,10 @@ fmt:
 	v fmt -w .
 
 test:
-	LANG=C v test .	
+	LANG=C v test .
 
 testfmt:
 	v fmt -verify .
+
+clean:
+	$(RM) -r bin
