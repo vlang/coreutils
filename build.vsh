@@ -4,6 +4,7 @@ import os // v has a bug that you can't use args
 
 const (
 	ignore_dirs = $if windows {
+		// avoid utmp-dependent utils (WinOS has no utmp support)
 		['uptime', 'users', 'who', 'whoami']
 	} $else {
 		[]string{}

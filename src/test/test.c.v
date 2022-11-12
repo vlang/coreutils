@@ -233,6 +233,7 @@ fn test_unary(option byte, arg string) bool {
 		}
 		`g` {
 			$if windows {
+				// group ID not supported for WinOS
 				return false
 			} $else {
 				if !os.exists(arg) {
@@ -268,6 +269,7 @@ fn test_unary(option byte, arg string) bool {
 		}
 		`u` {
 			$if windows {
+				// user ID not supported for WinOS
 				return false
 			} $else {
 				if !os.exists(arg) {
