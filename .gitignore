@@ -8,3 +8,7 @@ build
 *.so
 *.dylib
 *.dll
+
+.idea/
+*.iml
+build
