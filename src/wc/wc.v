@@ -133,7 +133,7 @@ fn count_file(mut file os.File) Count {
 	num_workers := runtime.nr_cpus()
 
 	for i := 0; i < num_workers; i++ {
-		go file_reader_counter(mut file_reader, counts)
+		spawn file_reader_counter(mut file_reader, counts)
 	}
 
 	mut total_count := Count{'', 0, 0, 0, 0, 0}
