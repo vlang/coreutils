@@ -28,7 +28,7 @@ fn setup_rmdir_command(args []string) !(RmdirCommand, []string) {
 		success_exit(fp.usage())
 	}
 	if version {
-		success_exit('rm $common.coreutils_version()')
+		success_exit('rm ${common.coreutils_version()}')
 	}
 	rmdir := RmdirCommand{verbose, parents}
 

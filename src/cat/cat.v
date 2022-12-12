@@ -43,7 +43,7 @@ fn cat(settings Settings) {
 			file = os.stdin()
 		} else {
 			file = os.open(fname) or {
-				eprintln('$app_name: $fname: No such file or directory')
+				eprintln('${app_name}: ${fname}: No such file or directory')
 				exit(1)
 			}
 		}
@@ -119,10 +119,10 @@ fn number_lines(line string, last_line string, line_number int, settings Setting
 		return error('skip line')
 	}
 	if settings.number_nonblanks && line != '' {
-		return ' $line_number\t$line', line, line_number + 1
+		return ' ${line_number}\t${line}', line, line_number + 1
 	}
 	if settings.number_all {
-		return ' $line_number\t$line', line, line_number + 1
+		return ' ${line_number}\t${line}', line, line_number + 1
 	}
 	// no numbering, shouldn't happen since this path is always be numbered
 	return line, line, line_number

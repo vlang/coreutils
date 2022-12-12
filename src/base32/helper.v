@@ -137,7 +137,7 @@ fn run_base32(args []string) {
 		success_exit(fp.usage())
 	}
 	if version {
-		success_exit('$name $common.coreutils_version()')
+		success_exit('${name} ${common.coreutils_version()}')
 	}
 	file_arg := fp.finalize() or { common.exit_with_error_message(name, err.msg()) }
 

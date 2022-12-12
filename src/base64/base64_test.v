@@ -10,23 +10,23 @@ fn test_help_and_version() {
 }
 
 fn test_abcd() {
-	res := os.execute('$the_executable abcd')
+	res := os.execute('${the_executable} abcd')
 	assert res.exit_code == 1
 	assert res.output.trim_space() == 'base64: abcd: No such file or directory'
 }
 
 fn expected_result(input string, output string) {
-	c := '$the_executable $input'
+	c := '${the_executable} ${input}'
 	res := os.execute(c)
-	eprintln('>>>> cmd: `$c`')
+	eprintln('>>>> cmd: `${c}`')
 	if res.exit_code != 0 || res.output != output {
-		eprintln('>>>> res.exit_code: $res.exit_code')
-		eprintln('>>>> res.output   : `$res.output`')
-		eprintln('>>>> expected     : `$output`')
+		eprintln('>>>> res.exit_code: ${res.exit_code}')
+		eprintln('>>>> res.output   : `${res.output}`')
+		eprintln('>>>> expected     : `${output}`')
 	}
 	assert res.exit_code == 0
 	assert res.output == output
-	testing.same_results('base64 $input', '$the_executable $input')
+	testing.same_results('base64 ${input}', '${the_executable} ${input}')
 }
 
 fn test_expected() {

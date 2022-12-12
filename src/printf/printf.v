@@ -8,7 +8,7 @@ const appname = 'printf'
 
 const version = 'v0.0.1'
 
-const usage = '$appname $version
+const usage = '${appname} ${version}
 ----------------------------------------------
 Usage: printf FORMAT [ARGUMENT]...
    or: printf OPTION
@@ -30,7 +30,7 @@ fn main() {
 					exit(0)
 				}
 				'--version' {
-					println('$appname $version')
+					println('${appname} ${version}')
 					exit(0)
 				}
 				else {}
@@ -176,7 +176,7 @@ fn apply_controls(s string, zero_top bool) (string, bool) {
 						out.write_string(utf32_to_str(out_ch))
 					}
 					else {
-						out.write_string('\\$ch2')
+						out.write_string('\\${ch2}')
 					}
 				}
 			}
@@ -242,7 +242,7 @@ fn apply_posix_escape(s string) string {
 			}
 		}
 	}
-	return if has_unprintable { '\$\'$upout\'' } else { s.replace_each([
+	return if has_unprintable { '\$\'${upout}\'' } else { s.replace_each([
 			'|',
 			'\\|',
 			'&',

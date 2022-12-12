@@ -6,7 +6,7 @@ pub const version = '0.0.1'
 
 // coreutils_version returns formatted coreutils tool version
 pub fn coreutils_version() string {
-	return '(V coreutils) $common.version'
+	return '(V coreutils) ${common.version}'
 }
 
 // coreutils_footer returns a formatted coreutils footer
@@ -41,8 +41,8 @@ pub fn exit_on_errors(errors int) {
 [noreturn]
 pub fn exit_with_error_message(tool_name string, error string) {
 	if error.len > 0 {
-		eprintln('$tool_name: $error')
+		eprintln('${tool_name}: ${error}')
 	}
-	eprintln("Try '$tool_name --help' for more information.")
+	eprintln("Try '${tool_name} --help' for more information.")
 	exit(1)
 }

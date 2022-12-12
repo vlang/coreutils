@@ -27,7 +27,7 @@ fn main() {
 	// sanitize settings
 	check_settings(settings) or {
 		eprintln(err)
-		eprintln("Try '$app_name --help' for more information.")
+		eprintln("Try '${app_name} --help' for more information.")
 		exit(1)
 	}
 
@@ -84,7 +84,7 @@ fn get_fstr(set Settings) string {
 		}
 	}
 
-	return '%0${padding}.$decimals$ctype$set.separator'
+	return '%0${padding}.${decimals}${ctype}${set.separator}'
 }
 
 // '9.00' => 2, 0.889 => 3
@@ -102,7 +102,7 @@ fn largest(x int, y int) int {
 [inline]
 fn check_settings(set Settings) ? {
 	if set.increment.f64() == 0 {
-		return error("$app_name: invalid zero increment value '0'")
+		return error("${app_name}: invalid zero increment value '0'")
 	}
 }
 
@@ -131,8 +131,8 @@ fn args() ?Settings {
 
 	match fnames.len {
 		0 {
-			eprintln('$app_name: missing operand')
-			eprintln("Try '$app_name --help' for more information.")
+			eprintln('${app_name}: missing operand')
+			eprintln("Try '${app_name} --help' for more information.")
 			exit(1)
 		}
 		1 {
@@ -148,8 +148,8 @@ fn args() ?Settings {
 			return Settings{format, separator, equal_width, fnames[0], fnames[1], fnames[2]}
 		}
 		else {
-			eprintln("$app_name: extra operand '${fnames[3]}'")
-			eprintln("Try '$app_name --help' for more information.")
+			eprintln("${app_name}: extra operand '${fnames[3]}'")
+			eprintln("Try '${app_name} --help' for more information.")
 			exit(1)
 		}
 	}

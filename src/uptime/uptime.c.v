@@ -83,12 +83,12 @@ fn print_uptime(utmp_buf []C.utmpx) ! {
 		print('up ???? days ??:??,  ')
 	} else {
 		if 0 < updays {
-			print(' up  $updays day${plural(updays)} ${uphours:2}:${upmins:02}')
+			print(' up  ${updays} day${plural(updays)} ${uphours:2}:${upmins:02}')
 		} else {
 			print(' up  ${uphours:2}:${upmins:02}')
 		}
 	}
-	print(',  $entries user${plural(i64(entries))}')
+	print(',  ${entries} user${plural(i64(entries))}')
 
 	avg := [3]f64{}
 	loads := C.getloadavg(avg, 3)
@@ -96,7 +96,7 @@ fn print_uptime(utmp_buf []C.utmpx) ! {
 		print('\n')
 	} else {
 		avg_str := avg[0..3].map('${it:.2f}').join(', ')
-		print(',  load average: $avg_str')
+		print(',  load average: ${avg_str}')
 		print('\n')
 	}
 }
@@ -119,7 +119,7 @@ fn main() {
 		utmp_file_vstr := cstring_to_vstring(common.utmp_file_charptr)
 		wtmp_file_vstr := cstring_to_vstring(common.wtmp_file_charptr)
 		fp.description('the load average. If FILE is not specified, use ${utmp_file_vstr}.')
-		fp.description('$wtmp_file_vstr as FILE is common.')
+		fp.description('${wtmp_file_vstr} as FILE is common.')
 	}
 	fp.limit_free_args(0, 1)!
 	args := fp.remaining_parameters()

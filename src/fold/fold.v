@@ -133,7 +133,7 @@ fn fold_content_to_fit_within_width(file os.File, width int, count_bytes bool, b
 	for {
 		f_reader.read(mut single_char_buf) or { break }
 		c := single_char_buf[0]
-		folder.write_char(c) or { panic('unable to write $c') }
+		folder.write_char(c) or { panic('unable to write ${c}') }
 	}
 
 	folder.flush() or { panic('unable to flush folder into output buf') }
@@ -144,7 +144,7 @@ fn (c FoldCommand) run(mut files []InputFile) {
 	mut open_fails_num := 0
 	for mut file in files {
 		file.open() or {
-			eprintln('$name: $err.msg()')
+			eprintln('${name}: ${err.msg()}')
 			open_fails_num++
 			continue
 		}
@@ -224,7 +224,7 @@ fn run_fold(args []string) {
 		success_exit(fp.usage())
 	}
 	if version {
-		success_exit('$name $common.coreutils_version()')
+		success_exit('${name} ${common.coreutils_version()}')
 	}
 
 	file_args := fp.finalize() or { common.exit_with_error_message(name, err.msg()) }

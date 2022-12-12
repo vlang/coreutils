@@ -23,13 +23,13 @@ fn main() {
 	remaining := fp.remaining_parameters()
 	unkown := remaining.filter(it[0] != `-`) // uname x
 	if unkown.len > 0 {
-		common.exit_with_error_message(fp.application_name, 'Expected no arguments, but given $unkown.len')
+		common.exit_with_error_message(fp.application_name, 'Expected no arguments, but given ${unkown.len}')
 	}
 	// uname -sxv
 	outer: for flag in remaining.filter(it[0] == `-`) {
 		for c in flag[1..] {
 			if c !in opt_map.keys() {
-				common.exit_with_error_message(fp.application_name, 'Unknown flag `$c.ascii_str()`')
+				common.exit_with_error_message(fp.application_name, 'Unknown flag `${c.ascii_str()}`')
 			}
 		}
 	}

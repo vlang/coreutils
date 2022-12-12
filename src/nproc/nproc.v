@@ -27,7 +27,7 @@ fn main() {
 
 	// Check if ignored CPUs is > 0
 	if ignored_cpus < 0 {
-		println('nproc: invalid number: \'$ignored_cpus\'')
+		println('nproc: invalid number: \'${ignored_cpus}\'')
 		exit(1)
 	}
 

@@ -31,11 +31,11 @@ fn apply_unit(n f64, unit string) !f64 {
 }
 
 fn f64_to_normal_string(n f64) string {
-	return '$n'.trim_right('.0')
+	return '${n}'.trim_right('.0')
 }
 
 fn invalid_time_interval(n f64, unit string) string {
-	return "$cmd_ns: invalid time interval '${f64_to_normal_string(n)}$unit'"
+	return "${cmd_ns}: invalid time interval '${f64_to_normal_string(n)}${unit}'"
 }
 
 fn main() {

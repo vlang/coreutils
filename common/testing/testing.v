@@ -71,30 +71,30 @@ pub fn (p CommandPair) same_results(options string) bool {
 	if options.len == 0 {
 		return same_results(p.original, p.deputy)
 	}
-	return same_results('$p.original $options', '$p.deputy $options')
+	return same_results('${p.original} ${options}', '${p.deputy} ${options}')
 }
 
 // expected_failure - given some options, execute both the original
 // and the deputy commands with them, and ensure that they both fail
 // with the same exit_code
 pub fn (p CommandPair) expected_failure(options string) ?os.Result {
-	ores := os.execute('$p.original $options')
+	ores := os.execute('${p.original} ${options}')
 	if ores.exit_code == 0 {
 		return IError(DidNotFailError{
-			msg: '$p.original $options'
+			msg: '${p.original} ${options}'
 			code: 1
 		})
 	}
-	dres := os.execute('$p.deputy $options')
+	dres := os.execute('${p.deputy} ${options}')
 	if dres.exit_code == 0 {
 		return IError(DidNotFailError{
-			msg: '$p.deputy $options'
+			msg: '${p.deputy} ${options}'
 			code: 2
 		})
 	}
 	if ores.exit_code != dres.exit_code {
 		return IError(ExitCodesDifferError{
-			msg: 'original.exit_code: $ores.exit_code != deputy.exit_code: dres.exit_code'
+			msg: 'original.exit_code: ${ores.exit_code} != deputy.exit_code: dres.exit_code'
 			code: 1
 		})
 	}
@@ -104,13 +104,13 @@ pub fn (p CommandPair) expected_failure(options string) ?os.Result {
 pub fn (p CommandPair) ensure_help_and_version_options_work() ! {
 	// For now, assume that the original has --version and --help
 	// and that they already work correctly.
-	if os.execute('$p.deputy --help').exit_code != 0 {
+	if os.execute('${p.deputy} --help').exit_code != 0 {
 		return IError(DoesNotWorkError{
 			msg: '--help'
 			code: 1
 		})
 	}
-	if os.execute('$p.deputy --version').exit_code != 0 {
+	if os.execute('${p.deputy} --version').exit_code != 0 {
 		return IError(DoesNotWorkError{
 			msg: '--version'
 			code: 2
@@ -145,14 +145,14 @@ pub fn same_results(cmd1 string, cmd2 string) bool {
 	noutput2 := normalise(cmd2_res.output)
 	$if trace_same_results ? {
 		eprintln('------------------------------------')
-		eprintln('>> same_results cmd1: "$cmd1"')
-		eprintln('>> same_results cmd2: "$cmd2"')
-		eprintln('                cmd1_res.exit_code: $cmd1_res.exit_code')
-		eprintln('                cmd2_res.exit_code: $cmd2_res.exit_code')
-		eprintln('                cmd1_res.output.len: $cmd1_res.output.len | "$noutput1"')
-		eprintln('                cmd2_res.output.len: $cmd2_res.output.len | "$noutput2"')
-		eprintln('              > cmd1_res.output.len: $cmd1_res.output.len | "$cmd1_res.output"')
-		eprintln('              > cmd2_res.output.len: $cmd2_res.output.len | "$cmd2_res.output"')
+		eprintln('>> same_results cmd1: "${cmd1}"')
+		eprintln('>> same_results cmd2: "${cmd2}"')
+		eprintln('                cmd1_res.exit_code: ${cmd1_res.exit_code}')
+		eprintln('                cmd2_res.exit_code: ${cmd2_res.exit_code}')
+		eprintln('                cmd1_res.output.len: ${cmd1_res.output.len} | "${noutput1}"')
+		eprintln('                cmd2_res.output.len: ${cmd2_res.output.len} | "${noutput2}"')
+		eprintln('              > cmd1_res.output.len: ${cmd1_res.output.len} | "${cmd1_res.output}"')
+		eprintln('              > cmd2_res.output.len: ${cmd2_res.output.len} | "${cmd2_res.output}"')
 	}
 	if testing.gnu_coreutils_installed {
 		// aim for 1:1 output compatibility:
@@ -166,8 +166,8 @@ pub fn same_results(cmd1 string, cmd2 string) bool {
 		after1 := cmd1_res.output.all_after('load average:')
 		after2 := cmd2_res.output.all_after('load average:')
 		$if trace_same_results ? {
-			eprintln('                after1.len: $after1.len | "$after1"')
-			eprintln('                after2.len: $after2.len | "$after2"')
+			eprintln('                after1.len: ${after1.len} | "${after1}"')
+			eprintln('                after2.len: ${after2.len} | "${after2}"')
 		}
 		return cmd1_res.exit_code == cmd2_res.exit_code && after1 == after2
 	}

@@ -21,7 +21,7 @@ struct HeadCommand {
 
 fn write_header(name string, first_file bool) {
 	prefix := if first_file { '' } else { '\n' }
-	print('$prefix==> $name <==\n')
+	print('${prefix}==> ${name} <==\n')
 }
 
 [direct_array_access]
@@ -209,7 +209,7 @@ fn (c HeadCommand) run(mut files []InputFile) {
 	mut open_fails_num := 0
 	for i, mut file in files {
 		file.open() or {
-			eprintln('$name: $err.msg()')
+			eprintln('${name}: ${err.msg()}')
 			open_fails_num++
 			continue
 		}
@@ -317,7 +317,7 @@ fn setup_command(args []string) ?(HeadCommand, []InputFile) {
 		success_exit(fp.usage())
 	}
 	if version {
-		success_exit('$name $common.coreutils_version()')
+		success_exit('${name} ${common.coreutils_version()}')
 	}
 
 	file_args := fp.finalize() or { common.exit_with_error_message(name, err.msg()) }
