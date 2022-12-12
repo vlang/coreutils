@@ -19,13 +19,13 @@ fn expected_result(input string, output string) {
 	c := '${the_executable} ${input}'
 	res := os.execute(c)
 	eprintln('>>>> cmd: `${c}`')
-	if res.exit_code != 0 || res.output != output {
+	if res.exit_code != 0 || res.output.split_into_lines() != output.split_into_lines() {
 		eprintln('>>>> res.exit_code: ${res.exit_code}')
 		eprintln('>>>> res.output   : `${res.output}`')
 		eprintln('>>>> expected     : `${output}`')
 	}
 	assert res.exit_code == 0
-	assert res.output == output
+	assert res.output.split_into_lines() == output.split_into_lines()
 	testing.same_results('base64 ${input}', '${the_executable} ${input}')
 }
 

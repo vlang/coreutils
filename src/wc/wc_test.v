@@ -1,6 +1,8 @@
 import os
 import common.testing
 
+const eol = testing.output_eol()
+
 const the_executable = testing.prepare_executable('wc')
 
 const cmd = testing.new_paired_command('wc', the_executable)
@@ -28,17 +30,17 @@ fn test_abcd() {
 fn test_default() {
 	res := os.execute('${the_executable} ${test_txt_path}')
 	assert res.exit_code == 0
-	assert res.output == ' 1  5 25 ${test_txt_path}\n'
+	assert res.output == ' 1  5 25 ${test_txt_path}${eol}'
 }
 
 fn test_max_line_length() {
 	res := os.execute('${the_executable} -L ${test_txt_path}')
 	assert res.exit_code == 0
-	assert res.output == '12 ${test_txt_path}\n'
+	assert res.output == '12 ${test_txt_path}${eol}'
 }
 
 fn test_char_count() {
 	res := os.execute('${the_executable} -m ${test_txt_path}')
 	assert res.exit_code == 0
-	assert res.output == '25 ${test_txt_path}\n'
+	assert res.output == '25 ${test_txt_path}${eol}'
 }
