@@ -180,9 +180,18 @@ pub fn same_results(cmd1 string, cmd2 string) bool {
 
 fn normalise(s string) string {
 	return s.replace_each(['‘', "'", '’', "'"]).replace('  ', ' ').replace('  ', ' ').replace('  ',
-		' ').replace(', ', ' ')
+		' ').replace(', ', ' ').split_into_lines().join('\n').trim_space()
 }
 
 pub fn check_dir_exists(d string) bool {
 	return os.exists(d) && os.is_dir(d)
+}
+
+pub fn output_eol() string {
+	$if windows {
+		// WinOS => CRLF
+		return '\r\n'
+	}
+	// POSIX => LF
+	return '\n'
 }
