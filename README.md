@@ -27,6 +27,10 @@ the command input/output consistent across the tools.
 
 Running `make` or `v run build.vsh` will build all the programs in `bin/`.
 
+Note: support for access to user account info (via utmp) is limited to POSIX-like platforms.
+And, so, for Windows, utilities requiring utmp support (uptime, users, who, whoami) are currently
+skipped during the default build process.
+
 ## Contributing
 
 Contributions are welcome!

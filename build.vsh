@@ -3,7 +3,12 @@
 import os // v has a bug that you can't use args
 
 const (
-	ignore_dirs = []string{}
+	ignore_dirs = $if windows {
+		// avoid utmp-dependent utils (WinOS has no utmp support)
+		['uptime', 'users', 'who', 'whoami']
+	} $else {
+		[]string{}
+	}
 )
 
 vargs := if os.args.len > 1 { os.args[1..] } else { []string{} }
