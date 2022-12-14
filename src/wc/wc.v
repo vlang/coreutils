@@ -162,7 +162,7 @@ fn get_files(args []string) map[string]os.File {
 		mut files := map[string]os.File{}
 		for file_path in args {
 			files[file_path] = os.open(file_path) or {
-				eprintln('$application_name: $file_path: No such file or directory')
+				eprintln('${application_name}: ${file_path}: No such file or directory')
 				exit(1)
 			}
 		}

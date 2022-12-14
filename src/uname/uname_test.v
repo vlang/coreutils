@@ -9,9 +9,9 @@ fn test_help_and_version() {
 }
 
 fn test_unknown_option() {
-	testing.command_fails('$the_executable -x')!
-	testing.command_fails('$the_executable -sm -vx')!
-	testing.command_fails('$the_executable -sm a')!
+	testing.command_fails('${the_executable} -x')!
+	testing.command_fails('${the_executable} -sm -vx')!
+	testing.command_fails('${the_executable} -sm a')!
 }
 
 fn test_print_system_info() {

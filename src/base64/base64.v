@@ -26,7 +26,7 @@ fn get_file(args []string) os.File {
 	} else {
 		file_path := args[0]
 		return os.open(file_path) or {
-			eprintln('$application_name: $file_path: No such file or directory')
+			eprintln('${application_name}: ${file_path}: No such file or directory')
 			exit(1)
 		}
 	}
@@ -50,7 +50,7 @@ fn encode_and_print(mut file os.File, wrap int) {
 			if err is os.Eof {
 				break
 			}
-			eprintln('$application_name: Cannot read file')
+			eprintln('${application_name}: Cannot read file')
 			exit(1)
 		}
 		pos += u64(read_bytes)
@@ -114,7 +114,7 @@ fn decode_and_print(mut file os.File) {
 		// buffer with base64 encoded data only.
 		for {
 			read_bytes := file.read_bytes_into_newline(mut in_buffer[n_bytes..]) or {
-				eprintln('$application_name: Cannot read file')
+				eprintln('${application_name}: Cannot read file')
 				exit(1)
 			}
 			// edge case, when buffer is filled completely and last element it not \n.
@@ -157,12 +157,12 @@ fn main() {
 	}
 	if args.len > 1 {
 		extra_arg := args[1]
-		eprintln('$application_name: extra operand `$extra_arg`')
+		eprintln('${application_name}: extra operand `${extra_arg}`')
 		eprintln("Try 'base64 --help' for more information.")
 		exit(1)
 	}
 	if wraping_opt < 0 {
-		eprintln('$application_name: invalid wrap size: \'$wraping_opt\'')
+		eprintln('${application_name}: invalid wrap size: \'${wraping_opt}\'')
 		exit(1)
 	}
 

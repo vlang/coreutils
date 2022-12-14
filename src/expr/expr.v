@@ -10,7 +10,7 @@ const appname = 'expr'
 
 const version = 'v0.0.1'
 
-const usage = '$appname $version
+const usage = '${appname} ${version}
 ----------------------------------------------
 Usage: expr EXPRESSION
    or: expr OPTION
@@ -48,7 +48,7 @@ fn main() {
 					exit(0)
 				}
 				'--version' {
-					println('$appname $version')
+					println('${appname} ${version}')
 					exit(0)
 				}
 				else {}

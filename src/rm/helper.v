@@ -22,7 +22,7 @@ enum Interactive {
 
 // String substitution functions for errors and prompts
 fn rem(path string) string {
-	return "removed '$path'"
+	return "removed '${path}'"
 }
 
 fn prompt_file(path string) string {
@@ -33,41 +33,41 @@ fn prompt_file(path string) string {
 }
 
 fn err_is_dir(path string) string {
-	return "cannot remove '$path': Is a directory"
+	return "cannot remove '${path}': Is a directory"
 }
 
 fn err_is_dir_empty(path string) string {
-	return "cannot remove '$path': Directory not empty"
+	return "cannot remove '${path}': Directory not empty"
 }
 
 fn err_not_exist(path string) string {
-	return "failed to remove '$path: No such file or directory"
+	return "failed to remove '${path}: No such file or directory"
 }
 
 fn prompt_descend(path string) string {
-	return "rm: descend into directory '$path'? "
+	return "rm: descend into directory '${path}'? "
 }
 
 fn prompt_file_nonempty(path string) string {
-	return "rm: remove regular file '$path'? "
+	return "rm: remove regular file '${path}'? "
 }
 
 fn prompt_file_empty(path string) string {
-	return "rm: remove regular empty file '$path'? "
+	return "rm: remove regular empty file '${path}'? "
 }
 
 fn prompt_dir(path string) string {
-	return "rm: remove directory '$path? "
+	return "rm: remove directory '${path}? "
 }
 
 fn rem_args(len int) string {
 	arg := if len == 1 { 'argument' } else { 'arguments' }
-	return 'Remove $len $arg? '
+	return 'Remove ${len} ${arg}? '
 }
 
 fn rem_recurse(len int) string {
 	arg := if len == 1 { 'argument' } else { 'arguments' }
-	return 'rm: remove $len $arg recursively? '
+	return 'rm: remove ${len} ${arg} recursively? '
 }
 
 // End of string substitution functions
@@ -75,7 +75,7 @@ fn rem_recurse(len int) string {
 // Print error with tool name behind it
 fn error_message(tool_name string, error string) {
 	if error.len > 0 {
-		eprintln('$tool_name: $error')
+		eprintln('${tool_name}: ${error}')
 	}
 }
 
@@ -143,7 +143,7 @@ fn setup_rm_command(args []string) !(RmCommand, []string) {
 		success_exit(fp.usage())
 	}
 	if version {
-		success_exit('rm $common.coreutils_version()')
+		success_exit('rm ${common.coreutils_version()}')
 	}
 
 	rm := RmCommand{recursive, dir, interactive, verbose, force, less_int}

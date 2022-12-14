@@ -28,7 +28,7 @@ fn mkdir_cmd(files []string, opts &Options) {
 		if opts.parent {
 			os.mkdir_all(f, mode: opts.mode) or {
 				num_fails++
-				eprintln('$name: $f: $err.msg()')
+				eprintln('${name}: ${f}: ${err.msg()}')
 				continue
 			}
 			announce_creation(f, opts.verbose)
@@ -37,13 +37,13 @@ fn mkdir_cmd(files []string, opts &Options) {
 
 		// Ensure that the target dir to create's parent dir exists.
 		if !os.exists(os.dir(f)) {
-			eprintln("$name: cannot create directory '$f': No such file or directory")
+			eprintln("${name}: cannot create directory '${f}': No such file or directory")
 			num_fails++
 			continue
 		}
 
 		os.mkdir(f, mode: opts.mode) or {
-			eprintln("$name: cannot create directory '$f': File exists")
+			eprintln("${name}: cannot create directory '${f}': File exists")
 			num_fails++
 			continue
 		}
@@ -57,7 +57,7 @@ fn mkdir_cmd(files []string, opts &Options) {
 
 fn announce_creation(f string, verbose bool) {
 	if verbose {
-		println("$name: created directory '$f'")
+		println("${name}: created directory '${f}'")
 	}
 }
 
@@ -80,13 +80,13 @@ fn run_mkdir(args []string) {
 		success_exit(fp.usage())
 	}
 	if version {
-		success_exit('$name $common.coreutils_version()')
+		success_exit('${name} ${common.coreutils_version()}')
 	}
 
 	file_args := fp.finalize() or { common.exit_with_error_message(name, err.msg()) }
 	if file_args.len == 0 {
-		eprintln('$name: missing operand')
-		eprintln("Try '$name --help' for more information")
+		eprintln('${name}: missing operand')
+		eprintln("Try '${name} --help' for more information")
 		exit(1)
 	}
 

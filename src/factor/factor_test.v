@@ -10,16 +10,16 @@ fn test_help_and_version() {
 }
 
 fn test_abcd() {
-	res := os.execute('$the_executable abcd')
+	res := os.execute('${the_executable} abcd')
 	assert res.exit_code == 1
 	assert res.output.trim_space() == 'factor: ‘abcd’ is not a valid positive integer'
 }
 
 fn expected_result(input string, output []string) {
-	res := os.execute('$the_executable $input')
+	res := os.execute('${the_executable} ${input}')
 	assert res.exit_code == 0
 	assert res.output.split_into_lines() == output
-	testing.same_results('factor $input', '$the_executable $input')
+	testing.same_results('factor ${input}', '${the_executable} ${input}')
 }
 
 fn test_expected() {

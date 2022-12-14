@@ -13,8 +13,8 @@ chdir('src')!
 
 dirs := ls('.')!.filter(is_dir(it))
 
-if !exists('$curdir/bin') {
-	mkdir('$curdir/bin')!
+if !exists('${curdir}/bin') {
+	mkdir('${curdir}/bin')!
 }
 
 for dir in dirs {
@@ -28,13 +28,13 @@ for dir in dirs {
 	// Get all of the of v files in the directory and get unix modifed time
 	mut modification_time := []i64{}
 	for src_file in ls(dir)!.filter(it.ends_with('.v')) {
-		modification_time << os.file_last_mod_unix('$dir/$src_file')
+		modification_time << os.file_last_mod_unix('${dir}/${src_file}')
 	}
 
 	// Check if the binary exists and is newer than the source files
 	// If it is, skip it
-	if exists('$curdir/bin/$dir') {
-		bin_mod_time := os.file_last_mod_unix('$curdir/bin/$dir')
+	if exists('${curdir}/bin/${dir}') {
+		bin_mod_time := os.file_last_mod_unix('${curdir}/bin/${dir}')
 		// If the binary is newer than the source files, skip it
 		if modification_time.filter(it < bin_mod_time).len == modification_time.len {
 			continue
@@ -46,7 +46,7 @@ for dir in dirs {
 		final_args += ' ' + arg
 	}
 	println('compiling ${dir}...')
-	cmd := 'v $final_args -o $curdir/bin/$dir ./$dir'
+	cmd := 'v ${final_args} -o ${curdir}/bin/${dir} ./${dir}'
 	execute_or_panic(cmd)
 }
 

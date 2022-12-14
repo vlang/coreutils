@@ -30,7 +30,7 @@ fn main() {
 	// Main functionality
 	if args.len == 0 {
 		for k, v in os.environ() {
-			mut s := '$k=$v'
+			mut s := '${k}=${v}'
 			if opt_nul_terminate {
 				print(s)
 				print(zero_byte)

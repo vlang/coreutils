@@ -125,8 +125,8 @@ fn test_results() {
 	for test in tests {
 		res := cmd.same_results(test)
 		if !res {
-			if os.execute('$cmd.original $test').exit_code == 2
-				&& os.execute('$cmd.deputy $test').exit_code == 2 {
+			if os.execute('${cmd.original} ${test}').exit_code == 2
+				&& os.execute('${cmd.deputy} ${test}').exit_code == 2 {
 				continue
 			}
 			failed << test
@@ -179,18 +179,18 @@ fn test_multi_byte_results() {
 	for test in mb_tests {
 		res := cmd.same_results(test)
 		if !res {
-			original_cmd := '$cmd.original $test'
-			deputy_cmd := '$cmd.deputy $test'
+			original_cmd := '${cmd.original} ${test}'
+			deputy_cmd := '${cmd.deputy} ${test}'
 			ores := os.execute(original_cmd)
 			dres := os.execute(deputy_cmd)
 			if ores.exit_code == 2 && dres.exit_code == 2 {
 				continue
 			}
 			failed << test
-			eprintln('>>> original_cmd: `$original_cmd`')
-			eprintln('>>>   deputy_cmd: `$deputy_cmd`')
-			eprintln('>>>    fail_ores: $ores')
-			eprintln('>>>    fail_dres: $dres')
+			eprintln('>>> original_cmd: `${original_cmd}`')
+			eprintln('>>>   deputy_cmd: `${deputy_cmd}`')
+			eprintln('>>>    fail_ores: ${ores}')
+			eprintln('>>>    fail_dres: ${dres}')
 		}
 	}
 	println(failed.join('\n'))
