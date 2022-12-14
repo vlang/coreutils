@@ -80,24 +80,25 @@ pub fn (p CommandPair) same_results(options string) bool {
 pub fn (p CommandPair) expected_failure(options string) ?os.Result {
 	ores := os.execute('${p.original} ${options}')
 	if ores.exit_code == 0 {
-		return IError(DidNotFailError{
+		return DidNotFailError{
 			msg: '${p.original} ${options}'
 			code: 1
-		})
+		}
 	}
 	dres := os.execute('${p.deputy} ${options}')
 	if dres.exit_code == 0 {
-		return IError(DidNotFailError{
+		return DidNotFailError{
 			msg: '${p.deputy} ${options}'
 			code: 2
-		})
+		}
 	}
 	if ores.exit_code != dres.exit_code {
-		return IError(ExitCodesDifferError{
+		return ExitCodesDifferError{
 			msg: 'original.exit_code: ${ores.exit_code} != deputy.exit_code: dres.exit_code'
 			code: 1
-		})
+		}
 	}
+	assert true
 	return dres
 }
 
@@ -105,17 +106,18 @@ pub fn (p CommandPair) ensure_help_and_version_options_work() ! {
 	// For now, assume that the original has --version and --help
 	// and that they already work correctly.
 	if os.execute('${p.deputy} --help').exit_code != 0 {
-		return IError(DoesNotWorkError{
+		return DoesNotWorkError{
 			msg: '--help'
 			code: 1
-		})
+		}
 	}
 	if os.execute('${p.deputy} --version').exit_code != 0 {
-		return IError(DoesNotWorkError{
+		return DoesNotWorkError{
 			msg: '--version'
 			code: 2
-		})
+		}
 	}
+	assert true
 }
 
 // command_fails executes a command, and ensures
@@ -125,11 +127,12 @@ pub fn (p CommandPair) ensure_help_and_version_options_work() ! {
 pub fn command_fails(cmd string) !os.Result {
 	res := os.execute(cmd)
 	if res.exit_code == 0 {
-		return IError(DidNotFailError{
+		return DidNotFailError{
 			msg: cmd
 			code: 3
-		})
+		}
 	}
+	assert true
 	return res
 }
 

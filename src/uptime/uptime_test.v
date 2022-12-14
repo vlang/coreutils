@@ -14,5 +14,7 @@ fn test_unknown_option() {
 
 fn test_print_uptime() {
 	assert cmd.same_results('')
-	// assert cmd.same_results('/var/log/wtmp') // SKIP ~ `uptime FILE` is not universally supported
+	$if linux && glibc {
+		assert cmd.same_results('/var/log/wtmp')
+	}
 }
