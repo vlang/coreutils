@@ -104,7 +104,9 @@ const tests = [
 	//	r'"aa" : "a*\\{1\\}"',
 	//	r'"aa" : "a\\{1\\}*"'
 	//	r'"acd" : "a\\(b\\)?c\\1d"',
-	r'"-5" : "-\\{0,1\\}[0-9]*\$"',
+	// r'"-5" : "-\\{0,1\\}[0-9]*\$"', // DISABLED: escaping non-special characters in regex has undefined behavior
+	r'"-5" : "-\{0,1\}[0-9]*$"',
+	r'"-5" : "-\{0,1}[0-9]*$"',
 	r''
 	// big number is not supported for now
 	//	r'98782897298723498732987928734 + 1',
