@@ -49,9 +49,11 @@ const tests = [
 	r'"a)" : "a)"',
 	r'_ : "a\\)"'
 	//	r'_ : "\\)"',
-	r'"ab" : "a\\(\\)b"',
-	r'"a^b" : "a^b"',
-	r'"a\$b" : "a\$b"',
+	r'"ab" : "a\\(\\)b"'
+	// r'"a^b" : "a^b"',       // FixME: [2022-12-29; rivy] for WinOS comparison, `expr.exe` is bugged based on oniguruma bug (see GH:kkos/oniguruma/issues/279)
+	r'"a^b" : "a\^b"'
+	// r'"a\$b" : "a\\$b"',    // FixME: [2022-12-29; rivy] for WinOS comparison, `expr.exe` is bugged based on oniguruma bug (see GH:kkos/oniguruma/issues/279)
+	r'"a\$b" : a[$]b',
 	r'"" : "\\($\\)\\(^\\)"'
 	//	r'"b" : "a*\\(^b\$\\)c*"',
 	r'"X|" : "X\\(|\\)" : "(" "X|" : "X\\(|\\)" ")"'
