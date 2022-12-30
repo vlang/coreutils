@@ -1,7 +1,8 @@
+import math
 import os
 import regex
-import common
 import time
+import common
 
 const cmd_ns = 'sleep'
 
@@ -76,12 +77,12 @@ fn main() {
 			''
 		}
 		n_str := arg.trim_string_right(suffix)
-		if !is_decimal(n_str) {
+		if !(n_str == 'inf' || n_str == 'infinity') && !is_decimal(n_str) {
 			eprintln(invalid_time_interval_argument(arg))
 			ok = false
 			continue
 		}
-		n := n_str.f64() // unsafe { C.strtold(&char(arg.str), &endptr) }
+		n := if n_str == 'inf' || n_str == 'infinity' { math.inf(1) } else { n_str.f64() } // unsafe { C.strtold(&char(arg.str), &endptr) }
 		unit := suffix
 		if n < 0 {
 			eprintln(invalid_time_interval(n, unit))
