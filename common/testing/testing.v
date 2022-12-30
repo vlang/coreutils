@@ -175,6 +175,15 @@ pub fn same_results(cmd1 string, cmd2 string) bool {
 	if cmd1.contains('printenv') && cmd2.contains('printenv.exe') {
 		return cmd1_res.exit_code == cmd2_res.exit_code
 	}
+	if cmd1.contains('sleep') {
+		after1 := noutput1.replace(': invalid float literal', '')
+		after2 := noutput2
+		$if trace_same_results ? {
+			eprintln('                after1.len: ${after1.len} | "${after1}"')
+			eprintln('                after2.len: ${after2.len} | "${after2}"')
+		}
+		return cmd1_res.exit_code == cmd2_res.exit_code && after1 == after2
+	}
 	if cmd1 == 'uptime' || cmd1 == 'uptime /var/log/wtmp' {
 		after1 := cmd1_res.output.all_after('load average:')
 		after2 := cmd2_res.output.all_after('load average:')
