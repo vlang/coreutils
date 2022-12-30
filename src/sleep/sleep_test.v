@@ -30,6 +30,17 @@ fn test_invalid_interval() {
 	assert res.exit_code == 1
 }
 
+fn test_valid_interval() {
+	assert cmd.same_results('0')
+	assert cmd.same_results('0s')
+	assert cmd.same_results('0.0')
+	assert cmd.same_results('0.0s')
+	assert cmd.same_results('0.1')
+	assert cmd.same_results('0.1s')
+	assert cmd.same_results('1')
+	assert cmd.same_results('1s')
+}
+
 fn test_interval() {
 	// 5e-7  * 86400 + 5e-7 * 3600 + 1e-4 * 60 + 1e-3 + 1e-3 = 0.053s = 53ms
 	x1 := time.ticks()
