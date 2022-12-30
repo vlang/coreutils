@@ -100,7 +100,7 @@ fn main() {
 		common.exit_with_error_message(cmd_ns, '')
 	}
 	// if seconds = +inf, it would not sleep
-	// but orginal `sleep` would sleep
+	// but original `sleep` would sleep
 	t := time.ticks()
 	time.sleep(seconds * time.second)
 	$if trace_sleep_ticks ? {
