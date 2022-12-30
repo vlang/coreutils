@@ -1,4 +1,5 @@
 import os
+import regex
 import common
 import time
 
@@ -30,12 +31,22 @@ fn apply_unit(n f64, unit string) !f64 {
 	return error(invalid_time_interval(n, unit))
 }
 
+fn is_decimal(s string) bool {
+	mut re := regex.regex_opt(r'^[-+]?[0-9]+([.][0-9]+)?([eE][-+][0-9]+)?$') or { panic(err) }
+	return re.matches_string(s)
+}
+
 fn f64_to_normal_string(n f64) string {
-	return '${n}'.trim_right('.0')
+	val := '${n}'.trim_right('.0')
+	return if val.len > 0 { val } else { '0' }
 }
 
 fn invalid_time_interval(n f64, unit string) string {
-	return "${cmd_ns}: invalid time interval '${f64_to_normal_string(n)}${unit}'"
+	return invalid_time_interval_argument('${f64_to_normal_string(n)}${unit}')
+}
+
+fn invalid_time_interval_argument(s string) string {
+	return "${cmd_ns}: invalid time interval '${s}'"
 }
 
 fn main() {
@@ -54,10 +65,25 @@ fn main() {
 	mut ok := true
 	mut seconds := f64(0)
 	for arg in args {
-		n := arg.f64() // unsafe { C.strtold(&char(arg.str), &endptr) }
-		sn := f64_to_normal_string(n)
-		unit := if arg.len > sn.len { arg[sn.len..] } else { '' }
-		if n < 0 || unit.len > 1 {
+		suffix := if arg.len > 1 {
+			c := arg[arg.len - 1..]
+			if ['s', 'm', 'h', 'd'].contains(c) {
+				c
+			} else {
+				''
+			}
+		} else {
+			''
+		}
+		n_str := arg.trim_string_right(suffix)
+		if !is_decimal(n_str) {
+			eprintln(invalid_time_interval_argument(arg))
+			ok = false
+			continue
+		}
+		n := n_str.f64() // unsafe { C.strtold(&char(arg.str), &endptr) }
+		unit := suffix
+		if n < 0 {
 			eprintln(invalid_time_interval(n, unit))
 			ok = false
 			continue
