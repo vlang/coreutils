@@ -152,10 +152,10 @@ pub fn same_results(cmd1 string, cmd2 string) bool {
 		eprintln('>> same_results cmd2: "${cmd2}"')
 		eprintln('                cmd1_res.exit_code: ${cmd1_res.exit_code}')
 		eprintln('                cmd2_res.exit_code: ${cmd2_res.exit_code}')
-		eprintln('                cmd1_res.output.len: ${cmd1_res.output.len} | "${noutput1}"')
-		eprintln('                cmd2_res.output.len: ${cmd2_res.output.len} | "${noutput2}"')
-		eprintln('              > cmd1_res.output.len: ${cmd1_res.output.len} | "${cmd1_res.output}"')
-		eprintln('              > cmd2_res.output.len: ${cmd2_res.output.len} | "${cmd2_res.output}"')
+		eprintln('                cmd1_res.output.len: ${noutput1.len} | "${noutput1}"')
+		eprintln('                cmd2_res.output.len: ${noutput2.len} | "${noutput2}"')
+		eprintln('        (raw) > cmd1_res.output.len: ${cmd1_res.output.len} | "${cmd1_res.output}"')
+		eprintln('        (raw) > cmd2_res.output.len: ${cmd2_res.output.len} | "${cmd2_res.output}"')
 	}
 	if testing.gnu_coreutils_installed {
 		// aim for 1:1 output compatibility:
