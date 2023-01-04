@@ -1,7 +1,7 @@
 import os
 import common
 
-const out_files = [ 'nohup.out', '${os.getenv_opt('HOME')!}/nohup.out' ]
+const out_files = ['nohup.out', '${os.getenv_opt('HOME')!}/nohup.out']
 
 fn main() {
 	mut fp := common.flag_parser(os.args)
@@ -13,12 +13,12 @@ fn main() {
 		println(fp.usage())
 		return
 	}
-	
+
 	// do this early before we loose access to stderr
 	if os.exists_in_system_path(command[0]) == false {
 		eprintln('fatal: ${command[0]} does not exist or is not executable')
 	}
-	
+
 	stdout_is_tty := os.is_atty(os.stdout().fd)
 
 	if os.is_atty(os.stdin().fd) == 1 {
@@ -29,11 +29,9 @@ fn main() {
 		mut f := os.stdout()
 
 		for file in out_files {
-			mut temp := os.open_file(file, 'a', 0o600) or {
-				continue
-			}
+			mut temp := os.open_file(file, 'a', 0o600) or { continue }
 
-			println('info: redirecting stdout to ${file}')
+			println('info: redirecting stdout to $file')
 			f.reopen(file, 'a')! // from this point on stdout goes to nohup.out
 			temp.close()
 			break
@@ -45,8 +43,7 @@ fn main() {
 			f.reopen('nohup.out', 'rw') or {
 				f.reopen('${os.getenv_opt('HOME')!}/nohup.out', 'rw')!
 			}
-		}
-		else {
+		} else {
 			// couldn't find a v equilavent of this
 			C.dup2(os.stdout().fd, os.stderr().fd)
 		}

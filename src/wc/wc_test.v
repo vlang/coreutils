@@ -20,25 +20,25 @@ fn testsuite_end() {
 }
 
 fn test_abcd() {
-	res := os.execute('${the_executable} abcd')
+	res := os.execute('$the_executable abcd')
 	assert res.exit_code == 1
 	assert res.output.trim_space() == 'wc: abcd: No such file or directory'
 }
 
 fn test_default() {
-	res := os.execute('${the_executable} ${test_txt_path}')
+	res := os.execute('$the_executable $test_txt_path')
 	assert res.exit_code == 0
-	assert res.output == ' 1  5 25 ${test_txt_path}\n'
+	assert res.output == ' 1  5 25 $test_txt_path\n'
 }
 
 fn test_max_line_length() {
-	res := os.execute('${the_executable} -L ${test_txt_path}')
+	res := os.execute('$the_executable -L $test_txt_path')
 	assert res.exit_code == 0
-	assert res.output == '12 ${test_txt_path}\n'
+	assert res.output == '12 $test_txt_path\n'
 }
 
 fn test_char_count() {
-	res := os.execute('${the_executable} -m ${test_txt_path}')
+	res := os.execute('$the_executable -m $test_txt_path')
 	assert res.exit_code == 0
-	assert res.output == '25 ${test_txt_path}\n'
+	assert res.output == '25 $test_txt_path\n'
 }
