@@ -163,6 +163,14 @@ pub fn same_results(cmd1 string, cmd2 string) bool {
 		return cmd1_res.exit_code == cmd2_res.exit_code && cmd1_res.output == cmd2_res.output
 	}
 	// relax the strict matching for well known exceptions:
+	if cmd1.contains('coreutils') {
+		noutput1 = noutput1.replace("'coreutils ", "'")
+		// noutput2 = noutput2
+		$if trace_same_results ? {
+			eprintln('                 (coreutils) after1: ${noutput1.len} | "${noutput1}"')
+			eprintln('                 (coreutils) after2: ${noutput2.len} | "${noutput2}"')
+		}
+	}
 	if cmd1.contains('arch') {
 		// `arch` is not standardized and 'AMD64' is more commonly known as 'x86_64'
 		mut re := regex.regex_opt('[aA][mM][dD]64') or { panic(err) }
