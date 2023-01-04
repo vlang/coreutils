@@ -162,6 +162,16 @@ pub fn same_results(cmd1 string, cmd2 string) bool {
 		return cmd1_res.exit_code == cmd2_res.exit_code && cmd1_res.output == cmd2_res.output
 	}
 	// relax the strict matching for well known exceptions:
+	if cmd1.contains('arch') {
+		// `arch` is not standardized and 'AMD64' is more commonly known as 'x86_64'
+		after1 := noutput1
+		after2 := noutput2.replace('AMD64', 'x86_64')
+		$if trace_same_results ? {
+			eprintln('                after1.len: ${after1.len} | "${after1}"')
+			eprintln('                after2.len: ${after2.len} | "${after2}"')
+		}
+		return cmd1_res.exit_code == cmd2_res.exit_code && after1 == after2
+	}
 	if cmd1.contains('printenv') && cmd2.contains('printenv.exe') {
 		return cmd1_res.exit_code == cmd2_res.exit_code
 	}
