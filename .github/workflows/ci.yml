@@ -3,6 +3,54 @@ name: Build and Test
 on: [push, pull_request]
 
 jobs:
+  winos-test:
+    runs-on: windows-latest
+    env:
+      VFLAGS: -cc tcc
+      VJOBS: 1
+      VTEST_SHOW_START: 1
+    steps:
+      - name: Checkout Latest V
+        uses: actions/checkout@v2
+        with:
+          repository: vlang/v
+          path: v
+      - name: Build V
+        shell: bash
+        run: |
+          # Build V
+          cd v && ./make.bat -tcc
+          # ls -Al
+          # ln -s v.exe vv
+          # ls -Al
+          echo "adding '${PWD}' to PATH"
+          echo "${PWD}" >> $GITHUB_PATH
+      - name: Checkout Coreutils (for tests)
+        uses: actions/checkout@v2
+        with:
+          path: coreutils
+      - name: V doctor
+        shell: bash
+        run: |
+          # V doctor
+          v doctor
+      - name: Build all
+        shell: bash
+        run: |
+          # Build all
+          cd coreutils && v build.vsh
+      - name: Download uutils/coreutils
+        uses: engineerd/configurator@v0.0.8
+        with:
+          name: 'coreutils.exe'
+          url: 'https://github.com/uutils/coreutils/releases/download/0.0.17/coreutils-0.0.17-x86_64-pc-windows-msvc.zip'
+          pathInArchive: 'coreutils-0.0.17-x86_64-pc-windows-msvc/coreutils.exe'
+      - name: Run tests
+        shell: bash
+        run: |
+          # Run tests
+          cd coreutils && v test .
+
   ubuntu-fast-build:
     runs-on: ubuntu-latest
     steps:
@@ -48,7 +96,6 @@ jobs:
         run: cd coreutils && v run build.vsh -prod
       - name: Run tests
         run: cd coreutils && make test
-
 
   ubuntu-gnu-coreutils:
     runs-on: ubuntu-latest
