@@ -31,7 +31,7 @@ fn main() {
 		for file in out_files {
 			mut temp := os.open_file(file, 'a', 0o600) or { continue }
 
-			println('info: redirecting stdout to $file')
+			println('info: redirecting stdout to ${file}')
 			f.reopen(file, 'a')! // from this point on stdout goes to nohup.out
 			temp.close()
 			break
