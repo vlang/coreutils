@@ -2,9 +2,17 @@ import os
 import time
 import common.testing
 
-const executable_under_test = testing.prepare_executable('sleep')
+const util = 'sleep'
 
-const cmd = testing.new_paired_command('sleep', executable_under_test)
+const platform_util = $if !windows {
+	util
+} $else {
+	'coreutils ${util}'
+}
+
+const executable_under_test = testing.prepare_executable(util)
+
+const cmd = testing.new_paired_command(platform_util, executable_under_test)
 
 const cmd_ns = 'sleep'
 

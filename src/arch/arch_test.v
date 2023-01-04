@@ -1,8 +1,16 @@
 import common.testing
 
-const executable_under_test = testing.prepare_executable('arch')
+const util = 'arch'
 
-const cmd = testing.new_paired_command('arch', executable_under_test)
+const platform_util = $if !windows {
+	util
+} $else {
+	'coreutils ${util}'
+}
+
+const executable_under_test = testing.prepare_executable(util)
+
+const cmd = testing.new_paired_command(platform_util, executable_under_test)
 
 fn test_help_and_version() {
 	cmd.ensure_help_and_version_options_work()!

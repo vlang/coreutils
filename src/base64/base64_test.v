@@ -1,9 +1,17 @@
 import os
 import common.testing
 
-const executable_under_test = testing.prepare_executable('base64')
+const util = 'base64'
 
-const cmd = testing.new_paired_command('base64', executable_under_test)
+const platform_util = $if !windows {
+	util
+} $else {
+	'coreutils ${util}'
+}
+
+const executable_under_test = testing.prepare_executable(util)
+
+const cmd = testing.new_paired_command(platform_util, executable_under_test)
 
 fn test_help_and_version() {
 	cmd.ensure_help_and_version_options_work()!

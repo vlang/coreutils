@@ -1,7 +1,12 @@
 import common.testing
 
 const util = 'whoami'
-const platform_util = $if !windows { util } $else { "coreutils ${util}" }
+
+const platform_util = $if !windows {
+	util
+} $else {
+	'coreutils ${util}'
+}
 
 const executable_under_test = testing.prepare_executable(util)
 

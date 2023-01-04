@@ -3,9 +3,17 @@ import common.testing
 
 const eol = testing.output_eol()
 
-const executable_under_test = testing.prepare_executable('head')
+const util = 'head'
 
-const cmd = testing.new_paired_command('head', executable_under_test)
+const platform_util = $if !windows {
+	util
+} $else {
+	'coreutils ${util}'
+}
+
+const executable_under_test = testing.prepare_executable(util)
+
+const cmd = testing.new_paired_command(platform_util, executable_under_test)
 
 const test_txt_path = os.join_path(testing.temp_folder, 'test.txt')
 
