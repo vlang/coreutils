@@ -1,22 +1,22 @@
 import os
 import common.testing
 
-const the_executable = testing.prepare_executable('base64')
+const executable_under_test = testing.prepare_executable('base64')
 
-const cmd = testing.new_paired_command('base64', the_executable)
+const cmd = testing.new_paired_command('base64', executable_under_test)
 
 fn test_help_and_version() {
 	cmd.ensure_help_and_version_options_work()!
 }
 
 fn test_abcd() {
-	res := os.execute('${the_executable} abcd')
+	res := os.execute('${executable_under_test} abcd')
 	assert res.exit_code == 1
 	assert res.output.trim_space() == 'base64: abcd: No such file or directory'
 }
 
 fn expected_result(input string, output string) {
-	c := '${the_executable} ${input}'
+	c := '${executable_under_test} ${input}'
 	res := os.execute(c)
 	eprintln('>>>> cmd: `${c}`')
 	if res.exit_code != 0 || res.output.split_into_lines() != output.split_into_lines() {
@@ -26,7 +26,7 @@ fn expected_result(input string, output string) {
 	}
 	assert res.exit_code == 0
 	assert res.output.split_into_lines() == output.split_into_lines()
-	testing.same_results('base64 ${input}', '${the_executable} ${input}')
+	testing.same_results('base64 ${input}', '${executable_under_test} ${input}')
 }
 
 fn test_expected() {

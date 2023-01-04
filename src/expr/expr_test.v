@@ -1,9 +1,9 @@
 import common.testing
 import os
 
-const the_executable = testing.prepare_executable('expr')
+const executable_under_test = testing.prepare_executable('expr')
 
-const cmd = testing.new_paired_command('expr', the_executable)
+const cmd = testing.new_paired_command('expr', executable_under_test)
 
 fn test_help_and_version() {
 	cmd.ensure_help_and_version_options_work()!

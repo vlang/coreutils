@@ -8,13 +8,13 @@ const supported_platform = $if windows {
 	true
 } // WinOS lacks currently required utmp support
 
-const the_executable = if supported_platform {
+const executable_under_test = if supported_platform {
 	testing.prepare_executable(util)
 } else {
 	''
 }
 
-const cmd = testing.new_paired_command(util, the_executable)
+const cmd = testing.new_paired_command(util, executable_under_test)
 
 fn test_help_and_version() {
 	if !supported_platform {
@@ -27,7 +27,7 @@ fn test_unknown_option() {
 	if !supported_platform {
 		return
 	}
-	testing.command_fails('${the_executable} -x')!
+	testing.command_fails('${executable_under_test} -x')!
 }
 
 fn test_print_uptime() {

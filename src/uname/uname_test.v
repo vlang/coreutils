@@ -1,17 +1,17 @@
 import common.testing
 
-const the_executable = testing.prepare_executable('uname')
+const executable_under_test = testing.prepare_executable('uname')
 
-const cmd = testing.new_paired_command('uname', the_executable)
+const cmd = testing.new_paired_command('uname', executable_under_test)
 
 fn test_help_and_version() {
 	cmd.ensure_help_and_version_options_work()!
 }
 
 fn test_unknown_option() {
-	testing.command_fails('${the_executable} -x')!
-	testing.command_fails('${the_executable} -sm -vx')!
-	testing.command_fails('${the_executable} -sm a')!
+	testing.command_fails('${executable_under_test} -x')!
+	testing.command_fails('${executable_under_test} -sm -vx')!
+	testing.command_fails('${executable_under_test} -sm a')!
 }
 
 fn test_print_system_info() {
