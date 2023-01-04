@@ -7,7 +7,8 @@ const (
 		// avoid utmp-dependent utils (WinOS has no utmp support)
 		['uptime', 'users', 'who', 'whoami']
 	} $else {
-		[]string{}
+		['wc']
+		//[]string{}
 	}
 )
 

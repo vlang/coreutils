@@ -1,4 +1,5 @@
 import os
+import common
 import strings
 
 fn is_hex_char(c u8) bool {
@@ -111,50 +112,22 @@ fn unescape(str string) string {
 	return res.str()
 }
 
-const (
-	usage = 'Usage: echo [SHORT-OPTION]... [STRING]...
-or: echo LONG-OPTION
-Echo the STRING(s) to standard output.
-
-  -n             do not output the trailing newline
-  -e             enable interpretation of backslash escapes
-  -E             disable interpretation of backslash escapes (default)
-      --help     display this help and exit
-      --version  output version information and exit'
-	version = 'echo (V coreutils 0.0.1)'
-)
-
 fn main() {
-	mut idx := 1
-	mut append_newline := true
-	mut interpret_escapes := false
-	for idx < os.args.len {
-		match os.args[idx] {
-			'--help' {
-				println(usage)
-				exit(0)
-			}
-			'--version' {
-				println(version)
-				exit(0)
-			}
-			'-n' {
-				append_newline = false
-			}
-			'-e' {
-				interpret_escapes = true
-			}
-			'-E' {
-				interpret_escapes = false
-			}
-			else {
-				break
-			}
-		}
-		idx++
+	mut fp := common.flag_parser(os.args)
+	fp.application('echo')
+	fp.description('Echo a string to standard output')
+	fp.limit_free_args_to_at_least(1)!
+	no_newline := fp.bool('no_newline', `n`, false, 'do not output a trailing newline')
+	interpret_escapes := fp.bool('interpret_escapes', `e`, false, 'enable interpretation of backslash escapes')
+	
+	mut str_a := fp.finalize() or {
+		eprintln(err)
+		println(fp.usage())
+		return
 	}
-	mut str := os.args[idx..].join(' ')
-	if append_newline {
+	mut str := str_a.join(' ')
+
+	if no_newline == false {
 		str += '\n'
 	}
 	if interpret_escapes {
