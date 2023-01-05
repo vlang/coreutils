@@ -38,7 +38,7 @@ Contributions are welcome!
 Please only contribute versions of the original utilities written in V.
 Contributions written in other languages will likely be rejected.
 
-## Completed (40/109)
+## Completed (41/109)
 
 |  Done   | Cmd       | Descripton                                       |
 | :-----: | --------- | ------------------------------------------------ |
@@ -96,7 +96,7 @@ Contributions written in other languages will likely be rejected.
 | &check; | mv        | Move (rename) files                              |
 |         | nice      | Run a command with modified niceness             |
 | ?       | nl        | Number lines and write files                     |
-|         | nohup     | Run a command immune to hangups                  |
+| &check; | nohup     | Run a command immune to hangups                  |
 | &check; | nproc     | Print the number of available processors         |
 |         | numfmt    | Reformat numbers                                 |
 |         | od        | Write files in octal or other formats            |
