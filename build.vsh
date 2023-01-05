@@ -51,7 +51,7 @@ for dir in dirs {
 		final_args += ' ' + arg
 	}
 	println('compiling ${dir}...')
-	cmd := 'v ${final_args} -o ${curdir}/bin/${dir} ./${dir}'
+	cmd := @VEXE + ' ${final_args} -o ${curdir}/bin/${dir} ./${dir}'
 	execute_or_panic(cmd)
 }
 
