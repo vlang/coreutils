@@ -9,7 +9,7 @@ const (
 fn open_nohup_out(mut f os.File, print_message bool) ! {
 	for file in out_files {
 		mut temp := os.open_file(file, 'a', 0o600) or { continue }
-		
+
 		f.reopen(file, 'a')!
 		temp.close()
 		if print_message {
@@ -38,14 +38,16 @@ fn main() {
 	// because the command may contain -h
 	// and the common parser gets messed up
 	match os.args[1..] {
-		['-h'], ['--help'] { usage() }
+		['-h'], ['--help'] {
+			usage()
+		}
 		['-v'], ['--version'] {
 			println(tool_name + ' ' + common.coreutils_version())
 			return
 		}
 		else {}
 	}
-	
+
 	command := os.args[1..]
 	// do this early before we loose access to stderr
 	if os.exists_in_system_path(command[0]) == false {
@@ -61,16 +63,12 @@ fn main() {
 	}
 	if stdout_is_tty == 1 {
 		mut f := os.stdout()
-		open_nohup_out(mut f, true) or {
-			common.exit_with_error_message(tool_name, err.msg())
-		}
+		open_nohup_out(mut f, true) or { common.exit_with_error_message(tool_name, err.msg()) }
 	}
 	if os.is_atty(os.stderr().fd) == 1 {
 		if os.stdout().is_opened == false {
 			mut f := os.stderr()
-			open_nohup_out(mut f, false) or {
-				common.exit_with_error_message(tool_name, err.msg())
-			}
+			open_nohup_out(mut f, false) or { common.exit_with_error_message(tool_name, err.msg()) }
 		} else {
 			// couldn't find a v equilavent of this
 			C.dup2(os.stdout().fd, os.stderr().fd)

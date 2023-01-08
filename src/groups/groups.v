@@ -16,14 +16,14 @@ fn main() {
 		println(fp.usage())
 		return
 	}
-	
+
 	if input == [] {
-		input = [ os.loginname() ]
+		input = [os.loginname()]
 	}
-	
+
 	mut ret := map[string][]string{}
 
-	config := csv.ReaderConfig{`:`, `#`} // no disabling comments? 
+	config := csv.ReaderConfig{`:`, `#`} // no disabling comments?
 	data := os.read_file('/etc/group') or {
 		common.exit_with_error_message(tool_name, 'cannot read /etc/groups: ${err}')
 	}
@@ -34,7 +34,7 @@ fn main() {
 	// then splits it up, and each user is added to the map ret
 	// then when it comes time to get the users groups
 	// just look it up in the map
-	for i := 1;; i++ {
+	for i := 1; true; i++ {
 		line := parser.read() or { break }
 
 		if line.len == 4 {
@@ -42,8 +42,7 @@ fn main() {
 			for user in users { // loop through, add them to map
 				ret[user] << line[0]
 			}
-		}
-		else if line.len > 4 || line.len < 3 {
+		} else if line.len > 4 || line.len < 3 {
 			common.exit_with_error_message(tool_name, '/etc/groups is incorectly formatted on line ${i}')
 		}
 	}
