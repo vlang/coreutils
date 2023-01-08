@@ -1,0 +1,8 @@
+hello
+hello
+V panic: result not set (No such file or directory; code: 2)
+v hash: 6643839
+/tmp/v_1000/nohup.6384375619658133807.tmp.c:7901: at _v_panic: Backtrace
+/tmp/v_1000/nohup.6384375619658133807.tmp.c:7871: by panic_result_not_set
+/tmp/v_1000/nohup.6384375619658133807.tmp.c:18242: by main__main
+/tmp/v_1000/nohup.6384375619658133807.tmp.c:18650: by main
