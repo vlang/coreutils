@@ -3,7 +3,7 @@ import common
 import encoding.csv
 
 const (
-	tool_name = 'groups'
+	tool_name  = 'groups'
 	group_file = '/etc/group'
 )
 
@@ -18,16 +18,15 @@ fn main() {
 		println(fp.usage())
 		return
 	}
-	
+
 	mut input := ''
 
 	if args == [] {
 		input = os.loginname()
-	}
-	else {
+	} else {
 		input = args.join(' ')
 	}
-	
+
 	mut ret := []string{}
 	raw_data := os.read_file(group_file)! // v does not have a dedicated func for finding groups *yet*
 	mut parser := csv.new_reader(raw_data, delimiter: `:`)
@@ -38,8 +37,7 @@ fn main() {
 			if line[3].contains(input) {
 				ret << line[0]
 			}
-		}
-		else if line.len > 4 || line.len < 3 {
+		} else if line.len > 4 || line.len < 3 {
 			common.exit_with_error_message(tool_name, '${group_file} is formatted incorrectly')
 		}
 	}
