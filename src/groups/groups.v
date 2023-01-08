@@ -4,48 +4,48 @@ import encoding.csv
 
 const (
 	tool_name = 'groups'
+	group_file = '/etc/group'
 )
 
 fn main() {
 	mut fp := common.flag_parser(os.args)
-	fp.application('groups')
+	fp.application(tool_name)
 	fp.description('Show which groups a user belongs to')
+	fp.arguments_description('[user]')
 	fp.limit_free_args(0, 1)!
-	mut input := fp.finalize() or {
+	mut args := fp.finalize() or {
 		eprintln(err)
 		println(fp.usage())
 		return
 	}
+	
+	mut input := ''
 
-	if input == [] {
-		input = [os.loginname()]
+	if args == [] {
+		input = os.loginname()
 	}
-
-	mut ret := map[string][]string{}
-
-	config := csv.ReaderConfig{`:`, `#`} // no disabling comments?
-	data := os.read_file('/etc/group') or {
-		common.exit_with_error_message(tool_name, 'cannot read /etc/groups: ${err}')
+	else {
+		input = args.join(' ')
 	}
-	mut parser := csv.new_reader(data, config)
+	
+	mut ret := []string{}
+	raw_data := os.read_file(group_file)! // v does not have a dedicated func for finding groups *yet*
+	mut parser := csv.new_reader(raw_data, delimiter: `:`)
 
-	// this is sort of spagetti
-	// takes a line, checks if its syntax is correct
-	// then splits it up, and each user is added to the map ret
-	// then when it comes time to get the users groups
-	// just look it up in the map
-	for i := 1; true; i++ {
+	for {
 		line := parser.read() or { break }
-
 		if line.len == 4 {
-			users := line[3].split(',') // split users in group line[0] into array
-			for user in users { // loop through, add them to map
-				ret[user] << line[0]
+			if line[3].contains(input) {
+				ret << line[0]
 			}
-		} else if line.len > 4 || line.len < 3 {
-			common.exit_with_error_message(tool_name, '/etc/groups is incorectly formatted on line ${i}')
+		}
+		else if line.len > 4 || line.len < 3 {
+			common.exit_with_error_message(tool_name, '${group_file} is formatted incorrectly')
 		}
 	}
 
-	println(ret[input[0]].join(' '))
+	if args != [] {
+		print('${input}: ')
+	}
+	println(ret.join(' '))
 }
