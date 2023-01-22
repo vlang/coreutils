@@ -1,4 +1,5 @@
 import os
+import regex
 import common
 
 fn main() {
@@ -34,7 +35,25 @@ fn main() {
 		}
 	}
 	// Main functionality
-	uname := os.uname()
+	mut uname := os.uname()
+	// ToDO: [2023-01; rivy] remove this fix when os.uname is fixed
+	$if windows {
+		// compensate for os.uname "unique" values (as of "V 0.3.2 3625a74")
+		uname.sysname = 'Windows_NT'
+		// pull out version components from uname.release and uname.version
+		// * recipe works both for early "unique" os.uname variant and later more consistent (eg, "10.0" and "19040")
+		mut re := regex.regex_opt('[0-9]+')?
+		// mut version_components := re.find_all_str(uname.release + ' ' + uname.version + ' 10.0.0')
+		mut version_components := re.find_all_str(uname.version)
+		if version_components.len < 3 {
+			version_components.prepend(re.find_all_str(uname.release))
+		}
+		if version_components.len < 3 {
+			version_components = ['10', '0', '0']
+		}
+		uname.release = version_components[0..2].join('.')
+		uname.version = version_components[2]
+	}
 	mut result := []string{}
 	for addr, b in opt_map {
 		if b || opt_all {

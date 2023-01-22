@@ -1,25 +1,33 @@
 import os
 import common.testing
 
-const the_executable = testing.prepare_executable('factor')
+const util = 'factor'
 
-const cmd = testing.new_paired_command('factor', the_executable)
+const platform_util = $if !windows {
+	util
+} $else {
+	'coreutils ${util}'
+}
+
+const executable_under_test = testing.prepare_executable(util)
+
+const cmd = testing.new_paired_command(platform_util, executable_under_test)
 
 fn test_help_and_version() {
 	cmd.ensure_help_and_version_options_work()!
 }
 
 fn test_abcd() {
-	res := os.execute('${the_executable} abcd')
+	res := os.execute('${executable_under_test} abcd')
 	assert res.exit_code == 1
 	assert res.output.trim_space() == 'factor: ‘abcd’ is not a valid positive integer'
 }
 
 fn expected_result(input string, output []string) {
-	res := os.execute('${the_executable} ${input}')
+	res := os.execute('${executable_under_test} ${input}')
 	assert res.exit_code == 0
 	assert res.output.split_into_lines() == output
-	testing.same_results('factor ${input}', '${the_executable} ${input}')
+	testing.same_results('factor ${input}', '${executable_under_test} ${input}')
 }
 
 fn test_expected() {

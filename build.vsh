@@ -4,8 +4,14 @@ import os // v has a bug that you can't use args
 
 const (
 	ignore_dirs = $if windows {
-		// avoid utmp-dependent utils (WinOS has no utmp support)
-		['uptime', 'users', 'who', 'whoami']
+		[
+			// avoid *nix-dependent utils
+			'nohup',
+			// avoid utmp-dependent utils (WinOS has no utmp support)
+			'uptime',
+			'users',
+			'who',
+		]
 	} $else {
 		[]string{}
 	}
@@ -51,7 +57,7 @@ for dir in dirs {
 		final_args += ' ' + arg
 	}
 	println('compiling ${dir}...')
-	cmd := 'v ${final_args} -o ${curdir}/bin/${dir} ./${dir}'
+	cmd := @VEXE + ' ${final_args} -o ${curdir}/bin/${dir} ./${dir}'
 	execute_or_panic(cmd)
 }
 

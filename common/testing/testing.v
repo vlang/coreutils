@@ -1,6 +1,7 @@
 module testing
 
 import os
+import regex
 
 // The ...Error structs here implement IError,
 // so that they can be used as more specific errors,
@@ -144,35 +145,70 @@ const gnu_coreutils_installed = os.getenv('GNU_COREUTILS_INSTALLED').int() == 1
 pub fn same_results(cmd1 string, cmd2 string) bool {
 	mut cmd1_res := os.execute(cmd1)
 	mut cmd2_res := os.execute(cmd2)
-	noutput1 := normalise(cmd1_res.output)
-	noutput2 := normalise(cmd2_res.output)
+	mut noutput1 := normalise(cmd1_res.output)
+	mut noutput2 := normalise(cmd2_res.output)
 	$if trace_same_results ? {
 		eprintln('------------------------------------')
 		eprintln('>> same_results cmd1: "${cmd1}"')
 		eprintln('>> same_results cmd2: "${cmd2}"')
 		eprintln('                cmd1_res.exit_code: ${cmd1_res.exit_code}')
 		eprintln('                cmd2_res.exit_code: ${cmd2_res.exit_code}')
-		eprintln('                cmd1_res.output.len: ${cmd1_res.output.len} | "${noutput1}"')
-		eprintln('                cmd2_res.output.len: ${cmd2_res.output.len} | "${noutput2}"')
-		eprintln('              > cmd1_res.output.len: ${cmd1_res.output.len} | "${cmd1_res.output}"')
-		eprintln('              > cmd2_res.output.len: ${cmd2_res.output.len} | "${cmd2_res.output}"')
+		eprintln('                cmd1_res.output.len: ${noutput1.len} | "${noutput1}"')
+		eprintln('                cmd2_res.output.len: ${noutput2.len} | "${noutput2}"')
+		eprintln('        (raw) > cmd1_res.output.len: ${cmd1_res.output.len} | "${cmd1_res.output}"')
+		eprintln('        (raw) > cmd2_res.output.len: ${cmd2_res.output.len} | "${cmd2_res.output}"')
 	}
 	if testing.gnu_coreutils_installed {
 		// aim for 1:1 output compatibility:
 		return cmd1_res.exit_code == cmd2_res.exit_code && cmd1_res.output == cmd2_res.output
 	}
 	// relax the strict matching for well known exceptions:
+	if cmd1.contains('coreutils') {
+		noutput1 = noutput1.replace("'coreutils ", "'")
+		// noutput2 = noutput2
+		$if trace_same_results ? {
+			eprintln('                 (coreutils) after1: ${noutput1.len} | "${noutput1}"')
+			eprintln('                 (coreutils) after2: ${noutput2.len} | "${noutput2}"')
+		}
+	}
+	if cmd1.contains('arch') {
+		// `arch` is not standardized and 'AMD64' is more commonly known as 'x86_64'
+		mut re := regex.regex_opt('[aA][mM][dD]64') or { panic(err) }
+		// noutput1 = noutput1
+		noutput2 = re.replace(noutput2, 'x86_64')
+		$if trace_same_results ? {
+			eprintln('                 (arch) after1: ${noutput1.len} | "${noutput1}"')
+			eprintln('                 (arch) after2: ${noutput2.len} | "${noutput2}"')
+		}
+	}
 	if cmd1.contains('printenv') && cmd2.contains('printenv.exe') {
 		return cmd1_res.exit_code == cmd2_res.exit_code
 	}
-	if cmd1 == 'uptime' || cmd1 == 'uptime /var/log/wtmp' {
-		after1 := cmd1_res.output.all_after('load average:')
-		after2 := cmd2_res.output.all_after('load average:')
+	if cmd1.contains('sleep') {
+		noutput1 = noutput1.replace(': invalid float literal', '')
+		// noutput2 = noutput2
 		$if trace_same_results ? {
-			eprintln('                after1.len: ${after1.len} | "${after1}"')
-			eprintln('                after2.len: ${after2.len} | "${after2}"')
+			eprintln('                (sleep) after1: ${noutput1.len} | "${noutput1}"')
+			eprintln('                (sleep) after2: ${noutput2.len} | "${noutput2}"')
 		}
-		return cmd1_res.exit_code == cmd2_res.exit_code && after1 == after2
+	}
+	if cmd1.contains('uname') {
+		// `uname` is not standardized and 'AMD64' is more commonly known as 'x86_64'
+		mut re := regex.regex_opt('[aA][mM][dD]64') or { panic(err) }
+		// noutput1 = noutput1
+		noutput2 = re.replace(noutput2, 'x86_64')
+		$if trace_same_results ? {
+			eprintln('                 (arch) after1: ${noutput1.len} | "${noutput1}"')
+			eprintln('                 (arch) after2: ${noutput2.len} | "${noutput2}"')
+		}
+	}
+	if cmd1 == 'uptime' || cmd1 == 'uptime /var/log/wtmp' {
+		noutput1 = cmd1_res.output.all_after('load average:')
+		noutput2 = cmd2_res.output.all_after('load average:')
+		$if trace_same_results ? {
+			eprintln('               (uptime) after1: ${noutput1.len} | "${noutput1}"')
+			eprintln('               (uptime) after2: ${noutput2.len} | "${noutput2}"')
+		}
 	}
 	// in all other cases, compare the normalised output (less strict):
 	return cmd1_res.exit_code == cmd2_res.exit_code && noutput1 == noutput2
@@ -180,9 +216,18 @@ pub fn same_results(cmd1 string, cmd2 string) bool {
 
 fn normalise(s string) string {
 	return s.replace_each(['‘', "'", '’', "'"]).replace('  ', ' ').replace('  ', ' ').replace('  ',
-		' ').replace(', ', ' ')
+		' ').replace(', ', ' ').split_into_lines().join('\n').trim_space()
 }
 
 pub fn check_dir_exists(d string) bool {
 	return os.exists(d) && os.is_dir(d)
+}
+
+pub fn output_eol() string {
+	$if windows {
+		// WinOS => CRLF
+		return '\r\n'
+	}
+	// POSIX => LF
+	return '\n'
 }
