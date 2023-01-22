@@ -1,3 +1,4 @@
+import common
 import common.testing
 import os
 
@@ -187,22 +188,26 @@ const mb_tests = [
 ]
 
 fn test_multi_byte_results() {
+	use_utf := common.is_utf8()
 	mut failed := []string{}
-	for test in mb_tests {
-		res := cmd.same_results(test)
-		if !res {
-			original_cmd := '${cmd.original} ${test}'
-			deputy_cmd := '${cmd.deputy} ${test}'
-			ores := os.execute(original_cmd)
-			dres := os.execute(deputy_cmd)
-			if ores.exit_code == 2 && dres.exit_code == 2 {
-				continue
+	if use_utf {
+		// attempt multi-byte tests iff utf is enabled/used
+		for test in mb_tests {
+			res := cmd.same_results(test)
+			if !res {
+				original_cmd := '${cmd.original} ${test}'
+				deputy_cmd := '${cmd.deputy} ${test}'
+				ores := os.execute(original_cmd)
+				dres := os.execute(deputy_cmd)
+				if ores.exit_code == 2 && dres.exit_code == 2 {
+					continue
+				}
+				failed << test
+				eprintln('>>> original_cmd: `${original_cmd}`')
+				eprintln('>>>   deputy_cmd: `${deputy_cmd}`')
+				eprintln('>>>    fail_ores: ${ores}')
+				eprintln('>>>    fail_dres: ${dres}')
 			}
-			failed << test
-			eprintln('>>> original_cmd: `${original_cmd}`')
-			eprintln('>>>   deputy_cmd: `${deputy_cmd}`')
-			eprintln('>>>    fail_ores: ${ores}')
-			eprintln('>>>    fail_dres: ${dres}')
 		}
 	}
 	println(failed.join('\n'))
