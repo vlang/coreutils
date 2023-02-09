@@ -14,7 +14,7 @@ fn main() {
 
 	// Empty args == '.'
 	if args.len == 0 {
-		print_out(".", is_zero)
+		print_out('.', is_zero)
 	}
 
 	for arg in args {
@@ -34,7 +34,7 @@ fn print_out(out string, is_zero bool) {
 fn dirname(path string) string {
 	// Empty strings == '.'
 	if path.len == 0 {
-		return "."
+		return '.'
 	}
 
 	mut len := path.len - 1
@@ -45,14 +45,14 @@ fn dirname(path string) string {
 		len--
 	}
 
-	/* find start of directory */
+	// find start of directory
 	for len > 0 && path[len] != slash {
 		len--
 	}
 
 	// leading slash or no slashes at all
 	if len == 0 {
-		return if path[len] == slash { "/" } else { "." }
+		return if path[len] == slash { '/' } else { '.' }
 	} else {
 		// move past separating slashes
 		for len > 0 && path[len] == slash {
@@ -62,5 +62,5 @@ fn dirname(path string) string {
 
 	len++
 
-	return path[.. len]
+	return path[..len]
 }
