@@ -25,8 +25,15 @@ fn expected_result(input string, output string) {
 }
 
 fn test_expected() {
-	expected_result('/usr/bin/foo.txt', '/usr/bin')
-	expected_result('', '.')
-	expected_result('/usr/bin//.//', '/usr/bin')
-	expected_result('foo.txt', '.')
+	if os.user_os() == 'windows' {
+		expected_result('\\src\\expr\\foo.txt', '\\src\\expr')
+		expected_result('', '.')
+		expected_result('\\src\\expr\\\\.\\\\', '\\src\\expr')
+		expected_result('foo.txt', '.')
+	} else {
+		expected_result('/usr/bin/foo.txt', '/usr/bin')
+		expected_result('', '.')
+		expected_result('/usr/bin//.//', '/usr/bin')
+		expected_result('foo.txt', '.')
+	}
 }
