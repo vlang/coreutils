@@ -31,10 +31,6 @@ fn main() {
 	exit(exit_success)
 }
 
-fn is_slash(c u8) bool {
-	return c == u8(47)
-}
-
 fn print_out(out string, is_zero bool) {
 	if is_zero {
 		print('${out}\0')
@@ -46,9 +42,10 @@ fn print_out(out string, is_zero bool) {
 fn last_component(name string) int {
 	mut base := 0
 	mut last_slash := false
+	slash := if os.user_os() == 'windows' { u8(92) } else { u8(47) }
 
 	for ch in name {
-		if is_slash(ch) {
+		if ch == slash {
 			base++
 		} else {
 			break
@@ -56,7 +53,7 @@ fn last_component(name string) int {
 	}
 
 	for i := base; i < name.len; i++ {
-		if is_slash(name[i]) {
+		if name[i] == slash {
 			last_slash = true
 		} else if last_slash {
 			base = i

@@ -9,6 +9,12 @@ const platform_util = $if !windows {
 	'coreutils ${util}'
 }
 
+const slash = $if !windows {
+	'\\'
+} $else {
+	'/'
+}
+
 const executable_under_test = testing.prepare_executable(util)
 
 const cmd = testing.new_paired_command(platform_util, executable_under_test)
@@ -25,12 +31,12 @@ fn expected_result(input string, output string) {
 }
 
 fn test_expected() {
-	if os.user_os() == 'windows' {
+	$if windows {
 		expected_result('\\src\\expr\\foo.txt', '\\src\\expr')
 		expected_result('', '.')
 		expected_result('\\src\\expr\\\\.\\\\', '\\src\\expr')
 		expected_result('foo.txt', '.')
-	} else {
+	} $else {
 		expected_result('/usr/bin/foo.txt', '/usr/bin')
 		expected_result('', '.')
 		expected_result('/usr/bin//.//', '/usr/bin')
