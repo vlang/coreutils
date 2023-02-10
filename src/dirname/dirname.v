@@ -63,11 +63,15 @@ fn last_component(name string) int {
 			last_slash = false
 		}
 	}
+
+	if last_slash {
+		base--
+	}
+
 	return base
 }
 
 fn dirname(path string) string {
 	basename_index := last_component(path)
-
 	return os.dir(path[..basename_index])
 }
