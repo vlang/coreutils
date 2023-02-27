@@ -84,7 +84,7 @@ fn main() {
 	// Main functionality
 
 	// Uses C.getlogin internally
-	lname := os.loginname()
+	lname := os.loginname() or { '' }
 	if lname == '' {
 		// C.getlogin failed
 		error_exit('no login name')

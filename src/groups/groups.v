@@ -22,7 +22,7 @@ fn main() {
 	mut input := ''
 
 	if args == [] {
-		input = os.loginname()
+		input = os.loginname() or { '' }
 	} else {
 		input = args.join(' ')
 	}
