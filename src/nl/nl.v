@@ -322,7 +322,7 @@ fn get_format(str string) !Format {
 		'ln' { return Format.ln }
 		'rn' { return Format.rn }
 		'rz' { return Format.rz }
-		else { return error('Invalid line numbering format: $str') }
+		else { return error('Invalid line numbering format: ${str}') }
 	}
 }
 
@@ -341,12 +341,12 @@ fn get_style(str string) !Style {
 			if str.len > 1 && str[0] == `p` {
 				return Style.regex
 			} else {
-				return error('Invalid line numbering style: $str')
+				return error('Invalid line numbering style: ${str}')
 			}
 		}
 	}
 }
 
 fn get_style_regex(str string) !regex.RE {
-	return regex.regex_opt(str[1..]) or { return error('Invalid line numbering style: $str') }
+	return regex.regex_opt(str[1..]) or { return error('Invalid line numbering style: ${str}') }
 }
