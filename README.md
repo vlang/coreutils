@@ -38,7 +38,7 @@ Contributions are welcome!
 Please only contribute versions of the original utilities written in V.
 Contributions written in other languages will likely be rejected.
 
-## Completed (42/109)
+## Completed (44/109)
 
 |  Done   | Cmd       | Descripton                                       |
 | :-----: | --------- | ------------------------------------------------ |
@@ -95,7 +95,7 @@ Contributions written in other languages will likely be rejected.
 |         | mktemp    | Create temporary file or directory               |
 | &check; | mv        | Move (rename) files                              |
 |         | nice      | Run a command with modified niceness             |
-| ?       | nl        | Number lines and write files                     |
+| &check; | nl        | Number lines and write files                     |
 | &check; | nohup     | Run a command immune to hangups                  |
 | &check; | nproc     | Print the number of available processors         |
 |         | numfmt    | Reformat numbers                                 |
