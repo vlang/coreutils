@@ -100,7 +100,7 @@ fn largest(x int, y int) int {
 }
 
 [inline]
-fn check_settings(set Settings) ? {
+fn check_settings(set Settings) ! {
 	if set.increment.f64() == 0 {
 		return error("${app_name}: invalid zero increment value '0'")
 	}
