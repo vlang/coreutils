@@ -22,7 +22,7 @@ struct Settings {
 ///===================================================================///
 
 fn main() {
-	settings := args()?
+	settings := args()!
 
 	// sanitize settings
 	check_settings(settings) or {
@@ -110,7 +110,7 @@ fn check_settings(set Settings) ? {
 ///                                Args                               ///
 ///===================================================================///
 
-fn args() ?Settings {
+fn args() !Settings {
 	mut fp := common.flag_parser(os.args)
 	fp.application(app_name)
 	fp.description(app_description)
