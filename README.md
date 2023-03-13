@@ -85,7 +85,7 @@ Contributions written in other languages will likely be rejected.
 |         | join      | Join lines on a common field                     |
 |         | kill      | Send a signal to processes                       |
 |         | link      | Make a hard link via the link syscall            |
-|         | ln        | Make links between files                         |
+| &check; | ln        | Make links between files                         |
 | &check; | logname   | Print current login name                         |
 |         | ls        | List directory contents                          |
 | &check; | md5sum    | Print or check MD5 digests                       |
