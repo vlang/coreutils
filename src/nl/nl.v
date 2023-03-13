@@ -317,7 +317,7 @@ fn args() ?(Settings, []string) {
 	return settings, fnames
 }
 
-fn get_format(str string) ?Format {
+fn get_format(str string) !Format {
 	match str {
 		'ln' { return Format.ln }
 		'rn' { return Format.rn }
@@ -326,7 +326,7 @@ fn get_format(str string) ?Format {
 	}
 }
 
-fn get_style(str string) ?Style {
+fn get_style(str string) !Style {
 	match str {
 		'a' {
 			return Style.all
@@ -347,6 +347,6 @@ fn get_style(str string) ?Style {
 	}
 }
 
-fn get_style_regex(str string) ?regex.RE {
+fn get_style_regex(str string) !regex.RE {
 	return regex.regex_opt(str[1..]) or { return error('Invalid line numbering style: $str') }
 }

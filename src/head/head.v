@@ -239,7 +239,7 @@ mut:
 	file_ptr os.File
 }
 
-fn (mut f InputFile) open() ? {
+fn (mut f InputFile) open() ! {
 	if f.is_stdin {
 		return
 	}

@@ -113,7 +113,7 @@ fn path_number_and_format(mut br io.BufferedReader, settings Settings) {
 // number_nonblanks bool
 // number_all       bool
 // squeeze_blank    bool
-fn number_lines(line string, last_line string, line_number int, settings Settings) ?(string, string, int) {
+fn number_lines(line string, last_line string, line_number int, settings Settings) !(string, string, int) {
 	// number_all has overrides number_nonblanks.
 	if settings.squeeze_blank && line == '' && last_line == '' {
 		return error('skip line')
