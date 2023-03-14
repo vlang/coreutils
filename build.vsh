@@ -6,6 +6,7 @@ const (
 	ignore_dirs = $if windows {
 		[
 			// avoid *nix-dependent utils
+			'[',
 			'nohup',
 			// avoid utmp-dependent utils (WinOS has no utmp support)
 			'uptime',
