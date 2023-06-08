@@ -10,19 +10,19 @@ fn process(line string, initial bool, tabs int) {
 
 	if initial {
 		if line.starts_with('\t') {
-			println(line.replace_once('\t', sp))
+			print(line.replace_once('\t', sp))
 		} else {
-			println(line)
+			print(line)
 		}
 	} else {
-		println(line.replace('\t', sp))
+		print(line.replace('\t', sp))
 	}
 }
 
 fn main() {
 	mut fp := common.flag_parser(os.args)
 	fp.application('expand')
-	fp.description('convert tabs to spaces')
+	fp.description('Convert tabs to spaces')
 	initial := fp.bool('initial', `i`, false, 'do not convert tabs after non blanks')
 	tabs := fp.int('tabs', `t`, 8, 'have tabs N characters apart, not 8')
 
