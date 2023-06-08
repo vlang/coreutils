@@ -33,13 +33,26 @@ fn main() {
 	}
 
 	if str_a.len == 0 {
-		for line in os.get_lines() {
+		mut line := ''
+		for {
+			line = os.get_line()
+			if line.len <= 0 {
+				break
+			}
+
 			process(line, initial, tabs)
 		}
 	} else {
 		for path in str_a {
 			if path == '-' {
-				for line in os.get_lines() {
+				mut line := ''
+
+				for {
+					line = os.get_line()
+					if line.len <= 0 {
+						break
+					}
+
 					process(line, initial, tabs)
 				}
 			} else {
