@@ -70,7 +70,7 @@ Contributions written in other languages will likely be rejected.
 |         | du        | Estimate file space usage                        |
 | &check; | echo      | Print a line of text                             |
 |         | env       | Run a command in a modified environment          |
-|         | expand    | Convert tabs to spaces                           |
+| &check  | expand    | Convert tabs to spaces                           |
 | &check; | expr      | Evaluate expressions                             |
 | &check; | factor    | Print prime factors                              |
 | &check; | false     | Do nothing, unsuccessfully                       |
