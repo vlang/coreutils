@@ -57,7 +57,7 @@ fn test_default() {
 	]
 }
 
-fn test_max_initial_option() {
+fn test_initial_option() {
 	res := os.execute('${executable_under_test} ${test_txt_path} -i')
 	assert res.exit_code == 0
 	assert res.output.split_into_lines().filter(it != '') == [
