@@ -1,7 +1,13 @@
-import os
+import os { File }
 import common
 
-fn process(line string, initial bool, tabs int) {
+const (
+	name   = 'expand'
+	bufsiz = 4096
+	nl     = '\n'
+)
+
+fn process_line(line string, initial bool, tabs int) {
 	mut sp := ''
 
 	for i := tabs; i; i-- {
@@ -16,6 +22,36 @@ fn process(line string, initial bool, tabs int) {
 		}
 	} else {
 		print(line.replace('\t', sp))
+	}
+
+	if !line.ends_with(nl) {
+		os.flush()
+	}
+}
+
+fn process_stream(stream File, initial bool, tabs int) {
+	mut buf := []u8{len: bufsiz}
+	mut line := ''
+	for {
+		n := stream.read_bytes_into_newline(mut buf) or {
+			eprintln('${name}: ${err.msg()}')
+			0
+		}
+		if n <= 0 {
+			break
+		}
+
+		unsafe {
+			line += tos(buf.data, n)
+		}
+		if line.ends_with(nl) {
+			process_line(line, initial, tabs)
+			line = ''
+		}
+	}
+
+	if line != '' {
+		process_line(line, initial, tabs)
 	}
 }
 
@@ -32,34 +68,25 @@ fn main() {
 		return
 	}
 
-	if str_a.len == 0 {
-		mut line := ''
-		for {
-			line = os.get_line()
-			if line.len <= 0 {
-				break
-			}
+	mut streams := []File{}
 
-			process(line, initial, tabs)
-		}
+	if str_a.len == 0 {
+		streams << os.stdin()
 	} else {
 		for path in str_a {
 			if path == '-' {
-				mut line := ''
-
-				for {
-					line = os.get_line()
-					if line.len <= 0 {
-						break
-					}
-
-					process(line, initial, tabs)
-				}
+				streams << os.stdin()
 			} else {
-				for line in os.read_lines(path)! {
-					process(line, initial, tabs)
+				streams << os.open(path) or {
+					eprintln('${name}: ${err.msg()}')
+					exit(1)
 				}
 			}
 		}
+	}
+
+	for mut s in streams {
+		process_stream(s, initial, tabs)
+		s.close()
 	}
 }
