@@ -232,14 +232,19 @@ fn test_unary(option byte, arg string) bool {
 			return os.is_file(arg)
 		}
 		`g` {
-			if !os.exists(arg) {
+			$if windows {
+				// group ID not supported for WinOS
 				return false
+			} $else {
+				if !os.exists(arg) {
+					return false
+				}
+				attr := C.stat{}
+				unsafe {
+					C.stat(&char(arg.str), &attr)
+				}
+				return attr.st_mode & os.s_isgid > 0
 			}
-			attr := C.stat{}
-			unsafe {
-				C.stat(&char(arg.str), &attr)
-			}
-			return attr.st_mode & os.s_isgid > 0
 		}
 		`h`, `L` {
 			return os.is_link(arg)
@@ -263,14 +268,19 @@ fn test_unary(option byte, arg string) bool {
 			return os.is_atty(arg.int()) == 1
 		}
 		`u` {
-			if !os.exists(arg) {
+			$if windows {
+				// user ID not supported for WinOS
 				return false
+			} $else {
+				if !os.exists(arg) {
+					return false
+				}
+				attr := C.stat{}
+				unsafe {
+					C.stat(&char(arg.str), &attr)
+				}
+				return attr.st_mode & os.s_isuid > 0
 			}
-			attr := C.stat{}
-			unsafe {
-				C.stat(&char(arg.str), &attr)
-			}
-			return attr.st_mode & os.s_isuid > 0
 		}
 		`w` {
 			return os.is_writable(arg)
