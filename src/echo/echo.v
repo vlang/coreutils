@@ -9,7 +9,7 @@ fn is_hex_char(c u8) bool {
 	}
 }
 
-fn hex_to_byte(c byte) byte {
+fn hex_to_byte(c u8) u8 {
 	return match c {
 		`a`, `A` { 10 }
 		`b`, `B` { 11 }
@@ -25,7 +25,7 @@ fn is_octal_char(c byte) bool {
 	return `0` <= c && c <= `7`
 }
 
-fn octal_to_byte(c byte) byte {
+fn octal_to_byte(c u8) u8 {
 	return c - 48
 }
 
