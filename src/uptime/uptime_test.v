@@ -30,10 +30,11 @@ fn test_unknown_option() {
 	testing.command_fails('${executable_under_test} -x')!
 }
 
-fn test_print_uptime() {
-	if !supported_platform {
-		return
-	}
-	assert cmd.same_results('')
-	// assert cmd.same_results('/var/log/wtmp') // SKIP ~ `uptime FILE` is not universally supported
-}
+// SKIP ~ comparing subsequent runs of `uptime` is a *race condition* causing random failures
+// fn test_print_uptime() {
+// 	if !supported_platform {
+// 		return
+// 	}
+// 	assert cmd.same_results('')
+// 	// assert cmd.same_results('/var/log/wtmp') // SKIP ~ `uptime FILE` is not universally supported
+// }
