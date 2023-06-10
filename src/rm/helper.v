@@ -136,8 +136,8 @@ fn setup_rm_command(args []string) !(RmCommand, []string) {
 		int_type = Interactive.no
 	}
 
-	interactive := fp.bool('', `i`, false, 'interactive always') || (int_type == .yes)
-	less_int := fp.bool('', `I`, false, 'interactive once') || (int_type == .once)
+	interactive := fp.bool('', `i`, false, 'interactive always') || int_type == .yes
+	less_int := fp.bool('', `I`, false, 'interactive once') || int_type == .once
 
 	if help {
 		success_exit(fp.usage())

@@ -9,18 +9,18 @@ const test_txt_path = os.join_path(testing.temp_folder, 'test.txt')
 
 fn test_echo() {
 	res := os.execute('${shuf} -e aa bb')
-	assert (res.output == 'aa${eol}bb${eol}') || (res.output == 'bb${eol}aa${eol}')
+	assert res.output == 'aa${eol}bb${eol}' || res.output == 'bb${eol}aa${eol}'
 }
 
 fn test_file() {
 	os.write_file(test_txt_path, 'hello\nworld!')!
 	res := os.execute('${shuf} ${test_txt_path}')
-	assert (res.output == 'hello${eol}world!${eol}') || (res.output == 'world!${eol}hello${eol}')
+	assert res.output == 'hello${eol}world!${eol}' || res.output == 'world!${eol}hello${eol}'
 }
 
 fn test_zero_terminated_echo() {
 	res := os.execute('${shuf} -z -e aa bb')
-	assert (res.output == 'aabb') || (res.output == 'bbaa')
+	assert res.output == 'aabb' || res.output == 'bbaa'
 }
 
 fn test_zero_terminated_file() {
