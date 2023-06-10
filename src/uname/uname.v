@@ -42,7 +42,7 @@ fn main() {
 		uname.sysname = 'Windows_NT'
 		// pull out version components from uname.release and uname.version
 		// * recipe works both for early "unique" os.uname variant and later more consistent (eg, "10.0" and "19040")
-		mut re := regex.regex_opt('[0-9]+')?
+		mut re := regex.regex_opt('[0-9]+')!
 		// mut version_components := re.find_all_str(uname.release + ' ' + uname.version + ' 10.0.0')
 		mut version_components := re.find_all_str(uname.version)
 		if version_components.len < 3 {

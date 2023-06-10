@@ -306,7 +306,7 @@ fn v_sprintf(str string, _pt []string) (string, int, bool) {
 	mut len0 := -1 // forced length, if -1 free length
 	mut len1 := -1 // decimal part for floats
 	def_len1 := 6 // default value for len1
-	mut pad_ch := byte(` `) // pad char
+	mut pad_ch := u8(` `) // pad char
 
 	// prefix chars for Length field
 	mut ch1 := `0` // +1 char if present else `0`
@@ -959,7 +959,7 @@ fn remove_tail_zeros_old(s string) string {
 	mut last_zero_start := -1
 	mut dot_pos := -1
 	mut in_decimal := false
-	mut prev_ch := byte(0)
+	mut prev_ch := u8(0)
 	for i < s.len {
 		ch := unsafe { s.str[i] }
 		if ch == `.` {
