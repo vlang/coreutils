@@ -21,7 +21,7 @@ fn init() {
 pub fn is_utf8() bool {
 	locale := unsafe { C.setlocale(C.LC_CTYPE, &char(0)).vstring().to_lower() }
 	return locale.contains_any_substr(['utf8', 'utf-8']) || $if windows {
-		(C.GetACP() == 65001) || (C.GetConsoleOutputCP() == 65001) || (C.GetOEMCP() == 65001)
+		C.GetACP() == 65001 || C.GetConsoleOutputCP() == 65001 || C.GetOEMCP() == 65001
 	} $else {
 		false
 	}
