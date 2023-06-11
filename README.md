@@ -38,7 +38,7 @@ Contributions are welcome!
 Please only contribute versions of the original utilities written in V.
 Contributions written in other languages will likely be rejected.
 
-## Completed (44/109)
+## Completed (45/109)
 
 |  Done   | Cmd       | Descripton                                       |
 | :-----: | --------- | ------------------------------------------------ |
@@ -70,7 +70,7 @@ Contributions written in other languages will likely be rejected.
 |         | du        | Estimate file space usage                        |
 | &check; | echo      | Print a line of text                             |
 |         | env       | Run a command in a modified environment          |
-|         | expand    | Convert tabs to spaces                           |
+| &check; | expand    | Convert tabs to spaces                           |
 | &check; | expr      | Evaluate expressions                             |
 | &check; | factor    | Print prime factors                              |
 | &check; | false     | Do nothing, unsuccessfully                       |
