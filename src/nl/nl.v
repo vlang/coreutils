@@ -116,7 +116,7 @@ fn nl(settings Settings, streams []os.File) {
 					if skip {
 						prefix = skip_prefix
 					} else {
-						prefix = strconv.v_sprintf(f_lno, lineno)
+						prefix = unsafe { strconv.v_sprintf(f_lno, lineno) }
 
 						//// Compile options, default is GNU-compatible behavior ////
 						// In BSD, the upper digits are truncated in case of overflow.
