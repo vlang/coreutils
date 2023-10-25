@@ -21,7 +21,7 @@ fn hex_to_byte(c u8) u8 {
 	}
 }
 
-fn is_octal_char(c byte) bool {
+fn is_octal_char(c u8) bool {
 	return `0` <= c && c <= `7`
 }
 

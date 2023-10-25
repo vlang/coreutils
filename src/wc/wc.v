@@ -67,7 +67,7 @@ fn get_count(chunk FileChunk) Count {
 	return count
 }
 
-fn is_space(b byte) bool {
+fn is_space(b u8) bool {
 	return b == new_line || b == space || b == tab || b == carriage_return || b == vertical_tab
 		|| b == form_feed
 }
