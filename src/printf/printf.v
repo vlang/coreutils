@@ -302,7 +302,7 @@ fn v_sprintf(str string, _pt []string) (string, int, bool) {
 	mut i := 0 // main string index
 	mut p_index := 0 // parameter index
 	mut sign := false // sign flag
-	mut allign := strconv.Align_text.right
+	mut align := strconv.Align_text.right
 	mut len0 := -1 // forced length, if -1 free length
 	mut len1 := -1 // decimal part for floats
 	def_len1 := 6 // default value for len1
@@ -316,7 +316,7 @@ fn v_sprintf(str string, _pt []string) (string, int, bool) {
 	for i < str.len {
 		if status == .reset_params {
 			sign = false
-			allign = .right
+			align = .right
 			len0 = -1
 			len1 = -1
 			pad_ch = ` `
@@ -381,11 +381,11 @@ fn v_sprintf(str string, _pt []string) (string, int, bool) {
 				i++
 				continue
 			} else if ch == `-` {
-				allign = .left
+				align = .left
 				i++
 				continue
 			} else if ch in [`0`, ` `] {
-				if allign == .right {
+				if align == .right {
 					pad_ch = ch
 				}
 				i++
@@ -568,7 +568,7 @@ fn v_sprintf(str string, _pt []string) (string, int, bool) {
 					len1: 0
 					positive: positive
 					sign_flag: sign
-					allign: allign
+					align: align
 				))
 				status = .reset_params
 				p_index++
@@ -617,7 +617,7 @@ fn v_sprintf(str string, _pt []string) (string, int, bool) {
 					len1: 0
 					positive: positive
 					sign_flag: sign
-					allign: allign
+					align: align
 				))
 				status = .reset_params
 				p_index++
@@ -672,7 +672,7 @@ fn v_sprintf(str string, _pt []string) (string, int, bool) {
 					len1: 0
 					positive: true
 					sign_flag: false
-					allign: allign
+					align: align
 				))
 				status = .reset_params
 				p_index++
@@ -692,7 +692,7 @@ fn v_sprintf(str string, _pt []string) (string, int, bool) {
 					len1: len1
 					positive: positive
 					sign_flag: sign
-					allign: allign
+					align: align
 				)
 				res.write_string(if ch == `F` { s.to_upper() } else { s })
 				status = .reset_params
@@ -710,7 +710,7 @@ fn v_sprintf(str string, _pt []string) (string, int, bool) {
 					len1: len1
 					positive: positive
 					sign_flag: sign
-					allign: allign
+					align: align
 				)
 				res.write_string(if ch == `E` { s.to_upper() } else { s })
 				status = .reset_params
@@ -732,7 +732,7 @@ fn v_sprintf(str string, _pt []string) (string, int, bool) {
 						len1: len1
 						positive: positive
 						sign_flag: sign
-						allign: allign
+						align: align
 						rm_tail_zero: true
 					)
 				} else {
@@ -743,7 +743,7 @@ fn v_sprintf(str string, _pt []string) (string, int, bool) {
 						len1: len1
 						positive: positive
 						sign_flag: sign
-						allign: allign
+						align: align
 						rm_tail_zero: true
 					)
 				}
@@ -780,7 +780,7 @@ fn v_sprintf(str string, _pt []string) (string, int, bool) {
 					len1: 0
 					positive: true
 					sign_flag: false
-					allign: allign
+					align: align
 				))
 				status = .reset_params
 				p_index++
@@ -872,13 +872,13 @@ fn format_fl_old(f f64, p strconv.BF_param) string {
 
 		dif := p.len0 - s.len + sign_len_diff
 
-		if p.allign == .right {
+		if p.align == .right {
 			for i1 := 0; i1 < dif; i1++ {
 				res.write_byte(p.pad_ch)
 			}
 		}
 		res.write_string(s)
-		if p.allign == .left {
+		if p.align == .left {
 			for i1 := 0; i1 < dif; i1++ {
 				res.write_byte(p.pad_ch)
 			}
@@ -935,13 +935,13 @@ fn format_es_old(f f64, p strconv.BF_param) string {
 		}
 
 		dif := p.len0 - s.len + sign_len_diff
-		if p.allign == .right {
+		if p.align == .right {
 			for i1 := 0; i1 < dif; i1++ {
 				res.write_byte(p.pad_ch)
 			}
 		}
 		res.write_string(s)
-		if p.allign == .left {
+		if p.align == .left {
 			for i1 := 0; i1 < dif; i1++ {
 				res.write_byte(p.pad_ch)
 			}
@@ -1023,13 +1023,13 @@ fn format_dec_old(d u64, p strconv.BF_param) string {
 	}
 	dif := p.len0 - s.len + sign_len_diff
 
-	if p.allign == .right {
+	if p.align == .right {
 		for i1 := 0; i1 < dif; i1++ {
 			res.write_byte(p.pad_ch)
 		}
 	}
 	res.write_string(s)
-	if p.allign == .left {
+	if p.align == .left {
 		for i1 := 0; i1 < dif; i1++ {
 			res.write_byte(p.pad_ch)
 		}
