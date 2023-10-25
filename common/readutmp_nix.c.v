@@ -47,8 +47,8 @@ pub const wtmp_file_charptr = &char(C._PATH_WTMP)
 
 // Options for read_utmp.
 pub enum ReadUtmpOptions {
-	undefined = 0
-	check_pids = 1
+	undefined    = 0
+	check_pids   = 1
 	user_process = 2
 }
 
