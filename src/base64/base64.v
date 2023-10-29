@@ -17,7 +17,7 @@ const (
 	// more than 3/4 of chunk_size_decode
 	buffer_size_decode = 16 * 1024
 
-	newline            = []byte{len: 1, init: `\n`}
+	newline            = []u8{len: 1, init: `\n`}
 )
 
 fn get_file(args []string) os.File {

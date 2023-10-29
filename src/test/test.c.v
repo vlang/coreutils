@@ -214,7 +214,7 @@ fn (p Parser) get() ?string {
 	return none
 }
 
-fn test_unary(option byte, arg string) bool {
+fn test_unary(option u8, arg string) bool {
 	match option {
 		`b` {
 			return os.exists(arg) && FileType(os.inode(arg).typ) == .block_device

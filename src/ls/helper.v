@@ -4,7 +4,7 @@ const (
 
 // Based on the exit status of actual ls
 enum EXIT_STATUS {
-	success = 0
+	success   = 0
 	minor_err = 1
 	major_err = 2
 }
