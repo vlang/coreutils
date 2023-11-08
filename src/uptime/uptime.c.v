@@ -79,7 +79,7 @@ fn print_uptime(utmp_buf []C.utmpx) ! {
 		return ''
 	}
 
-	if uptime == math.max_i64 {
+	if uptime == max_i64 {
 		print('up ???? days ??:??,  ')
 	} else {
 		if 0 < updays {
