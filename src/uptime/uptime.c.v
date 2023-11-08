@@ -1,5 +1,4 @@
 import os
-import math
 import common
 
 #include <time.h>
@@ -35,7 +34,7 @@ fn print_uptime(utmp_buf []C.utmpx) ! {
 				endptr := &char(0)
 				upsecs := C.strtod(&buf[0], &endptr)
 				if buf.bytestr() != endptr.vstring() {
-					if 0 <= upsecs && upsecs < math.max_f64 {
+					if 0 <= upsecs && upsecs < max_f64 {
 						uptime = i64(upsecs)
 					} else {
 						uptime = -1
@@ -79,7 +78,7 @@ fn print_uptime(utmp_buf []C.utmpx) ! {
 		return ''
 	}
 
-	if uptime == math.max_i64 {
+	if uptime == max_i64 {
 		print('up ???? days ??:??,  ')
 	} else {
 		if 0 < updays {
