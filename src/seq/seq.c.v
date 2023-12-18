@@ -3,10 +3,8 @@ module main
 import common
 import os
 
-const (
-	app_name        = 'seq'
-	app_description = 'print a sequence of numbers'
-)
+const app_name = 'seq'
+const app_description = 'print a sequence of numbers'
 
 struct Settings {
 	format      string
@@ -88,18 +86,18 @@ fn get_fstr(set Settings) string {
 }
 
 // '9.00' => 2, 0.889 => 3
-[inline]
+@[inline]
 fn num_of_decimals(s string) int {
 	return if s.split('.').len > 1 { s.split('.')[1].len } else { 0 }
 }
 
 // returns largest number
-[inline]
+@[inline]
 fn largest(x int, y int) int {
 	return if x > y { x } else { y }
 }
 
-[inline]
+@[inline]
 fn check_settings(set Settings) ! {
 	if set.increment.f64() == 0 {
 		return error("${app_name}: invalid zero increment value '0'")

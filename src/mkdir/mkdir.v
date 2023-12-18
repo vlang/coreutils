@@ -1,11 +1,9 @@
 import os
 import common
 
-const (
-	name         = 'mkdir'
-	space_char   = u8(32)
-	default_mode = u32(0o777)
-)
+const name = 'mkdir'
+const space_char = u8(32)
+const default_mode = u32(0o777)
 
 struct Options {
 	mode    u32
@@ -14,7 +12,7 @@ struct Options {
 }
 
 // Print messages and exit
-[noreturn]
+@[noreturn]
 fn success_exit(messages ...string) {
 	for message in messages {
 		println(message)

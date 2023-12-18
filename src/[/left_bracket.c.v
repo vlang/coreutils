@@ -39,7 +39,7 @@ const binarys = [
 	'-ge',
 ]
 
-[noreturn]
+@[noreturn]
 fn my_panic(s string) {
 	eprintln(s)
 	exit(2)
@@ -206,7 +206,7 @@ fn (mut p Parser) term() bool {
 	return is_neg != (tok != '') // this means is_neg ^ (tok != '')
 }
 
-[inline]
+@[inline]
 fn (p Parser) get() ?string {
 	if p.idx < p.tokens.len {
 		return p.tokens[p.idx]

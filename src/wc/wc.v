@@ -8,16 +8,14 @@ import runtime
 // https://ajeetdsouza.github.io/blog/posts/beating-c-with-70-lines-of-go/
 // https://github.com/ajeetdsouza/blog-wc-go
 
-const (
-	application_name = 'wc'
-	buffer_size      = 16 * 1024
-	new_line         = `\n`
-	space            = ` `
-	tab              = `\t`
-	carriage_return  = `\r`
-	vertical_tab     = `\v`
-	form_feed        = `\f`
-)
+const application_name = 'wc'
+const buffer_size = 16 * 1024
+const new_line = `\n`
+const space = ` `
+const tab = `\t`
+const carriage_return = `\r`
+const vertical_tab = `\v`
+const form_feed = `\f`
 
 struct FileChunk {
 mut:

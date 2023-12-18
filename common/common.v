@@ -27,7 +27,7 @@ pub fn flag_parser(args []string) &flag.FlagParser {
 
 // exit_on_errors will exit with a code of either 0 or 1,
 // depending on the passed `errors` counter.
-[noreturn]
+@[noreturn]
 pub fn exit_on_errors(errors int) {
 	if errors != 0 {
 		exit(1)
@@ -38,7 +38,7 @@ pub fn exit_on_errors(errors int) {
 // exit_with_error_message will exit with error code 1,
 // showing the passed error message, and directing the
 // user to use --help
-[noreturn]
+@[noreturn]
 pub fn exit_with_error_message(tool_name string, error string) {
 	if error.len > 0 {
 		eprintln('${tool_name}: ${error}')

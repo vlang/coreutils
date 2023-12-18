@@ -1,8 +1,6 @@
 import common
 
-const (
-	name = 'ln'
-)
+const name = 'ln'
 
 fn success_exit(messages ...string) {
 	for message in messages {

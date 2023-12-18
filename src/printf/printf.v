@@ -800,7 +800,7 @@ fn v_sprintf(str string, _pt []string) (string, int, bool) {
 	return res.str(), p_index, false
 }
 
-[inline]
+@[inline]
 fn v_sprintf_panic(mut pt []string, idx int, len int) {
 	if idx >= len {
 		pt << ''
@@ -816,7 +816,7 @@ fn fabs(x f64) f64 {
 }
 
 // strings.Builder version of format_fl
-[manualfree]
+@[manualfree]
 fn format_fl_old(f f64, p strconv.BF_param) string {
 	unsafe {
 		mut s := ''
@@ -892,7 +892,7 @@ fn format_fl_old(f f64, p strconv.BF_param) string {
 	}
 }
 
-[manualfree]
+@[manualfree]
 fn format_es_old(f f64, p strconv.BF_param) string {
 	unsafe {
 		mut s := ''

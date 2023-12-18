@@ -5,10 +5,8 @@ import io
 import rand
 import common
 
-const (
-	app_name        = 'shuf'
-	app_description = 'Shuffles its input by outputting a random permutation of its input lines'
-)
+const app_name = 'shuf'
+const app_description = 'Shuffles its input by outputting a random permutation of its input lines'
 
 struct Settings {
 	echo            bool

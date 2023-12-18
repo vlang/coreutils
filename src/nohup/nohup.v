@@ -1,10 +1,8 @@
 import os
 import common
 
-const (
-	tool_name = 'nohup'
-	out_files = ['nohup.out', '${os.getenv_opt('HOME')!}/nohup.out']
-)
+const tool_name = 'nohup'
+const out_files = ['nohup.out', '${os.getenv_opt('HOME')!}/nohup.out']
 
 fn open_nohup_out(mut f os.File, print_message bool) ! {
 	for file in out_files {

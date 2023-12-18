@@ -3,13 +3,11 @@ import common
 import strings
 import io
 
-const (
-	name         = 'head'
-	buf_size     = 256
-	newline_char = u8(10)
-	nul_char     = u8(0)
-	space_char   = u8(32)
-)
+const name = 'head'
+const buf_size = 256
+const newline_char = u8(10)
+const nul_char = u8(0)
+const space_char = u8(32)
 
 struct HeadCommand {
 	bytes_to_read   int
@@ -24,7 +22,7 @@ fn write_header(name string, first_file bool) {
 	print('${prefix}==> ${name} <==\n')
 }
 
-[direct_array_access]
+@[direct_array_access]
 fn write_bytes(file_ptr os.File, num_bytes int) {
 	mut m_bytes_to_write := num_bytes
 	adj_buf_size := if num_bytes < buf_size { num_bytes } else { buf_size }
@@ -86,7 +84,7 @@ fn write_bytes_upto_max(file_ptr os.File, num_bytes int) {
 	print(output_buf.str())
 }
 
-[direct_array_access]
+@[direct_array_access]
 fn write_lines(file os.File, num_lines int, delim_char u8) {
 	mut m_lines_to_write := num_lines
 	mut f_reader := io.new_buffered_reader(reader: file)
@@ -223,7 +221,7 @@ fn (c HeadCommand) run(mut files []InputFile) {
 }
 
 // Print messages and exit
-[noreturn]
+@[noreturn]
 fn success_exit(messages ...string) {
 	for message in messages {
 		println(message)

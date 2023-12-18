@@ -3,17 +3,15 @@ import strings
 import common
 import io
 
-const (
-	name         = 'fold'
-	buf_size     = 256
-	newline_char = `\n`
-	nul_char     = `\0`
-	back_char    = `\b`
-	return_char  = `\r`
-	tab_char     = `\t`
-	space_char   = u8(32)
-	tab_width    = 8
-)
+const name = 'fold'
+const buf_size = 256
+const newline_char = `\n`
+const nul_char = `\0`
+const back_char = `\b`
+const return_char = `\r`
+const tab_char = `\t`
+const space_char = u8(32)
+const tab_width = 8
 
 struct Folder {
 	max_width       int
@@ -158,7 +156,7 @@ fn (c FoldCommand) run(mut files []InputFile) {
 }
 
 // Print messages and exit
-[noreturn]
+@[noreturn]
 fn success_exit(messages ...string) {
 	for message in messages {
 		println(message)

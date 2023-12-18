@@ -2,10 +2,8 @@ import os
 import runtime
 import common
 
-const (
-	app_name        = 'nproc'
-	app_description = 'Print the number of processing units available to the current process.'
-)
+const app_name = 'nproc'
+const app_description = 'Print the number of processing units available to the current process.'
 
 /*
 ** Nproc clone written in V

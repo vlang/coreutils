@@ -7,12 +7,10 @@ const eol = testing.output_eol()
 // since it is a good demonstration of the ideal/canonical method of testing
 // functionality that interacts with the file sys.
 
-const (
-	// tfolder will contain all the temporary files/subfolders made by
-	// the different tests. It would be removed in testsuite_end(), so
-	// individual os tests do not need to clean up after themselves.
-	tfolder = os.join_path(os.temp_dir(), 'coreutils', 'mkdir_test')
-)
+// tfolder will contain all the temporary files/subfolders made by
+// the different tests. It would be removed in testsuite_end(), so
+// individual os tests do not need to clean up after themselves.
+const tfolder = os.join_path(os.temp_dir(), 'coreutils', 'mkdir_test')
 
 fn testsuite_begin() {
 	eprintln('testsuite_begin, tfolder = ${tfolder}')

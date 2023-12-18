@@ -2,16 +2,14 @@ import os
 import common
 
 // Important constants
-const (
-	name                = 'rm'
-	interactive_yes     = ['y']
-	invalid_interactive = 'Invalid for interactive. Use either of [never, no, none], [once], [always, yes]'
-	valid_interactive   = [
-		['never', 'no', 'none'],
-		['once'],
-		['always', 'yes'],
-	]
-)
+const name = 'rm'
+const interactive_yes = ['y']
+const invalid_interactive = 'Invalid for interactive. Use either of [never, no, none], [once], [always, yes]'
+const valid_interactive = [
+	['never', 'no', 'none'],
+	['once'],
+	['always', 'yes'],
+]
 
 // Enum for interactive level
 enum Interactive {
