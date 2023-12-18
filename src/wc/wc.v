@@ -1,28 +1,28 @@
 import os
 import common
 import sync
-import runtime
+import arrays
 
 // Adapted from:
 // https://github.com/schicho/vwc
 // https://ajeetdsouza.github.io/blog/posts/beating-c-with-70-lines-of-go/
 // https://github.com/ajeetdsouza/blog-wc-go
 
-const (
-	application_name = 'wc'
-	buffer_size      = 16 * 1024
-	new_line         = `\n`
-	space            = ` `
-	tab              = `\t`
-	carriage_return  = `\r`
-	vertical_tab     = `\v`
-	form_feed        = `\f`
-)
+const application_name = 'wc'
+const buffer_size        = 16 * 1024
+const new_line          = `\n`
+const space             = ` `
+const tab               = `\t`
+const carriage_return   = `\r`
+const vertical_tab      = `\v`
+const form_feed         = `\f`
+const file_list_sep    = '\x00'
 
 struct FileChunk {
 mut:
 	prev_char_is_space bool
 	buffer             []u8
+	is_last_chunk      bool = false
 }
 
 struct Count {
@@ -35,13 +35,21 @@ mut:
 	max_line_length u32
 }
 
-fn get_count(chunk FileChunk) Count {
+struct Pair {
+mut:
+	name string
+	file os.File
+}
+
+fn get_count(chunk FileChunk, last_line_length u32) (Count, u32) {
 	mut count := Count{'', 0, 0, 0, 0, 0}
 	mut prev_char_is_space := chunk.prev_char_is_space
-	mut line_length := u32(0)
+	mut line_length := last_line_length
+	mut last_newline_pos := u32(0)
 
 	for b in chunk.buffer {
 		match b {
+			`\r` { continue }  // TODO handle windows \r\n
 			new_line {
 				count.line_count++
 				prev_char_is_space = true
@@ -49,10 +57,15 @@ fn get_count(chunk FileChunk) Count {
 					count.max_line_length = line_length
 				}
 				line_length = 0
+				last_newline_pos = line_length
 			}
-			space, tab, carriage_return, vertical_tab, form_feed {
+			space, carriage_return, vertical_tab, form_feed {
 				prev_char_is_space = true
 				line_length++
+			}
+			tab {
+				prev_char_is_space = true
+				line_length += 8
 			}
 			else {
 				if prev_char_is_space {
@@ -64,7 +77,11 @@ fn get_count(chunk FileChunk) Count {
 		}
 	}
 
-	return count
+	if line_length > count.max_line_length {
+		count.max_line_length = line_length
+	}
+
+	return count, line_length
 }
 
 fn is_space(b u8) bool {
@@ -86,14 +103,19 @@ fn (mut file_reader FileReader) read_chunk(mut buffer []u8) ?FileChunk {
 	}
 
 	nbytes := file_reader.file.read(mut buffer) or { return none } // Propagate error. Either EOF or read error.
-	chunk := FileChunk{file_reader.last_char_is_space, buffer[..nbytes]}
+	mut chunk := FileChunk{file_reader.last_char_is_space, buffer[..nbytes], false}
 	file_reader.last_char_is_space = is_space(buffer[nbytes - 1])
+	if nbytes < buffer.len {
+		chunk.is_last_chunk = true
+	}
 	return chunk
 }
 
-fn file_reader_counter(mut file_reader FileReader, counts chan Count) {
+fn file_reader_counter(mut file_reader FileReader) Count {
 	mut buffer := []u8{len: buffer_size}
 	mut total_count := Count{'', 0, 0, 0, 0, 0}
+	mut count := Count{'', 0, 0, 0, 0, 0}
+	mut line_length := u32(0)
 
 	for {
 		chunk := file_reader.read_chunk(mut buffer) or {
@@ -109,7 +131,7 @@ fn file_reader_counter(mut file_reader FileReader, counts chan Count) {
 			exit(1)
 		}
 
-		count := get_count(chunk)
+		count, line_length = get_count(chunk, line_length)
 
 		total_count.line_count += count.line_count
 		total_count.word_count += count.word_count
@@ -120,7 +142,7 @@ fn file_reader_counter(mut file_reader FileReader, counts chan Count) {
 		}
 	}
 
-	counts <- total_count
+	return total_count
 }
 
 fn count_file(mut file os.File) Count {
@@ -129,45 +151,36 @@ fn count_file(mut file os.File) Count {
 	}
 
 	mut file_reader := &FileReader{file, true, sync.new_mutex()}
-	counts := chan Count{}
-	num_workers := runtime.nr_cpus()
-
-	for i := 0; i < num_workers; i++ {
-		spawn file_reader_counter(mut file_reader, counts)
-	}
-
-	mut total_count := Count{'', 0, 0, 0, 0, 0}
-
-	for i := 0; i < num_workers; i++ {
-		count := <-counts
-		total_count.line_count += count.line_count
-		total_count.word_count += count.word_count
-		total_count.byte_count += count.byte_count
-		total_count.char_count += count.char_count
-		if count.max_line_length > total_count.max_line_length {
-			total_count.max_line_length = count.max_line_length
-		}
-	}
-	counts.close()
-
-	return total_count
+	return file_reader_counter(mut file_reader)
 }
 
-fn get_files(args []string) map[string]os.File {
+fn get_files(args []string) []Pair {
 	if args.len == 0 || args[0] == '-' {
-		return {
-			'-': os.stdin()
-		}
+		return [Pair{'-', os.stdin()}]
 	} else {
-		mut files := map[string]os.File{}
+		mut files := []Pair{}
 		for file_path in args {
-			files[file_path] = os.open(file_path) or {
-				eprintln('${application_name}: ${file_path}: No such file or directory')
-				exit(1)
+			files << Pair{
+				file_path,
+				os.open(file_path) or {
+					eprintln('${application_name}: ${file_path}: No such file or directory')
+					exit(1)
+				}
 			}
 		}
 		return files
 	}
+}
+
+fn get_file_names_from_list_file(list_file string) []string {
+	return (os.read_file(list_file) or {
+		eprintln('${application_name}: ${list_file}: error reading file - $err')
+		exit(1)
+	}).split(file_list_sep)
+}
+
+fn get_file_names_from_stdin_stream() [] string {
+	return os.get_line().split(file_list_sep)
 }
 
 fn rjust(s string, width int) string {
@@ -193,12 +206,19 @@ fn main() {
 	mut lines_opt := fp.bool('lines', `l`, false, 'print the newline counts')
 	mut words_opt := fp.bool('words', `w`, false, 'print the words counts')
 	maxline_opt := fp.bool('max-line-length', `L`, false, 'print the maximum display width')
+	list_file := fp.string_opt('files0-from', 0,  'read input from the files specified by NUL-terminated names in file F; If F is - then read names from standard input') or { '' }
 
-	args := fp.finalize() or {
+	mut args := fp.finalize() or {
 		eprintln(err)
 		exit(1)
 	}
 
+	if list_file == '-' {
+		args = get_file_names_from_stdin_stream()
+	} else if list_file != '' {
+		args = get_file_names_from_list_file(list_file)
+	}
+	args = args.filter(it.len > 0)
 	if !bytes_opt && !chars_opt && !lines_opt && !words_opt && !maxline_opt {
 		lines_opt = true
 		words_opt = true
@@ -206,9 +226,9 @@ fn main() {
 	}
 
 	mut results := []Count{}
-	for name, mut file in get_files(args) {
-		mut count := count_file(mut file)
-		count.name = name
+	for mut p in get_files(args) {
+		mut count := count_file(mut p.file)
+		count.name = p.name
 		results << count
 	}
 
@@ -227,27 +247,43 @@ fn main() {
 		}
 	}
 
+	total_line_count_len := total_line_count.str().len
+	total_word_count_len := total_word_count.str().len
+	total_byte_count_len := total_byte_count.str().len
+	total_char_count_len := total_char_count.str().len
+	max_line_length_len := max_line_length.str().len
+
 	mut col_size := int(0)
 	if byte(bytes_opt) + byte(chars_opt) + byte(lines_opt) + byte(words_opt) + byte(maxline_opt) == 1 {
 		col_size = 0
 	} else {
-		if total_line_count.str().len > col_size {
-			col_size = total_line_count.str().len
+		if total_line_count_len > col_size {
+			col_size = total_line_count_len
 		}
-		if total_word_count.str().len > col_size {
-			col_size = total_word_count.str().len
+		if total_word_count_len > col_size {
+			col_size = total_word_count_len
 		}
-		if total_byte_count.str().len > col_size {
-			col_size = total_byte_count.str().len
+		if total_byte_count_len > col_size {
+			col_size = total_byte_count_len
 		}
-		if total_char_count.str().len > col_size {
-			col_size = total_char_count.str().len
+		if total_char_count_len > col_size {
+			col_size = total_char_count_len
 		}
-		if max_line_length.str().len > col_size {
-			col_size = max_line_length.str().len
+		if max_line_length_len > col_size {
+			col_size = max_line_length_len
 		}
 	}
 
+	min_col_size := arrays.max(
+		[total_line_count_len, total_word_count_len, total_byte_count_len, total_char_count_len, max_line_length_len]
+	) or { panic(err) }
+	if results.len > 1 && col_size < min_col_size {
+		col_size = min_col_size
+	}
+
+	if list_file == '-' {
+		col_size = 0
+	}
 	mut cols := []string{}
 	for res in results {
 		cols = []string{}
@@ -276,19 +312,19 @@ fn main() {
 	if results.len > 1 {
 		cols = []string{}
 		if lines_opt {
-			cols << rjust(total_line_count.str(), total_line_count.str().len)
+			cols << rjust(total_line_count.str(), col_size)
 		}
 		if words_opt {
-			cols << rjust(total_word_count.str(), total_word_count.str().len)
+			cols << rjust(total_word_count.str(), col_size)
 		}
 		if bytes_opt {
-			cols << rjust(total_byte_count.str(), total_byte_count.str().len)
+			cols << rjust(total_byte_count.str(), col_size)
 		}
 		if chars_opt {
-			cols << rjust(total_char_count.str(), total_char_count.str().len)
+			cols << rjust(total_char_count.str(), col_size)
 		}
 		if maxline_opt {
-			cols << rjust(max_line_length.str(), max_line_length.str().len)
+			cols << rjust(max_line_length.str(), col_size)
 		}
 		cols << 'total'
 		print(cols.join(' '))
