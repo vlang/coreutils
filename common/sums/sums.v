@@ -8,12 +8,12 @@ pub fn sum(args []string, sum_name string, sum_type string, num_chars_in_sum int
 	mut fp := common.flag_parser(args)
 	fp.application(sum_name)
 	fp.arguments_description('[OPTION]... [FILE]...')
-	fp.description('Print or check $sum_type checksums.')
+	fp.description('Print or check ${sum_type} checksums.')
 	fp.description('')
 	fp.description('With no FILE, or when FILE is -, read standard input.')
 
 	binary := fp.bool('binary', `b`, false, 'read in binary mode')
-	check := fp.bool('check', `c`, false, 'read $sum_type sums from the FILEs and check them')
+	check := fp.bool('check', `c`, false, 'read ${sum_type} sums from the FILEs and check them')
 	tag := fp.bool('tag', 0, false, 'create a BSD-style checksum')
 	_ := fp.bool('text', `t`, false, 'read in text mode (default)') // accepted but ignored, just like GNU
 	// yes, the spaces are needed in the next line, to make the 'help' output line up
@@ -26,7 +26,7 @@ pub fn sum(args []string, sum_name string, sum_type string, num_chars_in_sum int
 	warn := fp.bool('warn', `w`, false, '(only with -c) warn about improperly formatted checksum lines')
 
 	mut files := fp.finalize() or {
-		eprintln("${args[0]}: $err.msg()\nTry '${args[0]} --help' for more information.")
+		eprintln("${args[0]}: ${err.msg()}\nTry '${args[0]} --help' for more information.")
 		exit(1)
 	}
 
@@ -45,12 +45,12 @@ pub fn sum(args []string, sum_name string, sum_type string, num_chars_in_sum int
 
 	for file in files {
 		if os.is_dir(file) {
-			eprintln('${args[0]}: $file: Is a directory')
+			eprintln('${args[0]}: ${file}: Is a directory')
 			continue
 		}
 
 		if !os.exists(file) {
-			eprintln('${args[0]}: $file: No such file or directory')
+			eprintln('${args[0]}: ${file}: No such file or directory')
 			continue
 		}
 
@@ -61,7 +61,7 @@ pub fn sum(args []string, sum_name string, sum_type string, num_chars_in_sum int
 				lines = os.get_lines()
 			} else {
 				lines = os.read_lines(file) or {
-					eprintln('${args[0]}: $file: FAILED open or read')
+					eprintln('${args[0]}: ${file}: FAILED open or read')
 					continue
 				}
 			}
@@ -97,7 +97,7 @@ pub fn sum(args []string, sum_name string, sum_type string, num_chars_in_sum int
 					bad_sum_line++
 
 					if warn {
-						eprintln('${args[0]}: $file: ${i + 1}: improperly formatted $sum_type checksum line')
+						eprintln('${args[0]}: ${file}: ${i + 1}: improperly formatted ${sum_type} checksum line')
 					}
 
 					continue
@@ -121,13 +121,13 @@ pub fn sum(args []string, sum_name string, sum_type string, num_chars_in_sum int
 					bytes = stdin.bytes()
 				} else {
 					if !os.exists(file_to_check) {
-						eprintln('${args[0]}: $file_to_check: No such file or directory')
+						eprintln('${args[0]}: ${file_to_check}: No such file or directory')
 					}
 
 					bytes = os.read_bytes(file_to_check) or {
 						if !ignore_missing {
 							no_read++
-							eprintln('$file_to_check FAILED open or read')
+							eprintln('${file_to_check} FAILED open or read')
 						}
 						continue
 					}
@@ -137,12 +137,12 @@ pub fn sum(args []string, sum_name string, sum_type string, num_chars_in_sum int
 
 				if sum_to_check == sum.hex() {
 					if !quiet && !status {
-						println('$file_to_check OK')
+						println('${file_to_check} OK')
 					}
 				} else {
 					bad_sum++
 					if !status {
-						println('$file_to_check FAILED')
+						println('${file_to_check} FAILED')
 					}
 				}
 			}
@@ -150,7 +150,7 @@ pub fn sum(args []string, sum_name string, sum_type string, num_chars_in_sum int
 			if bad_sum_line > 0 {
 				if !status {
 					plural_msg := if bad_sum_line == 1 { 'line is' } else { 'lines are' }
-					eprintln('${args[0]}: WARNING: $bad_sum_line $plural_msg improperly formatted')
+					eprintln('${args[0]}: WARNING: ${bad_sum_line} ${plural_msg} improperly formatted')
 				}
 
 				rc = if strict { 1 } else { 0 }
@@ -159,7 +159,7 @@ pub fn sum(args []string, sum_name string, sum_type string, num_chars_in_sum int
 			if no_read > 0 {
 				if !status {
 					plural_msg := if no_read == 1 { 'listed file' } else { 'listed files' }
-					eprintln('${args[0]}: WARNING: $no_read $plural_msg could not be read')
+					eprintln('${args[0]}: WARNING: ${no_read} ${plural_msg} could not be read')
 				}
 
 				rc = 1
@@ -172,7 +172,7 @@ pub fn sum(args []string, sum_name string, sum_type string, num_chars_in_sum int
 					} else {
 						'computed checksums'
 					}
-					eprintln('${args[0]}: WARNING: $bad_sum $plural_msg did NOT match')
+					eprintln('${args[0]}: WARNING: ${bad_sum} ${plural_msg} did NOT match')
 				}
 
 				rc = 1
@@ -185,7 +185,7 @@ pub fn sum(args []string, sum_name string, sum_type string, num_chars_in_sum int
 				bytes = os.read_bytes(file) or {
 					if !ignore_missing {
 						no_read++
-						eprintln('$file FAILED open or read')
+						eprintln('${file} FAILED open or read')
 					}
 					continue
 				}
@@ -194,9 +194,9 @@ pub fn sum(args []string, sum_name string, sum_type string, num_chars_in_sum int
 			sum := sum_fn(bytes)
 
 			if tag {
-				print('$sum_type ($file) = $sum.hex()$eol')
+				print('${sum_type} (${file}) = ${sum.hex()}${eol}')
 			} else {
-				print('$sum.hex() $prefix$file$eol')
+				print('${sum.hex()} ${prefix}${file}${eol}')
 			}
 		}
 	}

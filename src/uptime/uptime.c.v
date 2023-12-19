@@ -23,7 +23,7 @@ fn C.time(t &i64) i64
 fn C.strtod(str &char, endptr &&char) f64
 fn C.getloadavg(loadavg [3]f64, nelem int) int
 
-fn print_uptime(utmp_buf []C.utmpx) ? {
+fn print_uptime(utmp_buf []C.utmpx) ! {
 	// Get uptime
 	mut uptime := i64(0)
 	fp := C.fopen(&char('/proc/uptime'.str), &char('r'.str))
@@ -83,12 +83,14 @@ fn print_uptime(utmp_buf []C.utmpx) ? {
 		print('up ???? days ??:??,  ')
 	} else {
 		if 0 < updays {
-			print(' up  $updays day${plural(updays)} ${uphours:2}:${upmins:02}')
+			print('up ${updays} day${plural(updays)}, ${uphours:2}:${upmins:02}')
+		} else if 0 < uphours {
+			print('up ${uphours:2}:${upmins:02}')
 		} else {
-			print(' up  ${uphours:2}:${upmins:02}')
+			print('up ${upmins} min')
 		}
 	}
-	print(',  $entries user${plural(i64(entries))}')
+	print(',  ${entries} user${plural(i64(entries))}')
 
 	avg := [3]f64{}
 	loads := C.getloadavg(avg, 3)
@@ -96,15 +98,15 @@ fn print_uptime(utmp_buf []C.utmpx) ? {
 		print('\n')
 	} else {
 		avg_str := avg[0..3].map('${it:.2f}').join(', ')
-		print(',  load average: $avg_str')
+		print(',  load average: ${avg_str}')
 		print('\n')
 	}
 }
 
-fn uptime(filename &char, options common.ReadUtmpOptions) ? {
+fn uptime(filename &char, options common.ReadUtmpOptions) ! {
 	mut utmp_buf := []C.utmpx{}
 	common.read_utmp(filename, mut utmp_buf, options)
-	print_uptime(utmp_buf)?
+	print_uptime(utmp_buf)!
 }
 
 fn main() {
@@ -119,9 +121,9 @@ fn main() {
 		utmp_file_vstr := cstring_to_vstring(common.utmp_file_charptr)
 		wtmp_file_vstr := cstring_to_vstring(common.wtmp_file_charptr)
 		fp.description('the load average. If FILE is not specified, use ${utmp_file_vstr}.')
-		fp.description('$wtmp_file_vstr as FILE is common.')
+		fp.description('${wtmp_file_vstr} as FILE is common.')
 	}
-	fp.limit_free_args(0, 1)?
+	fp.limit_free_args(0, 1)!
 	args := fp.remaining_parameters()
 
 	// Main functionality

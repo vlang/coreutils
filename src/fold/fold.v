@@ -3,17 +3,15 @@ import strings
 import common
 import io
 
-const (
-	name         = 'fold'
-	buf_size     = 256
-	newline_char = `\n`
-	nul_char     = `\0`
-	back_char    = `\b`
-	return_char  = `\r`
-	tab_char     = `\t`
-	space_char   = u8(32)
-	tab_width    = 8
-)
+const name = 'fold'
+const buf_size = 256
+const newline_char = `\n`
+const nul_char = `\0`
+const back_char = `\b`
+const return_char = `\r`
+const tab_char = `\t`
+const space_char = u8(32)
+const tab_width = 8
 
 struct Folder {
 	max_width       int
@@ -34,26 +32,26 @@ fn new_folder(width int, count_bytes bool, break_at_spaces bool) Folder {
 	}
 }
 
-fn (mut f Folder) write_char(c int) ? {
+fn (mut f Folder) write_char(c int) ! {
 	u_c := u8(c)
 	f.pending_output << u_c
 
 	if u_c == newline_char {
-		f.flush()?
+		f.flush()!
 		return
 	}
 
 	f.column = adjust_column(f.column, u_c, f.count_bytes)
 	if f.column > f.max_width {
 		if f.break_at_spaces {
-			f.break_on_last_space()?
+			f.break_on_last_space()!
 			return
 		}
-		f.move_last_c_to_newline()?
+		f.move_last_c_to_newline()!
 	}
 }
 
-fn (mut f Folder) break_on_last_space() ? {
+fn (mut f Folder) break_on_last_space() ! {
 	mut last_found_space := 0
 	for i := f.pending_output.len - 1; i >= 0; i-- {
 		if f.pending_output[i] == space_char {
@@ -67,23 +65,23 @@ fn (mut f Folder) break_on_last_space() ? {
 	post_space := pending_output_cpy[last_found_space + 1..]
 	f.pending_output = pre_space
 
-	f.flush()?
+	f.flush()!
 
-	f.write_char(int(newline_char))?
+	f.write_char(int(newline_char))!
 	for c in post_space {
-		f.write_char(c)?
+		f.write_char(c)!
 	}
 }
 
-fn (mut f Folder) move_last_c_to_newline() ? {
+fn (mut f Folder) move_last_c_to_newline() ! {
 	last_written_c := f.pending_output.pop()
 	f.pending_output << newline_char
-	f.flush()?
-	f.write_char(last_written_c)?
+	f.flush()!
+	f.write_char(last_written_c)!
 }
 
-fn (mut f Folder) flush() ? {
-	f.output_buf.write(f.pending_output)?
+fn (mut f Folder) flush() ! {
+	f.output_buf.write(f.pending_output)!
 	f.pending_output.clear()
 	f.column = 0
 	print(f.str())
@@ -133,7 +131,7 @@ fn fold_content_to_fit_within_width(file os.File, width int, count_bytes bool, b
 	for {
 		f_reader.read(mut single_char_buf) or { break }
 		c := single_char_buf[0]
-		folder.write_char(c) or { panic('unable to write $c') }
+		folder.write_char(c) or { panic('unable to write ${c}') }
 	}
 
 	folder.flush() or { panic('unable to flush folder into output buf') }
@@ -144,7 +142,7 @@ fn (c FoldCommand) run(mut files []InputFile) {
 	mut open_fails_num := 0
 	for mut file in files {
 		file.open() or {
-			eprintln('$name: $err.msg()')
+			eprintln('${name}: ${err.msg()}')
 			open_fails_num++
 			continue
 		}
@@ -158,7 +156,7 @@ fn (c FoldCommand) run(mut files []InputFile) {
 }
 
 // Print messages and exit
-[noreturn]
+@[noreturn]
 fn success_exit(messages ...string) {
 	for message in messages {
 		println(message)
@@ -174,7 +172,7 @@ mut:
 	file    os.File
 }
 
-fn (mut f InputFile) open() ? {
+fn (mut f InputFile) open() ! {
 	if f.is_stdin {
 		return
 	}
@@ -224,7 +222,7 @@ fn run_fold(args []string) {
 		success_exit(fp.usage())
 	}
 	if version {
-		success_exit('$name $common.coreutils_version()')
+		success_exit('${name} ${common.coreutils_version()}')
 	}
 
 	file_args := fp.finalize() or { common.exit_with_error_message(name, err.msg()) }

@@ -47,8 +47,8 @@ pub const wtmp_file_charptr = &char(C._PATH_WTMP)
 
 // Options for read_utmp.
 pub enum ReadUtmpOptions {
-	undefined = 0
-	check_pids = 1
+	undefined    = 0
+	check_pids   = 1
 	user_process = 2
 }
 
@@ -60,10 +60,10 @@ pub fn is_user_process(u &C.utmpx) bool {
 
 fn desirable_utmp_entry(u &C.utmpx, options ReadUtmpOptions) bool {
 	user_proc := is_user_process(u)
-	if (options == ReadUtmpOptions.user_process) && !user_proc {
+	if options == ReadUtmpOptions.user_process && !user_proc {
 		return false
 	}
-	if (options == ReadUtmpOptions.check_pids) && user_proc && 0 < u.ut_pid
+	if options == ReadUtmpOptions.check_pids && user_proc && 0 < u.ut_pid
 		&& (C.kill(u.ut_pid, 0) < 0 && C.errno == C.ESRCH) {
 		return false
 	}

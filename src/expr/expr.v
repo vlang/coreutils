@@ -10,7 +10,7 @@ const appname = 'expr'
 
 const version = 'v0.0.1'
 
-const usage = '$appname $version
+const usage = '${appname} ${version}
 ----------------------------------------------
 Usage: expr EXPRESSION
    or: expr OPTION
@@ -19,7 +19,7 @@ Options:
   --help                   display this help and exit
   --version                output version information and exit'
 
-const locale = common.is_utf8()
+const use_utf = common.is_utf8()
 
 type Value = i64 | string
 
@@ -29,7 +29,7 @@ mut:
 	idx u64
 }
 
-[noreturn]
+@[noreturn]
 fn my_panic(err string, code int) {
 	eprintln(err)
 	exit(code)
@@ -48,7 +48,7 @@ fn main() {
 					exit(0)
 				}
 				'--version' {
-					println('$appname $version')
+					println('${appname} ${version}')
 					exit(0)
 				}
 				else {}
@@ -205,7 +205,7 @@ fn match_str(s string, _m string) Value {
 	} else {
 		return i64(if start == -1 {
 			0
-		} else if locale {
+		} else if use_utf {
 			s[start..end].len_utf8()
 		} else {
 			end - start
@@ -285,7 +285,7 @@ fn (mut p Parser) primary() Value {
 			if pos < 1 || len < 1 {
 				return ''
 			}
-			if locale {
+			if use_utf {
 				ustr := str.runes()
 				start := if ustr.len < pos - 1 { i64(ustr.len) } else { pos - 1 }
 				end := if ustr.len < start + len { i64(ustr.len) } else { start + len }
@@ -301,7 +301,7 @@ fn (mut p Parser) primary() Value {
 		'index' {
 			str := p.primary().str()
 			chr := p.primary().str()
-			if locale {
+			if use_utf {
 				ustr := str.runes()
 				uchr := chr.runes()
 				for i, r in ustr {
@@ -321,7 +321,7 @@ fn (mut p Parser) primary() Value {
 		}
 		'length' {
 			val := p.primary().str()
-			return i64(if locale {
+			return i64(if use_utf {
 				val.len_utf8()
 			} else {
 				val.len
@@ -333,7 +333,7 @@ fn (mut p Parser) primary() Value {
 	}
 }
 
-[inline]
+@[inline]
 fn (p Parser) get() ?string {
 	if p.idx < p.tokens.len {
 		return p.tokens[p.idx]
@@ -355,9 +355,9 @@ fn (v Value) i64() i64 {
 	}
 }
 
-fn (v Value) i64_opt() ?i64 {
+fn (v Value) i64_opt() !i64 {
 	match v {
-		string { return strconv.parse_int(v, 0, 64) }
+		string { return strconv.parse_int(v, 0, 64)! }
 		i64 { return v }
 	}
 }

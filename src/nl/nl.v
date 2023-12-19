@@ -13,10 +13,8 @@ import regex
 // one_delimiter_posix := false		// false:GNU, true:BSD
 // fixed_width := false				// false:GNU, true:BSD
 
-const (
-	app_name        = 'nl'
-	app_description = 'Line numbering filter'
-)
+const app_name = 'nl'
+const app_description = 'Line numbering filter'
 
 enum Section {
 	header
@@ -116,7 +114,7 @@ fn nl(settings Settings, streams []os.File) {
 					if skip {
 						prefix = skip_prefix
 					} else {
-						prefix = strconv.v_sprintf(f_lno, lineno)
+						prefix = unsafe { strconv.v_sprintf(f_lno, lineno) }
 
 						//// Compile options, default is GNU-compatible behavior ////
 						// In BSD, the upper digits are truncated in case of overflow.
@@ -201,7 +199,7 @@ fn check_skip_line(style Style, re regex.RE, join_blank int, prev_blanks int, li
 	}
 }
 
-[inline]
+@[inline]
 fn format_lineno(format Format, width int) string {
 	return match format {
 		.rn { '%${width}ld' }
@@ -210,7 +208,7 @@ fn format_lineno(format Format, width int) string {
 	}
 }
 
-[inline]
+@[inline]
 fn check_section_delimiter(settings Settings, line string) Section {
 	return match line {
 		settings.delimiters[.header] { Section.header }
@@ -220,7 +218,7 @@ fn check_section_delimiter(settings Settings, line string) Section {
 	}
 }
 
-[inline]
+@[inline]
 fn is_overflow_add_i64(a i64, b i64) bool {
 	// Warning! Unspecified behavior.
 	return _unlikely_((a < 0 && b < 0 && (a + b) > 0) || (a > 0 && b > 0 && (a + b) < 0))
@@ -317,16 +315,16 @@ fn args() ?(Settings, []string) {
 	return settings, fnames
 }
 
-fn get_format(str string) ?Format {
+fn get_format(str string) !Format {
 	match str {
 		'ln' { return Format.ln }
 		'rn' { return Format.rn }
 		'rz' { return Format.rz }
-		else { return error('Invalid line numbering format: $str') }
+		else { return error('Invalid line numbering format: ${str}') }
 	}
 }
 
-fn get_style(str string) ?Style {
+fn get_style(str string) !Style {
 	match str {
 		'a' {
 			return Style.all
@@ -341,12 +339,12 @@ fn get_style(str string) ?Style {
 			if str.len > 1 && str[0] == `p` {
 				return Style.regex
 			} else {
-				return error('Invalid line numbering style: $str')
+				return error('Invalid line numbering style: ${str}')
 			}
 		}
 	}
 }
 
-fn get_style_regex(str string) ?regex.RE {
-	return regex.regex_opt(str[1..]) or { return error('Invalid line numbering style: $str') }
+fn get_style_regex(str string) !regex.RE {
+	return regex.regex_opt(str[1..]) or { return error('Invalid line numbering style: ${str}') }
 }

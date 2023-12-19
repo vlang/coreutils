@@ -1,18 +1,15 @@
-// module rmutil
 import os
 import common
 
 // Important constants
-const (
-	name                = 'rm'
-	interactive_yes     = ['y']
-	invalid_interactive = 'Invalid for interactive. Use either of [never, no, none], [once], [always, yes]'
-	valid_interactive   = [
-		['never', 'no', 'none'],
-		['once'],
-		['always', 'yes'],
-	]
-)
+const name = 'rm'
+const interactive_yes = ['y']
+const invalid_interactive = 'Invalid for interactive. Use either of [never, no, none], [once], [always, yes]'
+const valid_interactive = [
+	['never', 'no', 'none'],
+	['once'],
+	['always', 'yes'],
+]
 
 // Enum for interactive level
 enum Interactive {
@@ -23,7 +20,7 @@ enum Interactive {
 
 // String substitution functions for errors and prompts
 fn rem(path string) string {
-	return "removed '$path'"
+	return "removed '${path}'"
 }
 
 fn prompt_file(path string) string {
@@ -34,41 +31,41 @@ fn prompt_file(path string) string {
 }
 
 fn err_is_dir(path string) string {
-	return "cannot remove '$path': Is a directory"
+	return "cannot remove '${path}': Is a directory"
 }
 
 fn err_is_dir_empty(path string) string {
-	return "cannot remove '$path': Directory not empty"
+	return "cannot remove '${path}': Directory not empty"
 }
 
 fn err_not_exist(path string) string {
-	return "failed to remove '$path: No such file or directory"
+	return "failed to remove '${path}: No such file or directory"
 }
 
 fn prompt_descend(path string) string {
-	return "rm: descend into directory '$path'? "
+	return "rm: descend into directory '${path}'? "
 }
 
 fn prompt_file_nonempty(path string) string {
-	return "rm: remove regular file '$path'? "
+	return "rm: remove regular file '${path}'? "
 }
 
 fn prompt_file_empty(path string) string {
-	return "rm: remove regular empty file '$path'? "
+	return "rm: remove regular empty file '${path}'? "
 }
 
 fn prompt_dir(path string) string {
-	return "rm: remove directory '$path? "
+	return "rm: remove directory '${path}? "
 }
 
 fn rem_args(len int) string {
 	arg := if len == 1 { 'argument' } else { 'arguments' }
-	return 'Remove $len $arg? '
+	return 'Remove ${len} ${arg}? '
 }
 
 fn rem_recurse(len int) string {
 	arg := if len == 1 { 'argument' } else { 'arguments' }
-	return 'rm: remove $len $arg recursively? '
+	return 'rm: remove ${len} ${arg} recursively? '
 }
 
 // End of string substitution functions
@@ -76,7 +73,7 @@ fn rem_recurse(len int) string {
 // Print error with tool name behind it
 fn error_message(tool_name string, error string) {
 	if error.len > 0 {
-		eprintln('$tool_name: $error')
+		eprintln('${tool_name}: ${error}')
 	}
 }
 
@@ -103,20 +100,22 @@ fn int_yes(prompt string) bool {
 }
 
 // Check if value provided for interactive option is valid
-fn check_interactive(interactive string) ?Interactive {
+fn check_interactive(interactive string) !Interactive {
 	for i in int(Interactive.no) .. int(Interactive.yes) + 1 {
 		if interactive in valid_interactive[i] {
-			return Interactive(i)
+			unsafe {
+				return Interactive(i)
+			}
 		}
 	}
 	return error(invalid_interactive)
 }
 
 // Parse flags, create command struct and get all options (files)
-fn setup_rm_command(args []string) ?(RmCommand, []string) {
+fn setup_rm_command(args []string) !(RmCommand, []string) {
 	mut fp := common.flag_parser(args)
 	fp.application('rm')
-	fp.limit_free_args_to_at_least(1)?
+	fp.limit_free_args_to_at_least(1) or { common.exit_with_error_message(name, err.msg()) }
 
 	dir := fp.bool('dir', `d`, false, 'dir')
 	force := fp.bool('force', `f`, false, 'force')
@@ -130,24 +129,24 @@ fn setup_rm_command(args []string) ?(RmCommand, []string) {
 	interactive_str := fp.string('interactive', 0, '', 'interactive')
 	mut int_type := Interactive.no
 	if interactive_str != '' {
-		int_type = check_interactive(interactive_str)?
+		int_type = check_interactive(interactive_str)!
 	} else {
 		int_type = Interactive.no
 	}
 
-	interactive := fp.bool('', `i`, false, 'interactive always') || (int_type == .yes)
-	less_int := fp.bool('', `I`, false, 'interactive once') || (int_type == .once)
+	interactive := fp.bool('', `i`, false, 'interactive always') || int_type == .yes
+	less_int := fp.bool('', `I`, false, 'interactive once') || int_type == .once
 
 	if help {
 		success_exit(fp.usage())
 	}
 	if version {
-		success_exit('rm $common.coreutils_version()')
+		success_exit('rm ${common.coreutils_version()}')
 	}
 
 	rm := RmCommand{recursive, dir, interactive, verbose, force, less_int}
 
-	files := fp.finalize()?
+	files := fp.finalize()!
 
 	// println(rm)
 	return rm, files

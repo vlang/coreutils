@@ -1,5 +1,5 @@
 import os
 
 fn main() {
-	run_cp(os.args)
+	run_ln(os.args)
 }

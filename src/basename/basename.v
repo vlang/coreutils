@@ -7,7 +7,7 @@ fn main() {
 	mut fp := common.flag_parser(os.args)
 	fp.application('basename')
 	fp.description('Strip directory and suffix from a file name')
-	fp.limit_free_args_to_at_least(1)?
+	fp.limit_free_args_to_at_least(1)!
 	mut is_multi := fp.bool('multiple', `a`, false, 'support multiple args as NAME')
 	mut suffix := ''
 	if _suffix := fp.string_opt('suffix', `s`, 'remove a trailing SUFFIX; implies -a') {
@@ -50,7 +50,7 @@ fn basename(name string, suffix string, is_zero bool) {
 		if name_noslash == '' {
 			out = '/'
 		} else {
-			if idx := name_noslash.last_index('/') {
+			if idx := name_noslash.index_last('/') {
 				out = name_noslash[idx + 1..]
 			} else {
 				out = name_noslash

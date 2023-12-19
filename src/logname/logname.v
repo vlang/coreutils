@@ -5,9 +5,7 @@ import flag
 The following block has been created in this file, but should be extracted to a common module for use by all utils
 */
 
-const (
-	version_str = 'V Coreutils 0.0.1'
-)
+const version_str = 'V Coreutils 0.0.1'
 
 // A default error exit, when code is not important
 fn error_exit(errors ...string) {
@@ -37,11 +35,11 @@ fn success_exit(messages ...string) {
 ** logic: Creates a parser with given arguments. Checks if --help or --version flag are present, and prints and exits if yes
 */
 
-fn flags_common(args []string, app_name string, free_args_min int, free_args_max int) ?(&flag.FlagParser, string) {
+fn flags_common(args []string, app_name string, free_args_min int, free_args_max int) !(&flag.FlagParser, string) {
 	// Flags
 	mut fp := flag.new_flag_parser(os.args)
 	fp.application(app_name)
-	fp.limit_free_args(free_args_min, free_args_max)?
+	fp.limit_free_args(free_args_min, free_args_max)!
 	fp.version(version_str) // Preferably take from common version constant, should be updated regularly
 	fp.description('Tool to display login name')
 	exec := fp.args[0]
@@ -54,7 +52,7 @@ fn flags_common(args []string, app_name string, free_args_min int, free_args_max
 }
 
 // Use if no arguments are taken
-fn flags_common_no_args(args []string, app_name string) ?(&flag.FlagParser, string) {
+fn flags_common_no_args(args []string, app_name string) !(&flag.FlagParser, string) {
 	return flags_common(args, app_name, 0, 0)
 }
 
@@ -77,14 +75,14 @@ logname
 
 fn main() {
 	// Exec is not needed
-	mut fp, _ := flags_common_no_args(os.args, 'logname')?
+	mut fp, _ := flags_common_no_args(os.args, 'logname')!
 
 	fp.finalize() or { error_exit(err.str(), fp.usage()) }
 
 	// Main functionality
 
 	// Uses C.getlogin internally
-	lname := os.loginname()
+	lname := os.loginname() or { '' }
 	if lname == '' {
 		// C.getlogin failed
 		error_exit('no login name')

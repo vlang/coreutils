@@ -1,11 +1,9 @@
 import os
 import common
 
-const (
-	name         = 'mkdir'
-	space_char   = u8(32)
-	default_mode = u32(0o777)
-)
+const name = 'mkdir'
+const space_char = u8(32)
+const default_mode = u32(0o777)
 
 struct Options {
 	mode    u32
@@ -14,7 +12,7 @@ struct Options {
 }
 
 // Print messages and exit
-[noreturn]
+@[noreturn]
 fn success_exit(messages ...string) {
 	for message in messages {
 		println(message)
@@ -28,28 +26,26 @@ fn mkdir_cmd(files []string, opts &Options) {
 		if opts.parent {
 			os.mkdir_all(f, mode: opts.mode) or {
 				num_fails++
-				eprintln('$name: $f: $err.msg()')
+				eprintln('${name}: ${f}: ${err.msg()}')
 				continue
 			}
-			announce_creation(f, true, opts.verbose)
+			announce_creation(f, opts.verbose)
 			continue
 		}
 
 		// Ensure that the target dir to create's parent dir exists.
 		if !os.exists(os.dir(f)) {
-			eprintln("$name: cannot create directory '$f': No such file or directory")
+			eprintln("${name}: cannot create directory '${f}': No such file or directory")
 			num_fails++
 			continue
 		}
 
-		// It shouldn't be possible to get true and no error here...
-		created := os.mkdir(f, mode: opts.mode) or {
-			eprintln("$name: cannot create directory '$f': File exists")
+		os.mkdir(f, mode: opts.mode) or {
+			eprintln("${name}: cannot create directory '${f}': File exists")
 			num_fails++
 			continue
 		}
-
-		announce_creation(f, created, opts.verbose)
+		announce_creation(f, opts.verbose)
 	}
 
 	if num_fails == files.len {
@@ -57,10 +53,9 @@ fn mkdir_cmd(files []string, opts &Options) {
 	}
 }
 
-fn announce_creation(f string, created bool, verbose bool) {
-	// NOTE(tauraamui): Should we do something different if not created?
-	if created && verbose {
-		println("$name: created directory '$f'")
+fn announce_creation(f string, verbose bool) {
+	if verbose {
+		println("${name}: created directory '${f}'")
 	}
 }
 
@@ -83,13 +78,13 @@ fn run_mkdir(args []string) {
 		success_exit(fp.usage())
 	}
 	if version {
-		success_exit('$name $common.coreutils_version()')
+		success_exit('${name} ${common.coreutils_version()}')
 	}
 
 	file_args := fp.finalize() or { common.exit_with_error_message(name, err.msg()) }
 	if file_args.len == 0 {
-		eprintln('$name: missing operand')
-		eprintln("Try '$name --help' for more information")
+		eprintln('${name}: missing operand')
+		eprintln("Try '${name} --help' for more information")
 		exit(1)
 	}
 

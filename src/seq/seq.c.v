@@ -2,12 +2,9 @@ module main
 
 import common
 import os
-import strconv
 
-const (
-	app_name        = 'seq'
-	app_description = 'print a sequence of numbers'
-)
+const app_name = 'seq'
+const app_description = 'print a sequence of numbers'
 
 struct Settings {
 	format      string
@@ -23,12 +20,12 @@ struct Settings {
 ///===================================================================///
 
 fn main() {
-	settings := args()?
+	settings := args()!
 
 	// sanitize settings
 	check_settings(settings) or {
 		eprintln(err)
-		eprintln("Try '$app_name --help' for more information.")
+		eprintln("Try '${app_name} --help' for more information.")
 		exit(1)
 	}
 
@@ -40,12 +37,12 @@ fn seq(set Settings) {
 	inc := set.increment.f64()
 
 	/// gets format string for printf
-	fstr := get_fstr(set)
+	fstr := get_fstr(set) + '\n'
 
 	mut i := set.first.f64()
 	for i < last {
 		i += inc
-		print(strconv.v_sprintf(fstr, i))
+		C.printf(fstr.str, i)
 	}
 }
 
@@ -85,25 +82,25 @@ fn get_fstr(set Settings) string {
 		}
 	}
 
-	return '%0${padding}.$decimals$ctype$set.separator'
+	return '%0${padding}.${decimals}${ctype}${set.separator}'
 }
 
 // '9.00' => 2, 0.889 => 3
-[inline]
+@[inline]
 fn num_of_decimals(s string) int {
 	return if s.split('.').len > 1 { s.split('.')[1].len } else { 0 }
 }
 
 // returns largest number
-[inline]
+@[inline]
 fn largest(x int, y int) int {
 	return if x > y { x } else { y }
 }
 
-[inline]
-fn check_settings(set Settings) ? {
+@[inline]
+fn check_settings(set Settings) ! {
 	if set.increment.f64() == 0 {
-		return error("$app_name: invalid zero increment value '0'")
+		return error("${app_name}: invalid zero increment value '0'")
 	}
 }
 
@@ -111,7 +108,7 @@ fn check_settings(set Settings) ? {
 ///                                Args                               ///
 ///===================================================================///
 
-fn args() ?Settings {
+fn args() !Settings {
 	mut fp := common.flag_parser(os.args)
 	fp.application(app_name)
 	fp.description(app_description)
@@ -132,8 +129,8 @@ fn args() ?Settings {
 
 	match fnames.len {
 		0 {
-			eprintln('$app_name: missing operand')
-			eprintln("Try '$app_name --help' for more information.")
+			eprintln('${app_name}: missing operand')
+			eprintln("Try '${app_name} --help' for more information.")
 			exit(1)
 		}
 		1 {
@@ -149,8 +146,8 @@ fn args() ?Settings {
 			return Settings{format, separator, equal_width, fnames[0], fnames[1], fnames[2]}
 		}
 		else {
-			eprintln("$app_name: extra operand '${fnames[3]}'")
-			eprintln("Try '$app_name --help' for more information.")
+			eprintln("${app_name}: extra operand '${fnames[3]}'")
+			eprintln("Try '${app_name} --help' for more information.")
 			exit(1)
 		}
 	}

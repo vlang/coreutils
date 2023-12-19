@@ -39,7 +39,7 @@ const binarys = [
 	'-ge',
 ]
 
-[noreturn]
+@[noreturn]
 fn my_panic(s string) {
 	eprintln(s)
 	exit(2)
@@ -206,7 +206,7 @@ fn (mut p Parser) term() bool {
 	return is_neg != (tok != '') // this means is_neg ^ (tok != '')
 }
 
-[inline]
+@[inline]
 fn (p Parser) get() ?string {
 	if p.idx < p.tokens.len {
 		return p.tokens[p.idx]
@@ -214,7 +214,7 @@ fn (p Parser) get() ?string {
 	return none
 }
 
-fn test_unary(option byte, arg string) bool {
+fn test_unary(option u8, arg string) bool {
 	match option {
 		`b` {
 			return os.exists(arg) && FileType(os.inode(arg).typ) == .block_device
@@ -232,14 +232,19 @@ fn test_unary(option byte, arg string) bool {
 			return os.is_file(arg)
 		}
 		`g` {
-			if !os.exists(arg) {
+			$if windows {
+				// group ID not supported for WinOS
 				return false
+			} $else {
+				if !os.exists(arg) {
+					return false
+				}
+				attr := C.stat{}
+				unsafe {
+					C.stat(&char(arg.str), &attr)
+				}
+				return attr.st_mode & os.s_isgid > 0
 			}
-			attr := C.stat{}
-			unsafe {
-				C.stat(&char(arg.str), &attr)
-			}
-			return attr.st_mode & os.s_isgid > 0
 		}
 		`h`, `L` {
 			return os.is_link(arg)
@@ -263,14 +268,19 @@ fn test_unary(option byte, arg string) bool {
 			return os.is_atty(arg.int()) == 1
 		}
 		`u` {
-			if !os.exists(arg) {
+			$if windows {
+				// user ID not supported for WinOS
 				return false
+			} $else {
+				if !os.exists(arg) {
+					return false
+				}
+				attr := C.stat{}
+				unsafe {
+					C.stat(&char(arg.str), &attr)
+				}
+				return attr.st_mode & os.s_isuid > 0
 			}
-			attr := C.stat{}
-			unsafe {
-				C.stat(&char(arg.str), &attr)
-			}
-			return attr.st_mode & os.s_isuid > 0
 		}
 		`w` {
 			return os.is_writable(arg)

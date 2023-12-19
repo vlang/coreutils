@@ -21,7 +21,7 @@ fn main() {
 			} else if arg == '-h' {
 				help()
 			} else {
-				println('unknown option: $arg')
+				println('unknown option: ${arg}')
 			}
 		} else {
 			pwd := os.getenv('cd')
@@ -37,7 +37,7 @@ fn main() {
 			} else if arg == '-h' {
 				help()
 			} else {
-				println('unknown option: $arg')
+				println('unknown option: ${arg}')
 			}
 		} else {
 			pwd := os.getenv('PWD')

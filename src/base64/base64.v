@@ -2,23 +2,21 @@ import os
 import common
 import encoding.base64
 
-const (
-	application_name   = 'base64'
+const application_name = 'base64'
 
-	// multiple of 3 so we can encode the data in chunks and concatenate
-	chunk_size_encode  = 15 * 1024
+// multiple of 3 so we can encode the data in chunks and concatenate
+const chunk_size_encode = 15 * 1024
 
-	// 4/3 of chunk_size_encode
-	buffer_size_encode = 4 * (15 / 3) * 1024
+// 4/3 of chunk_size_encode
+const buffer_size_encode = 4 * (15 / 3) * 1024
 
-	// multiple of 4 so we can decode the data in chunks and concatenate
-	chunk_size_decode  = 16 * 1024
+// multiple of 4 so we can decode the data in chunks and concatenate
+const chunk_size_decode = 16 * 1024
 
-	// more than 3/4 of chunk_size_decode
-	buffer_size_decode = 16 * 1024
+// more than 3/4 of chunk_size_decode
+const buffer_size_decode = 16 * 1024
 
-	newline            = []byte{len: 1, init: `\n`}
-)
+const newline = []u8{len: 1, init: `\n`}
 
 fn get_file(args []string) os.File {
 	if args.len == 0 || args[0] == '-' {
@@ -26,7 +24,7 @@ fn get_file(args []string) os.File {
 	} else {
 		file_path := args[0]
 		return os.open(file_path) or {
-			eprintln('$application_name: $file_path: No such file or directory')
+			eprintln('${application_name}: ${file_path}: No such file or directory')
 			exit(1)
 		}
 	}
@@ -47,28 +45,13 @@ fn encode_and_print(mut file os.File, wrap int) {
 	mut pos := u64(0)
 	for {
 		read_bytes := file.read_bytes_into(pos, mut in_buffer) or {
-			match err {
-				none {
-					0
-				}
-				else {
-					-1
-				}
-			}
-		}
-
-		match read_bytes {
-			0 {
+			if err is os.Eof {
 				break
 			}
-			-1 {
-				eprintln('$application_name: Cannot read file')
-				exit(1)
-			}
-			else {
-				pos += u64(read_bytes)
-			}
+			eprintln('${application_name}: Cannot read file')
+			exit(1)
 		}
+		pos += u64(read_bytes)
 
 		encoded_bytes := base64.encode_in_buffer(in_buffer[..read_bytes], out_buffer.data)
 
@@ -129,7 +112,7 @@ fn decode_and_print(mut file os.File) {
 		// buffer with base64 encoded data only.
 		for {
 			read_bytes := file.read_bytes_into_newline(mut in_buffer[n_bytes..]) or {
-				eprintln('$application_name: Cannot read file')
+				eprintln('${application_name}: Cannot read file')
 				exit(1)
 			}
 			// edge case, when buffer is filled completely and last element it not \n.
@@ -172,12 +155,12 @@ fn main() {
 	}
 	if args.len > 1 {
 		extra_arg := args[1]
-		eprintln('$application_name: extra operand `$extra_arg`')
+		eprintln('${application_name}: extra operand `${extra_arg}`')
 		eprintln("Try 'base64 --help' for more information.")
 		exit(1)
 	}
 	if wraping_opt < 0 {
-		eprintln('$application_name: invalid wrap size: \'$wraping_opt\'')
+		eprintln('${application_name}: invalid wrap size: \'${wraping_opt}\'')
 		exit(1)
 	}
 

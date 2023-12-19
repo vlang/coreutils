@@ -27,6 +27,10 @@ the command input/output consistent across the tools.
 
 Running `make` or `v run build.vsh` will build all the programs in `bin/`.
 
+Note: support for access to user account info (via utmp) is limited to POSIX-like platforms.
+And, so, for Windows, utilities requiring utmp support (uptime, users, who, whoami) are currently
+skipped during the default build process.
+
 ## Contributing
 
 Contributions are welcome!
@@ -34,7 +38,7 @@ Contributions are welcome!
 Please only contribute versions of the original utilities written in V.
 Contributions written in other languages will likely be rejected.
 
-## Completed (41/109)
+## Completed (45/109)
 
 |  Done   | Cmd       | Descripton                                       |
 | :-----: | --------- | ------------------------------------------------ |
@@ -62,11 +66,11 @@ Contributions written in other languages will likely be rejected.
 |         | df        | Report file system disk space usage              |
 |         | dir       | Briefly list directory contents                  |
 |         | dircolors | Color setup for ls                               |
-|         | dirname   | Strip last file name component                   |
+| &check; | dirname   | Strip last file name component                   |
 |         | du        | Estimate file space usage                        |
 | &check; | echo      | Print a line of text                             |
 |         | env       | Run a command in a modified environment          |
-|         | expand    | Convert tabs to spaces                           |
+| &check; | expand    | Convert tabs to spaces                           |
 | &check; | expr      | Evaluate expressions                             |
 | &check; | factor    | Print prime factors                              |
 | &check; | false     | Do nothing, unsuccessfully                       |
@@ -81,7 +85,7 @@ Contributions written in other languages will likely be rejected.
 |         | join      | Join lines on a common field                     |
 |         | kill      | Send a signal to processes                       |
 |         | link      | Make a hard link via the link syscall            |
-|         | ln        | Make links between files                         |
+| &check; | ln        | Make links between files                         |
 | &check; | logname   | Print current login name                         |
 |         | ls        | List directory contents                          |
 | &check; | md5sum    | Print or check MD5 digests                       |
@@ -92,7 +96,7 @@ Contributions written in other languages will likely be rejected.
 | &check; | mv        | Move (rename) files                              |
 |         | nice      | Run a command with modified niceness             |
 | &check; | nl        | Number lines and write files                     |
-|         | nohup     | Run a command immune to hangups                  |
+| &check; | nohup     | Run a command immune to hangups                  |
 | &check; | nproc     | Print the number of available processors         |
 |         | numfmt    | Reformat numbers                                 |
 |         | od        | Write files in octal or other formats            |

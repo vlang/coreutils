@@ -1,23 +1,21 @@
 import common
 
-const (
-	name              = 'rmdir'
-	valid_interactive = [
-		['never', 'no', 'none'],
-		['once'],
-		['always', 'yes'],
-	]
-)
+const name = 'rmdir'
+const valid_interactive = [
+	['never', 'no', 'none'],
+	['once'],
+	['always', 'yes'],
+]
 
 fn success_exit(msg string) {
 	println(msg)
 	exit(0)
 }
 
-fn setup_rmdir_command(args []string) ?(RmdirCommand, []string) {
+fn setup_rmdir_command(args []string) !(RmdirCommand, []string) {
 	mut fp := common.flag_parser(args)
 	fp.application('rm')
-	fp.limit_free_args_to_at_least(1)?
+	fp.limit_free_args_to_at_least(1)!
 
 	parents := fp.bool('parents', `p`, false, 'parents')
 	verbose := fp.bool('verbose', `v`, false, 'verbose')
@@ -28,11 +26,11 @@ fn setup_rmdir_command(args []string) ?(RmdirCommand, []string) {
 		success_exit(fp.usage())
 	}
 	if version {
-		success_exit('rm $common.coreutils_version()')
+		success_exit('rm ${common.coreutils_version()}')
 	}
 	rmdir := RmdirCommand{verbose, parents}
 
-	dirs := fp.finalize()?
+	dirs := fp.finalize()!
 
 	return rmdir, dirs
 }

@@ -8,7 +8,7 @@ const appname = 'printf'
 
 const version = 'v0.0.1'
 
-const usage = '$appname $version
+const usage = '${appname} ${version}
 ----------------------------------------------
 Usage: printf FORMAT [ARGUMENT]...
    or: printf OPTION
@@ -30,7 +30,7 @@ fn main() {
 					exit(0)
 				}
 				'--version' {
-					println('$appname $version')
+					println('${appname} ${version}')
 					exit(0)
 				}
 				else {}
@@ -176,7 +176,7 @@ fn apply_controls(s string, zero_top bool) (string, bool) {
 						out.write_string(utf32_to_str(out_ch))
 					}
 					else {
-						out.write_string('\\$ch2')
+						out.write_string('\\${ch2}')
 					}
 				}
 			}
@@ -242,7 +242,7 @@ fn apply_posix_escape(s string) string {
 			}
 		}
 	}
-	return if has_unprintable { '\$\'$upout\'' } else { s.replace_each([
+	return if has_unprintable { '\$\'${upout}\'' } else { s.replace_each([
 			'|',
 			'\\|',
 			'&',
@@ -302,11 +302,11 @@ fn v_sprintf(str string, _pt []string) (string, int, bool) {
 	mut i := 0 // main string index
 	mut p_index := 0 // parameter index
 	mut sign := false // sign flag
-	mut allign := strconv.Align_text.right
+	mut align := strconv.Align_text.right
 	mut len0 := -1 // forced length, if -1 free length
 	mut len1 := -1 // decimal part for floats
 	def_len1 := 6 // default value for len1
-	mut pad_ch := byte(` `) // pad char
+	mut pad_ch := u8(` `) // pad char
 
 	// prefix chars for Length field
 	mut ch1 := `0` // +1 char if present else `0`
@@ -316,7 +316,7 @@ fn v_sprintf(str string, _pt []string) (string, int, bool) {
 	for i < str.len {
 		if status == .reset_params {
 			sign = false
-			allign = .right
+			align = .right
 			len0 = -1
 			len1 = -1
 			pad_ch = ` `
@@ -381,11 +381,11 @@ fn v_sprintf(str string, _pt []string) (string, int, bool) {
 				i++
 				continue
 			} else if ch == `-` {
-				allign = .left
+				align = .left
 				i++
 				continue
 			} else if ch in [`0`, ` `] {
-				if allign == .right {
+				if align == .right {
 					pad_ch = ch
 				}
 				i++
@@ -568,7 +568,7 @@ fn v_sprintf(str string, _pt []string) (string, int, bool) {
 					len1: 0
 					positive: positive
 					sign_flag: sign
-					allign: allign
+					align: align
 				))
 				status = .reset_params
 				p_index++
@@ -617,7 +617,7 @@ fn v_sprintf(str string, _pt []string) (string, int, bool) {
 					len1: 0
 					positive: positive
 					sign_flag: sign
-					allign: allign
+					align: align
 				))
 				status = .reset_params
 				p_index++
@@ -672,7 +672,7 @@ fn v_sprintf(str string, _pt []string) (string, int, bool) {
 					len1: 0
 					positive: true
 					sign_flag: false
-					allign: allign
+					align: align
 				))
 				status = .reset_params
 				p_index++
@@ -692,7 +692,7 @@ fn v_sprintf(str string, _pt []string) (string, int, bool) {
 					len1: len1
 					positive: positive
 					sign_flag: sign
-					allign: allign
+					align: align
 				)
 				res.write_string(if ch == `F` { s.to_upper() } else { s })
 				status = .reset_params
@@ -710,7 +710,7 @@ fn v_sprintf(str string, _pt []string) (string, int, bool) {
 					len1: len1
 					positive: positive
 					sign_flag: sign
-					allign: allign
+					align: align
 				)
 				res.write_string(if ch == `E` { s.to_upper() } else { s })
 				status = .reset_params
@@ -732,7 +732,7 @@ fn v_sprintf(str string, _pt []string) (string, int, bool) {
 						len1: len1
 						positive: positive
 						sign_flag: sign
-						allign: allign
+						align: align
 						rm_tail_zero: true
 					)
 				} else {
@@ -743,7 +743,7 @@ fn v_sprintf(str string, _pt []string) (string, int, bool) {
 						len1: len1
 						positive: positive
 						sign_flag: sign
-						allign: allign
+						align: align
 						rm_tail_zero: true
 					)
 				}
@@ -780,7 +780,7 @@ fn v_sprintf(str string, _pt []string) (string, int, bool) {
 					len1: 0
 					positive: true
 					sign_flag: false
-					allign: allign
+					align: align
 				))
 				status = .reset_params
 				p_index++
@@ -800,7 +800,7 @@ fn v_sprintf(str string, _pt []string) (string, int, bool) {
 	return res.str(), p_index, false
 }
 
-[inline]
+@[inline]
 fn v_sprintf_panic(mut pt []string, idx int, len int) {
 	if idx >= len {
 		pt << ''
@@ -816,7 +816,7 @@ fn fabs(x f64) f64 {
 }
 
 // strings.Builder version of format_fl
-[manualfree]
+@[manualfree]
 fn format_fl_old(f f64, p strconv.BF_param) string {
 	unsafe {
 		mut s := ''
@@ -872,13 +872,13 @@ fn format_fl_old(f f64, p strconv.BF_param) string {
 
 		dif := p.len0 - s.len + sign_len_diff
 
-		if p.allign == .right {
+		if p.align == .right {
 			for i1 := 0; i1 < dif; i1++ {
 				res.write_byte(p.pad_ch)
 			}
 		}
 		res.write_string(s)
-		if p.allign == .left {
+		if p.align == .left {
 			for i1 := 0; i1 < dif; i1++ {
 				res.write_byte(p.pad_ch)
 			}
@@ -892,7 +892,7 @@ fn format_fl_old(f f64, p strconv.BF_param) string {
 	}
 }
 
-[manualfree]
+@[manualfree]
 fn format_es_old(f f64, p strconv.BF_param) string {
 	unsafe {
 		mut s := ''
@@ -935,13 +935,13 @@ fn format_es_old(f f64, p strconv.BF_param) string {
 		}
 
 		dif := p.len0 - s.len + sign_len_diff
-		if p.allign == .right {
+		if p.align == .right {
 			for i1 := 0; i1 < dif; i1++ {
 				res.write_byte(p.pad_ch)
 			}
 		}
 		res.write_string(s)
-		if p.allign == .left {
+		if p.align == .left {
 			for i1 := 0; i1 < dif; i1++ {
 				res.write_byte(p.pad_ch)
 			}
@@ -959,7 +959,7 @@ fn remove_tail_zeros_old(s string) string {
 	mut last_zero_start := -1
 	mut dot_pos := -1
 	mut in_decimal := false
-	mut prev_ch := byte(0)
+	mut prev_ch := u8(0)
 	for i < s.len {
 		ch := unsafe { s.str[i] }
 		if ch == `.` {
@@ -1023,13 +1023,13 @@ fn format_dec_old(d u64, p strconv.BF_param) string {
 	}
 	dif := p.len0 - s.len + sign_len_diff
 
-	if p.allign == .right {
+	if p.align == .right {
 		for i1 := 0; i1 < dif; i1++ {
 			res.write_byte(p.pad_ch)
 		}
 	}
 	res.write_string(s)
-	if p.allign == .left {
+	if p.align == .left {
 		for i1 := 0; i1 < dif; i1++ {
 			res.write_byte(p.pad_ch)
 		}
