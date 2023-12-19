@@ -9,14 +9,14 @@ import arrays
 // https://github.com/ajeetdsouza/blog-wc-go
 
 const application_name = 'wc'
-const buffer_size        = 16 * 1024
-const new_line          = `\n`
-const space             = ` `
-const tab               = `\t`
-const carriage_return   = `\r`
-const vertical_tab      = `\v`
-const form_feed         = `\f`
-const file_list_sep    = '\x00'
+const buffer_size = 16 * 1024
+const new_line = `\n`
+const space = ` `
+const tab = `\t`
+const carriage_return = `\r`
+const vertical_tab = `\v`
+const form_feed = `\f`
+const file_list_sep = '\x00'
 
 struct FileChunk {
 mut:
