@@ -1,10 +1,8 @@
 import common
 import os
 
-const (
-	app_name        = 'hostid'
-	app_description = 'Print the numeric identifier (in hexadecimal) of the current host.'
-)
+const app_name = 'hostid'
+const app_description = 'Print the numeric identifier (in hexadecimal) of the current host.'
 
 /*
 ** hostid clone written in V

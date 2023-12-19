@@ -3,9 +3,7 @@ module main
 import common
 import os
 
-const (
-	app_name = 'false'
-)
+const app_name = 'false'
 
 fn false_fn() ! {
 	mut fp := common.flag_parser(os.args)

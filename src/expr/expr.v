@@ -29,7 +29,7 @@ mut:
 	idx u64
 }
 
-[noreturn]
+@[noreturn]
 fn my_panic(err string, code int) {
 	eprintln(err)
 	exit(code)
@@ -333,7 +333,7 @@ fn (mut p Parser) primary() Value {
 	}
 }
 
-[inline]
+@[inline]
 fn (p Parser) get() ?string {
 	if p.idx < p.tokens.len {
 		return p.tokens[p.idx]

@@ -4,10 +4,8 @@ import common
 import os
 import io
 
-const (
-	app_name        = 'cat'
-	app_description = 'concatenate files and print on the standard output'
-)
+const app_name = 'cat'
+const app_description = 'concatenate files and print on the standard output'
 
 struct Settings {
 	number_nonblanks bool // both number_nonblank, and number_all can never be true together

@@ -1,10 +1,8 @@
 import os
 import common
 
-const (
-	app_name        = 'hostname'
-	app_description = 'Prints or set the name of the current host system.'
-)
+const app_name = 'hostname'
+const app_description = 'Prints or set the name of the current host system.'
 
 /*
 ** GNU Coreutils Hostname clone made in V

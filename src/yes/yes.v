@@ -3,10 +3,8 @@ module main
 import common
 import os
 
-const (
-	app_name = 'yes'
-	buf_size = 8192
-)
+const app_name = 'yes'
+const buf_size = 8192
 
 fn yes() {
 	mut fp := common.flag_parser(os.args)

@@ -3,18 +3,15 @@ import bitfield
 import strings
 import common
 
-const (
-	name              = 'base32'
-	block_size        = 5
-	group_size        = 5
-	bits_in_byte      = 8
-	init_builder_size = 1024
-	end_byte          = `=`
-	char_set          = [`A`, `B`, `C`, `D`, `E`, `F`, `G`, `H`, `I`, `J`, `K`, `L`, `M`, `N`,
-		`O`, `P`, `Q`, `R`, `S`, `T`, `U`, `V`, `W`, `X`, `Y`, `Z`, `2`, `3`, `4`, `5`, `6`, `7`,
-		`=`]
-	invalid           = 'invalid input'
-)
+const name = 'base32'
+const block_size = 5
+const group_size = 5
+const bits_in_byte = 8
+const init_builder_size = 1024
+const end_byte = `=`
+const char_set = [`A`, `B`, `C`, `D`, `E`, `F`, `G`, `H`, `I`, `J`, `K`, `L`, `M`, `N`, `O`, `P`,
+	`Q`, `R`, `S`, `T`, `U`, `V`, `W`, `X`, `Y`, `Z`, `2`, `3`, `4`, `5`, `6`, `7`, `=`]
+const invalid = 'invalid input'
 
 fn get_blocks(groups []u8) []u8 {
 	mut full_block := bitfield.new(block_size * bits_in_byte)
@@ -153,13 +150,13 @@ fn run_base32(args []string) {
 	// println(args)
 }
 
-[noreturn]
+@[noreturn]
 fn success_exit(msg string) {
 	println(msg)
 	exit(0)
 }
 
-[noreturn]
+@[noreturn]
 fn error_exit(msg string) {
 	eprintln(msg)
 	exit(1)

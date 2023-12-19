@@ -1,13 +1,11 @@
 import common
 
-const (
-	name              = 'rmdir'
-	valid_interactive = [
-		['never', 'no', 'none'],
-		['once'],
-		['always', 'yes'],
-	]
-)
+const name = 'rmdir'
+const valid_interactive = [
+	['never', 'no', 'none'],
+	['once'],
+	['always', 'yes'],
+]
 
 fn success_exit(msg string) {
 	println(msg)

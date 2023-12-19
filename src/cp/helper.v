@@ -1,11 +1,9 @@
 import os
 import common
 
-const (
-	name            = 'cp'
-	interactive_yes = ['y']
-	combine_t_no_t  = 'cannot combine --target-directory (-t) and --no-target-directory (-T)'
-)
+const name = 'cp'
+const interactive_yes = ['y']
+const combine_t_no_t = 'cannot combine --target-directory (-t) and --no-target-directory (-T)'
 
 fn prompt_file(path string) string {
 	return "overwrite '${path}'? "
@@ -54,7 +52,7 @@ fn not_recursive(path string) string {
 }
 
 // Print messages and exit with error
-[noreturn]
+@[noreturn]
 fn error_exit(messages ...string) {
 	for message in messages {
 		eprintln(message)
@@ -63,7 +61,7 @@ fn error_exit(messages ...string) {
 }
 
 // Print messages and exit
-[noreturn]
+@[noreturn]
 fn success_exit(messages ...string) {
 	for message in messages {
 		println(message)

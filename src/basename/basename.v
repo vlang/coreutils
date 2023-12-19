@@ -50,7 +50,7 @@ fn basename(name string, suffix string, is_zero bool) {
 		if name_noslash == '' {
 			out = '/'
 		} else {
-			if idx := name_noslash.last_index('/') {
+			if idx := name_noslash.index_last('/') {
 				out = name_noslash[idx + 1..]
 			} else {
 				out = name_noslash

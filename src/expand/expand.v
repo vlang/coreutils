@@ -1,11 +1,9 @@
 import os { File }
 import common
 
-const (
-	name   = 'expand'
-	bufsiz = 4096
-	nl     = '\n'
-)
+const name = 'expand'
+const bufsiz = 4096
+const nl = '\n'
 
 fn process_line(line string, initial bool, tabs int) {
 	mut sp := ''

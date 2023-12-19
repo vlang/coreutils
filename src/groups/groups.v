@@ -2,10 +2,8 @@ import os
 import common
 import encoding.csv
 
-const (
-	tool_name  = 'groups'
-	group_file = '/etc/group'
-)
+const tool_name = 'groups'
+const group_file = '/etc/group'
 
 fn main() {
 	mut fp := common.flag_parser(os.args)
