@@ -1,5 +1,4 @@
 import os
-import regex
 
 import common.testing
 
