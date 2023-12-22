@@ -49,7 +49,9 @@ fn get_count(chunk FileChunk, last_line_length u32) (Count, u32) {
 
 	for b in chunk.buffer {
 		match b {
-			`\r` { continue }  // TODO handle windows \r\n
+			`\r` {
+				continue
+			} // TODO handle windows \r\n
 			new_line {
 				count.line_count++
 				prev_char_is_space = true
@@ -160,13 +162,10 @@ fn get_files(args []string) []Pair {
 	} else {
 		mut files := []Pair{}
 		for file_path in args {
-			files << Pair{
-				file_path,
-				os.open(file_path) or {
-					eprintln('${application_name}: ${file_path}: No such file or directory')
-					exit(1)
-				}
-			}
+			files << Pair{file_path, os.open(file_path) or {
+				eprintln('${application_name}: ${file_path}: No such file or directory')
+				exit(1)
+			}}
 		}
 		return files
 	}
@@ -174,12 +173,12 @@ fn get_files(args []string) []Pair {
 
 fn get_file_names_from_list_file(list_file string) []string {
 	return (os.read_file(list_file) or {
-		eprintln('${application_name}: ${list_file}: error reading file - $err')
+		eprintln('${application_name}: ${list_file}: error reading file - ${err}')
 		exit(1)
 	}).split(file_list_sep)
 }
 
-fn get_file_names_from_stdin_stream() [] string {
+fn get_file_names_from_stdin_stream() []string {
 	return os.get_line().split(file_list_sep)
 }
 
@@ -206,7 +205,9 @@ fn main() {
 	mut lines_opt := fp.bool('lines', `l`, false, 'print the newline counts')
 	mut words_opt := fp.bool('words', `w`, false, 'print the words counts')
 	maxline_opt := fp.bool('max-line-length', `L`, false, 'print the maximum display width')
-	list_file := fp.string_opt('files0-from', 0,  'read input from the files specified by NUL-terminated names in file F; If F is - then read names from standard input') or { '' }
+	list_file := fp.string_opt('files0-from', 0, 'read input from the files specified by NUL-terminated names in file F; If F is - then read names from standard input') or {
+		''
+	}
 
 	mut args := fp.finalize() or {
 		eprintln(err)
@@ -274,9 +275,8 @@ fn main() {
 		}
 	}
 
-	min_col_size := arrays.max(
-		[total_line_count_len, total_word_count_len, total_byte_count_len, total_char_count_len, max_line_length_len]
-	) or { panic(err) }
+	min_col_size := arrays.max([total_line_count_len, total_word_count_len, total_byte_count_len,
+		total_char_count_len, max_line_length_len]) or { panic(err) }
 	if results.len > 1 && col_size < min_col_size {
 		col_size = min_col_size
 	}
