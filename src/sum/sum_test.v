@@ -1,5 +1,4 @@
 import os
-
 import common.testing
 
 const eol = testing.output_eol()

@@ -4,10 +4,8 @@ import os
 import common
 import io
 
-const (
-	app_name        = 'sum'
-	app_description = 'Print checksum and block counts for each file in ARGS.'
-)
+const app_name = 'sum'
+const app_description = 'Print checksum and block counts for each file in ARGS.'
 
 struct Args {
 	use_bsd  bool
@@ -16,7 +14,7 @@ struct Args {
 }
 
 struct Sum {
-	checksum int
+	checksum    int
 	block_count u64
 mut:
 	file_name string
@@ -27,23 +25,25 @@ const sysv_block_size = 512
 const buffer_length = 128 * 1024
 
 // bsd_sum_stream calculates checksum using BSD algorithm
-fn bsd_sum_stream (bytes []u8, checksum int, _ bool) int {
+fn bsd_sum_stream(bytes []u8, checksum int, _ bool) int {
 	mut tmp_checksum := checksum
 
 	for b in bytes {
-		tmp_checksum = (tmp_checksum >> 1) + ((tmp_checksum & 1) << 15);
-		tmp_checksum += b;
-		tmp_checksum &= 0xffff;
+		tmp_checksum = (tmp_checksum >> 1) + ((tmp_checksum & 1) << 15)
+		tmp_checksum += b
+		tmp_checksum &= 0xffff
 	}
 
 	return tmp_checksum
 }
 
 // sysv_sum_stream calculates checksum using SysV algorithm
-fn sysv_sum_stream (bytes []u8, checksum int, is_final_chunk bool) int {
+fn sysv_sum_stream(bytes []u8, checksum int, is_final_chunk bool) int {
 	mut temp := checksum
 
-	for b in bytes { temp += b }
+	for b in bytes {
+		temp += b
+	}
 
 	if is_final_chunk {
 		r := (temp & 0xffff) + ((temp & 0xffffffff) >> 16)
@@ -95,7 +95,7 @@ fn calc_sums(args Args) []Sum {
 	}
 
 	mut f := os.File{}
-	mut buf := []u8{cap: buffer_length, len: buffer_length}
+	mut buf := []u8{len: buffer_length, cap: buffer_length}
 	mut blocks := u64(0)
 	mut sums := []Sum{}
 
@@ -104,10 +104,12 @@ fn calc_sums(args Args) []Sum {
 			f = os.stdin()
 		} else {
 			f = os.open(file) or { panic(err) }
-			defer { f.close() }
+			defer {
+				f.close()
+			}
 		}
 
-		mut rd := io.new_buffered_reader(io.BufferedReaderConfig{reader: f})
+		mut rd := io.new_buffered_reader(io.BufferedReaderConfig{ reader: f })
 		mut checksum := 0
 
 		for {
@@ -128,7 +130,7 @@ fn calc_sums(args Args) []Sum {
 
 		file_name := match file {
 			'-' { '' }
-			else { ' $file' }
+			else { ' ${file}' }
 		}
 		sums << Sum{checksum, blocks, file_name}
 	}
@@ -154,7 +156,6 @@ fn print_bsd(mut sums []Sum) {
 		println('${checksum_str} ${block_str}${sum.file_name}')
 	}
 }
-
 
 fn parse_args() Args {
 	mut fp := common.flag_parser(os.args)
