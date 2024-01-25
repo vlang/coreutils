@@ -3,7 +3,6 @@
 	since I could not figure out how to extend the existing one, even with an
 	embedded struct (no access to private functions).
 */
-
 import io
 
 // BufferedReader provides a buffered interface for a reader.
@@ -114,8 +113,8 @@ pub fn (r BufferedReader) end_of_stream() bool {
 }
 
 // read_line attempts to read a line from the buffered reader
-// it will read until it finds a new line character (\n) or
-// the end of stream.
+// it will read until it finds the specified line delimiter
+// such as (\n or \0) or the end of stream.
 pub fn (mut r BufferedReader) read_line_until(line_delim u8) !string {
 	if r.end_of_stream {
 		return io.Eof{}
