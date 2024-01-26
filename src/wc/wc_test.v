@@ -124,7 +124,6 @@ fn test_words_count() {
 	assert res.output == '5 ${test1_txt_path}${eol}'
 }
 
-
 fn test_one_file_all_flags() {
 	res := os.execute('${executable_under_test} -cmwlL ${test1_txt_path}')
 
@@ -173,4 +172,3 @@ fn test_under_16k_line_counts_max_line() {
 	assert res.exit_code == 0
 	assert res.output.trim_space() == '1     2 16401 16401 16383 ${long_under_16k}'
 }
-
