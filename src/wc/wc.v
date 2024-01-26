@@ -45,7 +45,6 @@ fn get_count(chunk FileChunk, last_line_length u32) (Count, u32) {
 	mut count := Count{'', 0, 0, 0, 0, 0}
 	mut prev_char_is_space := chunk.prev_char_is_space
 	mut line_length := last_line_length
-	mut last_newline_pos := u32(0)
 
 	for b in chunk.buffer {
 		match b {
@@ -59,7 +58,6 @@ fn get_count(chunk FileChunk, last_line_length u32) (Count, u32) {
 					count.max_line_length = line_length
 				}
 				line_length = 0
-				last_newline_pos = line_length
 			}
 			space, carriage_return, vertical_tab, form_feed {
 				prev_char_is_space = true
