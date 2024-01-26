@@ -1,5 +1,6 @@
 module main
 
+import io
 import math
 import os
 
@@ -105,7 +106,7 @@ fn uniq(settings Settings) {
 		outfile.close()
 	}
 
-	mut br := new_buffered_reader(BufferedReaderConfig{ reader: file })
+	mut br := io.new_buffered_reader(io.BufferedReaderConfig{ reader: file })
 	defer {
 		br.free()
 	}
@@ -115,7 +116,7 @@ fn uniq(settings Settings) {
 		count: 0
 	}
 	for {
-		line := br.read_line_until(settings.line_delimiter) or { break }
+		line := br.read_line(delim: settings.line_delimiter) or { break }
 		if !compare(line, s.seen, settings) {
 			output_line(s, settings, mut &outfile) or { panic(err) }
 			s.seen = line
