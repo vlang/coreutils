@@ -38,7 +38,7 @@ Contributions are welcome!
 Please only contribute versions of the original utilities written in V.
 Contributions written in other languages will likely be rejected.
 
-## Completed (45/109)
+## Completed (46/109)
 
 |  Done   | Cmd       | Descripton                                       |
 | :-----: | --------- | ------------------------------------------------ |
@@ -142,7 +142,7 @@ Contributions written in other languages will likely be rejected.
 |         | tty       | Print file name of terminal on standard input    |
 | &check; | uname     | Print system information                         |
 |         | unexpand  | Convert spaces to tabs                           |
-|         | uniq      | Uniquify files                                   |
+| &check; | uniq      | Uniquify files                                   |
 |         | unlink    | Remove files via the unlink syscall              |
 | &check; | uptime    | Print system uptime and load                     |
 |         | users     | Print login names of users currently logged in   |
