@@ -8,6 +8,9 @@ import os
 const app_name = 'uniq'
 const app_description = 'report or omit repeated lines'
 
+const e_noent = 0x00000002
+const e_isdir = 0x00000015
+
 struct Buffer {
 mut:
 	seen  string
@@ -87,8 +90,11 @@ fn uniq(settings Settings) {
 	if settings.input_file == '-' {
 		file = os.stdin()
 	} else {
+		if os.is_dir(settings.input_file) {
+			fail("error reading '${settings.input_file}'")
+		}
 		file = os.open(settings.input_file) or {
-			fail('${settings.input_file}: No such file or directory')
+			fail('${settings.input_file}: ${os.posix_get_error_msg(e_noent)}')
 		}
 	}
 	defer {
@@ -98,8 +104,11 @@ fn uniq(settings Settings) {
 	if settings.output_file == '-' {
 		outfile = os.stdout()
 	} else {
+		if os.is_dir(settings.output_file) {
+			fail('${settings.output_file}: ${os.posix_get_error_msg(e_isdir)}')
+		}
 		outfile = os.create(settings.output_file) or {
-			fail('${settings.output_file}: No such file or directory')
+			fail('${settings.output_file}: ${os.posix_get_error_msg(e_noent)}')
 		}
 	}
 	defer {
