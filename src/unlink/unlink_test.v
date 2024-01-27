@@ -41,12 +41,6 @@ fn test_target_is_directory() {
 	os.rmdir('foo')!
 }
 
-fn testsuite_begin() {
-}
-
-fn testsuite_end() {
-}
-
 fn test_help_and_version() {
 	cmd.ensure_help_and_version_options_work()!
 }
