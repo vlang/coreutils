@@ -40,8 +40,9 @@ fn main() {
 		}
 	} else {
 		for k in args {
-			mut v := os.getenv(k)
-			if v == '' {
+			// Use getenv_opt because it is possible for the environment variable
+			// to be set to the empty string which should not return an error code.
+			mut v := os.getenv_opt(k) or {
 				exit_code = 1 // at least one specified variable was not found
 				continue
 			}
