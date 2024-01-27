@@ -143,7 +143,7 @@ Contributions written in other languages will likely be rejected.
 | &check; | uname     | Print system information                         |
 |         | unexpand  | Convert spaces to tabs                           |
 | &check; | uniq      | Uniquify files                                   |
-|         | unlink    | Remove files via the unlink syscall              |
+| &check; | unlink    | Remove files via the unlink syscall              |
 | &check; | uptime    | Print system uptime and load                     |
 |         | users     | Print login names of users currently logged in   |
 |         | vdir      | Verbosely list directory contents                |
