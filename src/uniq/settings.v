@@ -42,14 +42,18 @@ fn args() Settings {
 	fnames := fp.remaining_parameters()
 
 	// Validation
-	if fnames.len > 2 {
-		// Exits the program
-		fail('Too many arguments specified')
-	} else if fnames.len == 2 {
-		st.output_file = fnames[1]
+	match fnames.len {
+		1 {
+			st.input_file = fnames[0]
+		}
+		2 {
+			st.input_file = fnames[0]
+			st.output_file = fnames[1]
+		}
+		else {
+			common.exit_with_error_message(app_name, 'extra operand ‘${fnames[2]}’')
+		}
 	}
-	if fnames.len > 0 {
-		st.input_file = fnames[0]
-	}
+
 	return st
 }

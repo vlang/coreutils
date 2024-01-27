@@ -30,6 +30,22 @@ fn call_for_test(args string) os.Result {
 	return res
 }
 
+fn test_target_does_not_exist() {
+	assert cmd.same_results('does_not_exist')
+}
+
+fn test_too_many_operands() {
+	assert cmd.same_results('a b c')
+}
+
+fn test_source_is_directory() {
+	assert cmd.same_results('foo')
+}
+
+fn test_target_is_directory() {
+	assert cmd.same_results('posix_nl.txt foo')
+}
+
 fn test_posix_spec_case_1() {
 	assert cmd.same_results('-c -f 1 posix_nl.txt')
 }
@@ -65,11 +81,13 @@ fn test_posix_spec_case_4_zero_term() {
 fn testsuite_begin() {
 	os.write_file(posix_test_path_newline, posix_test_data.join('\n'))!
 	os.write_file(posix_test_path_zeroterm, posix_test_data.join('\0'))!
+	os.mkdir('foo')!
 }
 
 fn testsuite_end() {
 	os.rm(posix_test_path_newline)!
 	os.rm(posix_test_path_zeroterm)!
+	os.rmdir('foo')!
 }
 
 fn test_help_and_version() {
