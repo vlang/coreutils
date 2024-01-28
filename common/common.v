@@ -81,6 +81,6 @@ pub fn (app CoreutilInfo) make_flag_parser(args []string) &flag.FlagParser {
 	fp.footer(coreutils_footer())
 	fp.skip_executable()
 	fp.application(app.name)
-	fp.description(app.description)	
+	fp.description(app.description)
 	return fp
 }
