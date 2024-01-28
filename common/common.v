@@ -71,3 +71,16 @@ pub fn (app CoreutilInfo) quit(detail CoreutilExitDetail) {
 	}
 	exit(detail.return_code)
 }
+
+// flag_parser returns a flag.FlagParser, with the common
+// options already set, reducing the boilerplate code in
+// each individual utility.
+pub fn (app CoreutilInfo) make_flag_parser(args []string) &flag.FlagParser {
+	mut fp := flag.new_flag_parser(args)
+	fp.version(coreutils_version())
+	fp.footer(coreutils_footer())
+	fp.skip_executable()
+	fp.application(app.name)
+	fp.description(app.description)	
+	return fp
+}
