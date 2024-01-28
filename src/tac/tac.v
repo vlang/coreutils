@@ -1,18 +1,10 @@
 module main
 
-import common
 import regex
 import os
 
-const app = common.CoreutilInfo{
-	name: 'tac'
-	description: 'concatenate and print files in reverse'
-}
-
 // TODO: Optimization - don't load entire file into memory
 
-const app_name = app.name
-const app_description = app.description
 // TODO: Should page_size be a global parameter for all coreutils?
 const page_size = 8192
 
@@ -80,8 +72,4 @@ fn tac(settings Settings) {
 		process_file(file, settings)
 		file.close()
 	}
-}
-
-fn main() {
-	tac(args())
 }

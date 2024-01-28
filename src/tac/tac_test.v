@@ -12,6 +12,10 @@ const cmd = testing.new_paired_command(platform_util, executable_under_test)
 const executable_under_test = testing.prepare_executable(util)
 const temp_dir = testing.temp_folder
 
+fn test_help_and_version() {
+	cmd.ensure_help_and_version_options_work()!
+}
+
 const tac_test_data = [
 	'#01 foo0 bar0 foo1 bar1',
 	'#02 bar0 foo1 bar1 foo1',
@@ -101,8 +105,4 @@ fn testsuite_end() {
 	for _, path in tac_test_files {
 		os.rm(path)!
 	}
-}
-
-fn test_help_and_version() {
-	cmd.ensure_help_and_version_options_work()!
 }
