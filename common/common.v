@@ -4,6 +4,19 @@ import flag
 
 pub const version = '0.0.1'
 
+pub struct CoreutilInfo {
+pub:
+	name        string
+	description string
+}
+
+pub struct CoreutilExitDetail {
+	message string
+mut:
+	return_code      int = 1
+	show_help_advice bool // defaults to false
+}
+
 // coreutils_version returns formatted coreutils tool version
 pub fn coreutils_version() string {
 	return '(V coreutils) ${common.version}'
@@ -45,4 +58,16 @@ pub fn exit_with_error_message(tool_name string, error string) {
 	}
 	eprintln("Try '${tool_name} --help' for more information.")
 	exit(1)
+}
+
+// A common way to exit with a custom error code (default: 1)
+// and the ability to direct the user to help (default: false)
+// to make it easier to match the output of the GNU coreutils
+@[noreturn]
+pub fn (app CoreutilInfo) quit(detail CoreutilExitDetail) {
+	eprintln('${app.name}: ${detail.message}')
+	if detail.show_help_advice {
+		eprintln("Try '${app.name} --help' for more information.")
+	}
+	exit(detail.return_code)
 }
