@@ -35,19 +35,19 @@ fn test_target_does_not_exist() {
 
 fn test_target_is_directory() {
 	$if !windows {
-		os.mkdir('foo')!
-		assert cmd.same_results('foo')
-		os.rmdir('foo')!
+		os.mkdir('${util}_foo')!
+		assert cmd.same_results('${util}_foo')
+		os.rmdir('${util}_foo')!
 	}
 }
 
 fn test_target_does_exist() {
 	// Unfortunately, we cannot do a same_results comparison since
 	// the first call will blow away the target
-	os.write_file('a', '')!
-	assert os.is_file('a')
-	call_for_test('a')
-	assert !os.is_file('a')
+	os.write_file('${util}_a', '')!
+	assert os.is_file('${util}_a')
+	call_for_test('${util}_a')
+	assert !os.is_file('${util}_a')
 }
 
 fn test_help_and_version() {
