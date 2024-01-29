@@ -14,7 +14,7 @@ struct Args {
 }
 
 fn swap_32(x u32) u32 {
-	return ((((x) & 0xff000000) >> 24) | (((x) & 0x00ff0000) >> 8) | (((x) & 0x0000ff00) << 8) | (((x) & 0x000000ff) << 24))
+	return ((x & 0xff000000) >> 24) | ((x & 0x00ff0000) >> 8) | ((x & 0x0000ff00) << 8) | ((x & 0x000000ff) << 24)
 }
 
 fn calc_sums(args Args) {
@@ -41,34 +41,24 @@ fn calc_sums(args Args) {
 			}
 		}
 
-		mut rd := io.new_buffered_reader(io.BufferedReaderConfig{ reader: f, cap: buffer_length})
+		mut rd := io.new_buffered_reader(io.BufferedReaderConfig{ reader: f, cap: buffer_length })
 		mut crc := u64(0)
 		mut total_length := u64(0)
 
 		for {
-			res := u64(rd.read(mut buf) or {
-				break
-			})
+			res := u64(rd.read(mut buf) or { break })
 
 			chunks := res / 8
-			for outer := 0; outer < chunks; outer ++ {
+			for outer := 0; outer < chunks; outer++ {
 				chunk := buf[outer * 8..outer * 8 + 8].clone()
 				first := four_bytes_to_int(chunk[..4])
 				mut second := four_bytes_to_int(chunk[4..])
 
-				crc ^= swap_32(first);
-				second = swap_32(second);
-
+				crc ^= swap_32(first)
+				second = swap_32(second)
 				// println('${crc} ${second}')
 
-				crc = crctab[7][(crc >> 24) & 0xFF] ^
-				crctab[6][(crc >> 16) & 0xFF] ^
-				crctab[5][(crc >> 8) & 0xFF] ^
-				crctab[4][(crc) & 0xFF] ^
-				crctab[3][(second >> 24) & 0xFF] ^
-				crctab[2][(second >> 16) & 0xFF] ^
-				crctab[1][(second >> 8) & 0xFF] ^
-				crctab[0][(second) & 0xFF]
+				crc = crctab[7][(crc >> 24) & 0xFF] ^ crctab[6][(crc >> 16) & 0xFF] ^ crctab[5][(crc >> 8) & 0xFF] ^ crctab[4][crc & 0xFF] ^ crctab[3][(second >> 24) & 0xFF] ^ crctab[2][(second >> 16) & 0xFF] ^ crctab[1][(second >> 8) & 0xFF] ^ crctab[0][second & 0xFF]
 			}
 
 			remaining_len := res - chunks * 8
@@ -81,7 +71,7 @@ fn calc_sums(args Args) {
 
 		mut len_counter := total_length
 		for ; len_counter; len_counter >>= 8 {
-			crc = (crc << 8) ^ crctab[0][((crc >> 24) ^ len_counter) & 0xFF];
+			crc = (crc << 8) ^ crctab[0][((crc >> 24) ^ len_counter) & 0xFF]
 		}
 		crc = ~crc & 0xffff_ffff
 
@@ -89,7 +79,7 @@ fn calc_sums(args Args) {
 			'-' { '' }
 			else { file }
 		}
-		println('$crc ${total_length} $file_str')
+		println('${crc} ${total_length} ${file_str}')
 	}
 }
 
@@ -107,7 +97,7 @@ fn cksum_slice8(buf []u8, crc_in u64, remaining_len u64) u64 {
 	return crc_tmp
 }
 
-fn id[T] (x T) T {
+fn id[T](x T) T {
 	return x
 }
 
@@ -118,11 +108,8 @@ fn four_bytes_to_int(bytes []u8) u32 {
 	for c in bytes.reverse() {
 		tmp_bytes << c.hex()
 	}
-	return u32(
-		arrays
-		.join_to_string[string](tmp_bytes, '', id[string])
-		.parse_uint(16, 32) or { panic(err) }
-	)
+	return u32(arrays.join_to_string[string](tmp_bytes, '', id[string])
+		.parse_uint(16, 32) or { panic(err) })
 }
 
 fn parse_args() Args {
