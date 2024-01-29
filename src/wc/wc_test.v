@@ -27,14 +27,13 @@ const long_under_16k = os.join_path(temp_dir, 'long_under_16k')
 
 // todo add tests
 // - long line (>16k) count max line
-// - count max line at 16k bytes break
-// - test windows \r\n vs \n
 
 fn test_help_and_version() {
 	cmd.ensure_help_and_version_options_work()!
 }
 
 fn testsuite_begin() {
+	os.chdir(testing.temp_folder)!
 	os.write_file(test1_txt_path, 'Hello World!\nHow are you?')!
 	os.write_file(test2_txt_path, 'twolinesonebreak\nbreakline')!
 	os.write_file(test3_txt_path, 'twolinestwobreaks\nbreakline\n')!

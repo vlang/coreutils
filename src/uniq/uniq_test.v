@@ -90,6 +90,7 @@ fn test_posix_spec_case_4_zero_term() {
 }
 
 fn testsuite_begin() {
+	os.chdir(testing.temp_folder)!
 	os.write_file(posix_test_path_newline, posix_test_data.join('\n'))!
 	os.write_file(posix_test_path_zeroterm, posix_test_data.join('\0'))!
 	os.mkdir('${util}_foo')!

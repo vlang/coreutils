@@ -16,6 +16,10 @@ const cmd = testing.new_paired_command(platform_util, executable_under_test)
 
 const cmd_ns = 'sleep'
 
+fn testsuite_begin() {
+	os.chdir(testing.temp_folder)!
+}
+
 fn test_help_and_version() {
 	cmd.ensure_help_and_version_options_work()!
 }

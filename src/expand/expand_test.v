@@ -18,6 +18,7 @@ const cmd = testing.new_paired_command(platform_util, executable_under_test)
 const test_txt_path = os.join_path(testing.temp_folder, 'test.txt')
 
 fn testsuite_begin() {
+	os.chdir(testing.temp_folder)!
 	mut f := os.open_file(test_txt_path, 'wb')!
 	for l in testtxtcontent {
 		f.writeln('${l}')!
