@@ -232,3 +232,46 @@ pub fn output_eol() string {
 	// POSIX => LF
 	return '\n'
 }
+
+// TestRig contains the relevant scaffolding for tests to avoid boilerplate in
+// the individual <util>_test.v files
+pub struct TestRig {
+pub:
+	util                  string
+	platform_util         string
+	executable_under_test string
+	temp_dir              string
+	cmd                   CommandPair
+}
+
+pub fn prepare_rig(util string) TestRig {
+	platform_util := $if !windows {
+		util
+	} $else {
+		'coreutils ${util}'
+	}
+	exec_under_test := prepare_executable(util)
+	temp_dir := os.join_path(temp_folder, util)
+	os.mkdir(temp_dir) or { panic('Unable to make test directory: ${temp_dir}') }
+	os.chdir(temp_dir) or { panic('Unable to set working directory: ${temp_dir}') }
+	return TestRig{
+		util: util
+		platform_util: platform_util
+		cmd: new_paired_command(platform_util, exec_under_test)
+		executable_under_test: exec_under_test
+		temp_dir: temp_dir
+	}
+}
+
+pub fn (rig TestRig) call_for_test(args string) os.Result {
+	res := os.execute('${rig.executable_under_test} ${args}')
+	assert res.exit_code == 0
+	return res
+}
+
+pub fn (rig TestRig) clean_up() ! {
+	assert rig.temp_dir[..temp_folder.len] == temp_folder
+	if os.is_dir(rig.temp_dir) {
+		os.rmdir_all(rig.temp_dir)!
+	}
+}
