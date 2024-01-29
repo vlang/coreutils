@@ -38,7 +38,7 @@ Contributions are welcome!
 Please only contribute versions of the original utilities written in V.
 Contributions written in other languages will likely be rejected.
 
-## Completed (47/109)
+## Completed (48/109)
 
 |  Done   | Cmd       | Descripton                                       |
 | :-----: | --------- | ------------------------------------------------ |
@@ -55,7 +55,7 @@ Contributions written in other languages will likely be rejected.
 |         | chmod     | Change access permissions                        |
 |         | chown     | Change file owner and group                      |
 |         | chroot    | Run a command with a different root directory    |
-|         | cksum     | Print CRC checksum and byte counts               |
+| &check; | cksum     | Print CRC checksum and byte counts               |
 |         | comm      | Compare two sorted files line by line            |
 |         | coreutils | Multi-call program                               |
 | &check; | cp        | Copy files and directories                       |
