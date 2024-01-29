@@ -27,8 +27,6 @@ const long_under_16k = os.join_path(temp_dir, 'long_under_16k')
 
 // todo add tests
 // - long line (>16k) count max line
-// - count max line at 16k bytes break
-// - test windows \r\n vs \n
 
 fn test_help_and_version() {
 	cmd.ensure_help_and_version_options_work()!
