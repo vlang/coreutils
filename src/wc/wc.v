@@ -22,7 +22,7 @@ struct FileChunk {
 mut:
 	prev_char_is_space bool
 	buffer             []u8
-	is_last_chunk      bool = false
+	is_last_chunk      bool
 }
 
 struct Count {
@@ -45,7 +45,6 @@ fn get_count(chunk FileChunk, last_line_length u32) (Count, u32) {
 	mut count := Count{'', 0, 0, 0, 0, 0}
 	mut prev_char_is_space := chunk.prev_char_is_space
 	mut line_length := last_line_length
-	mut last_newline_pos := u32(0)
 
 	for b in chunk.buffer {
 		match b {
@@ -59,7 +58,6 @@ fn get_count(chunk FileChunk, last_line_length u32) (Count, u32) {
 					count.max_line_length = line_length
 				}
 				line_length = 0
-				last_newline_pos = line_length
 			}
 			space, carriage_return, vertical_tab, form_feed {
 				prev_char_is_space = true
@@ -105,7 +103,7 @@ fn (mut file_reader FileReader) read_chunk(mut buffer []u8) ?FileChunk {
 	}
 
 	nbytes := file_reader.file.read(mut buffer) or { return none } // Propagate error. Either EOF or read error.
-	mut chunk := FileChunk{file_reader.last_char_is_space, buffer[..nbytes], false}
+	mut chunk := FileChunk{file_reader.last_char_is_space, buffer[..nbytes].clone(), false}
 	file_reader.last_char_is_space = is_space(buffer[nbytes - 1])
 	if nbytes < buffer.len {
 		chunk.is_last_chunk = true

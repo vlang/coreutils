@@ -1,4 +1,5 @@
 import common.testing
+import os
 
 const util = 'uptime'
 
@@ -12,6 +13,10 @@ const executable_under_test = if supported_platform {
 	testing.prepare_executable(util)
 } else {
 	''
+}
+
+fn testsuite_begin() {
+	os.chdir(testing.temp_folder)!
 }
 
 const cmd = testing.new_paired_command(util, executable_under_test)

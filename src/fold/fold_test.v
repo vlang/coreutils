@@ -22,6 +22,7 @@ fn test_help_and_version() {
 }
 
 fn testsuite_begin() {
+	os.chdir(testing.temp_folder)!
 	mut f := os.open_file(test_txt_path, 'wb')!
 	for l in testtxtcontent {
 		f.writeln('${l}') or {}

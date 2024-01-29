@@ -133,6 +133,10 @@ const tests = [
 	r"'(' 2 a",
 ]
 
+fn testsuite_begin() {
+	os.chdir(testing.temp_folder)!
+}
+
 fn test_results() {
 	mut failed := []string{}
 	for test in tests {

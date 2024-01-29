@@ -38,7 +38,7 @@ Contributions are welcome!
 Please only contribute versions of the original utilities written in V.
 Contributions written in other languages will likely be rejected.
 
-## Completed (45/109)
+## Completed (48/109)
 
 |  Done   | Cmd       | Descripton                                       |
 | :-----: | --------- | ------------------------------------------------ |
@@ -55,7 +55,7 @@ Contributions written in other languages will likely be rejected.
 |         | chmod     | Change access permissions                        |
 |         | chown     | Change file owner and group                      |
 |         | chroot    | Run a command with a different root directory    |
-|         | cksum     | Print CRC checksum and byte counts               |
+| &check; | cksum     | Print CRC checksum and byte counts               |
 |         | comm      | Compare two sorted files line by line            |
 |         | coreutils | Multi-call program                               |
 | &check; | cp        | Copy files and directories                       |
@@ -142,8 +142,8 @@ Contributions written in other languages will likely be rejected.
 |         | tty       | Print file name of terminal on standard input    |
 | &check; | uname     | Print system information                         |
 |         | unexpand  | Convert spaces to tabs                           |
-|         | uniq      | Uniquify files                                   |
-|         | unlink    | Remove files via the unlink syscall              |
+| &check; | uniq      | Uniquify files                                   |
+| &check; | unlink    | Remove files via the unlink syscall              |
 | &check; | uptime    | Print system uptime and load                     |
 |         | users     | Print login names of users currently logged in   |
 |         | vdir      | Verbosely list directory contents                |
