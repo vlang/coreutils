@@ -272,6 +272,6 @@ pub fn (rig TestRig) call_for_test(args string) os.Result {
 pub fn (rig TestRig) clean_up() ! {
 	assert rig.temp_dir[..temp_folder.len] == temp_folder
 	if os.is_dir(rig.temp_dir) {
-		os.rmdir_all(rig.temp_dir)!
+		os.rmdir_all(rig.temp_dir) or {}
 	}
 }
