@@ -21,8 +21,8 @@ const posix_test_data = [
 	'#06 foo0 bar0 foo1 bar1',
 	'#07 bar0 foo1 bar1 foo0',
 ]
-const posix_test_path_newline = '${util}_posix_nl.txt'
-const posix_test_path_zeroterm = '${util}_posix_zt.txt'
+const posix_test_path_newline = 'posix_nl.txt'
+const posix_test_path_zeroterm = 'posix_zt.txt'
 
 fn call_for_test(args string) os.Result {
 	res := os.execute('${executable_under_test} ${args}')
@@ -47,59 +47,58 @@ fn test_target_does_not_exist() {
 
 fn test_source_is_directory() {
 	$if !windows {
-		assert cmd.same_results('${util}_foo')
+		assert cmd.same_results('foo')
 	}
 }
 
 fn test_target_is_directory() {
 	$if !windows {
-		assert cmd.same_results('${posix_test_path_newline} ${util}_foo')
+		assert cmd.same_results('posix_nl.txt foo')
 	}
 }
 
 fn test_posix_spec_case_1() {
-	assert cmd.same_results('-c -f 1 ${posix_test_path_newline}')
+	assert cmd.same_results('-c -f 1 posix_nl.txt')
 }
 
 fn test_posix_spec_case_2() {
-	assert cmd.same_results('-d -f 1 ${posix_test_path_newline}')
+	assert cmd.same_results('-d -f 1 posix_nl.txt')
 }
 
 fn test_posix_spec_case_3() {
-	assert cmd.same_results('-u -f 1 ${posix_test_path_newline}')
+	assert cmd.same_results('-u -f 1 posix_nl.txt')
 }
 
 fn test_posix_spec_case_4() {
-	assert cmd.same_results('-d -s 2 ${posix_test_path_newline}')
+	assert cmd.same_results('-d -s 2 posix_nl.txt')
 }
 
 fn test_posix_spec_case_1_zero_term() {
-	assert call_for_test('-c -f 1 ${posix_test_path_zeroterm}').output.split('\0').len == 7
+	assert call_for_test('-c -f 1 posix_zt.txt').output.split('\0').len == 7
 }
 
 fn test_posix_spec_case_2_zero_term() {
-	assert call_for_test('-d -f 1 -z ${posix_test_path_zeroterm}').output.split('\0').len == 2
+	assert call_for_test('-d -f 1 -z posix_zt.txt').output.split('\0').len == 2
 }
 
 fn test_posix_spec_case_3_zero_term() {
-	assert call_for_test('-u -f 1 -z ${posix_test_path_zeroterm}').output.split('\0').len == 6
+	assert call_for_test('-u -f 1 -z posix_zt.txt').output.split('\0').len == 6
 }
 
 fn test_posix_spec_case_4_zero_term() {
-	assert call_for_test('-d -s 2 -z ${posix_test_path_zeroterm}').output.split('\0').len == 1
+	assert call_for_test('-d -s 2 -z posix_zt.txt').output.split('\0').len == 1
 }
 
 fn testsuite_begin() {
-	os.chdir(testing.temp_folder)!
 	os.write_file(posix_test_path_newline, posix_test_data.join('\n'))!
 	os.write_file(posix_test_path_zeroterm, posix_test_data.join('\0'))!
-	os.mkdir('${util}_foo')!
+	os.mkdir('foo')!
 }
 
 fn testsuite_end() {
-	os.rmdir('${util}_foo')!
 	os.rm(posix_test_path_newline)!
 	os.rm(posix_test_path_zeroterm)!
+	os.rmdir('foo')!
 }
 
 fn test_help_and_version() {
