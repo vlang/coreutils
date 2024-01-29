@@ -2,7 +2,7 @@ import common.testing
 import os
 import time
 
-const rig = testing.prepare_rig('sleep')
+const rig = testing.prepare_rig(util: 'sleep')
 const cmd = rig.cmd
 const executable_under_test = rig.executable_under_test
 

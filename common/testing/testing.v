@@ -242,24 +242,36 @@ pub:
 	executable_under_test string
 	temp_dir              string
 	cmd                   CommandPair
+	is_supported_platform bool
 }
 
-pub fn prepare_rig(util string) TestRig {
+pub struct TestRigConfig {
+pub:
+	util                  string
+	is_supported_platform bool = true
+}
+
+pub fn prepare_rig(config TestRigConfig) TestRig {
 	platform_util := $if !windows {
-		util
+		config.util
 	} $else {
-		'coreutils ${util}'
+		'coreutils ${config.util}'
 	}
-	exec_under_test := prepare_executable(util)
-	temp_dir := os.join_path(temp_folder, util)
+	exec_under_test := if config.is_supported_platform {
+		prepare_executable(config.util)
+	} else {
+		''
+	}
+	temp_dir := os.join_path(temp_folder, config.util)
 	os.mkdir(temp_dir) or { panic('Unable to make test directory: ${temp_dir}') }
 	os.chdir(temp_dir) or { panic('Unable to set working directory: ${temp_dir}') }
 	return TestRig{
-		util: util
+		util: config.util
 		platform_util: platform_util
 		cmd: new_paired_command(platform_util, exec_under_test)
 		executable_under_test: exec_under_test
 		temp_dir: temp_dir
+		is_supported_platform: config.is_supported_platform
 	}
 }
 

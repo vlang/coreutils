@@ -1,7 +1,7 @@
 import os
 import common.testing
 
-const rig = testing.prepare_rig('expand')
+const rig = testing.prepare_rig(util: 'expand')
 const cmd = rig.cmd
 const executable_under_test = rig.executable_under_test
 const eol = testing.output_eol()

@@ -1,7 +1,7 @@
 import common.testing
 import os
 
-const rig = testing.prepare_rig('whoami')
+const rig = testing.prepare_rig(util: 'whoami')
 const cmd = rig.cmd
 
 fn testsuite_begin() {

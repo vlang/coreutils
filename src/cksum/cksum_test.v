@@ -1,7 +1,7 @@
 import common.testing
 import os
 
-const rig = testing.prepare_rig('cksum')
+const rig = testing.prepare_rig(util: 'cksum')
 const cmd = rig.cmd
 const executable_under_test = rig.executable_under_test
 const eol = testing.output_eol()

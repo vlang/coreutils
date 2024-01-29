@@ -1,14 +1,14 @@
 import common.testing
 import os
 
-const rig = testing.prepare_rig('uptime')
-const cmd = rig.cmd
-const executable_under_test = rig.executable_under_test
 const supported_platform = $if windows {
 	false
 } $else {
 	true
 } // WinOS lacks currently required utmp support
+const rig = testing.prepare_rig(util: 'uptime', is_supported_platform: supported_platform)
+const cmd = rig.cmd
+const executable_under_test = rig.executable_under_test
 
 fn testsuite_begin() {
 	assert os.getwd() == rig.temp_dir

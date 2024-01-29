@@ -1,7 +1,7 @@
 import common.testing
 import os
 
-const rig = testing.prepare_rig('uniq')
+const rig = testing.prepare_rig(util: 'uniq')
 const cmd = rig.cmd
 
 fn testsuite_begin() {

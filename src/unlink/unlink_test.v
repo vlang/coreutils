@@ -1,7 +1,7 @@
 import common.testing
 import os
 
-const rig = testing.prepare_rig('unlink')
+const rig = testing.prepare_rig(util: 'unlink')
 const cmd = rig.cmd
 
 fn testsuite_begin() {

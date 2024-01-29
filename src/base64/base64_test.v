@@ -1,7 +1,7 @@
 import common.testing
 import os
 
-const rig = testing.prepare_rig('base64')
+const rig = testing.prepare_rig(util: 'base64')
 const cmd = rig.cmd
 const executable_under_test = rig.executable_under_test
 

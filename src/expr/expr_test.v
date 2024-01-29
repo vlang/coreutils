@@ -2,7 +2,7 @@ import common
 import common.testing
 import os
 
-const rig = testing.prepare_rig('expr')
+const rig = testing.prepare_rig(util: 'expr')
 const cmd = rig.cmd
 
 fn testsuite_begin() {

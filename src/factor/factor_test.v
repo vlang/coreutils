@@ -1,7 +1,7 @@
 import common.testing
 import os
 
-const rig = testing.prepare_rig('factor')
+const rig = testing.prepare_rig(util: 'factor')
 const cmd = rig.cmd
 const executable_under_test = rig.executable_under_test
 

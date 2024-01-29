@@ -1,7 +1,7 @@
 import common.testing
 import os
 
-const rig = testing.prepare_rig('dirname')
+const rig = testing.prepare_rig(util: 'dirname')
 const cmd = rig.cmd
 const executable_under_test = rig.executable_under_test
 const slash = $if !windows {
