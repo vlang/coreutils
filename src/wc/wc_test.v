@@ -33,6 +33,7 @@ fn test_help_and_version() {
 }
 
 fn testsuite_begin() {
+	os.chdir(testing.temp_folder)!
 	os.write_file(test1_txt_path, 'Hello World!\nHow are you?')!
 	os.write_file(test2_txt_path, 'twolinesonebreak\nbreakline')!
 	os.write_file(test3_txt_path, 'twolinestwobreaks\nbreakline\n')!

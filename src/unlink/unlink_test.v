@@ -18,6 +18,10 @@ fn call_for_test(args string) os.Result {
 	return res
 }
 
+fn testsuite_begin() {
+	os.chdir(testing.temp_folder)!
+}
+
 // TODO: The following tests fail in a Windows environment; need to
 // investigate what gives.
 fn test_target_does_not_exist() {

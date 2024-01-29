@@ -7,6 +7,10 @@ const shuf = testing.prepare_executable('shuf')
 
 const test_txt_path = os.join_path(testing.temp_folder, 'test.txt')
 
+fn testsuite_begin() {
+	os.chdir(testing.temp_folder)!
+}
+
 fn test_echo() {
 	res := os.execute('${shuf} -e aa bb')
 	assert res.output == 'aa${eol}bb${eol}' || res.output == 'bb${eol}aa${eol}'
