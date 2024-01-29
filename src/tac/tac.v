@@ -1,9 +1,24 @@
 module main
 
+import common
 import regex
 import os
 
-// TODO: Optimization - don't load entire file into memory
+const app = common.CoreutilInfo{
+	name: 'tac'
+	description: 'concatenate and print files in reverse'
+}
+
+const app_name = app.name
+const app_description = app.description
+
+struct Settings {
+mut:
+	before      bool
+	regex       bool
+	separator   string
+	input_files []string
+}
 
 // TODO: Should page_size be a global parameter for all coreutils?
 const page_size = 8192
@@ -59,6 +74,7 @@ fn process_file(file os.File, settings Settings) {
 	}
 }
 
+// TODO: Optimization - don't load entire file into memory
 fn tac(settings Settings) {
 	mut file := os.File{}
 	for fname in settings.input_files {
@@ -72,4 +88,29 @@ fn tac(settings Settings) {
 		process_file(file, settings)
 		file.close()
 	}
+}
+
+fn args() Settings {
+	mut fp := app.make_flag_parser(os.args)
+	mut st := Settings{}
+	st.before = fp.bool('before', `b`, false, 'attach the separator before instead of after')
+	st.regex = fp.bool('regex', `r`, false, 'interpret the separator as a regular expression')
+	st.separator = fp.string('separator', `s`, '\n', 'use STRING as the separator instead of newline')
+	fnames := fp.remaining_parameters()
+
+	if st.separator.len == 0 {
+		app.quit(message: 'separator cannot be empty')
+	}
+
+	if fnames.len == 0 {
+		st.input_files << '-'
+	} else {
+		st.input_files = fnames
+	}
+
+	return st
+}
+
+fn main() {
+	tac(args())
 }
