@@ -1,20 +1,15 @@
 import common.testing
 import os
 
-const util = 'whoami'
-
-const platform_util = $if !windows {
-	util
-} $else {
-	'coreutils ${util}'
-}
-
-const executable_under_test = testing.prepare_executable(util)
-
-const cmd = testing.new_paired_command(platform_util, executable_under_test)
+const rig = testing.prepare_rig('unlink')
+const cmd = rig.cmd
 
 fn testsuite_begin() {
-	os.chdir(testing.temp_folder)!
+	assert os.getwd() == rig.temp_dir
+}
+
+fn testsuite_end() {
+	rig.clean_up()!
 }
 
 fn test_help_and_version() {
@@ -22,7 +17,7 @@ fn test_help_and_version() {
 }
 
 fn test_unknown_option() {
-	testing.command_fails('${executable_under_test} -x')!
+	testing.command_fails('${rig.executable_under_test} -x')!
 }
 
 fn test_display_username() {

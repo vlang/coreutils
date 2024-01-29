@@ -2,17 +2,16 @@ import common
 import common.testing
 import os
 
-const util = 'expr'
+const rig = testing.prepare_rig('expr')
+const cmd = rig.cmd
 
-const platform_util = $if !windows {
-	util
-} $else {
-	'coreutils ${util}'
+fn testsuite_begin() {
+	assert os.getwd() == rig.temp_dir
 }
 
-const executable_under_test = testing.prepare_executable(util)
-
-const cmd = testing.new_paired_command(platform_util, executable_under_test)
+fn testsuite_end() {
+	rig.clean_up()!
+}
 
 fn test_help_and_version() {
 	cmd.ensure_help_and_version_options_work()!
@@ -132,10 +131,6 @@ const tests = [
 	r"'(' 2 ",
 	r"'(' 2 a",
 ]
-
-fn testsuite_begin() {
-	os.chdir(testing.temp_folder)!
-}
 
 fn test_results() {
 	mut failed := []string{}

@@ -1,25 +1,22 @@
 import common.testing
 import os
 
-const util = 'uptime'
-
+const rig = testing.prepare_rig('uptime')
+const cmd = rig.cmd
+const executable_under_test = rig.executable_under_test
 const supported_platform = $if windows {
 	false
 } $else {
 	true
 } // WinOS lacks currently required utmp support
 
-const executable_under_test = if supported_platform {
-	testing.prepare_executable(util)
-} else {
-	''
-}
-
 fn testsuite_begin() {
-	os.chdir(testing.temp_folder)!
+	assert os.getwd() == rig.temp_dir
 }
 
-const cmd = testing.new_paired_command(util, executable_under_test)
+fn testsuite_end() {
+	rig.clean_up()!
+}
 
 fn test_help_and_version() {
 	if !supported_platform {

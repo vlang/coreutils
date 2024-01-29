@@ -1,33 +1,19 @@
-import os
 import common.testing
+import os
 
+const rig = testing.prepare_rig('cksum')
+const cmd = rig.cmd
+const executable_under_test = rig.executable_under_test
 const eol = testing.output_eol()
-const util = 'cksum'
-
-const platform_util = $if !windows {
-	util
-} $else {
-	'coreutils ${util}'
-}
-
-const executable_under_test = testing.prepare_executable(util)
-
-const cmd = testing.new_paired_command(platform_util, executable_under_test)
-
-const temp_dir = testing.temp_folder
-const test1_txt_path = os.join_path(temp_dir, 'test1.txt')
-const test2_txt_path = os.join_path(temp_dir, 'test2.txt')
-const test3_txt_path = os.join_path(temp_dir, 'test3.txt')
-const dummy = os.join_path(temp_dir, 'dummy')
-const long_over_16k = os.join_path(temp_dir, 'long_over_16k')
-const long_under_16k = os.join_path(temp_dir, 'long_under_16k')
-
-fn test_help_and_version() {
-	cmd.ensure_help_and_version_options_work()!
-}
+const test1_txt_path = os.join_path(rig.temp_dir, 'test1.txt')
+const test2_txt_path = os.join_path(rig.temp_dir, 'test2.txt')
+const test3_txt_path = os.join_path(rig.temp_dir, 'test3.txt')
+const dummy = os.join_path(rig.temp_dir, 'dummy')
+const long_over_16k = os.join_path(rig.temp_dir, 'long_over_16k')
+const long_under_16k = os.join_path(rig.temp_dir, 'long_under_16k')
 
 fn testsuite_begin() {
-	os.chdir(testing.temp_folder)!
+	assert os.getwd() == rig.temp_dir
 	os.write_file(test1_txt_path, 'Hello World!\nHow are you?')!
 	os.write_file(test2_txt_path, 'a'.repeat(128 * 1024 + 5))!
 }
@@ -35,6 +21,11 @@ fn testsuite_begin() {
 fn testsuite_end() {
 	os.rm(test1_txt_path)!
 	os.rm(test2_txt_path)!
+	rig.clean_up()!
+}
+
+fn test_help_and_version() {
+	cmd.ensure_help_and_version_options_work()!
 }
 
 fn test_stdin() {

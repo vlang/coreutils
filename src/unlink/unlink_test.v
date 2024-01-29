@@ -1,25 +1,15 @@
 import common.testing
 import os
 
-const util = 'unlink'
-const platform_util = $if !windows {
-	util
-} $else {
-	'coreutils ${util}'
-}
-
-const cmd = testing.new_paired_command(platform_util, executable_under_test)
-const executable_under_test = testing.prepare_executable(util)
-const temp_dir = testing.temp_folder
-
-fn call_for_test(args string) os.Result {
-	res := os.execute('${executable_under_test} ${args}')
-	assert res.exit_code == 0
-	return res
-}
+const rig = testing.prepare_rig('unlink')
+const cmd = rig.cmd
 
 fn testsuite_begin() {
-	os.chdir(testing.temp_folder)!
+	assert os.getwd() == rig.temp_dir
+}
+
+fn testsuite_end() {
+	rig.clean_up()!
 }
 
 // TODO: The following tests fail in a Windows environment; need to
@@ -50,7 +40,7 @@ fn test_target_does_exist() {
 	// the first call will blow away the target
 	os.write_file('a', '')!
 	assert os.is_file('a')
-	call_for_test('a')
+	rig.call_for_test('a')
 	assert !os.is_file('a')
 }
 

@@ -1,16 +1,22 @@
 import common.testing
 import os
 
-const util = 'uniq'
-const platform_util = $if !windows {
-	util
-} $else {
-	'coreutils ${util}'
+const rig = testing.prepare_rig('uniq')
+const cmd = rig.cmd
+
+fn testsuite_begin() {
+	assert os.getwd() == rig.temp_dir
+	os.write_file(posix_test_path_newline, posix_test_data.join('\n'))!
+	os.write_file(posix_test_path_zeroterm, posix_test_data.join('\0'))!
+	os.mkdir('foo')!
 }
 
-const cmd = testing.new_paired_command(platform_util, executable_under_test)
-const executable_under_test = testing.prepare_executable(util)
-const temp_dir = testing.temp_folder
+fn testsuite_end() {
+	os.rm(posix_test_path_newline)!
+	os.rm(posix_test_path_zeroterm)!
+	os.rmdir('foo')!
+	rig.clean_up()!
+}
 
 const posix_test_data = [
 	'#01 foo0 bar0 foo1 bar1',
@@ -23,12 +29,6 @@ const posix_test_data = [
 ]
 const posix_test_path_newline = 'posix_nl.txt'
 const posix_test_path_zeroterm = 'posix_zt.txt'
-
-fn call_for_test(args string) os.Result {
-	res := os.execute('${executable_under_test} ${args}')
-	assert res.exit_code == 0
-	return res
-}
 
 // TODO: The following tests fail in a Windows environment; need to
 // investigate what gives.
@@ -74,32 +74,19 @@ fn test_posix_spec_case_4() {
 }
 
 fn test_posix_spec_case_1_zero_term() {
-	assert call_for_test('-c -f 1 posix_zt.txt').output.split('\0').len == 7
+	assert rig.call_for_test('-c -f 1 posix_zt.txt').output.split('\0').len == 7
 }
 
 fn test_posix_spec_case_2_zero_term() {
-	assert call_for_test('-d -f 1 -z posix_zt.txt').output.split('\0').len == 2
+	assert rig.call_for_test('-d -f 1 -z posix_zt.txt').output.split('\0').len == 2
 }
 
 fn test_posix_spec_case_3_zero_term() {
-	assert call_for_test('-u -f 1 -z posix_zt.txt').output.split('\0').len == 6
+	assert rig.call_for_test('-u -f 1 -z posix_zt.txt').output.split('\0').len == 6
 }
 
 fn test_posix_spec_case_4_zero_term() {
-	assert call_for_test('-d -s 2 -z posix_zt.txt').output.split('\0').len == 1
-}
-
-fn testsuite_begin() {
-	os.chdir(testing.temp_folder)!
-	os.write_file(posix_test_path_newline, posix_test_data.join('\n'))!
-	os.write_file(posix_test_path_zeroterm, posix_test_data.join('\0'))!
-	os.mkdir('foo')!
-}
-
-fn testsuite_end() {
-	os.rm(posix_test_path_newline)!
-	os.rm(posix_test_path_zeroterm)!
-	os.rmdir('foo')!
+	assert rig.call_for_test('-d -s 2 -z posix_zt.txt').output.split('\0').len == 1
 }
 
 fn test_help_and_version() {
