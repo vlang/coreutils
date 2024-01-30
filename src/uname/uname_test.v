@@ -1,21 +1,10 @@
 import common.testing
 import os
+import time
 
-const util = 'uname'
-
-const platform_util = $if !windows {
-	util
-} $else {
-	'coreutils ${util}'
-}
-
-const executable_under_test = testing.prepare_executable(util)
-
-const cmd = testing.new_paired_command(platform_util, executable_under_test)
-
-fn testsuite_begin() {
-	os.chdir(testing.temp_folder)!
-}
+const rig = testing.prepare_rig(util: 'uname')
+const cmd = rig.cmd
+const executable_under_test = rig.executable_under_test
 
 fn test_help_and_version() {
 	cmd.ensure_help_and_version_options_work()!
