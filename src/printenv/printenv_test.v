@@ -1,5 +1,4 @@
 import common.testing
-import os
 
 const rig = testing.prepare_rig(util: 'printenv')
 const cmd = rig.cmd
