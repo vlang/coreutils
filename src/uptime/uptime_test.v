@@ -1,5 +1,4 @@
 import common.testing
-import os
 
 const supported_platform = $if windows {
 	false

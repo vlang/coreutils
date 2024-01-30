@@ -1,6 +1,4 @@
 import common.testing
-import os
-import time
 
 const rig = testing.prepare_rig(util: 'uname')
 const cmd = rig.cmd
