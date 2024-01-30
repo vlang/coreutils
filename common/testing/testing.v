@@ -265,7 +265,7 @@ pub fn prepare_rig(config TestRigConfig) TestRig {
 	temp_dir := os.join_path(temp_folder, config.util)
 	os.mkdir(temp_dir) or { panic('Unable to make test directory: ${temp_dir}') }
 	os.chdir(temp_dir) or { panic('Unable to set working directory: ${temp_dir}') }
-	return TestRig{
+	rig := TestRig{
 		util: config.util
 		platform_util: platform_util
 		cmd: new_paired_command(platform_util, exec_under_test)
@@ -274,6 +274,7 @@ pub fn prepare_rig(config TestRigConfig) TestRig {
 		is_supported_platform: config.is_supported_platform
 	}
 	C.atexit(rig.clean_up)
+	return rig
 }
 
 pub fn (rig TestRig) call_for_test(args string) os.Result {
@@ -283,7 +284,6 @@ pub fn (rig TestRig) call_for_test(args string) os.Result {
 }
 
 pub fn (rig TestRig) clean_up() {
-	assert rig.temp_dir[..temp_folder.len] == temp_folder
 	if os.is_dir(rig.temp_dir) {
 		os.rmdir_all(rig.temp_dir) or {}
 	}
