@@ -13,7 +13,6 @@ const long_over_16k = os.join_path(rig.temp_dir, 'long_over_16k')
 const long_under_16k = os.join_path(rig.temp_dir, 'long_under_16k')
 
 fn testsuite_begin() {
-	assert os.getwd() == rig.temp_dir
 	os.write_file(test1_txt_path, 'Hello World!\nHow are you?')!
 	os.write_file(test2_txt_path, 'a'.repeat(128 * 1024 + 5))!
 }
@@ -21,7 +20,6 @@ fn testsuite_begin() {
 fn testsuite_end() {
 	os.rm(test1_txt_path)!
 	os.rm(test2_txt_path)!
-	rig.clean_up()!
 }
 
 fn test_help_and_version() {

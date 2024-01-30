@@ -10,14 +10,6 @@ const slash = $if !windows {
 	'/'
 }
 
-fn testsuite_begin() {
-	assert os.getwd() == rig.temp_dir
-}
-
-fn testsuite_end() {
-	rig.clean_up()!
-}
-
 fn test_help_and_version() {
 	cmd.ensure_help_and_version_options_work()!
 }

@@ -8,7 +8,6 @@ const eol = testing.output_eol()
 const test_txt_path = os.join_path(rig.temp_dir, 'test.txt')
 
 fn testsuite_begin() {
-	assert os.getwd() == rig.temp_dir
 	mut f := os.open_file(test_txt_path, 'wb')!
 	for l in testtxtcontent {
 		f.writeln('${l}') or {}
@@ -18,7 +17,6 @@ fn testsuite_begin() {
 
 fn testsuite_end() {
 	os.rm(test_txt_path)!
-	rig.clean_up()!
 }
 
 fn test_help_and_version() {

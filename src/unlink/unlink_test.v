@@ -4,14 +4,6 @@ import os
 const rig = testing.prepare_rig(util: 'unlink')
 const cmd = rig.cmd
 
-fn testsuite_begin() {
-	assert os.getwd() == rig.temp_dir
-}
-
-fn testsuite_end() {
-	rig.clean_up()!
-}
-
 // TODO: The following tests fail in a Windows environment; need to
 // investigate what gives.
 fn test_target_does_not_exist() {

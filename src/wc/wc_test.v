@@ -18,7 +18,6 @@ const long_under_16k = os.join_path(rig.temp_dir, 'long_under_16k')
 // - long line (>16k) count max line
 
 fn testsuite_begin() {
-	assert os.getwd() == rig.temp_dir
 	os.chdir(testing.temp_folder)!
 	os.write_file(test1_txt_path, 'Hello World!\nHow are you?')!
 	os.write_file(test2_txt_path, 'twolinesonebreak\nbreakline')!
@@ -37,7 +36,6 @@ fn testsuite_end() {
 	os.rm(long_over_16k)!
 	os.rm(long_under_16k)!
 	os.rm(file_list_path)!
-	rig.clean_up()!
 }
 
 fn test_help_and_version() {

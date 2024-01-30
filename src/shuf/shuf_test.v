@@ -7,14 +7,6 @@ const executable_under_test = rig.executable_under_test
 const eol = testing.output_eol()
 const test_txt_path = os.join_path(rig.temp_dir, 'test.txt')
 
-fn testsuite_begin() {
-	assert os.getwd() == rig.temp_dir
-}
-
-fn testsuite_end() {
-	rig.clean_up()!
-}
-
 fn test_help_and_version() {
 	cmd.ensure_help_and_version_options_work()!
 }

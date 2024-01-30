@@ -5,7 +5,6 @@ const rig = testing.prepare_rig(util: 'uniq')
 const cmd = rig.cmd
 
 fn testsuite_begin() {
-	assert os.getwd() == rig.temp_dir
 	os.write_file(posix_test_path_newline, posix_test_data.join('\n'))!
 	os.write_file(posix_test_path_zeroterm, posix_test_data.join('\0'))!
 	os.mkdir('foo')!
@@ -15,7 +14,6 @@ fn testsuite_end() {
 	os.rm(posix_test_path_newline)!
 	os.rm(posix_test_path_zeroterm)!
 	os.rmdir('foo')!
-	rig.clean_up()!
 }
 
 const posix_test_data = [
