@@ -1,16 +1,8 @@
 import common.testing
 import os
 
-const util = 'tac'
-const platform_util = $if !windows {
-	util
-} $else {
-	'coreutils ${util}'
-}
-
-const cmd = testing.new_paired_command(platform_util, executable_under_test)
-const executable_under_test = testing.prepare_executable(util)
-const temp_dir = testing.temp_folder
+const rig = testing.prepare_rig(util: 'tac')
+const cmd = rig.cmd
 
 fn test_help_and_version() {
 	cmd.ensure_help_and_version_options_work()!
@@ -27,14 +19,14 @@ const tac_test_data = [
 ]
 
 const tac_test_files = {
-	'vanilla':      '${util}_vanilla.txt'
-	'no_final_lf':  '${util}_no_final_lf.txt'
-	'seq':          '${util}_seq.txt'
-	'seq_ellipsis': '${util}_seq_ellipsis.txt'
+	'vanilla':      'vanilla.txt'
+	'no_final_lf':  'no_final_lf.txt'
+	'seq':          'seq.txt'
+	'seq_ellipsis': 'seq_ellipsis.txt'
 }
 
 fn call_for_test(args string) os.Result {
-	res := os.execute('${executable_under_test} ${args}')
+	res := os.execute('${rig.executable_under_test} ${args}')
 	assert res.exit_code == 0
 	return res
 }
@@ -83,7 +75,7 @@ fn test_multiple_sep_before() {
 }
 
 fn test_file_does_not_exist() {
-	assert cmd.same_results('${util}_no_such_file.txt')
+	assert cmd.same_results('no_such_file.txt')
 }
 
 fn make_test_file(path string, sep string) ! {
