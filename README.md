@@ -129,7 +129,7 @@ Contributions written in other languages will likely be rejected.
 |         | stty      | Print or change terminal characteristics         |
 |         | sum       | Print checksum and block counts                  |
 |         | sync      | Synchronize cached writes to persistent storage  |
-|         | tac       | Concatenate and write files in reverse           |
+| &check; | tac       | Concatenate and write files in reverse           |
 |         | tail      | Output the last part of files                    |
 |         | tee       | Redirect output to multiple files or processes   |
 | &check; | test      | Check file types and compare values              |
