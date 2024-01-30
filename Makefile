@@ -10,7 +10,7 @@ fmt:
 	v fmt -w .
 
 test:
-	LANG=C v test .
+	LANG=C v -Wimpure-v -W test .
 
 testfmt:
 	v fmt -verify .
