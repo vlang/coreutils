@@ -1,6 +1,7 @@
 import os
 import common.testing
 
+const rig = testing.prepare_rig(util: 'mkdir')
 const eol = testing.output_eol()
 
 // A lot of the following has been lifted directly from os_test.v in vlib,
@@ -42,7 +43,7 @@ const executable_under_test = testing.prepare_executable(util)
 const cmd = testing.new_paired_command(platform_util, executable_under_test)
 
 fn test_help_and_version() {
-	cmd.ensure_help_and_version_options_work()!
+	rig.assert_help_and_version_options_work()
 }
 
 fn test_default_create_single_dir() {

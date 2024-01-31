@@ -11,7 +11,7 @@ const slash = $if !windows {
 }
 
 fn test_help_and_version() {
-	cmd.ensure_help_and_version_options_work()!
+	rig.assert_help_and_version_options_work()
 }
 
 fn expected_result(input string, output string) {

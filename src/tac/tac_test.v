@@ -5,7 +5,7 @@ const rig = testing.prepare_rig(util: 'tac')
 const cmd = rig.cmd
 
 fn test_help_and_version() {
-	cmd.ensure_help_and_version_options_work()!
+	rig.assert_help_and_version_options_work()
 }
 
 const tac_test_data = [
@@ -34,7 +34,7 @@ fn call_for_test(args string) os.Result {
 fn run_for_all(args string) {
 	for tf, path in tac_test_files {
 		eprintln('   >>>>>  Now testing: ${tf}  <<<<<   ')
-		assert cmd.same_results('${args} ${path}')
+		rig.assert_same_results('${args} ${path}')
 	}
 }
 
@@ -67,15 +67,15 @@ fn test_regex_sep_before() {
 }
 
 fn test_multiple() {
-	assert cmd.same_results('${tac_test_files['vanilla']} ${tac_test_files['seq']}')
+	rig.assert_same_results('${tac_test_files['vanilla']} ${tac_test_files['seq']}')
 }
 
 fn test_multiple_sep_before() {
-	assert cmd.same_results('-b ${tac_test_files['vanilla']} ${tac_test_files['seq']}')
+	rig.assert_same_results('-b ${tac_test_files['vanilla']} ${tac_test_files['seq']}')
 }
 
 fn test_file_does_not_exist() {
-	assert cmd.same_results('no_such_file.txt')
+	rig.assert_same_results('no_such_file.txt')
 }
 
 fn make_test_file(path string, sep string) ! {

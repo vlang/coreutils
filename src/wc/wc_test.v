@@ -2,7 +2,6 @@ import common.testing
 import os
 
 const rig = testing.prepare_rig(util: 'wc')
-const cmd = rig.cmd
 const executable_under_test = rig.executable_under_test
 const eol = testing.output_eol()
 const file_list_sep = '\x00'
@@ -39,7 +38,7 @@ fn testsuite_end() {
 }
 
 fn test_help_and_version() {
-	cmd.ensure_help_and_version_options_work()!
+	rig.assert_help_and_version_options_work()
 }
 
 fn test_stdin() {

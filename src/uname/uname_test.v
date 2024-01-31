@@ -5,7 +5,7 @@ const cmd = rig.cmd
 const executable_under_test = rig.executable_under_test
 
 fn test_help_and_version() {
-	cmd.ensure_help_and_version_options_work()!
+	rig.assert_help_and_version_options_work()
 }
 
 fn test_unknown_option() {
@@ -15,19 +15,19 @@ fn test_unknown_option() {
 }
 
 fn test_print_system_info() {
-	assert cmd.same_results('')
-	// assert cmd.same_results('--all')
-	assert cmd.same_results('--kernel-name')
-	assert cmd.same_results('--nodename')
-	assert cmd.same_results('--kernel-release')
-	assert cmd.same_results('--kernel-version')
-	assert cmd.same_results('--machine')
+	rig.assert_same_results('')
+	// rig.assert_same_results('--all')
+	rig.assert_same_results('--kernel-name')
+	rig.assert_same_results('--nodename')
+	rig.assert_same_results('--kernel-release')
+	rig.assert_same_results('--kernel-version')
+	rig.assert_same_results('--machine')
 	/*
-	assert cmd.same_results('--processor')
-	assert cmd.same_results('--hardware-platform')
-	assert cmd.same_results('--operating-system')*/
+	rig.assert_same_results('--processor')
+	rig.assert_same_results('--hardware-platform')
+	rig.assert_same_results('--operating-system')*/
 
-	// assert cmd.same_results('-a')
-	// assert cmd.same_results('-ma')
-	assert cmd.same_results('-vm -srn')
+	// rig.assert_same_results('-a')
+	// rig.assert_same_results('-ma')
+	rig.assert_same_results('-vm -srn')
 }

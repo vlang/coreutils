@@ -13,7 +13,7 @@ fn test_help_and_version() {
 	if !supported_platform {
 		return
 	}
-	cmd.ensure_help_and_version_options_work()!
+	rig.assert_help_and_version_options_work()
 }
 
 fn test_unknown_option() {
@@ -28,6 +28,6 @@ fn test_unknown_option() {
 // 	if !supported_platform {
 // 		return
 // 	}
-// 	assert cmd.same_results('')
-// 	// assert cmd.same_results('/var/log/wtmp') // SKIP ~ `uptime FILE` is not universally supported
+// 	rig.assert_same_results('')
+// 	// rig.assert_same_results('/var/log/wtmp') // SKIP ~ `uptime FILE` is not universally supported
 // }

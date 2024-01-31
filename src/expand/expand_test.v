@@ -20,7 +20,7 @@ fn testsuite_end() {
 }
 
 fn test_help_and_version() {
-	cmd.ensure_help_and_version_options_work()!
+	rig.assert_help_and_version_options_work()
 }
 
 fn test_non_existent_file() {

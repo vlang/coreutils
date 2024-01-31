@@ -4,7 +4,7 @@ const rig = testing.prepare_rig(util: 'whoami')
 const cmd = rig.cmd
 
 fn test_help_and_version() {
-	cmd.ensure_help_and_version_options_work()!
+	rig.assert_help_and_version_options_work()
 }
 
 fn test_unknown_option() {
@@ -12,5 +12,5 @@ fn test_unknown_option() {
 }
 
 fn test_display_username() {
-	assert cmd.same_results('')
+	rig.assert_same_results('')
 }
