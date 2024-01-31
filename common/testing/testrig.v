@@ -35,7 +35,11 @@ pub fn (rig TestRig) clean_up() {
 }
 
 pub fn (rig TestRig) assert_same_results(args string) {
-	cmd1_res := os.execute('${rig.platform_util_path} ${args}')
+	cmd1_res := $if !windows {
+		os.execute('${rig.platform_util_path} ${args}')
+	} $else {
+		os.execute('${rig.platform_util_path} ${rig.util} ${args}')
+	}
 	cmd2_res := os.execute('${rig.executable_under_test} ${args}')
 	// If the name of the executable appears in the returned message, shorten it to the util
 	// name because the paths are different for GNU coreutil and v-coreutil
