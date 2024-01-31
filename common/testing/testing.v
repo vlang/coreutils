@@ -1,6 +1,5 @@
 module testing
 
-import arrays
 import os
 import regex
 
@@ -147,24 +146,8 @@ const gnu_coreutils_installed = os.getenv('GNU_COREUTILS_INSTALLED').int() == 1
 pub fn same_results(cmd1 string, cmd2 string) bool {
 	cmd1_res := os.execute(cmd1)
 	cmd2_res := os.execute(cmd2)
-	
-	// If the util failed, it will return an error of this form
-	// <util>: something went wrong
-	// We strip out the <util>: part because it may include the path with
-	// which it was called (e.g., /usr/bin/<util>) and may therefore not match 
-	mut j1 := 0
-	mut j2 := 0
-	if cmd1_res.exit_code != 0 {
-		j1 = arrays.max([cmd1_res.output.index_after(':', 0), 0]) or { 0 }
-	}
-	if cmd2_res.exit_code != 0 {
-		j2 = arrays.max([cmd2_res.output.index_after(':', 0), 0]) or { 0 }
-	}
-	cmd1_output := cmd1_res.output[j1..]
-	cmd2_output := cmd2_res.output[j2..]
-	mut noutput1 := normalise(cmd1_output)
-	mut noutput2 := normalise(cmd2_output)
-
+	mut noutput1 := normalise(cmd1_res.output)
+	mut noutput2 := normalise(cmd2_res.output)
 	$if trace_same_results ? {
 		eprintln('------------------------------------')
 		eprintln('>> same_results cmd1: "${cmd1}"')
@@ -178,7 +161,7 @@ pub fn same_results(cmd1 string, cmd2 string) bool {
 	}
 	if testing.gnu_coreutils_installed {
 		// aim for 1:1 output compatibility:
-		return cmd1_res.exit_code == cmd2_res.exit_code && cmd1_output == cmd2_output
+		return cmd1_res.exit_code == cmd2_res.exit_code && cmd1_res.output == cmd2_res.output
 	}
 	// relax the strict matching for well known exceptions:
 	if cmd1.contains('coreutils') {
