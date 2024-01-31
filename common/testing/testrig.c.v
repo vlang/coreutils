@@ -10,6 +10,10 @@ pub fn prepare_rig(config TestRigConfig) TestRig {
 	}
 
 	platform_util_path := os.find_abs_path_of_executable(call_util) or {
+		eprintln("ERROR: Local platform util '${call_util}' not found!")
+		assert false
+
+		// The compiler needs to know that this is going to end badly.
 		panic("Local platform util '${call_util}' not found!")
 	}
 
