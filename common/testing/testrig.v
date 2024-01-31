@@ -57,7 +57,8 @@ pub fn (rig TestRig) assert_same_results(args string) {
 	}
 	if gnu_coreutils_installed {
 		// aim for 1:1 output compatibility:
-		assert cmd1_res.exit_code == cmd2_res.exit_code && cmd1_output == cmd2_output
+		assert cmd1_res.exit_code == cmd2_res.exit_code 
+		assert cmd1_output == cmd2_output
 	}
 
 	match rig.util {
@@ -112,7 +113,8 @@ pub fn (rig TestRig) assert_same_results(args string) {
 			// in all other cases, compare the normalised output (less strict):
 		}
 	}
-	assert cmd1_res.exit_code == cmd2_res.exit_code && noutput1 == noutput2
+	assert cmd1_res.exit_code == cmd2_res.exit_code 
+	assert noutput1 == noutput2
 }
 
 pub fn (rig TestRig) assert_help_and_version_options_work() {
