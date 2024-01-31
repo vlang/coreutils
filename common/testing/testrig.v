@@ -40,15 +40,15 @@ pub fn (rig TestRig) assert_same_results(args string) {
 	} $else {
 		os.execute('${rig.platform_util_path} ${rig.util} ${args}')
 	}
-	cmd1_output := $if !windows {
-		cmd1_res.output
-	} $else {
-		cmd1_res.output.replace(rig.platform_util_path, rig.util)
-	}
 	cmd2_res := os.execute('${rig.executable_under_test} ${args}')
+
 	// If the name of the executable appears in the returned message, shorten it to the util
 	// name because the paths are different for GNU coreutil and v-coreutil
-
+	cmd1_output := $if !windows {
+		cmd1_res.output.replace(rig.platform_util_path, rig.util)
+	} $else {
+		cmd1_res.output.replace('${rig.platform_util_path} ${rig.util}', '${rig.util}')
+	}
 	cmd2_output := cmd2_res.output.replace(rig.executable_under_test, rig.util)
 	mut noutput1 := normalise(cmd1_output)
 	mut noutput2 := normalise(cmd2_output)
