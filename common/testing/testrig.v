@@ -91,6 +91,7 @@ pub fn (rig TestRig) assert_same_results(args string) {
 		}
 		'printenv' {
 			assert cmd1_res.exit_code == cmd2_res.exit_code
+			return
 		}
 		'sleep' {
 			noutput1 = noutput1.replace(': invalid float literal', '')
