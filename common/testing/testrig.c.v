@@ -21,11 +21,21 @@ pub:
 }
 
 pub fn prepare_rig(config TestRigConfig) TestRig {
-	platform_util := $if !windows {
+	local_util_name := $if !windows {
 		config.util
 	} $else {
-		'coreutils ${config.util}'
+		'coreutils'
 	}
+
+	local_util := os.find_abs_path_of_executable(local_util_name) or {
+		panic("Local platform util '${local_util_name}' not found!")
+	}
+	platform_util := if local_util_name == 'coreutils' {
+		'${local_util} ${config.util}'
+	} else {
+		local_util
+	}
+
 	exec_under_test := if config.is_supported_platform {
 		prepare_executable(config.util)
 	} else {
