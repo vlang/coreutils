@@ -26,7 +26,7 @@ pub fn sum(args []string, sum_name string, sum_type string, num_chars_in_sum int
 	warn := fp.bool('warn', `w`, false, '(only with -c) warn about improperly formatted checksum lines')
 
 	mut files := fp.finalize() or {
-		eprintln("${args[0]}: ${err.msg()}\nTry '${args[0]} --help' for more information.")
+		eprintln("${args[0]}: ${err.msg}\nTry '${args[0]} --help' for more information.")
 		exit(1)
 	}
 
