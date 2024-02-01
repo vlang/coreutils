@@ -2,7 +2,6 @@ import common.testing
 import os
 
 const rig = testing.prepare_rig(util: 'uniq')
-const cmd = rig.cmd
 
 fn testsuite_begin() {
 	os.write_file(posix_test_path_newline, posix_test_data.join('\n'))!
