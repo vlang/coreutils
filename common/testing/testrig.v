@@ -1,5 +1,6 @@
 module testing
 
+import common
 import os
 import regex
 
@@ -70,6 +71,22 @@ pub fn prepare_rig(config TestRigConfig) TestRig {
 pub fn (rig TestRig) clean_up() {
 	if os.is_dir(rig.temp_dir) {
 		os.rmdir_all(rig.temp_dir) or {}
+	}
+}
+
+pub fn (rig TestRig) assert_platform_util() {
+	platform_ver := $if !windows {
+		os.execute('${rig.platform_util_path} --version')
+	} $else {
+		os.execute('${rig.platform_util_path} ${rig.util} --version')
+	}
+	assert platform_ver.exit_code == 0
+	ver := platform_ver.output[..rig.util.len + 16]
+	if rig.util != 'uptime' {
+		assert ver == '${rig.util} (GNU coreutils)'
+	} else {
+		// uptime was moved to procps-ng and may not be available in coreutils
+		assert ver == 'uptime (GNU coreutils)' || ver == 'uptime from procps-ng '
 	}
 }
 
@@ -169,6 +186,9 @@ pub fn (rig TestRig) assert_same_results(args string) {
 pub fn (rig TestRig) assert_help_and_version_options_work() {
 	// For now, assume that the original has --version and --help
 	// and that they already work correctly.
-	assert os.execute('${rig.executable_under_test} --version').exit_code == 0
+
+	ver := os.execute('${rig.executable_under_test} --version')
+	assert ver.output == '${rig.util} (V coreutils) ${common.version}\n'
+	assert ver.exit_code == 0
 	assert os.execute('${rig.executable_under_test} --help').exit_code == 0
 }
