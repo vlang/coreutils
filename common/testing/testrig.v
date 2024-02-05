@@ -87,6 +87,7 @@ pub fn (rig TestRig) assert_platform_util() {
 		assert ver == '${rig.util} (GNU coreut' || ver == '${rig.util} (coreutils)'
 	} else {
 		// uptime was moved to procps-ng and may not be available in coreutils
+
 		assert
 			ver == 'uptime (GNU coreut' || ver == 'uptime (coreutils)' || ver == 'uptime from procps'
 	}
