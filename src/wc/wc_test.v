@@ -17,6 +17,7 @@ const long_under_16k = os.join_path(rig.temp_dir, 'long_under_16k')
 // - long line (>16k) count max line
 
 fn testsuite_begin() {
+	rig.assert_platform_util()
 	os.chdir(testing.temp_folder)!
 	os.write_file(test1_txt_path, 'Hello World!\nHow are you?')!
 	os.write_file(test2_txt_path, 'twolinesonebreak\nbreakline')!

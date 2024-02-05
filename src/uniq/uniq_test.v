@@ -4,6 +4,7 @@ import os
 const rig = testing.prepare_rig(util: 'uniq')
 
 fn testsuite_begin() {
+	rig.assert_platform_util()
 	os.write_file(posix_test_path_newline, posix_test_data.join('\n'))!
 	os.write_file(posix_test_path_zeroterm, posix_test_data.join('\0'))!
 	os.mkdir('foo')!

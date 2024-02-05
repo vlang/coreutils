@@ -14,6 +14,7 @@ const eol = testing.output_eol()
 const tfolder = os.join_path(os.temp_dir(), 'coreutils', 'mkdir_test')
 
 fn testsuite_begin() {
+	rig.assert_platform_util()
 	os.chdir(testing.temp_folder)!
 	eprintln('testsuite_begin, tfolder = ${tfolder}')
 	os.rmdir_all(tfolder) or {}

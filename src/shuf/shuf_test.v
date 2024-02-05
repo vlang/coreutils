@@ -2,10 +2,13 @@ import common.testing
 import os
 
 const rig = testing.prepare_rig(util: 'shuf')
-const cmd = rig.cmd
 const executable_under_test = rig.executable_under_test
 const eol = testing.output_eol()
 const test_txt_path = os.join_path(rig.temp_dir, 'test.txt')
+
+fn testsuite_begin() {
+	rig.assert_platform_util()
+}
 
 fn test_help_and_version() {
 	rig.assert_help_and_version_options_work()
