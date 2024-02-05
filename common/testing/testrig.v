@@ -75,6 +75,10 @@ pub fn (rig TestRig) clean_up() {
 }
 
 pub fn (rig TestRig) assert_platform_util() {
+	if !rig.is_supported_platform {
+		return
+	}
+
 	platform_ver := $if !windows {
 		os.execute('${rig.platform_util_path} --version')
 	} $else {
