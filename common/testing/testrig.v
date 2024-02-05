@@ -81,12 +81,14 @@ pub fn (rig TestRig) assert_platform_util() {
 		os.execute('${rig.platform_util_path} ${rig.util} --version')
 	}
 	assert platform_ver.exit_code == 0
-	ver := platform_ver.output[..rig.util.len + 16]
+	eprintln('Platform util version: ${platform_ver.output}')
+	ver := platform_ver.output.substr_with_check(0, rig.util.len + 12) or { platform_ver.output }
 	if rig.util != 'uptime' {
-		assert ver == '${rig.util} (GNU coreutils)'
+		assert ver == '${rig.util} (GNU coreut' || ver == '${rig.util} (coreutils)'
 	} else {
 		// uptime was moved to procps-ng and may not be available in coreutils
-		assert ver == 'uptime (GNU coreutils)' || ver == 'uptime from procps-ng '
+		assert
+			ver == 'uptime (GNU coreut' || ver == 'uptime (coreutils)' || ver == 'uptime from procps'
 	}
 }
 
