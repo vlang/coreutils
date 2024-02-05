@@ -82,14 +82,24 @@ pub fn (rig TestRig) assert_platform_util() {
 	}
 	assert platform_ver.exit_code == 0
 	eprintln('Platform util version: ${platform_ver.output}')
-	ver := platform_ver.output.substr_with_check(0, rig.util.len + 12) or { platform_ver.output }
-	if rig.util != 'uptime' {
-		assert ver == '${rig.util} (GNU coreut' || ver == '${rig.util} (coreutils)'
-	} else {
-		// uptime was moved to procps-ng and may not be available in coreutils
 
-		assert
-			ver == 'uptime (GNU coreut' || ver == 'uptime (coreutils)' || ver == 'uptime from procps'
+	if platform_ver.output.len > rig.util.len {
+		assert platform_ver.output[..rig.util.len] == rig.util
+	}
+
+	// Windows does not clearly identify the GNU coreutils in the version string
+	$if !windows {
+		ver := platform_ver.output.substr_with_check(0, rig.util.len + 12) or {
+			platform_ver.output
+		}
+		if rig.util != 'uptime' {
+			assert ver == '${rig.util} (GNU coreut' || ver == '${rig.util} (coreutils)'
+		} else {
+			// uptime was moved to procps-ng and may not be available in coreutils
+
+			assert
+				ver == 'uptime (GNU coreut' || ver == 'uptime (coreutils)' || ver == 'uptime from procps'
+		}
 	}
 }
 
