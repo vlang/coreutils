@@ -201,7 +201,7 @@ pub fn (rig TestRig) assert_help_and_version_options_work() {
 	// and that they already work correctly.
 
 	ver := os.execute('${rig.executable_under_test} --version')
-	assert ver.output == '${rig.util} (V coreutils) ${common.version}\n'
+	assert ver.output.trim_space() == '${rig.util} (V coreutils) ${common.version}'
 	assert ver.exit_code == 0
 	assert os.execute('${rig.executable_under_test} --help').exit_code == 0
 }
