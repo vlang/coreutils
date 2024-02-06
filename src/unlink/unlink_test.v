@@ -2,27 +2,26 @@ import common.testing
 import os
 
 const rig = testing.prepare_rig(util: 'unlink')
-const cmd = rig.cmd
 
 // TODO: The following tests fail in a Windows environment; need to
 // investigate what gives.
 fn test_target_does_not_exist() {
 	$if !windows {
-		assert cmd.same_results('does_not_exist')
+		rig.assert_same_results('does_not_exist')
 	}
 }
 
 // TODO: This test does not run in all environments; to be investigated.
 // fn test_too_many_operands() {
 // 	$if !windows {
-// 		assert cmd.same_results('a b c')
+// 		rig.assert_same_results('a b c')
 // 	}
 // }
 
 fn test_target_is_directory() {
 	$if !windows {
 		os.mkdir('foo')!
-		assert cmd.same_results('foo')
+		rig.assert_same_results('foo')
 		os.rmdir('foo')!
 	}
 }
@@ -37,5 +36,5 @@ fn test_target_does_exist() {
 }
 
 fn test_help_and_version() {
-	cmd.ensure_help_and_version_options_work()!
+	rig.assert_help_and_version_options_work()
 }

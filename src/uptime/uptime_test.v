@@ -6,14 +6,17 @@ const supported_platform = $if windows {
 	true
 } // WinOS lacks currently required utmp support
 const rig = testing.prepare_rig(util: 'uptime', is_supported_platform: supported_platform)
-const cmd = rig.cmd
 const executable_under_test = rig.executable_under_test
+
+fn testsuite_begin() {
+	rig.assert_platform_util()
+}
 
 fn test_help_and_version() {
 	if !supported_platform {
 		return
 	}
-	cmd.ensure_help_and_version_options_work()!
+	rig.assert_help_and_version_options_work()
 }
 
 fn test_unknown_option() {
@@ -28,6 +31,6 @@ fn test_unknown_option() {
 // 	if !supported_platform {
 // 		return
 // 	}
-// 	assert cmd.same_results('')
-// 	// assert cmd.same_results('/var/log/wtmp') // SKIP ~ `uptime FILE` is not universally supported
+// 	rig.assert_same_results('')
+// 	// rig.assert_same_results('/var/log/wtmp') // SKIP ~ `uptime FILE` is not universally supported
 // }

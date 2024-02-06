@@ -2,12 +2,12 @@ import common.testing
 import os
 
 const rig = testing.prepare_rig(util: 'fold')
-const cmd = rig.cmd
 const executable_under_test = rig.executable_under_test
 const eol = testing.output_eol()
 const test_txt_path = os.join_path(rig.temp_dir, 'test.txt')
 
 fn testsuite_begin() {
+	rig.assert_platform_util()
 	mut f := os.open_file(test_txt_path, 'wb')!
 	for l in testtxtcontent {
 		f.writeln('${l}') or {}
@@ -20,7 +20,7 @@ fn testsuite_end() {
 }
 
 fn test_help_and_version() {
-	cmd.ensure_help_and_version_options_work()!
+	rig.assert_help_and_version_options_work()
 }
 
 fn test_non_existent_file() {

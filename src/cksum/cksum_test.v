@@ -2,7 +2,6 @@ import common.testing
 import os
 
 const rig = testing.prepare_rig(util: 'cksum')
-const cmd = rig.cmd
 const executable_under_test = rig.executable_under_test
 const eol = testing.output_eol()
 const test1_txt_path = os.join_path(rig.temp_dir, 'test1.txt')
@@ -13,6 +12,7 @@ const long_over_16k = os.join_path(rig.temp_dir, 'long_over_16k')
 const long_under_16k = os.join_path(rig.temp_dir, 'long_under_16k')
 
 fn testsuite_begin() {
+	rig.assert_platform_util()
 	os.write_file(test1_txt_path, 'Hello World!\nHow are you?')!
 	os.write_file(test2_txt_path, 'a'.repeat(128 * 1024 + 5))!
 }
@@ -23,7 +23,7 @@ fn testsuite_end() {
 }
 
 fn test_help_and_version() {
-	cmd.ensure_help_and_version_options_work()!
+	rig.assert_help_and_version_options_work()
 }
 
 fn test_stdin() {

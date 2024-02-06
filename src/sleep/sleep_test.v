@@ -3,11 +3,14 @@ import os
 import time
 
 const rig = testing.prepare_rig(util: 'sleep')
-const cmd = rig.cmd
 const executable_under_test = rig.executable_under_test
 
+fn testsuite_begin() {
+	rig.assert_platform_util()
+}
+
 fn test_help_and_version() {
-	cmd.ensure_help_and_version_options_work()!
+	rig.assert_help_and_version_options_work()
 }
 
 fn test_unknown_option() {
@@ -16,27 +19,27 @@ fn test_unknown_option() {
 }
 
 fn test_missing_arg() {
-	assert cmd.same_results('')
+	rig.assert_same_results('')
 }
 
 fn test_invalid_interval() {
-	assert cmd.same_results('-- -1')
-	assert cmd.same_results('1a')
-	assert cmd.same_results('1s0')
-	assert cmd.same_results('0.01 -- -1 0.01 1a 0.01 1s0')
+	rig.assert_same_results('-- -1')
+	rig.assert_same_results('1a')
+	rig.assert_same_results('1s0')
+	rig.assert_same_results('0.01 -- -1 0.01 1a 0.01 1s0')
 	res := os.execute('${executable_under_test} -1.7e+308')
 	assert res.exit_code == 1
 }
 
 fn test_valid_interval() {
-	assert cmd.same_results('0')
-	assert cmd.same_results('0s')
-	assert cmd.same_results('0.0')
-	assert cmd.same_results('0.0s')
-	assert cmd.same_results('0.1')
-	assert cmd.same_results('0.1s')
-	assert cmd.same_results('1')
-	assert cmd.same_results('1s')
+	rig.assert_same_results('0')
+	rig.assert_same_results('0s')
+	rig.assert_same_results('0.0')
+	rig.assert_same_results('0.0s')
+	rig.assert_same_results('0.1')
+	rig.assert_same_results('0.1s')
+	rig.assert_same_results('1')
+	rig.assert_same_results('1s')
 }
 
 fn test_interval() {

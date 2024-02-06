@@ -2,7 +2,6 @@ import common.testing
 import os
 
 const rig = testing.prepare_rig(util: 'wc')
-const cmd = rig.cmd
 const executable_under_test = rig.executable_under_test
 const eol = testing.output_eol()
 const file_list_sep = '\x00'
@@ -18,6 +17,7 @@ const long_under_16k = os.join_path(rig.temp_dir, 'long_under_16k')
 // - long line (>16k) count max line
 
 fn testsuite_begin() {
+	rig.assert_platform_util()
 	os.chdir(testing.temp_folder)!
 	os.write_file(test1_txt_path, 'Hello World!\nHow are you?')!
 	os.write_file(test2_txt_path, 'twolinesonebreak\nbreakline')!
@@ -39,7 +39,7 @@ fn testsuite_end() {
 }
 
 fn test_help_and_version() {
-	cmd.ensure_help_and_version_options_work()!
+	rig.assert_help_and_version_options_work()
 }
 
 fn test_stdin() {
