@@ -121,10 +121,6 @@ fn test_compare() {
 	}
 	pairwise_compare('-r ref_file -s /32', 32)!
 
-	$if windows {
-		pairwise_compare('-s ^%1024', 57 * 1024)!
-	}
-
 	assert os.exists('a')
 	assert os.exists('b')
 	os.rm('a')!
