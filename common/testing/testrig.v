@@ -107,13 +107,21 @@ pub fn (rig TestRig) assert_platform_util() {
 	}
 }
 
-pub fn (rig TestRig) assert_same_results(args string) {
-	cmd1_res := $if !windows {
+pub fn (rig TestRig) call_orig(args string) os.Result {
+	return $if !windows {
 		os.execute('${rig.platform_util_path} ${args}')
 	} $else {
 		os.execute('${rig.platform_util_path} ${rig.util} ${args}')
 	}
-	cmd2_res := os.execute('${rig.executable_under_test} ${args}')
+}
+
+pub fn (rig TestRig) call_new(args string) os.Result {
+	return os.execute('${rig.executable_under_test} ${args}')
+}
+
+pub fn (rig TestRig) assert_same_results(args string) {
+	cmd1_res := rig.call_orig(args)
+	cmd2_res := rig.call_new(args)
 
 	// If the name of the executable appears in the returned message, shorten it to the util
 	// name because the paths are different for GNU coreutil and v-coreutil
