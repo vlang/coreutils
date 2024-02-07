@@ -38,7 +38,15 @@ Contributions are welcome!
 Please only contribute versions of the original utilities written in V.
 Contributions written in other languages will likely be rejected.
 
-## Completed (48/109)
+When your contribution is finalized, don't forget to update the completed 
+count below and mark it as done in this README.md. Thanks!
+
+**NOTE: When testing on Windows**, comparison tests are currently run against 
+[uutils/coreutils](https://github.com/uutils/coreutils), a Rust re-implementation of 
+GNU coreutils. They are not 100% compatiable. If you encounter different behaviors, 
+compare against the true GNU coreutils version on the Linux-based tests first.
+
+## Completed (50/109)
 
 |  Done   | Cmd       | Descripton                                       |
 | :-----: | --------- | ------------------------------------------------ |
@@ -137,7 +145,7 @@ Contributions written in other languages will likely be rejected.
 |         | touch     | Change file timestamps                           |
 |         | tr        | Translate, squeeze, and/or delete characters     |
 | &check; | true      | Do nothing, successfully                         |
-|         | truncate  | Shrink or extend the size of a file              |
+| &check; | truncate  | Shrink or extend the size of a file              |
 |         | tsort     | Topological sort                                 |
 |         | tty       | Print file name of terminal on standard input    |
 | &check; | uname     | Print system information                         |
