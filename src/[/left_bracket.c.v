@@ -214,13 +214,21 @@ fn (p Parser) get() ?string {
 	return none
 }
 
+fn is_file_type(path string, typ os.FileType) bool {
+	if !os.exists(path) {
+		return false
+	}
+	st := os.stat(path) or { my_panic('unable to stat') }
+	return st.get_filetype() == typ
+}
+
 fn test_unary(option u8, arg string) bool {
 	match option {
 		`b` {
-			return os.exists(arg) && FileType(os.inode(arg).typ) == .block_device
+			return is_file_type(arg, .block_device)
 		}
 		`c` {
-			return os.exists(arg) && FileType(os.inode(arg).typ) == .character_device
+			return is_file_type(arg, .character_device)
 		}
 		`d` {
 			return os.is_dir(arg)
@@ -239,11 +247,8 @@ fn test_unary(option u8, arg string) bool {
 				if !os.exists(arg) {
 					return false
 				}
-				attr := C.stat{}
-				unsafe {
-					C.stat(&char(arg.str), &attr)
-				}
-				return attr.st_mode & os.s_isgid > 0
+				attr := os.stat(arg) or { my_panic('unable to stat') }
+				return attr.mode & os.s_isgid > 0
 			}
 		}
 		`h`, `L` {
@@ -253,13 +258,13 @@ fn test_unary(option u8, arg string) bool {
 			return arg.len != 0
 		}
 		`p` {
-			return os.exists(arg) && FileType(os.inode(arg).typ) == .fifo
+			return is_file_type(arg, .fifo)
 		}
 		`r` {
 			return os.is_readable(arg)
 		}
 		`S` {
-			return os.exists(arg) && FileType(os.inode(arg).typ) == .socket
+			return is_file_type(arg, .socket)
 		}
 		`s` {
 			return os.file_size(arg) > 0
@@ -275,11 +280,8 @@ fn test_unary(option u8, arg string) bool {
 				if !os.exists(arg) {
 					return false
 				}
-				attr := C.stat{}
-				unsafe {
-					C.stat(&char(arg.str), &attr)
-				}
-				return attr.st_mode & os.s_isuid > 0
+				attr := os.stat(arg) or { my_panic('unable to stat') }
+				return attr.mode & os.s_isuid > 0
 			}
 		}
 		`w` {
@@ -294,33 +296,6 @@ fn test_unary(option u8, arg string) bool {
 		else {}
 	}
 	my_panic('unexpected unary operator')
-}
-
-// Minimal stat struct as specified in
-// https://pubs.opengroup.org/onlinepubs/9699919799/basedefs/sys_stat.h.html
-// TODO: Replace with os.stat() once it's in in v:main
-pub struct C.stat {
-	st_dev   u64
-	st_ino   u64
-	st_mode  u32
-	st_nlink u64
-	st_uid   u32
-	st_gid   u32
-	st_rdev  u64
-	st_size  u64
-	st_atime int
-	st_mtime int
-	st_ctime int
-}
-
-enum FileType {
-	regular
-	directory
-	character_device
-	block_device
-	fifo
-	symbolic_link
-	socket
 }
 
 fn test_binary(option string, arg1 string, arg2 string) bool {
@@ -377,13 +352,9 @@ fn test_binary(option string, arg1 string, arg2 string) bool {
 			if !os.exists(arg1) || !os.exists(arg2) {
 				return false
 			}
-			attr1 := C.stat{}
-			attr2 := C.stat{}
-			unsafe {
-				C.stat(&char(arg1.str), &attr1)
-				C.stat(&char(arg2.str), &attr2)
-			}
-			return attr1.st_dev == attr2.st_dev && attr1.st_ino == attr2.st_ino
+			attr1 := os.stat(arg1) or { my_panic('unable to stat') }
+			attr2 := os.stat(arg2) or { my_panic('unable to stat') }
+			return attr1.dev == attr2.dev && attr1.inode == attr2.inode
 		}
 		else {
 			my_panic('unexpected binary operator')
