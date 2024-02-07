@@ -17,12 +17,13 @@ struct C.stat {
 	st_ctime   i64 // 8
 }
 
+// get_block_size for the --io-blocks option
 pub fn get_block_size(path string) !u64 {
 	mut s := C.stat{}
 	unsafe {
 		res := C.stat(&char(path.str), &s)
 		if res != 0 {
-			return error("unable to determine blocksize for '${path}'")
+			return error_with_code("unable to determine blocksize for '${path}'", C.errno)
 		}
 		return s.st_blksize
 	}
