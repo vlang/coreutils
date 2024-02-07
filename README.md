@@ -46,7 +46,7 @@ count below and mark it as done in this README.md. Thanks!
 GNU coreutils. They are not 100% compatiable. If you encounter different behaviors, 
 compare against the true GNU coreutils version on the Linux-based tests first.
 
-## Completed (50/109)
+## Completed (51/109)
 
 |  Done   | Cmd       | Descripton                                       |
 | :-----: | --------- | ------------------------------------------------ |
@@ -136,7 +136,7 @@ compare against the true GNU coreutils version on the Linux-based tests first.
 |         | stdbuf    | Run a command with modified I/O stream buffering |
 |         | stty      | Print or change terminal characteristics         |
 |         | sum       | Print checksum and block counts                  |
-|         | sync      | Synchronize cached writes to persistent storage  |
+| &check; | sync      | Synchronize cached writes to persistent storage  |
 | &check; | tac       | Concatenate and write files in reverse           |
 |         | tail      | Output the last part of files                    |
 |         | tee       | Redirect output to multiple files or processes   |
