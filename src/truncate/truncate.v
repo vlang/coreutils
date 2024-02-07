@@ -10,6 +10,7 @@ const app = common.CoreutilInfo{
 	description: 'shrink or extend the size of a file to the specified size'
 }
 
+const default_block_size = 4096
 const powers = ' KMGTPEZYRQ'
 
 // Settings for Utility: truncate
@@ -19,7 +20,6 @@ mut:
 	io_blocks    bool
 	reference    string
 	size         string
-	ref_size     u64
 	size_opt     SizeSettings
 	output_files []string
 }
@@ -48,7 +48,11 @@ fn truncate(settings Settings) {
 				f.close()
 			}
 			if os.exists(fname) {
-				os.truncate(fname, settings.ref_size) or { app.quit(message: err.msg()) }
+				block_size := if settings.io_blocks { get_block_size(fname) or {
+						default_block_size} } else { 1 }
+				size := calc_target_size(get_size(settings.reference), settings.size_opt,
+					block_size)
+				os.truncate(fname, size) or { app.quit(message: err.msg()) }
 			}
 		} else {
 			if !os.exists(fname) && !settings.no_create {
@@ -58,15 +62,17 @@ fn truncate(settings Settings) {
 			// If --no-create is set, nothing is done but no error is generated
 			// This is behavior from the original GNU coreutil.
 			if os.exists(fname) {
-				size := calc_target_size(get_size(fname), settings.size_opt)
+				block_size := if settings.io_blocks { get_block_size(fname) or {
+						default_block_size} } else { 1 }
+				size := calc_target_size(get_size(fname), settings.size_opt, block_size)
 				os.truncate(fname, size) or { app.quit(message: err.msg()) }
 			}
 		}
 	}
 }
 
-fn calc_target_size(orig_size u64, st SizeSettings) u64 {
-	target_size := st.size
+fn calc_target_size(orig_size u64, st SizeSettings, block_size u64) u64 {
+	target_size := st.size * block_size
 	match st.mode {
 		.absolute {
 			return target_size
@@ -183,6 +189,12 @@ fn args() Settings {
 		app.quit(message: 'missing file operand')
 	}
 
+	if st.io_blocks {
+		if st.size == '' {
+			app.quit(message: '--io-blocks was specified but --size was not')
+		}
+	}
+
 	if st.size != '' {
 		st.size_opt = parse_size_opt(st.size)
 	}
@@ -191,8 +203,6 @@ fn args() Settings {
 		if st.size != '' && st.size_opt.mode == .absolute {
 			app.quit(message: 'you must specify a relative ‘--size’ with ‘--reference’')
 		}
-		ref_file_size := get_size(st.reference)
-		st.ref_size = calc_target_size(ref_file_size, st.size_opt)
 	}
 
 	return st

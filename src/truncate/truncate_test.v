@@ -57,14 +57,14 @@ fn test_size_parser() {
 }
 
 fn test_size_calc() {
-	assert calc_target_size(777, parse_size_opt('/256')) == 768
-	assert calc_target_size(777, parse_size_opt('%256')) == 1024
-	assert calc_target_size(777, parse_size_opt('%256K')) == 256 * 1024
-	assert calc_target_size(777, parse_size_opt('/256K')) == 0
-	assert calc_target_size(777, parse_size_opt('+514')) == 1291
-	assert calc_target_size(777, parse_size_opt('-77')) == 700
-	assert calc_target_size(777, parse_size_opt('-7777')) == 0
-	assert calc_target_size(777, parse_size_opt('+14GB')) == 14_000_000_777
+	assert calc_target_size(777, parse_size_opt('/256'), 1) == 768
+	assert calc_target_size(777, parse_size_opt('%256'), 1) == 1024
+	assert calc_target_size(777, parse_size_opt('%256K'), 1) == 256 * 1024
+	assert calc_target_size(777, parse_size_opt('/256K'), 1) == 0
+	assert calc_target_size(777, parse_size_opt('+514'), 1) == 1291
+	assert calc_target_size(777, parse_size_opt('-77'), 1) == 700
+	assert calc_target_size(777, parse_size_opt('-7777'), 1) == 0
+	assert calc_target_size(777, parse_size_opt('+14GB'), 1) == 14_000_000_777
 }
 
 fn pairwise_compare(args string, expected_size u64) ! {
@@ -103,6 +103,7 @@ fn test_compare() {
 	cmd := rig.call_new('-s 42 ref_file')
 	assert cmd.exit_code == 0
 	assert os.exists('ref_file')
+	assert os.stat('ref_file')!.size == 42
 
 	pairwise_compare('-r ref_file -s +3', 45)!
 	pairwise_compare('-r ref_file -s -2', 40)!
@@ -111,6 +112,48 @@ fn test_compare() {
 	pairwise_compare('-r ref_file -s %1K', 1024)!
 	pairwise_compare('-r ref_file -s %25', 50)!
 	pairwise_compare('-r ref_file -s /32', 32)!
+
+	assert os.exists('a')
+	assert os.exists('b')
+	os.rm('a')!
+	os.rm('b')!
+	os.rm('ref_file')!
+}
+
+fn test_compare_blocks() {
+	assert !os.exists('a')
+	assert !os.exists('b')
+
+	// We got the tool, might as well use it to make a reference file
+	cmd := rig.call_new('-o -s 42 ref_file')
+	assert cmd.exit_code == 0
+	assert os.exists('ref_file')
+
+	block_size := get_block_size('ref_file') or { default_block_size }
+
+	// Do not create a file so expected size does not matter
+	pairwise_compare('-o -s 1024 -c', 0 * block_size)!
+	assert !os.exists('a')
+	assert !os.exists('b')
+
+	pairwise_compare('-o -s 57721', 57721 * block_size)!
+	pairwise_compare('-o -s %1024', 57 * 1024 * block_size)!
+	pairwise_compare('-o -s /4096', 56 * 1024 * block_size)!
+	pairwise_compare('-o -s 1024 -c', 1024 * block_size)!
+	pairwise_compare('-o -s +1K -c', 2048 * block_size)!
+	pairwise_compare('-o -s ">4KB" -c', 4000 * block_size)!
+	pairwise_compare('-o -s ">3KB" -c', 4000 * block_size)!
+	pairwise_compare('-o -s "<2KB" -c', 2000 * block_size)!
+	pairwise_compare('-o -s "<3KB" -c', 2000 * block_size)!
+	pairwise_compare('-o -s ">3K" -c', 3072 * block_size)!
+
+	pairwise_compare('-o -r ref_file -s +3', 45 * block_size)!
+	pairwise_compare('-o -r ref_file -s -2', 40 * block_size)!
+	pairwise_compare('-o -r ref_file -s "<1MiB"', 42 * block_size)!
+	pairwise_compare('-o -r ref_file -s ">12KiB"', 12 * 1024 * block_size)!
+	pairwise_compare('-o -r ref_file -s %1K', 1024 * block_size)!
+	pairwise_compare('-o -r ref_file -s %25', 50 * block_size)!
+	pairwise_compare('-o -r ref_file -s /32', 32 * block_size)!
 
 	assert os.exists('a')
 	assert os.exists('b')
