@@ -11,6 +11,10 @@ const app = common.CoreutilInfo{
 }
 
 const default_block_size = 4096
+// Convert metric prefixes to powers:
+// (10^(3*<index in powers const>) for kilo, mega, giga, tera, peta, exa, zetta, yotta, ronna, quetta-bytes
+// (2^(10*<index in powers const>) for kibi, mebi, gibi, tebi, pebi, exbi, zebi, yobi, "robi", "quibi"-bytes
+// Reminder: 2^0 == 10^0 == 1
 const powers = ' KMGTPEZYRQ'
 
 // Settings for Utility: truncate
@@ -40,37 +44,37 @@ mut:
 	size u64
 }
 
-fn truncate(settings Settings) {
-	for fname in settings.output_files {
-		if settings.reference != '' {
-			if !os.exists(fname) && !settings.no_create {
-				mut f := os.create(fname) or { app.quit(message: "unable to create '${fname}'") }
-				f.close()
-			}
-			if os.exists(fname) {
-				block_size := if settings.io_blocks { get_block_size(fname) or {
-						default_block_size} } else { 1 }
-				size := calc_target_size(get_size(settings.reference), settings.size_opt,
-					block_size)
-				os.truncate(fname, size) or { app.quit(message: err.msg()) }
-			}
-		} else {
-			if !os.exists(fname) && !settings.no_create {
-				mut f := os.create(fname) or { app.quit(message: "unable to create '${fname}'") }
-				f.close()
-			}
-			// If --no-create is set, nothing is done but no error is generated
-			// This is behavior from the original GNU coreutil.
-			if os.exists(fname) {
-				block_size := if settings.io_blocks { get_block_size(fname) or {
-						default_block_size} } else { 1 }
-				size := calc_target_size(get_size(fname), settings.size_opt, block_size)
-				os.truncate(fname, size) or { app.quit(message: err.msg()) }
-			}
-		}
+// if_blank substitutes a blank string with replacement or returns the original
+// if it is not blank
+fn if_blank(s string, replacement string) string {
+	if s != '' {
+		return s
+	}
+	return replacement
+}
+
+// get_size returns the file size for path in bytes
+fn get_size(path string) u64 {
+	attr := os.stat(path) or { app.quit(message: err.msg()) }
+	return attr.size
+}
+
+// parse_size_operator translates the size op to the SizeMode enum for settings
+fn parse_size_operator(op u8) SizeMode {
+	return match op {
+		`+` { .add }
+		`-` { .subtract }
+		`<` { .at_most }
+		`>` { .at_least }
+		`/` { .round_down }
+		`%` { .round_up }
+		else { .absolute }
 	}
 }
 
+// calc_target_size takes the input orig_size and modifies it based on the
+// selected command options (e.g., returns absolute value or adds or substracts
+// from it)
 fn calc_target_size(orig_size u64, st SizeSettings, block_size u64) u64 {
 	target_size := st.size * block_size
 	match st.mode {
@@ -102,25 +106,8 @@ fn calc_target_size(orig_size u64, st SizeSettings, block_size u64) u64 {
 	}
 }
 
-fn parse_size_operator(op u8) SizeMode {
-	return match op {
-		`+` { .add }
-		`-` { .subtract }
-		`<` { .at_most }
-		`>` { .at_least }
-		`/` { .round_down }
-		`%` { .round_up }
-		else { .absolute }
-	}
-}
-
-fn if_blank(s string, replacement string) string {
-	if s != '' {
-		return s
-	}
-	return replacement
-}
-
+// parse_size_opt parses the --size parameter into the desired operating mode (op),
+// the size and the unit of the size in metric or binary (e.g., kilo or kibibytes)
 fn parse_size_opt(opt string) SizeSettings {
 	mut re := regex.regex_opt(r'^(?P<op>[+\-<>/%])?(?P<size>\d+)(?P<prefix>[KkMmGgTtPpEeZzYyRrQq])?(?P<unit>(iB)|(B))?$') or {
 		app.quit(message: 'regex error')
@@ -144,7 +131,7 @@ fn parse_size_opt(opt string) SizeSettings {
 	assert orig_size >= 0
 
 	// Rather than a lengthy match statement, store the powers in ascending order in the powers string and look
-	// at the index of the unit to get the power (e.g., Gigabyte is 1024^3 and 'G' has index 3 in powers)
+	// at the index of the unit to get the power (e.g., gigabyte is 1024^3 and 'G' has index 3 in powers)
 	pow := powers.index(prefix) or {
 		app.quit(message: 'invalid unit prefix in size option: ${opt}')
 	}
@@ -167,11 +154,7 @@ fn parse_size_opt(opt string) SizeSettings {
 	}
 }
 
-fn get_size(path string) u64 {
-	attr := os.stat(path) or { app.quit(message: err.msg()) }
-	return attr.size
-}
-
+// args creates the util's settings from the command line options
 fn args() Settings {
 	mut fp := app.make_flag_parser(os.args)
 	mut st := Settings{}
@@ -206,6 +189,39 @@ fn args() Settings {
 	}
 
 	return st
+}
+
+// truncate does the actual work of creating a file if non exists and calling os.truncate()
+// to get it to the desired size
+fn truncate(settings Settings) {
+	for fname in settings.output_files {
+		if settings.reference != '' {
+			if !os.exists(fname) && !settings.no_create {
+				mut f := os.create(fname) or { app.quit(message: "unable to create '${fname}'") }
+				f.close()
+			}
+			if os.exists(fname) {
+				block_size := if settings.io_blocks { get_block_size(fname) or {
+						default_block_size} } else { 1 }
+				size := calc_target_size(get_size(settings.reference), settings.size_opt,
+					block_size)
+				os.truncate(fname, size) or { app.quit(message: err.msg()) }
+			}
+		} else {
+			if !os.exists(fname) && !settings.no_create {
+				mut f := os.create(fname) or { app.quit(message: "unable to create '${fname}'") }
+				f.close()
+			}
+			// If --no-create is set, nothing is done but no error is generated
+			// This is behavior from the original GNU coreutil.
+			if os.exists(fname) {
+				block_size := if settings.io_blocks { get_block_size(fname) or {
+						default_block_size} } else { 1 }
+				size := calc_target_size(get_size(fname), settings.size_opt, block_size)
+				os.truncate(fname, size) or { app.quit(message: err.msg()) }
+			}
+		}
+	}
 }
 
 fn main() {
