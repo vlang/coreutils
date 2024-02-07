@@ -5,10 +5,6 @@ import os
 const rig = testing.prepare_rig(util: 'expr')
 const cmd = rig.cmd
 
-fn test_help_and_version() {
-	rig.assert_help_and_version_options_work()
-}
-
 const tests = [
 	r'5 + 6',
 	r'5 - 6',
@@ -203,4 +199,12 @@ fn test_multi_byte_results() {
 	}
 	println(failed.join('\n'))
 	assert failed.len == 0
+}
+
+fn testsuite_begin() {
+	rig.assert_platform_util()
+}
+
+fn test_help_and_version() {
+	rig.assert_help_and_version_options_work()
 }

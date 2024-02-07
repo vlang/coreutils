@@ -4,6 +4,10 @@ const rig = testing.prepare_rig(util: 'uname')
 const cmd = rig.cmd
 const executable_under_test = rig.executable_under_test
 
+fn testsuite_begin() {
+	rig.assert_platform_util()
+}
+
 fn test_help_and_version() {
 	rig.assert_help_and_version_options_work()
 }

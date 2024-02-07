@@ -87,6 +87,7 @@ fn make_test_file(path string, sep string) ! {
 }
 
 fn testsuite_begin() {
+	rig.assert_platform_util()
 	os.write_file(tac_test_files['vanilla'], tac_test_data.join('\n'))!
 	os.write_file(tac_test_files['no_final_lf'], tac_test_data.join('\n') + '\n')!
 	make_test_file(tac_test_files['seq'], '\n')!

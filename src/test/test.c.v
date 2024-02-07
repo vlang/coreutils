@@ -296,12 +296,21 @@ fn test_unary(option u8, arg string) bool {
 	my_panic('unexpected unary operator')
 }
 
-struct C.stat {
-	st_size  u64
+// Minimal stat struct as specified in
+// https://pubs.opengroup.org/onlinepubs/9699919799/basedefs/sys_stat.h.html
+// TODO: Replace with os.stat() once it's in in v:main
+pub struct C.stat {
+	st_dev   u64
+	st_ino   u64
 	st_mode  u32
+	st_nlink u64
+	st_uid   u32
+	st_gid   u32
+	st_rdev  u64
+	st_size  u64
+	st_atime int
 	st_mtime int
-	st_dev   usize
-	st_ino   usize
+	st_ctime int
 }
 
 enum FileType {

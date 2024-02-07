@@ -8,9 +8,7 @@ import common
 
 const appname = 'expr'
 
-const version = 'v0.0.1'
-
-const usage = '${appname} ${version}
+const usage = '${appname} ${common.version}
 ----------------------------------------------
 Usage: expr EXPRESSION
    or: expr OPTION
@@ -48,7 +46,7 @@ fn main() {
 					exit(0)
 				}
 				'--version' {
-					println('${appname} ${version}')
+					println('${appname} (V coreutils) ${common.version}')
 					exit(0)
 				}
 				else {}
