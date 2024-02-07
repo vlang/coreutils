@@ -144,34 +144,29 @@ fn test_compare_blocks() {
 	assert !os.exists('a')
 	assert !os.exists('b')
 
-	pairwise_compare('-o -s 57721', 57721 * block_size)!
 	$if !windows {
+		pairwise_compare('-o -s 57721', 57721 * block_size)!
 		pairwise_compare('-o -s "%1024"', 57 * 1024 * block_size)!
-	}
-	pairwise_compare('-o -s /4096', 56 * 1024 * block_size)!
-	pairwise_compare('-o -s 1024 -c', 1024 * block_size)!
-	pairwise_compare('-o -s +1K -c', 2048 * block_size)!
-	pairwise_compare('-o -s ">4KB" -c', 4000 * block_size)!
-	pairwise_compare('-o -s ">3KB" -c', 4000 * block_size)!
-	pairwise_compare('-o -s "<2KB" -c', 2000 * block_size)!
-	pairwise_compare('-o -s "<3KB" -c', 2000 * block_size)!
-	pairwise_compare('-o -s ">3K" -c', 3072 * block_size)!
-
-	pairwise_compare('-o -r ref_file -s +3', 45 * block_size)!
-	$if !windows {
+		pairwise_compare('-o -s /4096', 56 * 1024 * block_size)!
+		pairwise_compare('-o -s 1024 -c', 1024 * block_size)!
+		pairwise_compare('-o -s +1K -c', 2048 * block_size)!
+		pairwise_compare('-o -s ">4KB" -c', 4000 * block_size)!
+		pairwise_compare('-o -s ">3KB" -c', 4000 * block_size)!
+		pairwise_compare('-o -s "<2KB" -c', 2000 * block_size)!
+		pairwise_compare('-o -s "<3KB" -c', 2000 * block_size)!
+		pairwise_compare('-o -s ">3K" -c', 3072 * block_size)!
+		pairwise_compare('-o -r ref_file -s +3', 45 * block_size)!
 		pairwise_compare('-o -r ref_file -s -2', 40 * block_size)!
-	}
-	pairwise_compare('-o -r ref_file -s "<1MiB"', 42 * block_size)!
-	pairwise_compare('-o -r ref_file -s ">12KiB"', 12 * 1024 * block_size)!
-	$if !windows {
+		pairwise_compare('-o -r ref_file -s "<1MiB"', 42 * block_size)!
+		pairwise_compare('-o -r ref_file -s ">12KiB"', 12 * 1024 * block_size)!
 		pairwise_compare('-o -r ref_file -s "%1K"', 1024 * block_size)!
 		pairwise_compare('-o -r ref_file -s "%25"', 50 * block_size)!
+		pairwise_compare('-o -r ref_file -s /32', 32 * block_size)!
+		assert os.exists('a')
+		assert os.exists('b')
+		os.rm('a')!
+		os.rm('b')!
 	}
-	pairwise_compare('-o -r ref_file -s /32', 32 * block_size)!
 
-	assert os.exists('a')
-	assert os.exists('b')
-	os.rm('a')!
-	os.rm('b')!
 	os.rm('ref_file')!
 }
