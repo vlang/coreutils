@@ -94,7 +94,9 @@ fn test_compare() {
 	pairwise_compare('-s /4096', 56 * 1024)!
 	pairwise_compare('-s 1024 -c', 1024)!
 	pairwise_compare('-s +1K -c', 2048)!
-	pairwise_compare('-s "-2E" -c', 0)!
+	$if !windows {
+		pairwise_compare('-s -2E -c', 0)!
+	}
 	pairwise_compare('-s ">4KB" -c', 4000)!
 	pairwise_compare('-s ">3KB" -c', 4000)!
 	pairwise_compare('-s "<2KB" -c', 2000)!
@@ -108,7 +110,9 @@ fn test_compare() {
 	assert os.stat('ref_file')!.size == 42
 
 	pairwise_compare('-r ref_file -s +3', 45)!
-	pairwise_compare('-r ref_file -s "-2"', 40)!
+	$if !windows {
+		pairwise_compare('-r ref_file -s -2', 40)!
+	}
 	pairwise_compare('-r ref_file -s "<1MiB"', 42)!
 	pairwise_compare('-r ref_file -s ">12KiB"', 12 * 1024)!
 	$if !windows {
@@ -158,7 +162,9 @@ fn test_compare_blocks() {
 	pairwise_compare('-o -s ">3K" -c', 3072 * block_size)!
 
 	pairwise_compare('-o -r ref_file -s +3', 45 * block_size)!
-	pairwise_compare('-o -r ref_file -s "-2"', 40 * block_size)!
+	$if !windows {
+		pairwise_compare('-o -r ref_file -s -2', 40 * block_size)!
+	}
 	pairwise_compare('-o -r ref_file -s "<1MiB"', 42 * block_size)!
 	pairwise_compare('-o -r ref_file -s ">12KiB"', 12 * 1024 * block_size)!
 	$if !windows {
