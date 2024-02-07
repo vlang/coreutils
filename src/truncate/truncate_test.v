@@ -88,7 +88,7 @@ fn test_compare() {
 
 	pairwise_compare('-s 1024 -c', 0)!
 	pairwise_compare('-s 57721', 57721)!
-	pairwise_compare('-s %1024', 57 * 1024)!
+	pairwise_compare('-s "%1024"', 57 * 1024)!
 	pairwise_compare('-s /4096', 56 * 1024)!
 	pairwise_compare('-s 1024 -c', 1024)!
 	pairwise_compare('-s +1K -c', 2048)!
@@ -109,8 +109,8 @@ fn test_compare() {
 	pairwise_compare('-r ref_file -s -2', 40)!
 	pairwise_compare('-r ref_file -s "<1MiB"', 42)!
 	pairwise_compare('-r ref_file -s ">12KiB"', 12 * 1024)!
-	pairwise_compare('-r ref_file -s %1K', 1024)!
-	pairwise_compare('-r ref_file -s %25', 50)!
+	pairwise_compare('-r ref_file -s "%1K"', 1024)!
+	pairwise_compare('-r ref_file -s "%25"', 50)!
 	pairwise_compare('-r ref_file -s /32', 32)!
 
 	assert os.exists('a')
