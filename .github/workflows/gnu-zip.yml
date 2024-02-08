@@ -25,4 +25,6 @@ jobs:
           Write-Host $env:GITHUB_PATH
       - name: Testing
         run: |
-          seq 1 20
+          seq 1 10
+          seq 1 10 | shuf
+          
