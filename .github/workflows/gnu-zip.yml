@@ -14,7 +14,7 @@ jobs:
         with:
           name: "cat.exe"
           url: "https://georgmeyer.ch/download/coreutils-8.32-x64-win.zip"
-          pathInArchive: "coreutils-8.32/bin/cat.exe"
+          pathInArchive: "coreutils-8.32/bin/seq.exe"
       - name: Testing
         run: |
-          cat --version
+          seq 1 20
