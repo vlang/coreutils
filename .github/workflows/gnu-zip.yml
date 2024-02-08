@@ -1,4 +1,4 @@
-name: Build and Test Manual
+name: Download GNU Coreutils
 
 on:
   push:
