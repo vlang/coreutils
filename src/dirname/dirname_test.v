@@ -1,37 +1,27 @@
 import common.testing
 import os
 
-const util = 'dirname'
-
-const platform_util = $if !windows {
-	util
-} $else {
-	'coreutils ${util}'
-}
-
+const rig = testing.prepare_rig(util: 'dirname')
+const executable_under_test = rig.executable_under_test
 const slash = $if !windows {
 	'\\'
 } $else {
 	'/'
 }
 
-const executable_under_test = testing.prepare_executable(util)
-
-const cmd = testing.new_paired_command(platform_util, executable_under_test)
-
 fn testsuite_begin() {
-	os.chdir(testing.temp_folder)!
+	rig.assert_platform_util()
 }
 
 fn test_help_and_version() {
-	cmd.ensure_help_and_version_options_work()!
+	rig.assert_help_and_version_options_work()
 }
 
 fn expected_result(input string, output string) {
 	res := os.execute('${executable_under_test} ${input}')
 	assert res.exit_code == 0
 	assert res.output.trim_space() == output
-	testing.same_results('dirname ${input}', '${executable_under_test} ${input}')
+	testing.same_results('${rig.util} ${input}', '${executable_under_test} ${input}')
 }
 
 fn test_expected() {

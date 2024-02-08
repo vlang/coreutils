@@ -1,24 +1,14 @@
-import os
 import common.testing
+import os
 
+const rig = testing.prepare_rig(util: 'head')
+const cmd = rig.cmd
+const executable_under_test = rig.executable_under_test
 const eol = testing.output_eol()
-
-const util = 'head'
-
-const platform_util = $if !windows {
-	util
-} $else {
-	'coreutils ${util}'
-}
-
-const executable_under_test = testing.prepare_executable(util)
-
-const cmd = testing.new_paired_command(platform_util, executable_under_test)
-
-const test_txt_path = os.join_path(testing.temp_folder, 'test.txt')
+const test_txt_path = os.join_path(rig.temp_dir, 'test.txt')
 
 fn testsuite_begin() {
-	os.chdir(testing.temp_folder)!
+	rig.assert_platform_util()
 	mut f := os.open_file(test_txt_path, 'wb')!
 	for l in testtxtcontent {
 		f.writeln('${l}')!
@@ -31,7 +21,7 @@ fn testsuite_end() {
 }
 
 fn test_help_and_version() {
-	cmd.ensure_help_and_version_options_work()!
+	rig.assert_help_and_version_options_work()
 }
 
 fn test_non_existent_file() {

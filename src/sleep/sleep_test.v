@@ -1,27 +1,16 @@
+import common.testing
 import os
 import time
-import common.testing
 
-const util = 'sleep'
-
-const platform_util = $if !windows {
-	util
-} $else {
-	'coreutils ${util}'
-}
-
-const executable_under_test = testing.prepare_executable(util)
-
-const cmd = testing.new_paired_command(platform_util, executable_under_test)
-
-const cmd_ns = 'sleep'
+const rig = testing.prepare_rig(util: 'sleep')
+const executable_under_test = rig.executable_under_test
 
 fn testsuite_begin() {
-	os.chdir(testing.temp_folder)!
+	rig.assert_platform_util()
 }
 
 fn test_help_and_version() {
-	cmd.ensure_help_and_version_options_work()!
+	rig.assert_help_and_version_options_work()
 }
 
 fn test_unknown_option() {
@@ -30,27 +19,27 @@ fn test_unknown_option() {
 }
 
 fn test_missing_arg() {
-	assert cmd.same_results('')
+	rig.assert_same_results('')
 }
 
 fn test_invalid_interval() {
-	assert cmd.same_results('-- -1')
-	assert cmd.same_results('1a')
-	assert cmd.same_results('1s0')
-	assert cmd.same_results('0.01 -- -1 0.01 1a 0.01 1s0')
+	rig.assert_same_results('-- -1')
+	rig.assert_same_results('1a')
+	rig.assert_same_results('1s0')
+	rig.assert_same_results('0.01 -- -1 0.01 1a 0.01 1s0')
 	res := os.execute('${executable_under_test} -1.7e+308')
 	assert res.exit_code == 1
 }
 
 fn test_valid_interval() {
-	assert cmd.same_results('0')
-	assert cmd.same_results('0s')
-	assert cmd.same_results('0.0')
-	assert cmd.same_results('0.0s')
-	assert cmd.same_results('0.1')
-	assert cmd.same_results('0.1s')
-	assert cmd.same_results('1')
-	assert cmd.same_results('1s')
+	rig.assert_same_results('0')
+	rig.assert_same_results('0s')
+	rig.assert_same_results('0.0')
+	rig.assert_same_results('0.0s')
+	rig.assert_same_results('0.1')
+	rig.assert_same_results('0.1s')
+	rig.assert_same_results('1')
+	rig.assert_same_results('1s')
 }
 
 fn test_interval() {

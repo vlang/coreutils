@@ -32,7 +32,7 @@ fn process_stream(stream File, initial bool, tabs int) {
 	mut line := ''
 	for {
 		n := stream.read_bytes_into_newline(mut buf) or {
-			eprintln('${name}: ${err.msg()}')
+			eprintln('${name}: ${err.msg}')
 			0
 		}
 		if n <= 0 {
@@ -76,7 +76,7 @@ fn main() {
 				streams << os.stdin()
 			} else {
 				streams << os.open(path) or {
-					eprintln('${name}: ${err.msg()}')
+					eprintln('${name}: ${err.msg}')
 					exit(1)
 				}
 			}

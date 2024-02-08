@@ -144,8 +144,8 @@ const gnu_coreutils_installed = os.getenv('GNU_COREUTILS_INSTALLED').int() == 1
 // and for their output.
 // note: use `v -d trace_same_results ...` to enable trace output
 pub fn same_results(cmd1 string, cmd2 string) bool {
-	mut cmd1_res := os.execute(cmd1)
-	mut cmd2_res := os.execute(cmd2)
+	cmd1_res := os.execute(cmd1)
+	cmd2_res := os.execute(cmd2)
 	mut noutput1 := normalise(cmd1_res.output)
 	mut noutput2 := normalise(cmd2_res.output)
 	$if trace_same_results ? {

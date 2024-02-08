@@ -1,38 +1,23 @@
-import os
 import common.testing
+import os
 
+const rig = testing.prepare_rig(util: 'wc')
+const executable_under_test = rig.executable_under_test
 const eol = testing.output_eol()
 const file_list_sep = '\x00'
-
-const util = 'wc'
-
-const platform_util = $if !windows {
-	util
-} $else {
-	'coreutils ${util}'
-}
-
-const executable_under_test = testing.prepare_executable(util)
-
-const cmd = testing.new_paired_command(platform_util, executable_under_test)
-
-const temp_dir = testing.temp_folder
-const file_list_path = os.join_path(temp_dir, 'files.txt')
-const test1_txt_path = os.join_path(temp_dir, 'test1.txt')
-const test2_txt_path = os.join_path(temp_dir, 'test2.txt')
-const test3_txt_path = os.join_path(temp_dir, 'test3.txt')
-const dummy = os.join_path(temp_dir, 'dummy')
-const long_over_16k = os.join_path(temp_dir, 'long_over_16k')
-const long_under_16k = os.join_path(temp_dir, 'long_under_16k')
+const file_list_path = os.join_path(rig.temp_dir, 'files.txt')
+const test1_txt_path = os.join_path(rig.temp_dir, 'test1.txt')
+const test2_txt_path = os.join_path(rig.temp_dir, 'test2.txt')
+const test3_txt_path = os.join_path(rig.temp_dir, 'test3.txt')
+const dummy = os.join_path(rig.temp_dir, 'dummy')
+const long_over_16k = os.join_path(rig.temp_dir, 'long_over_16k')
+const long_under_16k = os.join_path(rig.temp_dir, 'long_under_16k')
 
 // todo add tests
 // - test windows \r\n vs \n
 
-fn test_help_and_version() {
-	cmd.ensure_help_and_version_options_work()!
-}
-
 fn testsuite_begin() {
+	rig.assert_platform_util()
 	os.chdir(testing.temp_folder)!
 	os.write_file(test1_txt_path, 'Hello World!\nHow are you?')!
 	os.write_file(test2_txt_path, 'twolinesonebreak\nbreakline')!
@@ -51,6 +36,10 @@ fn testsuite_end() {
 	os.rm(long_over_16k)!
 	os.rm(long_under_16k)!
 	os.rm(file_list_path)!
+}
+
+fn test_help_and_version() {
+	rig.assert_help_and_version_options_work()
 }
 
 fn test_stdin() {

@@ -8,9 +8,7 @@ import common
 
 const appname = 'expr'
 
-const version = 'v0.0.1'
-
-const usage = '${appname} ${version}
+const usage = '${appname} ${common.version}
 ----------------------------------------------
 Usage: expr EXPRESSION
    or: expr OPTION
@@ -48,7 +46,7 @@ fn main() {
 					exit(0)
 				}
 				'--version' {
-					println('${appname} ${version}')
+					println('${appname} (V coreutils) ${common.version}')
 					exit(0)
 				}
 				else {}
@@ -350,7 +348,7 @@ fn (v Value) str() string {
 
 fn (v Value) i64() i64 {
 	match v {
-		string { return strconv.parse_int(v, 0, 64) or { my_panic(err.msg(), 2) } }
+		string { return strconv.parse_int(v, 0, 64) or { my_panic(err.msg, 2) } }
 		i64 { return v }
 	}
 }

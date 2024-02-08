@@ -142,7 +142,7 @@ fn (c FoldCommand) run(mut files []InputFile) {
 	mut open_fails_num := 0
 	for mut file in files {
 		file.open() or {
-			eprintln('${name}: ${err.msg()}')
+			eprintln('${name}: ${err.msg}')
 			open_fails_num++
 			continue
 		}
@@ -225,7 +225,7 @@ fn run_fold(args []string) {
 		success_exit('${name} ${common.coreutils_version()}')
 	}
 
-	file_args := fp.finalize() or { common.exit_with_error_message(name, err.msg()) }
+	file_args := fp.finalize() or { common.exit_with_error_message(name, err.msg) }
 
 	cmd := FoldCommand{
 		max_col_width: width
