@@ -18,7 +18,7 @@ jobs:
         shell: powershell
         run: |
           $wd = Get-Location
-          $p = $wd + '/coreutils-8.32/bin'
+          $p = $wd.Path + '/coreutils-8.32/bin'
           Write-Host $p
           Expand-Archive -Path "coreutils.zip"
           Add-Content $env:GITHUB_PATH $p
