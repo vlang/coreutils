@@ -10,11 +10,19 @@ jobs:
   winos-test:
     runs-on: windows-latest
     steps:
-      - uses: engineerd/configurator@v0.0.10
-        with:
-          name: "cat.exe"
-          url: "https://georgmeyer.ch/download/coreutils-8.32-x64-win.zip"
-          pathInArchive: "coreutils-8.32/bin/seq.exe"
+      - name: Download
+        shell: powershell
+        run: |
+          Invoke-WebRequest -Uri https://georgmeyer.ch/download/coreutils-8.32-x64-win.zip -OutFile coreutils.zip
+      - name: Extract
+        shell: powershell
+        run: |
+          $wd = Get-Location
+          $p = $wd + '/coreutils-8.32/bin'
+          Write-Host $p
+          Expand-Archive -Path "coreutils.zip"
+          Add-Content $env:GITHUB_PATH $p
+          Write-Host $env:GITHUB_PATH
       - name: Testing
         run: |
           seq 1 20
