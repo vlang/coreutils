@@ -4,6 +4,8 @@ import common
 import os
 import regex
 
+const small_diff_size = 64
+
 // TestRig contains the relevant scaffolding for tests to avoid boilerplate in
 // the individual <util>_test.v files
 pub struct TestRig {
@@ -14,13 +16,11 @@ pub:
 	executable_under_test string
 	temp_dir              string
 	cmd                   CommandPair
-	is_supported_platform bool
 }
 
 pub struct TestRigConfig {
 pub:
-	util                  string
-	is_supported_platform bool = true
+	util string
 }
 
 pub fn (rig TestRig) call_for_test(args string) os.Result {
@@ -47,11 +47,7 @@ pub fn prepare_rig(config TestRigConfig) TestRig {
 		call_util
 	}
 
-	exec_under_test := if config.is_supported_platform {
-		prepare_executable(config.util)
-	} else {
-		''
-	}
+	exec_under_test := prepare_executable(config.util)
 	temp_dir := os.join_path(temp_folder, config.util)
 	os.mkdir(temp_dir) or { panic('Unable to make test directory: ${temp_dir}') }
 	os.chdir(temp_dir) or { panic('Unable to set working directory: ${temp_dir}') }
@@ -62,7 +58,6 @@ pub fn prepare_rig(config TestRigConfig) TestRig {
 		cmd: new_paired_command(platform_util, exec_under_test)
 		executable_under_test: exec_under_test
 		temp_dir: temp_dir
-		is_supported_platform: config.is_supported_platform
 	}
 	wire_clean_up_at_exit(rig)
 	return rig
@@ -75,10 +70,6 @@ pub fn (rig TestRig) clean_up() {
 }
 
 pub fn (rig TestRig) assert_platform_util() {
-	if !rig.is_supported_platform {
-		return
-	}
-
 	platform_ver := $if !windows {
 		os.execute('${rig.platform_util_path} --version')
 	} $else {
@@ -119,6 +110,17 @@ pub fn (rig TestRig) call_new(args string) os.Result {
 	return os.execute('${rig.executable_under_test} ${args}')
 }
 
+// print_small_diff eprints only differing small results that differ
+// usually just vary by newlines or NULs
+fn eprintln_small_diff(a string, b string) {
+	if a != b && (a.len < testing.small_diff_size && b.len < testing.small_diff_size) {
+		eprintln('Output 1: [${a}] (${a.len} bytes)')
+		eprintln(' - bytes: ${a.bytes()}')
+		eprintln('Output 2: [${b}] (${b.len} bytes)')
+		eprintln(' - bytes: ${b.bytes()}')
+	}
+}
+
 pub fn (rig TestRig) assert_same_results(args string) {
 	cmd1_res := rig.call_orig(args)
 	cmd2_res := rig.call_new(args)
@@ -148,7 +150,8 @@ pub fn (rig TestRig) assert_same_results(args string) {
 	if gnu_coreutils_installed {
 		// aim for 1:1 output compatibility:
 		assert cmd1_res.exit_code == cmd2_res.exit_code
-		assert cmd1_output == cmd2_output
+		eprintln_small_diff(cmd1_output, cmd2_output)
+		assert cmd1_output == cmd2_output, '${cmd1_output.len} bytes vs. ${cmd2_output.len} bytes'
 	}
 
 	match rig.util {
@@ -205,7 +208,14 @@ pub fn (rig TestRig) assert_same_results(args string) {
 		}
 	}
 	assert cmd1_res.exit_code == cmd2_res.exit_code
-	assert noutput1 == noutput2
+	eprintln_small_diff(noutput1, noutput2)
+	assert noutput1 == noutput2, '${noutput1.len} bytes vs. ${noutput2.len} bytes'
+}
+
+pub fn (rig TestRig) assert_same_exit_code(args string) {
+	cmd1_res := rig.call_orig(args)
+	cmd2_res := rig.call_new(args)
+	assert cmd1_res.exit_code == cmd2_res.exit_code
 }
 
 pub fn (rig TestRig) assert_help_and_version_options_work() {

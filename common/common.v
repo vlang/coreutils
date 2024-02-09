@@ -1,13 +1,16 @@
 module common
 
 import flag
+import os
 
 pub const version = '0.0.1'
+pub const err_platform_not_supported = 0x7F
 
 pub struct CoreutilInfo {
 pub:
 	name        string
 	description string
+	help        string
 }
 
 pub struct CoreutilExitDetail {
@@ -16,6 +19,10 @@ mut:
 	return_code      int = 1
 	show_help_advice bool // defaults to false
 }
+
+pub const exit_err_programming_error = 0x7c
+pub const exit_err_not_implemented = 0x7d
+pub const exit_err_platform_not_supported = 0x7e
 
 // coreutils_version returns formatted coreutils tool version
 pub fn coreutils_version() string {
@@ -72,15 +79,32 @@ pub fn (app CoreutilInfo) quit(detail CoreutilExitDetail) {
 	exit(detail.return_code)
 }
 
+pub fn (app CoreutilInfo) eprintln_posix(message string) {
+	eprintln('${app.name}: ${message}: ${os.error_posix().msg}')
+}
+
 // flag_parser returns a flag.FlagParser, with the common
 // options already set, reducing the boilerplate code in
 // each individual utility.
 pub fn (app CoreutilInfo) make_flag_parser(args []string) &flag.FlagParser {
 	mut fp := flag.new_flag_parser(args)
 	fp.version(coreutils_version())
+	if app.help != '' {
+		fp.footer(app.help)
+	}
 	fp.footer(coreutils_footer())
 	fp.skip_executable()
 	fp.application(app.name)
 	fp.description(app.description)
 	return fp
+}
+
+@[inline]
+pub fn eol() string {
+	$if windows {
+		// WinOS => CRLF
+		return '\r\n'
+	}
+	// POSIX => LF
+	return '\n'
 }

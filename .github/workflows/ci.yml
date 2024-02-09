@@ -81,8 +81,8 @@ jobs:
         run: cd coreutils && make testfmt
       - name: Build all
         run: cd coreutils && v run build.vsh
-      - name: Debug uptime_test.v
-        run: cd coreutils && v -d trace_same_results -stats src/uptime/uptime_test.v
+      - name: Debug uptime_nix_test.v
+        run: cd coreutils && v -d trace_same_results -stats src/uptime/uptime_nix_test.v
       - name: Run tests
         run: cd coreutils && make test
 
