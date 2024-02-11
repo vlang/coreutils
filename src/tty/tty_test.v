@@ -1,6 +1,11 @@
 import common.testing
 
-const rig = testing.prepare_rig(util: 'tty')
+const supported_platform = $if windows {
+	false
+} $else {
+	true
+} // No tty in Windows
+const rig = testing.prepare_rig(util: 'tty', is_supported_platform: supported_platform)
 
 fn testsuite_begin() {
 	rig.assert_platform_util()
