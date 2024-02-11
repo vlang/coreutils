@@ -23,7 +23,7 @@ fn tty(settings Settings) {
 	if name := ttyname(c_stdin) {
 		println(name)
 	} else {
-		app.quit(message: err.msg)
+		app.quit(message: 'not a tty', return_code: 1)
 	}
 }
 
