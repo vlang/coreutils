@@ -3,6 +3,7 @@ module common
 import flag
 
 pub const version = '0.0.1'
+pub const err_platform_not_supported = 0x7F
 
 pub struct CoreutilInfo {
 pub:

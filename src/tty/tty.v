@@ -43,9 +43,5 @@ fn args() Settings {
 
 fn main() {
 	// TODO: Invalid usage should return with exit code 2 (TTY_FAILURE)
-	$if !windows {
-		tty(args())
-	} $else {
-		app.quit(message: 'Unfortunately, this util is not available on Windows.', exit_code: 127)
-	}
+	tty(args())
 }
