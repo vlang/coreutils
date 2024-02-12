@@ -29,7 +29,7 @@ fn args() Settings {
 	} else if rem_pars.len == 1 {
 		st.input_file = rem_pars[0].str
 	} else if rem_pars.len > 1 {
-		app.quit(message: 'extra operand ‘${rem_pars[1]}’', show_help_advice: true)
+		app.quit(message: "extra operand '${rem_pars[1]}'", show_help_advice: true)
 	}
 	return st
 }
