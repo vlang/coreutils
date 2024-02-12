@@ -24,7 +24,8 @@ fn test_compare() {
 		return
 	}
 	rig.assert_same_results('')
-	// Don't even try to compile this for Windows
+	rig.assert_same_results('does_not_exist')
+	// // Don't even try to compile this for Windows
 	$if !windows {
 		unsafe { rig.assert_same_results(cstring_to_vstring(common.utmp_file_charptr)) }
 		unsafe { rig.assert_same_results(cstring_to_vstring(common.wtmp_file_charptr)) }
@@ -35,7 +36,6 @@ fn test_call_errors() {
 	if !supported_platform {
 		return
 	}
-	rig.assert_same_results('')
-	unsafe { rig.assert_same_exit_code('-x') }
-	unsafe { rig.assert_same_results('a b c') }
+	rig.assert_same_exit_code('-x')
+	rig.assert_same_results('a b c')
 }

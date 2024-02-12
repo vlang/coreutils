@@ -13,8 +13,11 @@ mut:
 }
 
 fn users(settings Settings) {
-	print(utmp_users(settings.input_file).join(' '))
-	print(common.eol())
+	users := utmp_users(settings.input_file).join(' ')
+	print(users)
+	if users != '' {
+		print(common.eol())
+	}
 }
 
 fn args() Settings {
