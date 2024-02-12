@@ -208,6 +208,12 @@ pub fn (rig TestRig) assert_same_results(args string) {
 	assert noutput1 == noutput2
 }
 
+pub fn (rig TestRig) assert_same_exit_code(args string) {
+	cmd1_res := rig.call_orig(args)
+	cmd2_res := rig.call_new(args)
+	assert cmd1_res.exit_code == cmd2_res.exit_code
+}
+
 pub fn (rig TestRig) assert_help_and_version_options_work() {
 	// For now, assume that the original has --version and --help
 	// and that they already work correctly.
