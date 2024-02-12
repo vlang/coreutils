@@ -4,6 +4,8 @@ import common
 import os
 import regex
 
+const small_diff_size = 64
+
 // TestRig contains the relevant scaffolding for tests to avoid boilerplate in
 // the individual <util>_test.v files
 pub struct TestRig {
@@ -119,6 +121,17 @@ pub fn (rig TestRig) call_new(args string) os.Result {
 	return os.execute('${rig.executable_under_test} ${args}')
 }
 
+// print_small_diff eprints only differing small results that differ
+// usually just vary by newlines or NULs
+fn eprintln_small_diff(a string, b string) {
+	if a != b && (a.len < testing.small_diff_size && b.len < testing.small_diff_size) {
+		eprintln('Output 1: [${a}] (${a.len} bytes)')
+		eprintln(' - bytes: ${a.bytes()}')
+		eprintln('Output 2: [${b}] (${b.len} bytes)')
+		eprintln(' - bytes: ${b.bytes()}')
+	}
+}
+
 pub fn (rig TestRig) assert_same_results(args string) {
 	cmd1_res := rig.call_orig(args)
 	cmd2_res := rig.call_new(args)
@@ -148,7 +161,8 @@ pub fn (rig TestRig) assert_same_results(args string) {
 	if gnu_coreutils_installed {
 		// aim for 1:1 output compatibility:
 		assert cmd1_res.exit_code == cmd2_res.exit_code
-		assert cmd1_output == cmd2_output
+		eprintln_small_diff(cmd1_output, cmd2_output)
+		assert cmd1_output == cmd2_output, '${cmd1_output.len} bytes vs. ${cmd2_output.len} bytes'
 	}
 
 	match rig.util {
@@ -205,7 +219,14 @@ pub fn (rig TestRig) assert_same_results(args string) {
 		}
 	}
 	assert cmd1_res.exit_code == cmd2_res.exit_code
-	assert noutput1 == noutput2
+	eprintln_small_diff(noutput1, noutput2)
+	assert noutput1 == noutput2, '${noutput1.len} bytes vs. ${noutput2.len} bytes'
+}
+
+pub fn (rig TestRig) assert_same_exit_code(args string) {
+	cmd1_res := rig.call_orig(args)
+	cmd2_res := rig.call_new(args)
+	assert cmd1_res.exit_code == cmd2_res.exit_code
 }
 
 pub fn (rig TestRig) assert_help_and_version_options_work() {

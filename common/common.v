@@ -85,3 +85,13 @@ pub fn (app CoreutilInfo) make_flag_parser(args []string) &flag.FlagParser {
 	fp.description(app.description)
 	return fp
 }
+
+@[inline]
+pub fn eol() string {
+	$if windows {
+		// WinOS => CRLF
+		return '\r\n'
+	}
+	// POSIX => LF
+	return '\n'
+}
