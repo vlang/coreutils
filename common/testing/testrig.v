@@ -205,7 +205,14 @@ pub fn (rig TestRig) assert_same_results(args string) {
 		}
 	}
 	assert cmd1_res.exit_code == cmd2_res.exit_code
-	assert noutput1 == noutput2
+	// More detail for small results that usually just vary by newlines or NULs
+	if noutput1 != noutput2 && noutput1.len < 64 {
+		eprintln("Output 1: [${noutput1}] (${noutput1.len} bytes)")
+		eprintln(" - bytes: ${noutput1.bytes()}")
+		eprintln("Output 2: [${noutput2}] (${noutput2.len} bytes)")
+		eprintln(" - bytes: ${noutput2.bytes()}")
+	}
+	assert noutput1 == noutput2, '[${noutput1}] != [${noutput1}]'
 }
 
 pub fn (rig TestRig) assert_same_exit_code(args string) {
