@@ -17,7 +17,7 @@ fn utmp_users(filename &char) []string {
 			users << cstring_to_vstring(u.ut_user)
 		}
 	}
-	// Obtain same order as GNU coreutils
-	users.reverse_in_place()
+	// Obtain sorted order as GNU coreutils
+	users.sort()
 	return users
 }
