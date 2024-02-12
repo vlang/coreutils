@@ -1,5 +1,6 @@
 module testing
 
+import common
 import os
 import regex
 
@@ -225,10 +226,5 @@ pub fn check_dir_exists(d string) bool {
 }
 
 pub fn output_eol() string {
-	$if windows {
-		// WinOS => CRLF
-		return '\r\n'
-	}
-	// POSIX => LF
-	return '\n'
+	return common.eol()
 }
