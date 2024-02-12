@@ -161,7 +161,7 @@ pub fn (rig TestRig) assert_same_results(args string) {
 	if gnu_coreutils_installed {
 		// aim for 1:1 output compatibility:
 		assert cmd1_res.exit_code == cmd2_res.exit_code
-		eprintln_small_diff(noutput1, noutput2)
+		eprintln_small_diff(cmd1_output, cmd2_output)
 		assert cmd1_output == cmd2_output, '${cmd1_output.len} bytes vs. ${cmd2_output.len} bytes'
 	}
 
