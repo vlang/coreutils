@@ -46,7 +46,7 @@ count below and mark it as done in this README.md. Thanks!
 GNU coreutils. They are not 100% compatiable. If you encounter different behaviors, 
 compare against the true GNU coreutils version on the Linux-based tests first.
 
-## Completed (51/109)
+## Completed (52/109)
 
 |  Done   | Cmd       | Descripton                                       |
 | :-----: | --------- | ------------------------------------------------ |
@@ -147,7 +147,7 @@ compare against the true GNU coreutils version on the Linux-based tests first.
 | &check; | true      | Do nothing, successfully                         |
 | &check; | truncate  | Shrink or extend the size of a file              |
 |         | tsort     | Topological sort                                 |
-|         | tty       | Print file name of terminal on standard input    |
+| &check; | tty       | Print file name of terminal on standard input    |
 | &check; | uname     | Print system information                         |
 |         | unexpand  | Convert spaces to tabs                           |
 | &check; | uniq      | Uniquify files                                   |
