@@ -1,29 +1,17 @@
 import common.testing
 
-const supported_platform = $if windows {
-	false
-} $else {
-	true
-} // WinOS lacks currently required utmp support
-const rig = testing.prepare_rig(util: 'uptime', is_supported_platform: supported_platform)
-const executable_under_test = rig.executable_under_test
+const rig = testing.prepare_rig(util: 'uptime')
 
 fn testsuite_begin() {
 	rig.assert_platform_util()
 }
 
 fn test_help_and_version() {
-	if !supported_platform {
-		return
-	}
 	rig.assert_help_and_version_options_work()
 }
 
 fn test_unknown_option() {
-	if !supported_platform {
-		return
-	}
-	testing.command_fails('${executable_under_test} -x')!
+	testing.command_fails('${rig.executable_under_test} -x')!
 }
 
 // SKIP ~ comparing subsequent runs of `uptime` is a *race condition* causing random failures
