@@ -357,12 +357,14 @@ fn format_output(path string, st Statx, fmt string, mtab []MountInfo) {
 			}
 			mut format := ''
 			mut token := ''
-			mut j := scan_num(fmt[i + 1..])
+			mut s := fmt[i + 1..]
+			mut j := scan_num(&s)
 			if j > 0 {
 				format = fmt[i + 1..i + 1 + j]
 				i += j
 			}
-			j = scan_for_tokens(fmt[i + 1..], tokens_statx)
+			s = fmt[i + 1..]
+			j = scan_for_tokens(&s, tokens_statx)
 			if j > 0 {
 				token = fmt[i + 1..i + 1 + j]
 				i += j
@@ -388,12 +390,14 @@ fn format_output_fs(path string, st Statvfs, fmt string, mtab []MountInfo, fslis
 			}
 			mut format := ''
 			mut token := ''
-			mut j := scan_num(fmt[i + 1..])
+			mut s := fmt[i + 1..]
+			mut j := scan_num(&s)
 			if j > 0 {
 				format = fmt[i + 1..i + 1 + j]
 				i += j
 			}
-			j = scan_for_tokens(fmt[i + 1..], tokens_statvfs)
+			s = fmt[i + 1..]
+			j = scan_for_tokens(&s, tokens_statvfs)
 			if j > 0 {
 				token = fmt[i + 1..i + 1 + j]
 				i += j
