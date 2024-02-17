@@ -49,6 +49,40 @@ fn test_compare() {
 	// rig.assert_same_results('-L --terse *')
 	rig.assert_same_results('-f -c "%n %l %s %S %b %c" *')
 	rig.assert_same_results('-c "%N" *')
+	rig.assert_same_results('-c "%m:%n" *')
+
+	rig.assert_same_results('--terse a')
+	rig.assert_same_results('--terse b')
+	rig.assert_same_results('--terse c')
+	rig.assert_same_results('--terse c/*')
+	rig.assert_same_results('--terse link_to_c')
+	rig.assert_same_results('--terse link*')
+	rig.assert_same_results('--terse *')
+	rig.assert_same_results('--terse --dereference *')
+
+	// TODO: Review %B
+	format_test := r'%04a %A %b %d %D %f %F %g %G %h %i %m %n %N %o %-10s\t %t %T %u %U %w %W %x %X %y %Y %z %Z'
+	rig.assert_same_results('--printf="${format_test}\\n" a')
+	rig.assert_same_results('--format="${format_test}" a')
+	rig.assert_same_results('--printf="${format_test}\\n" b')
+	rig.assert_same_results('--printf="${format_test}\\n" c')
+	rig.assert_same_results('--printf="${format_test}\\n" c/*')
+	rig.assert_same_results('--printf="${format_test}\\n" link_to_c')
+	rig.assert_same_results('--printf="${format_test}\\n" link*')
+	rig.assert_same_results('--printf="${format_test}\\n" *')
+	rig.assert_same_results('--printf="${format_test}\\n" --dereference *')
+
+	// Ensure both follow GNUs behavior of using the last format specified
+	rig.assert_same_results('--terse --format "abc" --format "xxx" --format "def" a')
+
+	// Different behavior between GNU and V coreutil
+	a := rig.call_orig('--format "abc" --printf "def" a')
+	assert a.exit_code == 0 && a.output == 'def'
+	b := rig.call_new('--format "abc" --printf "def" a')
+	assert b.exit_code == 1
+
+	// GNU 9.x has different outputs; testing against those versions will
+	// cause the following to fail:
 	rig.assert_same_results('a')
 	rig.assert_same_results('b')
 	rig.assert_same_results('c')
@@ -56,8 +90,8 @@ fn test_compare() {
 	rig.assert_same_results('link_to_c')
 	rig.assert_same_results('link*')
 	rig.assert_same_results('*')
-	rig.assert_same_results('-c "%m:%n" *')
 	rig.assert_same_results('--dereference *')
-	// rig.assert_same_results('-f /')
+
 	// TODO: file system id does not match between v version and GNU
+	// rig.assert_same_results('-f /')	
 }
