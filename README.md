@@ -46,7 +46,7 @@ count below and mark it as done in this README.md. Thanks!
 GNU coreutils. They are not 100% compatiable. If you encounter different behaviors, 
 compare against the true GNU coreutils version on the Linux-based tests first.
 
-## Completed (53/109)
+## Completed (54/109)
 
 |  Done   | Cmd       | Descripton                                       |
 | :-----: | --------- | ------------------------------------------------ |
@@ -132,7 +132,7 @@ compare against the true GNU coreutils version on the Linux-based tests first.
 | &check; | sleep     | Delay for a specified time                       |
 |         | sort      | Sort text files                                  |
 |         | split     | Split a file into pieces                         |
-|         | stat      | Report file or file system status                |
+| &check; | stat      | Report file or file system status                |
 |         | stdbuf    | Run a command with modified I/O stream buffering |
 |         | stty      | Print or change terminal characteristics         |
 |         | sum       | Print checksum and block counts                  |
