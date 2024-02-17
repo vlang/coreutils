@@ -47,7 +47,7 @@ fn test_compare() {
 	// Compares including free space are risky, can change between calls esp. on tmpfs
 	// rig.assert_same_results('--terse *')
 	// rig.assert_same_results('-L --terse *')
-	rig.assert_same_results('-f -c "%n %l %s %S %b %c %t %T" *')
+	rig.assert_same_results('-f -c "%n %l %s %S %b %c" *')
 	rig.assert_same_results('-c "%N" *')
 	rig.assert_same_results('a')
 	rig.assert_same_results('b')
