@@ -44,7 +44,7 @@ fn is_absolute_path(path string) bool {
 	$if !windows {
 		return path.starts_with(os.path_separator)
 	} $else {
-		return (path.len >= 3 && (path[1] == `:` && path[2] == os.path_separator))
+		return (path.len >= 3 && (path[1] == `:` && path[2] == os.path_separator[0]))
 			|| (path.len > 2 && path.starts_with('${os.path_separator}${os.path_separator}'))
 	}
 }
