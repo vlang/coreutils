@@ -207,9 +207,9 @@ pub fn (rig TestRig) assert_same_results(args string) {
 			// in all other cases, compare the normalised output (less strict):
 		}
 	}
-	assert cmd1_res.exit_code == cmd2_res.exit_code
 	eprintln_small_diff(noutput1, noutput2)
-	assert noutput1 == noutput2, '${noutput1.len} bytes vs. ${noutput2.len} bytes'
+	assert cmd1_res.exit_code == cmd2_res.exit_code, '${args}'
+	assert noutput1 == noutput2, '${args}: ${noutput1.len} bytes vs. ${noutput2.len} bytes'
 }
 
 pub fn (rig TestRig) assert_same_exit_code(args string) {
