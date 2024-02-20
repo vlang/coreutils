@@ -60,9 +60,20 @@ fn canonicalize(path string, mode CanonicalizeMode) !(string, bool) {
 			sb.clear()
 			sb.write_string(resolved_path)
 		} else {
-			new_path := sb.after(0) + os.path_separator + resolved_path
-			sb.clear()
-			sb.write_string(os.abs_path(new_path))
+			$if !windows {
+				new_path := sb.after(0) + os.path_separator + resolved_path
+				sb.clear()
+				sb.write_string(os.abs_path(new_path))
+			} $else {
+				s := sb.after(0)
+				new_path := if s != '' {
+					s + os.path_separator + resolved_path
+				} else {
+					resolved_path
+				}
+				sb.clear()
+				sb.write_string(os.abs_path(new_path))
+			}
 		}
 		if mode == .all_must_exist || (mode == .all_but_last_must_exist && i < p.len - 1) {
 			if !os.exists(sb.after(0)) {
