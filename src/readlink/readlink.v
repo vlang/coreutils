@@ -40,13 +40,22 @@ fn resolve_link_fully(path string, max_depth int) !string {
 	return error('Too many levels of symbolic links')
 }
 
+fn is_absolute_path(path string) bool {
+	$if !windows {
+		return path.starts_with(os.path_separator)
+	} $else {
+		return (path.len >= 3 && (path[1] == `:` && path[2] == os.path_separator))
+			|| (path.len > 2 && path.starts_with('${os.path_separator}${os.path_separator}'))
+	}
+}
+
 fn canonicalize(path string, mode CanonicalizeMode) !(string, bool) {
 	mut ok := true
 	mut sb := strings.new_builder(path.len)
 	p := path.split(os.path_separator)
 	for i := 0; i < p.len; i++ {
 		resolved_path := resolve_link_fully(os.join_path(sb.after(0), p[i]), max_link_depth)!
-		if resolved_path.starts_with(os.path_separator) {
+		if is_absolute_path(resolved_path) {
 			// Absolute path replaces everything that came before
 			sb.clear()
 			sb.write_string(resolved_path)
