@@ -27,53 +27,55 @@ mut:
 	exit_code    u8
 }
 
-fn resolve_link_fully(path string, max_depth int) !string {
+// resolve_link_fully keeps following a symlink until max_depth has been reached
+// or a non-link target was found and returned. If the original path was not a link
+// none is returned; if max_depth is exceeded, a NUL (\0) is returned.
+fn resolve_link_fully(path string, max_depth int) ?string {
 	mut resolved_path := path
 	for i := 0; i < max_depth; i++ {
 		if lpath := do_readlink(resolved_path) {
 			resolved_path = lpath
 		} else {
-			// No further resolution found
-			return resolved_path
+			if i > 0 {
+				return resolved_path
+			} else {
+				return none
+			}
 		}
 	}
-	return error('Too many levels of symbolic links')
+	return '\0'
 }
 
-fn is_absolute_path(path string) bool {
-	$if !windows {
-		return path.starts_with(os.path_separator)
-	} $else {
-		return (path.len >= 3 && (path[1] == `:` && path[2] == os.path_separator[0]))
-			|| (path.len > 2 && path.starts_with('${os.path_separator}${os.path_separator}'))
-	}
-}
-
+// canonicalize takes an absolute path and resolves each component of it if it is
+// a symlink, depending on mode allowing or disallowing missing components
 fn canonicalize(path string, mode CanonicalizeMode) !(string, bool) {
+	assert os.is_abs_path(path)
 	mut ok := true
+	// mut res := ''
 	mut sb := strings.new_builder(path.len)
+
 	p := path.split(os.path_separator)
-	for i := 0; i < p.len; i++ {
-		resolved_path := resolve_link_fully(os.join_path(sb.after(0), p[i]), max_link_depth)!
-		if is_absolute_path(resolved_path) {
-			// Absolute path replaces everything that came before
-			sb.clear()
-			sb.write_string(resolved_path)
-		} else {
-			$if !windows {
-				new_path := sb.after(0) + os.path_separator + resolved_path
-				sb.clear()
-				sb.write_string(os.abs_path(new_path))
-			} $else {
-				s := sb.after(0)
-				new_path := if s != '' {
-					s + os.path_separator + resolved_path
-				} else {
-					resolved_path
-				}
-				sb.clear()
-				sb.write_string(os.abs_path(new_path))
+	// Windows UNC path?
+	if path.len > 2 && (path[0] == `\\` || path[0] == `/`) && path[1] == path[0] {
+		sb.write_string(path[0..2])
+	} else {
+		sb.write_string(p[0])
+	}
+	// Start at 1, the root has already been added
+	for i := 1; i < p.len; i++ {
+		resolved_path := resolve_link_fully(os.join_path(sb.after(0), p[i]), max_link_depth)
+		if res := resolved_path {
+			if res == '\0' {
+				return error('Too many levels of symbolic links')
 			}
+			if os.is_abs_path(res) {
+				sb.clear()
+				sb.write_string(res)
+			} else {
+				sb.write_string(os.path_separator + res)
+			}
+		} else {
+			sb.write_string(os.path_separator + p[i])
 		}
 		if mode == .all_must_exist || (mode == .all_but_last_must_exist && i < p.len - 1) {
 			if !os.exists(sb.after(0)) {
@@ -81,8 +83,7 @@ fn canonicalize(path string, mode CanonicalizeMode) !(string, bool) {
 			}
 		}
 	}
-	cpath := sb.str()
-	return os.abs_path(cpath), ok
+	return os.abs_path(sb.str()), ok
 }
 
 fn readlink(settings Settings) {
