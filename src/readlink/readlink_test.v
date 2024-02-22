@@ -60,8 +60,9 @@ fn test_compare() {
 	rig.assert_same_results('-mv a')
 	rig.assert_same_results('-ev link_to_a')
 	rig.assert_same_results('-ev link_to_b')
-	rig.assert_same_results('-v does_not_exist/neither_does_this')
 	$if !windows {
+		// Error message does not match in Windows and POSIX
+		rig.assert_same_results('-v does_not_exist/neither_does_this')
 		rig.assert_same_results('link_to_b')
 		rig.assert_same_results('link_to_c')
 		rig.assert_same_results('link_to_link_to_c')
