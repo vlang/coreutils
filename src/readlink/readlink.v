@@ -35,6 +35,12 @@ fn resolve_link_fully(path string, max_depth int) ?string {
 	for i := 0; i < max_depth; i++ {
 		if lpath := do_readlink(resolved_path) {
 			resolved_path = lpath
+			$if windows {
+				// In Windows, a non-symlink will be resolved to itself
+				if lpath == path {
+					return none
+				}
+			}
 		} else {
 			if i > 0 {
 				return resolved_path
