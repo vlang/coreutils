@@ -46,7 +46,7 @@ count below and mark it as done in this README.md. Thanks!
 GNU coreutils. They are not 100% compatiable. If you encounter different behaviors, 
 compare against the true GNU coreutils version on the Linux-based tests first.
 
-## Completed (54/109)
+## Completed (55/109)
 
 |  Done   | Cmd       | Descripton                                       |
 | :-----: | --------- | ------------------------------------------------ |
@@ -116,7 +116,7 @@ compare against the true GNU coreutils version on the Linux-based tests first.
 | &check; | printf    | Format and print data                            |
 |         | ptx       | Produce permuted indexes                         |
 | &check; | pwd       | Print working directory                          |
-|         | readlink  | Print value of a symlink or canonical file name  |
+| &check; | readlink  | Print value of a symlink or canonical file name  |
 |         | realpath  | Print the resolved file name                     |
 | &check; | rm        | Remove files or directories                      |
 | &check; | rmdir     | Remove empty directories                         |

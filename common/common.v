@@ -77,8 +77,24 @@ pub fn (app CoreutilInfo) quit(detail CoreutilExitDetail) {
 	exit(detail.return_code)
 }
 
+// strip_error_code_from_msg strips the final semicolon and code
+// ("<msg>; code: <code>") away from a POSIX and Win32 error to make
+// it match what GNU coreutils return
+pub fn strip_error_code_from_msg(msg string) string {
+	j := msg.index_last('; code: ') or { -1 }
+	if j > 0 {
+		return msg[0..j]
+	} else {
+		return msg
+	}
+}
+
+pub fn (app CoreutilInfo) eprintln(message string) {
+	eprintln('${app.name}: ${strip_error_code_from_msg(message)}')
+}
+
 pub fn (app CoreutilInfo) eprintln_posix(message string) {
-	eprintln('${app.name}: ${message}: ${os.error_posix().msg}')
+	app.eprintln('${message}: ${os.error_posix()}')
 }
 
 // flag_parser returns a flag.FlagParser, with the common
