@@ -25,18 +25,20 @@ fn testsuite_begin() {
 }
 
 fn testsuite_end() {
-	os.rm('a')!
-	os.rm('b')!
-	os.rm('c/a')!
-	os.rm('c/b')!
+	os.rm('link_to_link_to_link_to_c')!
+	os.rm('link_to_link_to_c')!
+	os.rm('link_to_c')!
+	os.rm('link_to_b')!
+	os.rm('recursive_link')!
 	$if !windows {
 		os.rm('c/c_up')!
 		os.rm('c/c_same')!
 	}
+	os.rm('c/b')!
+	os.rm('c/a')!
 	os.rmdir('c')!
-	os.rm('link_to_b')!
-	os.rm('link_to_c')!
-	os.rm('recursive_link')!
+	os.rm('b')!
+	os.rm('a')!
 }
 
 fn test_help_and_version() {
@@ -58,13 +60,13 @@ fn test_compare() {
 	rig.assert_same_results('-mv a')
 	rig.assert_same_results('-ev link_to_a')
 	rig.assert_same_results('-ev link_to_b')
-	rig.assert_same_results('-fv link_to_link_to_c')
-	rig.assert_same_results('-fv recursive_link')
 	rig.assert_same_results('-v does_not_exist/neither_does_this')
 	$if !windows {
 		rig.assert_same_results('link_to_b')
 		rig.assert_same_results('link_to_c')
 		rig.assert_same_results('link_to_link_to_c')
+		rig.assert_same_results('-fv link_to_link_to_c')
+		rig.assert_same_results('-fv recursive_link')
 		rig.assert_same_results('-fv link_to_link_to_c/c_same/c_same/c_up/link_to_c/c_up/a')
 		rig.assert_same_results('-ev link_to_link_to_c/c_same/c_same/c_up/link_to_c/c_up/a')
 		rig.assert_same_results('-ev link_to_link_to_c/c_same/c_same/c_up/link_to_c/c_up/does_not_exist')
