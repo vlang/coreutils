@@ -25,12 +25,12 @@ fn testsuite_begin() {
 }
 
 fn testsuite_end() {
-	os.rm('link_to_link_to_link_to_c')!
-	os.rm('link_to_link_to_c')!
-	os.rm('link_to_c')!
-	os.rm('link_to_b')!
-	os.rm('recursive_link')!
 	$if !windows {
+		os.rm('link_to_link_to_link_to_c')!
+		os.rm('link_to_link_to_c')!
+		os.rm('link_to_c')!
+		os.rm('link_to_b')!
+		os.rm('recursive_link')!
 		os.rm('c/c_up')!
 		os.rm('c/c_same')!
 	}
