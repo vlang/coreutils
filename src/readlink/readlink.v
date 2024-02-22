@@ -28,28 +28,23 @@ mut:
 }
 
 // resolve_link_fully keeps following a symlink until max_depth has been reached
-// or a non-link target was found and returned. If the original path was not a link
-// none is returned; if max_depth is exceeded, a NUL (\0) is returned.
-fn resolve_link_fully(path string, max_depth int) ?string {
+// (in which case it errors) or a non-link target is found and returned.
+fn resolve_link_fully(path string, max_depth int) !string {
 	mut resolved_path := path
 	for i := 0; i < max_depth; i++ {
 		if lpath := do_readlink(resolved_path) {
-			resolved_path = lpath
 			$if windows {
 				// In Windows, a non-symlink will be resolved to itself
 				if lpath == resolved_path {
-					return none
+					return resolved_path
 				}
 			}
+			resolved_path = lpath
 		} else {
-			if i > 0 {
-				return resolved_path
-			} else {
-				return none
-			}
+			return resolved_path
 		}
 	}
-	return '\0'
+	return error('Too many levels of symbolic links')
 }
 
 // canonicalize takes an absolute path and resolves each component of it if it is
@@ -69,11 +64,7 @@ fn canonicalize(path string, mode CanonicalizeMode) !(string, bool) {
 	}
 	// Start at 1, the root has already been added
 	for i := 1; i < p.len; i++ {
-		resolved_path := resolve_link_fully(os.join_path(sb.after(0), p[i]), max_link_depth)
-		if res := resolved_path {
-			if res == '\0' {
-				return error('Too many levels of symbolic links')
-			}
+		if res := resolve_link_fully(os.join_path(sb.after(0), p[i]), max_link_depth) {
 			if os.is_abs_path(res) {
 				sb.clear()
 				sb.write_string(res)
@@ -81,7 +72,7 @@ fn canonicalize(path string, mode CanonicalizeMode) !(string, bool) {
 				sb.write_string(os.path_separator + res)
 			}
 		} else {
-			sb.write_string(os.path_separator + p[i])
+			return err
 		}
 		if mode == .all_must_exist || (mode == .all_but_last_must_exist && i < p.len - 1) {
 			if !os.exists(sb.after(0)) {

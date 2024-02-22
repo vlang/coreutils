@@ -59,7 +59,7 @@ fn test_compare() {
 	rig.assert_same_results('-ev link_to_a')
 	rig.assert_same_results('-ev link_to_b')
 	rig.assert_same_results('link_to_b')
-	rig.assert_same_results('link_to_b')
+	rig.assert_same_results('link_to_c')
 	rig.assert_same_results('link_to_link_to_c')
 	rig.assert_same_results('-fv link_to_link_to_c')
 	rig.assert_same_results('-fv recursive_link')
