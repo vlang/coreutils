@@ -225,7 +225,7 @@ fn run_fold(args []string) {
 		success_exit('${name} ${common.coreutils_version()}')
 	}
 
-	file_args := fp.finalize() or { common.exit_with_error_message(name, err.msg) }
+	file_args := fp.finalize() or { common.exit_with_error_message(name, err.msg()) }
 
 	cmd := FoldCommand{
 		max_col_width: width

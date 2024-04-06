@@ -48,7 +48,9 @@ fn int_yes(prompt string) bool {
 }
 
 pub fn run_mv(args []string) {
-	mv, sources, dest := setup_mv_command(args) or { common.exit_with_error_message(name, err.msg) }
+	mv, sources, dest := setup_mv_command(args) or {
+		common.exit_with_error_message(name, err.msg())
+	}
 	if sources.len > 1 && !os.is_dir(dest) {
 		common.exit_with_error_message(name, target_not_dir(dest))
 	}
@@ -60,7 +62,7 @@ pub fn run_mv(args []string) {
 fn setup_mv_command(args []string) ?(MvCommand, []string, string) {
 	mut fp := common.flag_parser(args)
 	fp.application('mv')
-	fp.limit_free_args_to_at_least(1) or { common.exit_with_error_message(name, err.msg) }
+	fp.limit_free_args_to_at_least(1) or { common.exit_with_error_message(name, err.msg()) }
 
 	force := fp.bool('force', `f`, false, 'ignore interactive and no-clobber')
 	interactive := fp.bool('interactive', `i`, false, 'ask for each overwrite')

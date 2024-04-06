@@ -12,7 +12,7 @@ fn success_exit(messages ...string) {
 fn run_ln(args []string) {
 	mut fp := common.flag_parser(args)
 	fp.application(name)
-	fp.limit_free_args_to_at_least(2) or { common.exit_with_error_message(name, err.msg) }
+	fp.limit_free_args_to_at_least(2) or { common.exit_with_error_message(name, err.msg()) }
 
 	force := fp.bool('', `f`, false, 'Force existing destination pathnames to be removed to allow the link.')
 	follow_symbolic := fp.bool('', `L`, false, 'For each source_file operand that names a file of type symbolic link, create a (hard) link to the file referenced by the symbolic link.')
@@ -29,7 +29,7 @@ fn run_ln(args []string) {
 		success_exit('${name} ${common.coreutils_version()}')
 	}
 
-	files := fp.finalize() or { common.exit_with_error_message(name, err.msg) }
+	files := fp.finalize() or { common.exit_with_error_message(name, err.msg()) }
 
 	mut ln := Linker{
 		force: force

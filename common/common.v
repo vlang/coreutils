@@ -81,7 +81,7 @@ pub fn (app CoreutilInfo) quit(detail CoreutilExitDetail) {
 // ("<msg>; code: <code>") away from a POSIX and Win32 error to make
 // it match what GNU coreutils return
 pub fn strip_error_code_from_msg(msg string) string {
-	j := msg.index_last('; code: ') or { -1 }
+	j := msg.last_index('; code: ') or { -1 }
 	if j > 0 {
 		return msg[0..j]
 	} else {

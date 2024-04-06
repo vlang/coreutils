@@ -72,7 +72,7 @@ fn success_exit(messages ...string) {
 fn setup_cp_command(args []string) ?(CpCommand, []string, string) {
 	mut fp := common.flag_parser(args)
 	fp.application('cp')
-	fp.limit_free_args_to_at_least(1) or { common.exit_with_error_message(name, err.msg) }
+	fp.limit_free_args_to_at_least(1) or { common.exit_with_error_message(name, err.msg()) }
 
 	force := fp.bool('force', `f`, false, 'ignore interactive and no-clobber')
 	interactive := fp.bool('interactive', `i`, false, 'ask for each overwrite')
@@ -143,7 +143,9 @@ fn setup_cp_command(args []string) ?(CpCommand, []string, string) {
 }
 
 pub fn run_cp(args []string) {
-	cp, sources, dest := setup_cp_command(args) or { common.exit_with_error_message(name, err.msg) }
+	cp, sources, dest := setup_cp_command(args) or {
+		common.exit_with_error_message(name, err.msg())
+	}
 	if sources.len > 1 && !os.is_dir(dest) {
 		common.exit_with_error_message(name, target_not_dir(dest))
 	}
