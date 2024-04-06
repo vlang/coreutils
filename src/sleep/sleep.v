@@ -92,7 +92,7 @@ fn main() {
 		if s := apply_unit(n, unit) {
 			seconds += s
 		} else {
-			eprintln(err.msg)
+			eprintln(err.msg())
 			ok = false
 		}
 	}

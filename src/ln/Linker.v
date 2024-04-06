@@ -38,18 +38,18 @@ fn (ln Linker) link_to_dir() {
 fn (ln Linker) link(source_path string, target_path string) {
 	if os.exists(target_path) {
 		if ln.force {
-			os.rm(target_path) or { common.exit_with_error_message(name, err.msg) }
+			os.rm(target_path) or { common.exit_with_error_message(name, err.msg()) }
 		} else {
 			common.exit_with_error_message(name, '${target_path} already exists')
 		}
 	}
 	if ln.symbolic {
-		os.symlink(source_path, target_path) or { common.exit_with_error_message(name, err.msg) }
+		os.symlink(source_path, target_path) or { common.exit_with_error_message(name, err.msg()) }
 	} else {
 		if os.is_dir(source_path) {
 			common.exit_with_error_message(name, 'only symbolic links are supported for directories')
 		}
-		os.link(source_path, target_path) or { common.exit_with_error_message(name, err.msg) }
+		os.link(source_path, target_path) or { common.exit_with_error_message(name, err.msg()) }
 	}
 	println('${target_path} -> ${source_path}')
 }

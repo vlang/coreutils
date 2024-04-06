@@ -81,7 +81,7 @@ fn run_mkdir(args []string) {
 		success_exit('${name} ${common.coreutils_version()}')
 	}
 
-	file_args := fp.finalize() or { common.exit_with_error_message(name, err.msg) }
+	file_args := fp.finalize() or { common.exit_with_error_message(name, err.msg()) }
 	if file_args.len == 0 {
 		eprintln('${name}: missing operand')
 		eprintln("Try '${name} --help' for more information")

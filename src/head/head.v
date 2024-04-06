@@ -318,7 +318,7 @@ fn setup_command(args []string) ?(HeadCommand, []InputFile) {
 		success_exit('${name} ${common.coreutils_version()}')
 	}
 
-	file_args := fp.finalize() or { common.exit_with_error_message(name, err.msg) }
+	file_args := fp.finalize() or { common.exit_with_error_message(name, err.msg()) }
 
 	return HeadCommand{
 		bytes_to_read: bytes
@@ -330,7 +330,7 @@ fn setup_command(args []string) ?(HeadCommand, []InputFile) {
 }
 
 fn run_head(args []string) {
-	head, mut files := setup_command(args) or { common.exit_with_error_message(name, err.msg) }
+	head, mut files := setup_command(args) or { common.exit_with_error_message(name, err.msg()) }
 
 	head.run(mut files)
 }

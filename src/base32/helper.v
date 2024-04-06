@@ -41,7 +41,7 @@ fn decode_and_output(file os.File, wrap int) {
 	mut i := u64(0)
 	for {
 		num := file.read_bytes_into(i, mut groups) or {
-			common.exit_with_error_message(name, err.msg)
+			common.exit_with_error_message(name, err.msg())
 		}
 		if num == 0 || (num == 1 && groups[0] == `\n`) {
 			break
@@ -49,7 +49,7 @@ fn decode_and_output(file os.File, wrap int) {
 			common.exit_with_error_message(name, invalid)
 		}
 		i += u64(num)
-		builder.write(get_blocks(groups)) or { common.exit_with_error_message(name, err.msg) }
+		builder.write(get_blocks(groups)) or { common.exit_with_error_message(name, err.msg()) }
 	}
 	print(builder.str())
 }
@@ -81,7 +81,7 @@ fn encode_and_output(file os.File, wrap int) {
 					0
 				}
 				else {
-					common.exit_with_error_message(name, err.msg)
+					common.exit_with_error_message(name, err.msg())
 				}
 			}
 		}
@@ -104,7 +104,7 @@ fn encode_and_output(file os.File, wrap int) {
 		}
 		groups := get_groups(block, u8(num_equal))
 		mut result := strings.new_builder(groups.len)
-		result.write(groups) or { common.exit_with_error_message(name, err.msg) }
+		result.write(groups) or { common.exit_with_error_message(name, err.msg()) }
 		print(result.str())
 	}
 	println('')
@@ -114,7 +114,7 @@ fn get_file(file_arg []string) os.File {
 	if file_arg.len == 0 || file_arg[0] == '-' {
 		return os.stdin()
 	} else {
-		return os.open(file_arg[0]) or { common.exit_with_error_message(name, err.msg) }
+		return os.open(file_arg[0]) or { common.exit_with_error_message(name, err.msg()) }
 	}
 }
 
@@ -136,7 +136,7 @@ fn run_base32(args []string) {
 	if version {
 		success_exit('${name} ${common.coreutils_version()}')
 	}
-	file_arg := fp.finalize() or { common.exit_with_error_message(name, err.msg) }
+	file_arg := fp.finalize() or { common.exit_with_error_message(name, err.msg()) }
 
 	if file_arg.len > 1 {
 		common.exit_with_error_message(name, 'only one file should be provided')

@@ -130,12 +130,12 @@ fn main() {
 	match args.len {
 		0 {
 			uptime(common.utmp_file_charptr, .check_pids) or {
-				common.exit_with_error_message(fp.application_name, err.msg)
+				common.exit_with_error_message(fp.application_name, err.msg())
 			}
 		}
 		1 {
 			uptime(&char(args[0].str), .undefined) or {
-				common.exit_with_error_message(fp.application_name, err.msg)
+				common.exit_with_error_message(fp.application_name, err.msg())
 			}
 		}
 		else {}

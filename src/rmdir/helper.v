@@ -36,7 +36,7 @@ fn setup_rmdir_command(args []string) !(RmdirCommand, []string) {
 }
 
 fn run_rmdir(args []string) {
-	rmdir, dirs := setup_rmdir_command(args) or { common.exit_with_error_message(name, err.msg) }
+	rmdir, dirs := setup_rmdir_command(args) or { common.exit_with_error_message(name, err.msg()) }
 	for dir in dirs {
 		rmdir.remove_dir(dir)
 	}

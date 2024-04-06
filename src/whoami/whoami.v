@@ -8,6 +8,6 @@ fn main() {
 	fp.description('Same as id -un.')
 	fp.limit_free_args_to_exactly(0)!
 	fp.remaining_parameters()
-	username := whoami() or { common.exit_with_error_message('whoami', err.msg) }
+	username := whoami() or { common.exit_with_error_message('whoami', err.msg()) }
 	println(username)
 }
