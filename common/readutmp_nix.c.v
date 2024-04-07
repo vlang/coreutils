@@ -14,6 +14,7 @@ pub struct C.timeval {
 
 // <time.h>
 pub struct C.timeval {
+pub:
 	tv_sec  u64 // Seconds.
 	tv_usec u64 // Microseconds.
 }

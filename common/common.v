@@ -16,10 +16,11 @@ pub:
 }
 
 pub struct CoreutilExitDetail {
+pub:
 	message string
-mut:
-	return_code      int = 1
+pub mut:
 	show_help_advice bool // defaults to false
+	return_code      int = 1
 }
 
 // coreutils_version returns formatted coreutils tool version
