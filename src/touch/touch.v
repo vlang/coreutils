@@ -7,12 +7,12 @@ import time
 const app_name = 'touch'
 
 struct TouchArgs {
-	access_time_only       bool
-	modification_time_only bool
-	no_create              bool
-	time_arg               string
-	date_arg               string
-	path_args              []string
+	access_only bool
+	mod_only    bool
+	no_create   bool
+	time_arg    string
+	date_arg    string
+	path_args   []string
 }
 
 // Print messages and exit
@@ -22,7 +22,7 @@ fn success_exit(message string) {
 	exit(0)
 }
 
-fn touch(args TouchArgs) int {
+fn get_date_time(args TouchArgs) (int, int) {
 	now := int(time.utc().unix())
 	mut acc := now
 	mut mod := now
@@ -35,6 +35,12 @@ fn touch(args TouchArgs) int {
 		acc = unix
 		mod = unix
 	}
+
+	return acc, mod
+}
+
+fn touch(args TouchArgs) int {
+	mut acc, mut mod := get_date_time(args)
 
 	for path in args.path_args {
 		if !os.exists(path) {
@@ -53,16 +59,16 @@ fn touch(args TouchArgs) int {
 			common.exit_with_error_message(app_name, 'unable to query ${path}')
 		}
 
-		if args.access_time_only {
+		if args.access_only {
 			mod = int(stat.mtime)
 		}
 
-		if args.modification_time_only {
+		if args.mod_only {
 			acc = int(stat.atime)
 		}
 
 		os.utime(path, acc, mod) or {
-			common.exit_with_error_message(app_name, 'unable to modify ${path}')
+			common.exit_with_error_message(app_name, 'unable to change times for ${path}')
 		}
 	}
 
@@ -81,10 +87,10 @@ fn main() {
 	fp.description('-r ref_file OPTION, or the -d date_time OPTION. If none')
 	fp.description('of these are specified, touch uses the current time.')
 
-	access_time_only := fp.bool('', `a`, false, 'change access time only')
+	access_only := fp.bool('', `a`, false, 'change access time only')
 	no_create := fp.bool('no-create', `c`, false, 'do not create any files')
 	date_arg := fp.string('date_time', `d`, '', 'Use specified date.')
-	mod_time_only := fp.bool('', `m`, false, 'change modifcation time only')
+	mod_only := fp.bool('', `m`, false, 'change modifcation time only')
 	time_arg := fp.string('time', `t`, '', 'Use specified time.')
 
 	help := fp.bool('help', 0, false, 'display this help')
@@ -93,15 +99,20 @@ fn main() {
 	if help {
 		success_exit(fp.usage())
 	}
+
 	if version {
 		success_exit('${app_name} ${common.coreutils_version()}')
 	}
 
 	path_args := fp.finalize() or { common.exit_with_error_message(app_name, err.msg()) }
 
+	if path_args.len == 0 {
+		common.exit_with_error_message(app_name, 'No FILE... option specified')
+	}
+
 	args := TouchArgs{
-		access_time_only: access_time_only
-		modification_time_only: mod_time_only
+		access_only: access_only
+		mod_only: mod_only
 		no_create: no_create
 		time_arg: time_arg
 		date_arg: date_arg
