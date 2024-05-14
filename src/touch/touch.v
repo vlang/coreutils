@@ -11,7 +11,7 @@ struct TouchArgs {
 	modification_time_only bool
 	no_create              bool
 	time_arg               string
-	data_arg               string
+	date_arg               string
 	path_args              []string
 }
 
@@ -27,34 +27,45 @@ fn touch(args TouchArgs) int {
 	mut acc := now
 	mut mod := now
 
-	for path in args.path_args {
-		if os.exists(path) {
-			stat := os.lstat(path) or {
-				common.exit_with_error_message(app_name, 'unable to query ${path}')
-			}
-
-			if args.access_time_only {
-				mod = int(stat.mtime)
-			}
-
-			if args.modification_time_only {
-				acc = int(stat.atime)
-			}
-
-			os.utime(path, acc, mod) or {
-				common.exit_with_error_message(app_name, 'unable to modify ${path}')
-			}
-
-			continue
+	if args.date_arg.len > 0 {
+		date := time.parse_iso8601(args.date_arg) or {
+			common.exit_with_error_message(app_name, 'unable to parse date ${args.date_arg}')
 		}
+		unix := int(date.unix())
+		acc = unix
+		mod = unix
+	}
 
-		if !args.no_create {
+	for path in args.path_args {
+		if !os.exists(path) {
+			if args.no_create {
+				continue
+			}
+
 			mut file := os.create(path) or {
 				common.exit_with_error_message(app_name, 'unable to create ${path}')
 			}
+
 			file.close()
 		}
+
+		stat := os.lstat(path) or {
+			common.exit_with_error_message(app_name, 'unable to query ${path}')
+		}
+
+		if args.access_time_only {
+			mod = int(stat.mtime)
+		}
+
+		if args.modification_time_only {
+			acc = int(stat.atime)
+		}
+
+		os.utime(path, acc, mod) or {
+			common.exit_with_error_message(app_name, 'unable to modify ${path}')
+		}
 	}
+
 	return 0
 }
 
@@ -72,9 +83,9 @@ fn main() {
 
 	access_time_only := fp.bool('', `a`, false, 'change access time only')
 	no_create := fp.bool('no-create', `c`, false, 'do not create any files')
-	data_arg := fp.string('date_time', `d`, '', 'Use specified date. YYYY-MM-DDThh:mm:SS[.frac][tz]')
+	date_arg := fp.string('date_time', `d`, '', 'Use specified date.')
 	mod_time_only := fp.bool('', `m`, false, 'change modifcation time only')
-	time_arg := fp.string('time', `t`, '', 'Use specified time. [[CC]YY]MMDDhhmm[.SS]')
+	time_arg := fp.string('time', `t`, '', 'Use specified time.')
 
 	help := fp.bool('help', 0, false, 'display this help')
 	version := fp.bool('version', 0, false, 'display version information')
@@ -93,7 +104,7 @@ fn main() {
 		modification_time_only: mod_time_only
 		no_create: no_create
 		time_arg: time_arg
-		data_arg: data_arg
+		date_arg: date_arg
 		path_args: path_args
 	}
 
