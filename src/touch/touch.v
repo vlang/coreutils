@@ -2,39 +2,52 @@ module main
 
 import common
 import os
+import time
 
 const app_name = 'touch'
 
-struct TouchCommand {
+struct TouchArgs {
 	access_time_only bool
 	no_create        bool
-	file_args        []string
+	path_args        []string
 }
 
 // Print messages and exit
 @[noreturn]
-fn success_exit(messages ...string) {
-	for message in messages {
-		println(message)
-	}
+fn success_exit(message string) {
+	println(message)
 	exit(0)
 }
 
-fn touch(cmd TouchCommand) {
+@[noreturn]
+fn error_exit(message string) {
+	println(message)
+	exit(1)
+}
+
+fn touch(args TouchArgs) int {
+	now := int(time.utc().unix())
+
+	for path in args.path_args {
+		if os.exists(path) {
+			os.utime(path, now, now) or { error_exit('unable to modify ${path}') }	
+		}
+		else {
+			mut file := os.create(path) or { error_exit('unable to create ${path}') }
+			file.close()
+		}
+	}
+	return 0
 }
 
 fn main() {
 	mut fp := common.flag_parser(os.args)
 	fp.application(app_name)
 	fp.limit_free_args_to_at_least(1)!
-	fp.usage_example('Usage: [OPTION]... FILE...\n')
-	fp.description('Update the access and modification times of each FILE to the current time.')
-	fp.description('')
-	fp.description('A FILE argument that does not exist is created empty, unless -c or -h')
-	fp.description('is supplied.')
-	fp.description('')
-	fp.description('A FILE argument string of - is handled specially and causes touch to')
-	fp.description('change the times of the file associated with standard output.')
+	fp.usage_example('[OPTION]... FILE...')
+	fp.description('\n\nUpdate the access and modification times of each FILE to the current time.')
+	fp.description('\nA FILE argument that does not exist is created empty, unless -c or -h is supplied')
+	fp.description('\nA FILE argument string of - is handled specially and causes touch to change the\ntimes of the file associated with standard output.')
 
 	access_time_only := fp.bool('', `a`, false, 'change only the access time')
 	no_create := fp.bool('no-create', `c`, false, 'do not create any files')
@@ -49,14 +62,13 @@ fn main() {
 		success_exit('${app_name} ${common.coreutils_version()}')
 	}
 
-	file_args := fp.finalize() or { common.exit_with_error_message(app_name, err.msg()) }
+	path_args := fp.finalize() or { common.exit_with_error_message(app_name, err.msg()) }
 
-
-	cmd := TouchCommand{
+	args := TouchArgs{
 		access_time_only: access_time_only
 		no_create: no_create
-		file_args: file_args
+		path_args: path_args
 	}
 
-	touch(cmd)
+	touch(args)
 }
