@@ -7,9 +7,12 @@ import time
 const app_name = 'touch'
 
 struct TouchArgs {
-	access_time_only bool
-	no_create        bool
-	path_args        []string
+	access_time_only       bool
+	modification_time_only bool
+	no_create              bool
+	time_arg               string
+	data_arg               string
+	path_args              []string
 }
 
 // Print messages and exit
@@ -19,21 +22,36 @@ fn success_exit(message string) {
 	exit(0)
 }
 
-@[noreturn]
-fn error_exit(message string) {
-	println(message)
-	exit(1)
-}
-
 fn touch(args TouchArgs) int {
 	now := int(time.utc().unix())
+	mut acc := now
+	mut mod := now
 
 	for path in args.path_args {
 		if os.exists(path) {
-			os.utime(path, now, now) or { error_exit('unable to modify ${path}') }	
+			stat := os.lstat(path) or {
+				common.exit_with_error_message(app_name, 'unable to query ${path}')
+			}
+
+			if args.access_time_only {
+				mod = int(stat.mtime)
+			}
+
+			if args.modification_time_only {
+				acc = int(stat.atime)
+			}
+
+			os.utime(path, acc, mod) or {
+				common.exit_with_error_message(app_name, 'unable to modify ${path}')
+			}
+
+			continue
 		}
-		else {
-			mut file := os.create(path) or { error_exit('unable to create ${path}') }
+
+		if !args.no_create {
+			mut file := os.create(path) or {
+				common.exit_with_error_message(app_name, 'unable to create ${path}')
+			}
 			file.close()
 		}
 	}
@@ -43,17 +61,23 @@ fn touch(args TouchArgs) int {
 fn main() {
 	mut fp := common.flag_parser(os.args)
 	fp.application(app_name)
-	fp.limit_free_args_to_at_least(1)!
 	fp.usage_example('[OPTION]... FILE...')
-	fp.description('\n\nUpdate the access and modification times of each FILE to the current time.')
-	fp.description('\nA FILE argument that does not exist is created empty, unless -c or -h is supplied')
-	fp.description('\nA FILE argument string of - is handled specially and causes touch to change the\ntimes of the file associated with standard output.')
+	fp.description('Change file access and modification times${common.eol()}')
+	fp.description('A FILE argument that does not exist is created empty,')
+	fp.description('unless -c or -h is supplied${common.eol()}')
+	fp.description('The time used can be specified by the -t time OPTION, the')
+	fp.description('corresponding time fields of the file referenced by the')
+	fp.description('-r ref_file OPTION, or the -d date_time OPTION. If none')
+	fp.description('of these are specified, touch uses the current time.')
 
-	access_time_only := fp.bool('', `a`, false, 'change only the access time')
+	access_time_only := fp.bool('', `a`, false, 'change access time only')
 	no_create := fp.bool('no-create', `c`, false, 'do not create any files')
+	data_arg := fp.string('date_time', `d`, '', 'Use specified date. YYYY-MM-DDThh:mm:SS[.frac][tz]')
+	mod_time_only := fp.bool('', `m`, false, 'change modifcation time only')
+	time_arg := fp.string('time', `t`, '', 'Use specified time. [[CC]YY]MMDDhhmm[.SS]')
 
-	help := fp.bool('help', 0, false, 'display this help and exit')
-	version := fp.bool('version', 0, false, 'output version information and exit')
+	help := fp.bool('help', 0, false, 'display this help')
+	version := fp.bool('version', 0, false, 'display version information')
 
 	if help {
 		success_exit(fp.usage())
@@ -66,7 +90,10 @@ fn main() {
 
 	args := TouchArgs{
 		access_time_only: access_time_only
+		modification_time_only: mod_time_only
 		no_create: no_create
+		time_arg: time_arg
+		data_arg: data_arg
 		path_args: path_args
 	}
 
