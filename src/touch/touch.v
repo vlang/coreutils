@@ -15,32 +15,39 @@ struct TouchArgs {
 	path_args   []string
 }
 
-// Print messages and exit
 @[noreturn]
 fn success_exit(message string) {
 	println(message)
 	exit(0)
 }
 
-fn get_date_time(args TouchArgs) (int, int) {
-	now := int(time.utc().unix())
-	mut acc := now
-	mut mod := now
-
-	if args.date_arg.len > 0 {
-		date := time.parse_iso8601(args.date_arg) or {
-			common.exit_with_error_message(app_name, 'unable to parse date ${args.date_arg}')
-		}
-		unix := int(date.unix())
-		acc = unix
-		mod = unix
+fn get_date_time(args TouchArgs) int {
+	if args.date_arg.len > 0 && args.time_arg.len > 0 {
+		common.exit_with_error_message(app_name, 'specify either -d or -t but not both')
 	}
 
-	return acc, mod
+	dt := if args.date_arg.len > 0 { args.date_arg } else { args.time_arg }
+
+	if dt.len > 0 {
+		date := time.parse_iso8601(dt) or {
+			common.exit_with_error_message(app_name, 'unable to parse date ${dt}')
+		}
+		return int(date.unix())
+	}
+
+	return int(time.utc().unix())
 }
 
-fn touch(args TouchArgs) int {
-	mut acc, mut mod := get_date_time(args)
+fn create_file(path string) {
+	mut file := os.create(path) or {
+		common.exit_with_error_message(app_name, 'unable to create ${path}')
+	}
+
+	file.close()
+}
+
+fn process_touch(args TouchArgs) int {
+	now := get_date_time(args)
 
 	for path in args.path_args {
 		if !os.exists(path) {
@@ -48,24 +55,15 @@ fn touch(args TouchArgs) int {
 				continue
 			}
 
-			mut file := os.create(path) or {
-				common.exit_with_error_message(app_name, 'unable to create ${path}')
-			}
-
-			file.close()
+			create_file(path)
 		}
 
 		stat := os.lstat(path) or {
 			common.exit_with_error_message(app_name, 'unable to query ${path}')
 		}
 
-		if args.access_only {
-			mod = int(stat.mtime)
-		}
-
-		if args.mod_only {
-			acc = int(stat.atime)
-		}
+		acc := if args.mod_only && !args.access_only { int(stat.atime) } else { now }
+		mod := if args.access_only && !args.mod_only { int(stat.mtime) } else { now }
 
 		os.utime(path, acc, mod) or {
 			common.exit_with_error_message(app_name, 'unable to change times for ${path}')
@@ -75,8 +73,8 @@ fn touch(args TouchArgs) int {
 	return 0
 }
 
-fn main() {
-	mut fp := common.flag_parser(os.args)
+fn touch(args []string) {
+	mut fp := common.flag_parser(args)
 	fp.application(app_name)
 	fp.usage_example('[OPTION]... FILE...')
 	fp.description('Change file access and modification times${common.eol()}')
@@ -107,10 +105,10 @@ fn main() {
 	path_args := fp.finalize() or { common.exit_with_error_message(app_name, err.msg()) }
 
 	if path_args.len == 0 {
-		common.exit_with_error_message(app_name, 'No FILE... option specified')
+		common.exit_with_error_message(app_name, 'FILE... option not specified.')
 	}
 
-	args := TouchArgs{
+	touch_args := TouchArgs{
 		access_only: access_only
 		mod_only: mod_only
 		no_create: no_create
@@ -119,5 +117,9 @@ fn main() {
 		path_args: path_args
 	}
 
-	touch(args)
+	process_touch(touch_args)
+}
+
+fn main() {
+	touch(os.args)
 }
