@@ -12,6 +12,7 @@ struct TouchArgs {
 	no_create   bool
 	time_arg    string
 	date_arg    string
+	reference   string
 	path_args   []string
 }
 
@@ -21,9 +22,13 @@ fn success_exit(message string) {
 	exit(0)
 }
 
-fn get_date_time(args TouchArgs) int {
+fn get_date_time(args TouchArgs) (int, int) {
 	if args.date_arg.len > 0 && args.time_arg.len > 0 {
-		common.exit_with_error_message(app_name, 'specify either -d or -t but not both')
+		common.exit_with_error_message(app_name, '-d or -t but not both')
+	}
+
+	if (args.date_arg.len > 0 || args.time_arg.len > 0) && args.reference.len > 0 {
+		common.exit_with_error_message(app_name, 'reference file or date/time but not both')
 	}
 
 	dt := if args.date_arg.len > 0 { args.date_arg } else { args.time_arg }
@@ -32,10 +37,18 @@ fn get_date_time(args TouchArgs) int {
 		date := time.parse_iso8601(dt) or {
 			common.exit_with_error_message(app_name, 'unable to parse date ${dt}')
 		}
-		return int(date.unix())
+		return int(date.unix()), int(date.unix())
 	}
 
-	return int(time.utc().unix())
+	if args.reference.len > 0 {
+		stat := os.lstat(args.reference) or {
+			common.exit_with_error_message(app_name, 'unable to find reference file ${args.reference}')
+		}
+
+		return int(stat.atime), int(stat.mtime)
+	}
+
+	return int(time.utc().unix()), int(time.utc().unix())
 }
 
 fn create_file(path string) {
@@ -46,8 +59,8 @@ fn create_file(path string) {
 	file.close()
 }
 
-fn process_touch(args TouchArgs) int {
-	now := get_date_time(args)
+fn process_touch(args TouchArgs) {
+	atime, mtime := get_date_time(args)
 
 	for path in args.path_args {
 		if !os.exists(path) {
@@ -62,15 +75,13 @@ fn process_touch(args TouchArgs) int {
 			common.exit_with_error_message(app_name, 'unable to query ${path}')
 		}
 
-		acc := if args.mod_only && !args.access_only { int(stat.atime) } else { now }
-		mod := if args.access_only && !args.mod_only { int(stat.mtime) } else { now }
+		acc := if args.mod_only && !args.access_only { int(stat.atime) } else { atime }
+		mod := if args.access_only && !args.mod_only { int(stat.mtime) } else { mtime }
 
 		os.utime(path, acc, mod) or {
 			common.exit_with_error_message(app_name, 'unable to change times for ${path}')
 		}
 	}
-
-	return 0
 }
 
 fn touch(args []string) {
@@ -88,7 +99,9 @@ fn touch(args []string) {
 	access_only := fp.bool('', `a`, false, 'change access time only')
 	no_create := fp.bool('no-create', `c`, false, 'do not create any files')
 	date_arg := fp.string('date_time', `d`, '', 'Use specified date.')
+	fp.bool('', `f`, false, 'ignored (for compatibility with BSD)')
 	mod_only := fp.bool('', `m`, false, 'change modifcation time only')
+	reference := fp.string('reference', `r`, '', 'use times from file <string>')
 	time_arg := fp.string('time', `t`, '', 'Use specified time.')
 
 	help := fp.bool('help', 0, false, 'display this help')
@@ -114,6 +127,7 @@ fn touch(args []string) {
 		no_create: no_create
 		time_arg: time_arg
 		date_arg: date_arg
+		reference: reference
 		path_args: path_args
 	}
 
