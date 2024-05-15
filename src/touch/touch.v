@@ -13,6 +13,7 @@ struct TouchArgs {
 	time_arg    string
 	date_arg    string
 	reference   string
+	no_ref      bool
 	path_args   []string
 }
 
@@ -71,15 +72,17 @@ fn process_touch(args TouchArgs) {
 			create_file(path)
 		}
 
-		stat := os.lstat(path) or {
-			common.exit_with_error_message(app_name, 'unable to query ${path}')
+		real_path := if args.no_ref { path } else { os.real_path(path) }
+
+		stat := os.lstat(real_path) or {
+			common.exit_with_error_message(app_name, 'unable to query ${real_path}')
 		}
 
 		acc := if args.mod_only && !args.access_only { int(stat.atime) } else { atime }
 		mod := if args.access_only && !args.mod_only { int(stat.mtime) } else { mtime }
 
-		os.utime(path, acc, mod) or {
-			common.exit_with_error_message(app_name, 'unable to change times for ${path}')
+		os.utime(real_path, acc, mod) or {
+			common.exit_with_error_message(app_name, 'unable to change times for ${real_path}')
 		}
 	}
 }
@@ -98,11 +101,12 @@ fn touch(args []string) {
 
 	access_only := fp.bool('', `a`, false, 'change access time only')
 	no_create := fp.bool('no-create', `c`, false, 'do not create any files')
-	date_arg := fp.string('date_time', `d`, '', 'Use specified date.')
+	date_arg := fp.string('date_time', `d`, '', 'Use specified date. format=ISO-8601')
 	fp.bool('', `f`, false, 'ignored (for compatibility with BSD)')
+	no_ref := fp.bool('no-reference', `h`, false, 'affect each symbolic link instead of any referenced file')
 	mod_only := fp.bool('', `m`, false, 'change modifcation time only')
 	reference := fp.string('reference', `r`, '', 'use times from file <string>')
-	time_arg := fp.string('time', `t`, '', 'Use specified time.')
+	time_arg := fp.string('time', `t`, '', 'Use specified time. format=[[CC]YY]MMDDhhmm[.ss]')
 
 	help := fp.bool('help', 0, false, 'display this help')
 	version := fp.bool('version', 0, false, 'display version information')
@@ -128,6 +132,7 @@ fn touch(args []string) {
 		time_arg: time_arg
 		date_arg: date_arg
 		reference: reference
+		no_ref: no_ref
 		path_args: path_args
 	}
 
