@@ -4,6 +4,10 @@ import common
 import os
 import time
 
+#include <sys/time.h>
+
+fn C.lutimes(&char, voidptr) int
+
 const app_name = 'touch'
 
 struct TouchArgs {
@@ -42,7 +46,8 @@ fn get_date_time(args TouchArgs) (int, int) {
 	}
 
 	if args.reference.len > 0 {
-		stat := os.lstat(args.reference) or {
+		// os.stat follows links
+		stat := os.stat(args.reference) or {
 			common.exit_with_error_message(app_name, 'unable to find reference file ${args.reference}')
 		}
 
@@ -56,33 +61,44 @@ fn create_file(path string) {
 	mut file := os.create(path) or {
 		common.exit_with_error_message(app_name, 'unable to create ${path}')
 	}
-
 	file.close()
+}
+
+fn lutime(path string, actime int, modtime int) ! {
+	mut times := [C.timeval{u64(actime), u64(0)}, C.timeval{u64(modtime), u64(0)}]
+	if C.lutimes(&char(path.str), voidptr(&times)) != 0 {
+		return error('lutime failed (${C.errno})')
+	}
 }
 
 fn process_touch(args TouchArgs) {
 	atime, mtime := get_date_time(args)
 
-	for path in args.path_args {
-		if !os.exists(path) {
+	for path_arg in args.path_args {
+		if !os.exists(path_arg) {
 			if args.no_create {
 				continue
 			}
-
-			create_file(path)
+			create_file(path_arg)
 		}
 
-		real_path := if args.no_ref { path } else { os.real_path(path) }
+		path := if args.no_ref { path_arg } else { os.real_path(path_arg) }
 
-		stat := os.lstat(real_path) or {
-			common.exit_with_error_message(app_name, 'unable to query ${real_path}')
+		stat := os.lstat(path) or {
+			common.exit_with_error_message(app_name, 'unable to query ${path}')
 		}
 
 		acc := if args.mod_only && !args.access_only { int(stat.atime) } else { atime }
 		mod := if args.access_only && !args.mod_only { int(stat.mtime) } else { mtime }
 
-		os.utime(real_path, acc, mod) or {
-			common.exit_with_error_message(app_name, 'unable to change times for ${real_path}')
+		if args.no_ref {
+			lutime(path, acc, mod) or {
+				common.exit_with_error_message(app_name, 'unable to change times for ${path}')
+			}
+		} else {
+			os.utime(path, acc, mod) or {
+				common.exit_with_error_message(app_name, 'unable to change times for ${path}')
+			}
 		}
 	}
 }
