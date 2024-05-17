@@ -14,7 +14,7 @@ struct DidNotFailError {
 }
 
 pub fn (err DidNotFailError) msg() string {
-	return err.msg
+	return err.msg()
 }
 
 pub fn (err DidNotFailError) code() int {
@@ -28,7 +28,7 @@ struct DoesNotWorkError {
 }
 
 pub fn (err DoesNotWorkError) msg() string {
-	return err.msg
+	return err.msg()
 }
 
 pub fn (err DoesNotWorkError) code() int {
@@ -42,7 +42,7 @@ struct ExitCodesDifferError {
 }
 
 pub fn (err ExitCodesDifferError) msg() string {
-	return err.msg
+	return err.msg()
 }
 
 pub fn (err ExitCodesDifferError) code() int {

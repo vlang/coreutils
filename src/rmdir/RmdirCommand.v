@@ -17,7 +17,7 @@ fn (r RmdirCommand) remove_dir(dir string) {
 		temp = os.dir(temp)
 		for temp != '' && temp != '/' && temp != '.' {
 			println(os.exists(temp))
-			os.rmdir(dir) or { eprintln('${temp}: ${err.msg}') }
+			os.rmdir(dir) or { eprintln('${temp}: ${err.msg()}') }
 			temp = os.dir(temp)
 		}
 	}
