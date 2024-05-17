@@ -21,86 +21,8 @@ struct TouchArgs {
 	path_args   []string
 }
 
-@[noreturn]
-fn success_exit(message string) {
-	println(message)
-	exit(0)
-}
-
-fn get_date_time(args TouchArgs) (int, int) {
-	if args.date_arg.len > 0 && args.time_arg.len > 0 {
-		common.exit_with_error_message(app_name, '-d or -t but not both')
-	}
-
-	if (args.date_arg.len > 0 || args.time_arg.len > 0) && args.reference.len > 0 {
-		common.exit_with_error_message(app_name, 'reference file or date/time but not both')
-	}
-
-	dt := if args.date_arg.len > 0 { args.date_arg } else { args.time_arg }
-
-	if dt.len > 0 {
-		date := time.parse_iso8601(dt) or {
-			common.exit_with_error_message(app_name, 'unable to parse date ${dt}')
-		}
-		return int(date.unix()), int(date.unix())
-	}
-
-	if args.reference.len > 0 {
-		// os.stat follows links
-		stat := os.stat(args.reference) or {
-			common.exit_with_error_message(app_name, 'unable to find reference file ${args.reference}')
-		}
-
-		return int(stat.atime), int(stat.mtime)
-	}
-
-	return int(time.utc().unix()), int(time.utc().unix())
-}
-
-fn create_file(path string) {
-	mut file := os.create(path) or {
-		common.exit_with_error_message(app_name, 'unable to create ${path}')
-	}
-	file.close()
-}
-
-fn lutime(path string, actime int, modtime int) ! {
-	mut times := [C.timeval{u64(actime), u64(0)}, C.timeval{u64(modtime), u64(0)}]
-	if C.lutimes(&char(path.str), voidptr(&times)) != 0 {
-		return error('lutime failed (${C.errno})')
-	}
-}
-
-fn process_touch(args TouchArgs) {
-	atime, mtime := get_date_time(args)
-
-	for path_arg in args.path_args {
-		if !os.exists(path_arg) {
-			if args.no_create {
-				continue
-			}
-			create_file(path_arg)
-		}
-
-		path := if args.no_ref { path_arg } else { os.real_path(path_arg) }
-
-		stat := os.lstat(path) or {
-			common.exit_with_error_message(app_name, 'unable to query ${path}')
-		}
-
-		acc := if args.mod_only && !args.access_only { int(stat.atime) } else { atime }
-		mod := if args.access_only && !args.mod_only { int(stat.mtime) } else { mtime }
-
-		if args.no_ref {
-			lutime(path, acc, mod) or {
-				common.exit_with_error_message(app_name, 'unable to change times for ${path}')
-			}
-		} else {
-			os.utime(path, acc, mod) or {
-				common.exit_with_error_message(app_name, 'unable to change times for ${path}')
-			}
-		}
-	}
+fn main() {
+	touch(os.args)
 }
 
 fn touch(args []string) {
@@ -155,6 +77,85 @@ fn touch(args []string) {
 	process_touch(touch_args)
 }
 
-fn main() {
-	touch(os.args)
+fn process_touch(args TouchArgs) {
+	atime, mtime := get_date_time(args)
+
+	for path_arg in args.path_args {
+		if !os.exists(path_arg) {
+			if args.no_create {
+				continue
+			}
+			create_file(path_arg)
+		}
+
+		path := if args.no_ref { path_arg } else { os.real_path(path_arg) }
+
+		// os.lstat does not follow links
+		lstat := os.lstat(path) or {
+			common.exit_with_error_message(app_name, 'unable to query ${path}')
+		}
+
+		acc := if args.mod_only && !args.access_only { int(lstat.atime) } else { atime }
+		mod := if args.access_only && !args.mod_only { int(lstat.mtime) } else { mtime }
+
+		if args.no_ref {
+			lutime(path, acc, mod) or {
+				common.exit_with_error_message(app_name, 'unable to change times for ${path}')
+			}
+		} else {
+			os.utime(path, acc, mod) or {
+				common.exit_with_error_message(app_name, 'unable to change times for ${path}')
+			}
+		}
+	}
+}
+
+fn get_date_time(args TouchArgs) (int, int) {
+	if args.date_arg.len > 0 && args.time_arg.len > 0 {
+		common.exit_with_error_message(app_name, '-d or -t but not both')
+	}
+
+	if (args.date_arg.len > 0 || args.time_arg.len > 0) && args.reference.len > 0 {
+		common.exit_with_error_message(app_name, 'reference file or date/time but not both')
+	}
+
+	dt := if args.date_arg.len > 0 { args.date_arg } else { args.time_arg }
+
+	if dt.len > 0 {
+		date := time.parse_iso8601(dt) or {
+			common.exit_with_error_message(app_name, 'unable to parse date ${dt}')
+		}
+		return int(date.unix()), int(date.unix())
+	}
+
+	if args.reference.len > 0 {
+		// os.stat follows links
+		stat := os.stat(args.reference) or {
+			common.exit_with_error_message(app_name, 'unable to find reference file ${args.reference}')
+		}
+
+		return int(stat.atime), int(stat.mtime)
+	}
+
+	return int(time.utc().unix()), int(time.utc().unix())
+}
+
+fn create_file(path string) {
+	mut file := os.create(path) or {
+		common.exit_with_error_message(app_name, 'unable to create ${path}')
+	}
+	file.close()
+}
+
+fn lutime(path string, actime int, modtime int) ! {
+ 	times := [C.timeval{u64(actime), u64(0)}, C.timeval{u64(modtime), u64(0)}]
+	if C.lutimes(&char(path.str), voidptr(times.data)) != 0 {
+		return error('lutime failed (${C.errno})')
+	}
+}
+
+@[noreturn]
+fn success_exit(message string) {
+	println(message)
+	exit(0)
 }

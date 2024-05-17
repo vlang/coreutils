@@ -138,10 +138,6 @@ fn test_touch_no_reference_option() {
 
 	// stat does not 'follow' links
 	lstat := os.lstat(link)!
-	println('')
-	println(time.unix(ltime))
-	println(time.unix(lstat.atime))
-	println(time.unix(lstat.mtime))
 	assert(lstat.atime == ltime)
 	assert(lstat.mtime == ltime)
 
