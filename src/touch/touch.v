@@ -44,7 +44,7 @@ fn touch(args []string) {
 	no_ref := fp.bool('no-reference', `h`, false, 'affect each symbolic link instead of any referenced file')
 	mod_only := fp.bool('', `m`, false, 'change modifcation time only')
 	reference := fp.string('reference', `r`, '', 'use times from file <string>')
-	time_arg := fp.string('time', `t`, '', 'Use specified time. format=[[CC]YY]MMDDhhmm[.ss]')
+	time_arg := fp.string('time', `t`, '', 'same as -d')
 
 	help := fp.bool('help', 0, false, 'display this help')
 	version := fp.bool('version', 0, false, 'display version information')
@@ -90,7 +90,6 @@ fn process_touch(args TouchArgs) {
 
 		path := if args.no_ref { path_arg } else { os.real_path(path_arg) }
 
-		// os.lstat does not follow links
 		lstat := os.lstat(path) or {
 			common.exit_with_error_message(app_name, 'unable to query ${path}')
 		}
@@ -98,14 +97,8 @@ fn process_touch(args TouchArgs) {
 		acc := if args.mod_only && !args.access_only { int(lstat.atime) } else { atime }
 		mod := if args.access_only && !args.mod_only { int(lstat.mtime) } else { mtime }
 
-		if args.no_ref {
-			lutime(path, acc, mod) or {
-				common.exit_with_error_message(app_name, 'unable to change times for ${path}')
-			}
-		} else {
-			os.utime(path, acc, mod) or {
-				common.exit_with_error_message(app_name, 'unable to change times for ${path}')
-			}
+		lutime(path, acc, mod) or {
+			common.exit_with_error_message(app_name, 'unable to change times for ${path}')
 		}
 	}
 }
@@ -147,9 +140,10 @@ fn create_file(path string) {
 	file.close()
 }
 
-fn lutime(path string, actime int, modtime int) ! {
- 	times := [C.timeval{u64(actime), u64(0)}, C.timeval{u64(modtime), u64(0)}]
-	if C.lutimes(&char(path.str), voidptr(times.data)) != 0 {
+
+fn lutime(path string, acctime int, modtime int) ! {
+	times := [C.timeval{u64(acctime), u64(0)}, C.timeval{u64(modtime), u64(0)}]!
+	if C.lutimes(&char(path.str), voidptr(&times[0])) != 0 {
 		return error('lutime failed (${C.errno})')
 	}
 }

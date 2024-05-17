@@ -136,7 +136,7 @@ fn test_touch_no_reference_option() {
 	assert(fstat.atime == ftime)
 	assert(fstat.mtime == ftime)
 
-	// stat does not 'follow' links
+	// lstat does not 'follow' links
 	lstat := os.lstat(link)!
 	assert(lstat.atime == ltime)
 	assert(lstat.mtime == ltime)
