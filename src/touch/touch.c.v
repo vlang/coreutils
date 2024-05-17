@@ -140,7 +140,6 @@ fn create_file(path string) {
 	file.close()
 }
 
-
 fn lutime(path string, acctime int, modtime int) ! {
 	times := [C.timeval{u64(acctime), u64(0)}, C.timeval{u64(modtime), u64(0)}]!
 	if C.lutimes(&char(path.str), voidptr(&times[0])) != 0 {
