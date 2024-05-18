@@ -4,10 +4,6 @@ import common
 import os
 import time
 
-#include <sys/time.h>
-
-fn C.lutimes(&char, voidptr) int
-
 const app_name = 'touch'
 
 struct TouchArgs {
@@ -138,13 +134,6 @@ fn create_file(path string) {
 		common.exit_with_error_message(app_name, 'unable to create ${path}')
 	}
 	file.close()
-}
-
-fn lutime(path string, acctime int, modtime int) ! {
-	times := [C.timeval{u64(acctime), u64(0)}, C.timeval{u64(modtime), u64(0)}]!
-	if C.lutimes(&char(path.str), voidptr(&times[0])) != 0 {
-		return error('lutime failed (${C.errno})')
-	}
 }
 
 @[noreturn]
