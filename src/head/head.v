@@ -207,7 +207,7 @@ fn (c HeadCommand) run(mut files []InputFile) {
 	mut open_fails_num := 0
 	for i, mut file in files {
 		file.open() or {
-			eprintln('${name}: ${err.msg}')
+			eprintln('${name}: ${err.msg()}')
 			open_fails_num++
 			continue
 		}

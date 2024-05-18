@@ -26,7 +26,7 @@ fn mkdir_cmd(files []string, opts &Options) {
 		if opts.parent {
 			os.mkdir_all(f, mode: opts.mode) or {
 				num_fails++
-				eprintln('${name}: ${f}: ${err.msg}')
+				eprintln('${name}: ${f}: ${err.msg()}')
 				continue
 			}
 			announce_creation(f, opts.verbose)
