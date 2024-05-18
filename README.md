@@ -141,7 +141,7 @@ compare against the true GNU coreutils version on the Linux-based tests first.
 |         | tail      | Output the last part of files                    |
 |         | tee       | Redirect output to multiple files or processes   |
 | &check; | test      | Check file types and compare values              |
-|         | timeout   | Run a command with a time limit                  |
+| &check; | timeout   | Run a command with a time limit                  |
 |         | touch     | Change file timestamps                           |
 |         | tr        | Translate, squeeze, and/or delete characters     |
 | &check; | true      | Do nothing, successfully                         |
