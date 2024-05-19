@@ -102,10 +102,7 @@ fn find_break(ln []rune, max int) int {
 }
 
 fn is_white_space(c rune) bool {
-	return match c {
-		` `, `\f` { true }
-		else { false }
-	}
+	return fmt.white_space.contains(c.str())
 }
 
 fn get_paragraphs(lines []string) [][]string {
