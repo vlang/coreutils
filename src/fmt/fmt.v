@@ -1,8 +1,9 @@
 // fmt -- simple text formatter
-module fmt
+module main
 
 import common
 import flag
+import io
 import os
 
 const app_name = 'fmt'
@@ -51,7 +52,12 @@ fn run_fmt(args []string) []string {
 	app_state := make_app_state(flags_args)
 
 	for file in app_state.file_args {
-		lines := os.read_lines(file) or { common.exit_with_error_message(fmt.app_name, err.msg()) }
+		lines := if file == '-' {
+			mut br := io.new_buffered_reader(io.BufferedReaderConfig{ reader: os.stdin() })
+			read_lines(mut br)
+		} else {
+			os.read_lines(file) or { common.exit_with_error_message(app_name, err.msg()) }
+		}
 		output << fmt(lines, app_state)
 	}
 	return output
@@ -85,12 +91,14 @@ fn fmt_paragraph(paragraph []string, app_state AppState) []string {
 			ln << ` `
 		}
 
+		indent := ' '.repeat(get_indent(line)).runes()
 		ln << line.runes()
 
 		for ln.len > app_state.width {
 			break_index := find_break(ln, app_state.width)
 			pa << ln[0..break_index].string()
 			ln = ln[break_index + 1..].clone()
+			ln.prepend(indent)
 		}
 	}
 	pa << ln.string()
@@ -109,7 +117,7 @@ fn find_break(ln []rune, max int) int {
 }
 
 fn is_white_space(c rune) bool {
-	return fmt.white_space.contains(c.str())
+	return white_space.contains(c.str())
 }
 
 // Breaks lines into logical unformatted paragraphs
@@ -129,24 +137,50 @@ fn is_white_space(c rune) bool {
 // for each line in the paragraph.
 fn get_paragraphs(lines []string) [][]string {
 	mut index := 0
+	mut last_indent := -1
 	mut paragraphs := [][]string{len: 1, init: []string{}}
 
 	for line in lines {
-		ln := line.trim_right(fmt.white_space)
+		ln := line.trim_right(white_space)
+
 		if ln.len == 0 {
+			paragraphs << []string{}
+			paragraphs << []string{}
 			index += 2
-			paragraphs << []string{}
-			paragraphs << []string{}
+			last_indent = -1
 			continue
 		}
+
+		indent := get_indent(ln)
+		if last_indent == -1 {
+			last_indent = indent
+		}
+
+		if last_indent != indent {
+			paragraphs << []string{}
+			index += 1
+			paragraphs[index] << ln
+			continue
+		}
+
 		paragraphs[index] << ln
 	}
+	//println(paragraphs)
 	return paragraphs
+}
+
+fn get_indent(line string) int {
+	ln := line.runes()
+	mut pos := 0
+	for pos < ln.len && is_white_space(ln[pos]) {
+		pos++
+	}
+	return pos
 }
 
 fn process_args(args []string) FlagsArgs {
 	mut fp := common.flag_parser(args)
-	fp.application(fmt.app_name)
+	fp.application(app_name)
 	fp.description('Simple text formatter')
 	pad := common.eol() + flag.space
 
@@ -160,20 +194,20 @@ fn process_args(args []string) FlagsArgs {
 	split_only := fp.bool('split-only', `s`, false, 'split long lines, but do not refill')
 	tagged_par := fp.bool('tagged-paragraph', `t`, false, 'indentation of first line different from second')
 	uniform_sp := fp.bool('uniform-spacing', `u`, false, 'one space between words, two after sentences')
-	width := fp.int('width', `w`, fmt.default_width, 'maximum line width (default of ${fmt.default_width} columns)')
-	goal := fp.int('goal', `g`, fmt.default_goal, 'goal width (default of ${fmt.default_goal}% of width)')
+	width := fp.int('width', `w`, default_width, 'maximum line width (default of ${default_width} columns)')
+	goal := fp.int('goal', `g`, default_goal, 'goal width (default of ${default_goal}% of width)')
 
 	help := fp.bool('help', 0, false, 'display this help')
 	version := fp.bool('version', 0, false, 'output version information')
 
-	file_args := fp.finalize() or { common.exit_with_error_message(fmt.app_name, err.msg()) }
+	file_args := fp.finalize() or { common.exit_with_error_message(app_name, err.msg()) }
 
 	if help {
 		success_exit(fp.usage())
 	}
 
 	if version {
-		success_exit('${fmt.app_name} ${common.coreutils_version()}')
+		success_exit('${app_name} ${common.coreutils_version()}')
 	}
 
 	return FlagsArgs{
@@ -192,10 +226,22 @@ fn make_app_state(flags_args FlagsArgs) AppState {
 	app_state := AppState{
 		width: flags_args.width
 		goal_width: flags_args.goal
-		file_args: flags_args.file_args
+		file_args: if flags_args.file_args.len > 0 {
+			flags_args.file_args
+		} else {
+			['-']
+		}
 	}
 
 	return app_state
+}
+
+fn read_lines(mut br io.BufferedReader) []string {
+	mut lines := []string{}
+	for {
+		lines << br.read_line() or { break }
+	}
+	return lines
 }
 
 @[noreturn]

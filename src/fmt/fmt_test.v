@@ -1,4 +1,4 @@
-module fmt
+module main
 
 fn p(msg string) {
 	print('${msg:-50}')
@@ -18,7 +18,7 @@ fn print_lines(lines []string) {
 
 fn test_basic_wrap() {
 	p(@METHOD)
-	output := run_fmt(['fmt', '-w', '30', 'simple.txt'])
+	output := run_fmt(['fmt', '-w', '30', 'testdata/simple.txt'])
 	// print_lines(output)
 	expected := [
 		'Now is the time for all good',
@@ -35,7 +35,7 @@ fn test_basic_wrap() {
 
 fn test_narrow_to_formatted() {
 	p(@METHOD)
-	output := run_fmt(['fmt', 'narrow.txt'])
+	output := run_fmt(['fmt', 'testdata/narrow.txt'])
 	// print_lines(output)
 	expected := [
 		'Hello World',
@@ -47,6 +47,22 @@ fn test_narrow_to_formatted() {
 		'banana, papaya, mango',
 		'',
 		'Much ado about nothing.  He he he.  Adios amigo.',
+	]
+	assert output == expected
+	pass()
+}
+
+fn test_line_indents_denote_new_paragraph() {
+	p(@METHOD)
+	output := run_fmt(['fmt', '-w', '35', 'testdata/basic_indent.txt'])
+	expected := [
+		'This is a single line paragraph',
+		'    because this line has a',
+		'    different indent',
+		'',
+		'Otherwise these other lines',
+		'comprise a simple multline',
+		'paragraph.',
 	]
 	assert output == expected
 	pass()
