@@ -10,6 +10,7 @@ const default_width = 75
 const default_goal = 93
 const tab_width = 8
 const white_space = ' \n\f\t\v\r'
+const end_of_sentence = [`.`, `!`, `?`]
 
 // Prefer lines to be LEEWAY % shorter than the maximum width,giving
 // room for optimization.
@@ -77,6 +78,13 @@ fn fmt_paragraph(paragraph []string, app_state AppState) []string {
 	}
 
 	for line in paragraph {
+		if ln.len > 0 {
+			if ln.last() in end_of_sentence {
+				ln << ` `
+			}
+			ln << ` `
+		}
+
 		ln << line.runes()
 
 		for ln.len > app_state.width {
@@ -84,9 +92,8 @@ fn fmt_paragraph(paragraph []string, app_state AppState) []string {
 			pa << ln[0..break_index].string()
 			ln = ln[break_index + 1..].clone()
 		}
-		pa << ln.string()
-		ln = []
 	}
+	pa << ln.string()
 	return pa
 }
 
@@ -105,6 +112,21 @@ fn is_white_space(c rune) bool {
 	return fmt.white_space.contains(c.str())
 }
 
+// Breaks lines into logical unformatted paragraphs
+//
+// A paragraph consists of a maximal number of non-blank
+// (excluding any prefix) lines subject to:
+//
+// * In split mode, a paragraph is a single non-blank line.
+// * In crown mode, the second and subsequent lines must have the
+//   same indentation, but possibly different from the indent of
+//   the first line.
+// * Tagged mode is similar, but the first and second lines must
+//   have different indentations.
+// * Otherwise, all lines of a paragraph must have the same indent.
+//
+// If a prefix is in effect, it must be present at the same indent
+// for each line in the paragraph.
 fn get_paragraphs(lines []string) [][]string {
 	mut index := 0
 	mut paragraphs := [][]string{len: 1, init: []string{}}
@@ -119,7 +141,6 @@ fn get_paragraphs(lines []string) [][]string {
 		}
 		paragraphs[index] << ln
 	}
-	// println(paragraphs)
 	return paragraphs
 }
 

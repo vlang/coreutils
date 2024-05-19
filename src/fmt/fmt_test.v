@@ -9,6 +9,8 @@ fn pass() {
 }
 
 fn print_lines(lines []string) {
+	println(' ')
+	println('-------------')
 	for line in lines {
 		println(line)
 	}
@@ -26,6 +28,25 @@ fn test_basic_wrap() {
 		'Now is the time for all good',
 		'men to come to the aid of',
 		'their country.',
+	]
+	assert output == expected
+	pass()
+}
+
+fn test_narrow_to_formatted() {
+	p(@METHOD)
+	output := run_fmt(['fmt', 'narrow.txt'])
+	// print_lines(output)
+	expected := [
+		'Hello World',
+		'',
+		'Hi there!  How are you?',
+		'',
+		'Just do-it.  Believe it.',
+		'',
+		'banana, papaya, mango',
+		'',
+		'Much ado about nothing.  He he he.  Adios amigo.',
 	]
 	assert output == expected
 	pass()
