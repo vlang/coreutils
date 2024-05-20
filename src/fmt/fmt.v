@@ -52,15 +52,19 @@ fn run_fmt(args []string) []string {
 	app_state := make_app_state(flags_args)
 
 	for file in app_state.file_args {
-		lines := if file == '-' {
-			mut br := io.new_buffered_reader(io.BufferedReaderConfig{ reader: os.stdin() })
-			read_lines(mut br)
-		} else {
-			os.read_lines(file) or { common.exit_with_error_message(app_name, err.msg()) }
-		}
+		lines := read_all_lines(file)
 		output << fmt(lines, app_state)
 	}
 	return output
+}
+
+fn read_all_lines(file string) []string {
+	return if file == '-' {
+		mut br := io.new_buffered_reader(io.BufferedReaderConfig{ reader: os.stdin() })
+		read_lines(mut br)
+	} else {
+		os.read_lines(file) or { common.exit_with_error_message(app_name, err.msg()) }
+	}
 }
 
 fn fmt(lines []string, app_state AppState) []string {
@@ -76,32 +80,46 @@ fn fmt(lines []string, app_state AppState) []string {
 }
 
 fn fmt_paragraph(paragraph []string, app_state AppState) []string {
-	mut ln := []rune{}
+	mut ta := ''
 	mut pa := []string{}
 
 	if paragraph.len == 0 {
 		return ['']
 	}
 
+	mut first_line := true
+	indent := ' '.repeat(get_indent(paragraph[0])).runes()
+
+	// join all lines with spacing for punchuation and breaks
 	for line in paragraph {
-		if ln.len > 0 {
-			if ln.last() in end_of_sentence {
-				ln << ` `
-			}
-			ln << ` `
+		mut l := line.clone()
+		if !first_line && indent.len > 0 {
+			l = l.trim_left(indent.string())
 		}
-
-		indent := ' '.repeat(get_indent(line)).runes()
-		ln << line.runes()
-
-		for ln.len > app_state.width {
-			break_index := find_break(ln, app_state.width)
-			pa << ln[0..break_index].string()
-			ln = ln[break_index + 1..].clone()
-			ln.prepend(indent)
+		ta += l + ' '
+		if l.runes().last() in end_of_sentence {
+			ta += ' '
 		}
+		first_line = false
 	}
-	pa << ln.string()
+
+	mut ln := ta.runes()
+
+	for ln.len >= app_state.width {
+		mut break_index := find_break(ln, app_state.width)
+		pa << ln[0..break_index].string()
+		ln = ln[break_index + 1..].clone()
+		for ln.len > 0 && is_white_space(ln[0]) {
+			ln.delete(0)
+		}
+		ln.prepend(indent)
+	}
+
+	last := ln.string().trim_right(white_space)
+
+	if last.len > 0 {
+		pa << ln.string().trim_right(white_space)
+	}
 	return pa
 }
 
@@ -165,7 +183,7 @@ fn get_paragraphs(lines []string) [][]string {
 
 		paragraphs[index] << ln
 	}
-	//println(paragraphs)
+	// println(paragraphs)
 	return paragraphs
 }
 

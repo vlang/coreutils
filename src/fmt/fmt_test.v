@@ -67,3 +67,40 @@ fn test_line_indents_denote_new_paragraph() {
 	assert output == expected
 	pass()
 }
+
+fn test_numbered_list_no_options() {
+	p(@METHOD)
+	output := run_fmt(['fmt', 'testdata/list.txt'])
+	// print_lines(output)
+	expected := [
+		'A list of items',
+		'',
+		'    1. Now is the time for all good men to come to the aid of their',
+		'    country.  2. Now is the time for all good men to come to the aid of',
+		'    their country.  3. Now is the time for all good men to come to the aid',
+		'    of their country.  4. Now is the time for all good men to come to the',
+		'    aid of their country.',
+	]
+	assert output == expected
+	pass()
+}
+
+fn test_numbered_list_w_40() {
+	p(@METHOD)
+	output := run_fmt(['fmt', '-w', '40', 'testdata/list.txt'])
+	// print_lines(output)
+	expected := [
+		'A list of items',
+		'',
+		'    1. Now is the time for all good men',
+		'    to come to the aid of their country.',
+		'    2. Now is the time for all good men',
+		'    to come to the aid of their country.',
+		'    3. Now is the time for all good men',
+		'    to come to the aid of their country.',
+		'    4. Now is the time for all good men',
+		'    to come to the aid of their country.',
+	]
+	assert output == expected
+	pass()
+}
