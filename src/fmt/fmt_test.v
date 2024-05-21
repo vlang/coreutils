@@ -131,3 +131,19 @@ fn test_split_only() {
 	assert output == expected
 	pass()
 }
+
+fn test_indents_no_blank_lines() {
+	p(@METHOD)
+	output := run_fmt(['fmt', 'testdata/poem.txt'])
+	expected := [
+		'Love is patient, love is kind. It does not envy,',
+		' it does not boast, it is not proud. It is not rude, it is not',
+		' self-seeking, it is not easily angered,',
+		'it keeps no record of wrongs. Love does not delight in evil but rejoices',
+		'with the truth. It always protects,',
+		' always trusts, always hopes, always perseveres.',
+		'Love never fails.',
+	]
+	assert output == expected
+	pass()
+}

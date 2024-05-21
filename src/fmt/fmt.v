@@ -5,14 +5,10 @@ import io
 import os
 
 const app_name = 'fmt'
-const default_width = 75
 const tab_width = 8
+const default_width = 75
 const white_space = ' \n\f\t\v\r'
 const end_of_sentence = [`.`, `!`, `?`]
-
-// The default secondary indent of tagged paragraph used for unindented
-// one-line paragraphs not preceded by any multi-line paragraphs
-const default_indent = 3
 
 struct App {
 	crown_marg bool
@@ -164,6 +160,7 @@ fn get_paragraphs(lines []string, app App) [][]string {
 		}
 
 		if last_indent != indent {
+			last_indent = indent
 			paragraphs << []string{}
 			index += 1
 			paragraphs[index] << ln
