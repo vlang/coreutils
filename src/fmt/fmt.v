@@ -1,6 +1,4 @@
 // fmt -- simple text formatter
-module main
-
 import common
 import flag
 import io
@@ -8,33 +6,21 @@ import os
 
 const app_name = 'fmt'
 const default_width = 75
-const default_goal = 93
 const tab_width = 8
 const white_space = ' \n\f\t\v\r'
 const end_of_sentence = [`.`, `!`, `?`]
-
-// Prefer lines to be LEEWAY % shorter than the maximum width,giving
-// room for optimization.
-const leeway = 7
 
 // The default secondary indent of tagged paragraph used for unindented
 // one-line paragraphs not preceded by any multi-line paragraphs
 const default_indent = 3
 
-struct FlagsArgs {
+struct App {
 	crown_marg bool
 	prefix_str string
 	split_only bool
 	tagged_par bool
 	uniform_sp bool
 	width      int
-	goal       int
-	file_args  []string
-}
-
-struct AppState {
-	width      int // The only output lines longer than this will each comprise a single word
-	goal_width int // The preferred width of text lines, set to LEEWAY % less than max_width
 	file_args  []string
 }
 
@@ -48,12 +34,11 @@ fn main() {
 
 fn run_fmt(args []string) []string {
 	mut output := []string{}
-	flags_args := process_args(args)
-	app_state := make_app_state(flags_args)
+	app := process_args(args)
 
-	for file in app_state.file_args {
+	for file in app.file_args {
 		lines := read_all_lines(file)
-		output << fmt(lines, app_state)
+		output << fmt(lines, app)
 	}
 	return output
 }
@@ -67,19 +52,19 @@ fn read_all_lines(file string) []string {
 	}
 }
 
-fn fmt(lines []string, app_state AppState) []string {
+fn fmt(lines []string, app App) []string {
 	mut output := []string{}
-	paragraphs := get_paragraphs(lines)
+	paragraphs := get_paragraphs(lines, app)
 
 	for paragraph in paragraphs {
-		for line in fmt_paragraph(paragraph, app_state) {
+		for line in fmt_paragraph(paragraph, app) {
 			output << line
 		}
 	}
 	return output
 }
 
-fn fmt_paragraph(paragraph []string, app_state AppState) []string {
+fn fmt_paragraph(paragraph []string, app App) []string {
 	mut ta := ''
 	mut pa := []string{}
 
@@ -97,7 +82,7 @@ fn fmt_paragraph(paragraph []string, app_state AppState) []string {
 			l = l.trim_left(indent.string())
 		}
 		ta += l + ' '
-		if l.runes().last() in end_of_sentence {
+		if l.len > 0 && l.runes().last() in end_of_sentence {
 			ta += ' '
 		}
 		first_line = false
@@ -105,8 +90,8 @@ fn fmt_paragraph(paragraph []string, app_state AppState) []string {
 
 	mut ln := ta.runes()
 
-	for ln.len >= app_state.width {
-		mut break_index := find_break(ln, app_state.width)
+	for ln.len > app.width {
+		mut break_index := find_break(ln, app.width)
 		pa << ln[0..break_index].string()
 		ln = ln[break_index + 1..].clone()
 		for ln.len > 0 && is_white_space(ln[0]) {
@@ -153,7 +138,11 @@ fn is_white_space(c rune) bool {
 //
 // If a prefix is in effect, it must be present at the same indent
 // for each line in the paragraph.
-fn get_paragraphs(lines []string) [][]string {
+fn get_paragraphs(lines []string, app App) [][]string {
+	if app.split_only {
+		return get_paragraphs_split_only(lines)
+	}
+
 	mut index := 0
 	mut last_indent := -1
 	mut paragraphs := [][]string{len: 1, init: []string{}}
@@ -187,6 +176,17 @@ fn get_paragraphs(lines []string) [][]string {
 	return paragraphs
 }
 
+fn get_paragraphs_split_only(lines []string) [][]string {
+	mut paragraphs := [][]string{}
+	for line in lines {
+		ln := line.trim_right(white_space)
+		lf := if ln.len == 0 { []string{} } else { []string{len: 1, init: ln} }
+		paragraphs << lf
+	}
+	// println(paragraphs)
+	return paragraphs
+}
+
 fn get_indent(line string) int {
 	ln := line.runes()
 	mut pos := 0
@@ -196,7 +196,7 @@ fn get_indent(line string) int {
 	return pos
 }
 
-fn process_args(args []string) FlagsArgs {
+fn process_args(args []string) App {
 	mut fp := common.flag_parser(args)
 	fp.application(app_name)
 	fp.description('Simple text formatter')
@@ -213,7 +213,6 @@ fn process_args(args []string) FlagsArgs {
 	tagged_par := fp.bool('tagged-paragraph', `t`, false, 'indentation of first line different from second')
 	uniform_sp := fp.bool('uniform-spacing', `u`, false, 'one space between words, two after sentences')
 	width := fp.int('width', `w`, default_width, 'maximum line width (default of ${default_width} columns)')
-	goal := fp.int('goal', `g`, default_goal, 'goal width (default of ${default_goal}% of width)')
 
 	help := fp.bool('help', 0, false, 'display this help')
 	version := fp.bool('version', 0, false, 'output version information')
@@ -228,30 +227,15 @@ fn process_args(args []string) FlagsArgs {
 		success_exit('${app_name} ${common.coreutils_version()}')
 	}
 
-	return FlagsArgs{
+	return App{
 		crown_marg: crown_marg
 		prefix_str: prefix_str
 		split_only: split_only
 		tagged_par: tagged_par
 		uniform_sp: uniform_sp
 		width: width
-		goal: goal
-		file_args: file_args
+		file_args: if file_args.len > 0 { file_args } else { ['-'] }
 	}
-}
-
-fn make_app_state(flags_args FlagsArgs) AppState {
-	app_state := AppState{
-		width: flags_args.width
-		goal_width: flags_args.goal
-		file_args: if flags_args.file_args.len > 0 {
-			flags_args.file_args
-		} else {
-			['-']
-		}
-	}
-
-	return app_state
 }
 
 fn read_lines(mut br io.BufferedReader) []string {

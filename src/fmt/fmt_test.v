@@ -104,3 +104,30 @@ fn test_numbered_list_w_40() {
 	assert output == expected
 	pass()
 }
+
+fn test_split_only() {
+	p(@METHOD)
+	output := run_fmt(['fmt', '-s', 'testdata/lorum_ipsum.txt'])
+	expected := [
+		'Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Curabitur',
+		'dignissim',
+		'venenatis pede. Quisque dui dui, ultricies ut, facilisis non, pulvinar non.',
+		'Duis quis arcu a purus volutpat iaculis. Morbi id dui in diam ornare',
+		'dictum. Praesent consectetuer vehicula ipsum. Praesent tortor massa, congue',
+		'et,',
+		'ornare in, posuere eget, pede.',
+		'',
+		'Vivamus rhoncus. Quisque lacus. In hac habitasse platea dictumst. Nullam',
+		'mauris',
+		'tellus, sollicitudin non, semper eget, sodales non, pede. Phasellus varius',
+		'ullamcorper libero. Fusce ipsum lorem, iaculis nec, vulputate vitae,',
+		'suscipit',
+		'vel, tortor. Cras varius.',
+		'',
+		'Nullam fringilla pellentesque orci. Nulla eu ante pulvinar velit rhoncus',
+		'lacinia. Morbi fringilla lacus quis arcu. Vestibulum sem quam, dapibus in,',
+		'fringilla ut, venenatis ut, neque.',
+	]
+	assert output == expected
+	pass()
+}
