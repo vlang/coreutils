@@ -161,7 +161,7 @@ fn test_uniform_spacing_option() {
 		'in    diam ornare',
 	]
 	assert output1 == expected1
-	
+
 	// uniform spacing case
 	output2 := run_fmt(['fmt', '-u', 'testdata/not_uniform_spacing.txt'])
 	expected2 := [
@@ -169,4 +169,30 @@ fn test_uniform_spacing_option() {
 		'Duis quis arcu a purus volutpat iaculis. Morbi id dui in diam ornare',
 	]
 	assert output2 == expected2
+}
+
+fn test_uniform_spacing_with_prefix_and_width() {
+	println(@METHOD)
+	output := run_fmt(['fmt', '-u', '-p', '> ', '-w', '30', 'testdata/prefix.txt'])
+	expected := [
+		'> Prefix lines test',
+		'',
+		'> Effects present letters',
+		'> inquiry no an removed or',
+		'> friends. Desire behind',
+		'> latter me though in.',
+		'>   Supposing shameless am he',
+		'>   engrossed up additions. My',
+		'>   possible peculiar together',
+		'>   to.',
+		'',
+		'> Desire so better am cannot',
+		'> he up before points.',
+		'> Remember mistaken opinions',
+		'> it pleasure of debating.',
+		'> Court front maids forty if',
+		'> aware their at. Chicken use',
+		'> are pressed removed.'
+	]
+	assert output == expected
 }

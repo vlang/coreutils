@@ -97,13 +97,11 @@ fn fmt_paragraph(paragraph Paragraph, app App) []string {
 	}
 
 	if app.uniform_sp {
+		ta = ta.after(app.prefix_str)
 		sp := ta.split(' ')
 		ns := sp.filter(it.len > 0)
 		ta = ns.join(' ')
-		ta = indent.string() + ta
-		if app.prefix_str.len > 0 {
-			ta = app.prefix_str + ta
-		}
+		ta = app.prefix_str + indent.string() + ta
 	}
 
 	mut rn := ta.runes()
