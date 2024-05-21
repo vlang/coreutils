@@ -118,6 +118,11 @@ fn test_touch_no_reference_option() {
 	ftime := time.parse_iso8601(fdate)!.unix()
 	touch(['touch', '-d', fdate, file])
 
+	if os.user_os() == 'windows' {
+		eprintln('skip symlink checks on windows, they need administrative permissions')
+		return
+	}
+
 	link := file + 'lnk'
 	os.symlink(file, link)!
 
