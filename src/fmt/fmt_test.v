@@ -1,13 +1,5 @@
 module main
 
-fn p(msg string) {
-	print('${msg:-50}')
-}
-
-fn pass() {
-	println('✅')
-}
-
 fn print_lines(lines []string) {
 	println(' ')
 	println('-------------')
@@ -17,7 +9,7 @@ fn print_lines(lines []string) {
 }
 
 fn test_basic_wrap() {
-	p(@METHOD)
+	println(@METHOD)
 	output := run_fmt(['fmt', '-w', '30', 'testdata/simple.txt'])
 	// print_lines(output)
 	expected := [
@@ -30,11 +22,10 @@ fn test_basic_wrap() {
 		'their country.',
 	]
 	assert output == expected
-	pass()
 }
 
 fn test_narrow_to_formatted() {
-	p(@METHOD)
+	println(@METHOD)
 	output := run_fmt(['fmt', 'testdata/narrow.txt'])
 	// print_lines(output)
 	expected := [
@@ -49,11 +40,10 @@ fn test_narrow_to_formatted() {
 		'Much ado about nothing.  He he he.  Adios amigo.',
 	]
 	assert output == expected
-	pass()
 }
 
 fn test_line_indents_denote_new_paragraph() {
-	p(@METHOD)
+	println(@METHOD)
 	output := run_fmt(['fmt', '-w', '35', 'testdata/basic_indent.txt'])
 	expected := [
 		'This is a single line paragraph',
@@ -65,11 +55,10 @@ fn test_line_indents_denote_new_paragraph() {
 		'paragraph.',
 	]
 	assert output == expected
-	pass()
 }
 
 fn test_numbered_list_no_options() {
-	p(@METHOD)
+	println(@METHOD)
 	output := run_fmt(['fmt', 'testdata/list.txt'])
 	// print_lines(output)
 	expected := [
@@ -82,11 +71,10 @@ fn test_numbered_list_no_options() {
 		'    aid of their country.',
 	]
 	assert output == expected
-	pass()
 }
 
 fn test_numbered_list_w_40() {
-	p(@METHOD)
+	println(@METHOD)
 	output := run_fmt(['fmt', '-w', '40', 'testdata/list.txt'])
 	// print_lines(output)
 	expected := [
@@ -102,11 +90,10 @@ fn test_numbered_list_w_40() {
 		'    to come to the aid of their country.',
 	]
 	assert output == expected
-	pass()
 }
 
 fn test_split_only() {
-	p(@METHOD)
+	println(@METHOD)
 	output := run_fmt(['fmt', '-s', 'testdata/lorum_ipsum.txt'])
 	expected := [
 		'Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Curabitur',
@@ -129,11 +116,10 @@ fn test_split_only() {
 		'fringilla ut, venenatis ut, neque.',
 	]
 	assert output == expected
-	pass()
 }
 
 fn test_indents_no_blank_lines() {
-	p(@METHOD)
+	println(@METHOD)
 	output := run_fmt(['fmt', 'testdata/poem.txt'])
 	expected := [
 		'Love is patient, love is kind. It does not envy,',
@@ -145,11 +131,10 @@ fn test_indents_no_blank_lines() {
 		'Love never fails.',
 	]
 	assert output == expected
-	pass()
 }
 
 fn test_prefix_str_option() {
-	p(@METHOD)
+	println(@METHOD)
 	output := run_fmt(['fmt', '-p', '> ', 'testdata/prefix.txt'])
 	expected := [
 		'Prefix lines test',
@@ -164,5 +149,24 @@ fn test_prefix_str_option() {
 		'> at. Chicken use are pressed removed.',
 	]
 	assert output == expected
-	pass()
+}
+
+fn test_uniform_spacing_option() {
+	println(@METHOD)
+	// non-uniform case
+	output1 := run_fmt(['fmt', 'testdata/not_uniform_spacing.txt'])
+	expected1 := [
+		'venenatis pede. Quisque dui     dui, ultricies ut, facilisis   non,',
+		'pulvinar non. Duis         quis arcu a purus volutpat iaculis. Morbi id dui',
+		'in    diam ornare',
+	]
+	assert output1 == expected1
+	
+	// uniform spacing case
+	output2 := run_fmt(['fmt', '-u', 'testdata/not_uniform_spacing.txt'])
+	expected2 := [
+		'venenatis pede. Quisque dui dui, ultricies ut, facilisis non, pulvinar non.',
+		'Duis quis arcu a purus volutpat iaculis. Morbi id dui in diam ornare',
+	]
+	assert output2 == expected2
 }

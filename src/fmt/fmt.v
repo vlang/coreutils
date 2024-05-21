@@ -96,6 +96,16 @@ fn fmt_paragraph(paragraph Paragraph, app App) []string {
 		first_line = false
 	}
 
+	if app.uniform_sp {
+		sp := ta.split(' ')
+		ns := sp.filter(it.len > 0)
+		ta = ns.join(' ')
+		ta = indent.string() + ta
+		if app.prefix_str.len > 0 {
+			ta = app.prefix_str + ta
+		}
+	}
+
 	mut rn := ta.runes()
 
 	for rn.len > app.width {
