@@ -142,7 +142,7 @@ compare against the true GNU coreutils version on the Linux-based tests first.
 |         | tee       | Redirect output to multiple files or processes   |
 | &check; | test      | Check file types and compare values              |
 |         | timeout   | Run a command with a time limit                  |
-|         | touch     | Change file timestamps                           |
+| &check; | touch     | Change file timestamps                           |
 |         | tr        | Translate, squeeze, and/or delete characters     |
 | &check; | true      | Do nothing, successfully                         |
 | &check; | truncate  | Shrink or extend the size of a file              |
