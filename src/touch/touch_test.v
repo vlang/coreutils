@@ -10,11 +10,11 @@ fn temp_file_name() string {
 }
 
 fn p(msg string) {
-	print('${msg:-50}')
+	println(msg)
 }
 
 fn pass() {
-	println('✅')
+	assert true
 }
 
 fn test_touch_one_file_no_options() {
