@@ -118,6 +118,11 @@ fn test_touch_no_reference_option() {
 	ftime := time.parse_iso8601(fdate)!.unix()
 	touch(['touch', '-d', fdate, file])
 
+	// confirm correct start state
+	stat := os.lstat(file)!
+	assert stat.atime == ftime
+	assert stat.mtime == ftime
+
 	if os.user_os() == 'windows' {
 		eprintln('skip symlink checks on windows, they need administrative permissions')
 		return
@@ -125,11 +130,6 @@ fn test_touch_no_reference_option() {
 
 	link := file + 'lnk'
 	os.symlink(file, link)!
-
-	// confirm correct start state
-	stat := os.lstat(file)!
-	assert stat.atime == ftime
-	assert stat.mtime == ftime
 
 	// touch the symlink
 	ldate := '2023-01-01T20:00:35'
