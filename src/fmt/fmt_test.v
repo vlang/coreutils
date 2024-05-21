@@ -147,3 +147,22 @@ fn test_indents_no_blank_lines() {
 	assert output == expected
 	pass()
 }
+
+fn test_prefix_str_option() {
+	p(@METHOD)
+	output := run_fmt(['fmt', '-p', '> ', 'testdata/prefix.txt'])
+	expected := [
+		'Prefix lines test',
+		'',
+		'> Effects present letters inquiry no an removed or friends. Desire behind',
+		'> latter me though in.',
+		'>   Supposing shameless am he engrossed up additions. My possible peculiar',
+		'>   together to.',
+		'',
+		'> Desire so better am cannot he up before points. Remember mistaken',
+		'> opinions it pleasure of debating.  Court front maids forty if aware their',
+		'> at. Chicken use are pressed removed.',
+	]
+	assert output == expected
+	pass()
+}

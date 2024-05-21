@@ -20,6 +20,12 @@ struct App {
 	file_args  []string
 }
 
+struct Paragraph {
+mut:
+	prefix bool
+	lines  []string = []string{}
+}
+
 fn main() {
 	output := run_fmt(os.args)
 
@@ -60,46 +66,55 @@ fn fmt(lines []string, app App) []string {
 	return output
 }
 
-fn fmt_paragraph(paragraph []string, app App) []string {
+fn fmt_paragraph(paragraph Paragraph, app App) []string {
 	mut ta := ''
 	mut pa := []string{}
 
-	if paragraph.len == 0 {
+	if paragraph.lines.len == 0 {
 		return ['']
 	}
 
 	mut first_line := true
-	indent := ' '.repeat(get_indent(paragraph[0])).runes()
+	indent := ' '.repeat(get_indent(paragraph.lines[0])).runes()
 
-	// join all lines with spacing for punchuation and breaks
-	for line in paragraph {
+	// join all lines in paragraph into a single string
+	for line in paragraph.lines {
 		mut l := line.clone()
+		// remove indents from all but first line
 		if !first_line && indent.len > 0 {
 			l = l.trim_left(indent.string())
 		}
+		// add prefix string
+		if first_line && paragraph.prefix {
+			l = app.prefix_str + l
+		}
 		ta += l + ' '
+		// add extra space for end of sentence punctuation
 		if l.len > 0 && l.runes().last() in end_of_sentence {
 			ta += ' '
 		}
 		first_line = false
 	}
 
-	mut ln := ta.runes()
+	mut rn := ta.runes()
 
-	for ln.len > app.width {
-		mut break_index := find_break(ln, app.width)
-		pa << ln[0..break_index].string()
-		ln = ln[break_index + 1..].clone()
-		for ln.len > 0 && is_white_space(ln[0]) {
-			ln.delete(0)
+	for rn.len > app.width {
+		mut break_index := find_break(rn, app.width)
+		pa << rn[0..break_index].string()
+		rn = rn[break_index + 1..].clone()
+		for rn.len > 0 && is_white_space(rn[0]) {
+			rn.delete(0)
 		}
-		ln.prepend(indent)
+		rn.prepend(indent)
+		if paragraph.prefix {
+			rn.prepend(app.prefix_str.runes())
+		}
 	}
 
-	last := ln.string().trim_right(white_space)
+	last := rn.string().trim_right(white_space)
 
 	if last.len > 0 {
-		pa << ln.string().trim_right(white_space)
+		pa << rn.string().trim_right(white_space)
 	}
 	return pa
 }
@@ -110,6 +125,11 @@ fn find_break(ln []rune, max int) int {
 
 	for !is_white_space(ln[idx]) && idx > 0 {
 		idx -= 1
+	}
+
+	// no whitespace in line so split at max
+	if idx == 0 {
+		idx = max
 	}
 
 	return idx
@@ -134,51 +154,57 @@ fn is_white_space(c rune) bool {
 //
 // If a prefix is in effect, it must be present at the same indent
 // for each line in the paragraph.
-fn get_paragraphs(lines []string, app App) [][]string {
+fn get_paragraphs(lines []string, app App) []Paragraph {
 	if app.split_only {
 		return get_paragraphs_split_only(lines)
 	}
 
-	mut index := 0
 	mut last_indent := -1
-	mut paragraphs := [][]string{len: 1, init: []string{}}
+	mut paragraphs := []Paragraph{len: 1, init: Paragraph{}}
 
 	for line in lines {
 		ln := line.trim_right(white_space)
 
+		// Blank line
 		if ln.len == 0 {
-			paragraphs << []string{}
-			paragraphs << []string{}
-			index += 2
+			paragraphs << Paragraph{}
+			paragraphs << Paragraph{}
 			last_indent = -1
 			continue
 		}
 
-		indent := get_indent(ln)
+		has_prefix := app.prefix_str.len > 0 && ln.starts_with(app.prefix_str)
+		np := if has_prefix { ln.after(app.prefix_str) } else { ln }
+
+		indent := get_indent(np)
 		if last_indent == -1 {
 			last_indent = indent
 		}
 
 		if last_indent != indent {
 			last_indent = indent
-			paragraphs << []string{}
-			index += 1
-			paragraphs[index] << ln
+			paragraphs << Paragraph{
+				prefix: has_prefix
+				lines: [np]
+			}
 			continue
 		}
 
-		paragraphs[index] << ln
+		paragraphs.last().prefix = has_prefix
+		paragraphs.last().lines << np
 	}
 	// println(paragraphs)
 	return paragraphs
 }
 
-fn get_paragraphs_split_only(lines []string) [][]string {
-	mut paragraphs := [][]string{}
+fn get_paragraphs_split_only(lines []string) []Paragraph {
+	mut paragraphs := []Paragraph{}
 	for line in lines {
 		ln := line.trim_right(white_space)
 		lf := if ln.len == 0 { []string{} } else { []string{len: 1, init: ln} }
-		paragraphs << lf
+		paragraphs << Paragraph{
+			lines: lf
+		}
 	}
 	// println(paragraphs)
 	return paragraphs
