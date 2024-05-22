@@ -1,5 +1,0 @@
-This is a single line paragraph
-    because this line has a different indent
-
-Otherwise these other lines comprise a simple
-multline paragraph.

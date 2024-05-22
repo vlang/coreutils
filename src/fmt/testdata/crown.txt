@@ -1,3 +1,0 @@
-By default,    blank lines, spaces between words, and indentation are preserved in the output;
-    successive input lines with different indentation are not joined; tabs are expanded on input and
-introduced on output.
