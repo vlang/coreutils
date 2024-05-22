@@ -221,3 +221,15 @@ fn test_tagged_and_width_options() {
 	]
 	assert expected == output
 }
+
+fn test_unicode_handling() {
+	println(@METHOD)
+	output := run_fmt(['fmt', '-w', '40', 'testdata/unicode.txt'])
+	expected := [
+		'I can do without ⑰ lobsters, you know.',
+		"Come on!' So they ⼘≺↩⌝⚙⠃ couldn't get",
+		'them out again. The Mock Turtle went on',
+		"again:-- 'I didn't mean it!' Ⓡpleaded.",
+	]
+	assert output == expected
+}
