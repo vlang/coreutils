@@ -1,11 +1,11 @@
 // fmt -- V version of POSIX fmt that works with UNICODE
-
 import common
 import flag
 import io
 import os
 
 const app_name = 'fmt'
+const space = ' '
 const tab_width = 8
 const tagged_indent = 4
 const default_width = 75
@@ -180,7 +180,7 @@ fn get_paragraphs(lines []string, app App) []Paragraph {
 	mut paragraphs := []Paragraph{len: 1, init: Paragraph{}}
 
 	for line in lines {
-		ln := line.trim_right(white_space)
+		ln := detab(line.trim_right(white_space))
 
 		// Blank line
 		if ln.len == 0 {
@@ -222,7 +222,7 @@ fn get_paragraphs(lines []string, app App) []Paragraph {
 fn get_paragraphs_split_only(lines []string) []Paragraph {
 	mut paragraphs := []Paragraph{}
 	for line in lines {
-		ln := line.trim_right(white_space)
+		ln := detab(line.trim_right(white_space))
 		lf := if ln.len == 0 { []string{} } else { []string{len: 1, init: ln} }
 		paragraphs << Paragraph{
 			lines: lf
@@ -289,6 +289,28 @@ fn read_lines(mut br io.BufferedReader) []string {
 		lines << br.read_line() or { break }
 	}
 	return lines
+}
+
+fn detab(s string) string {
+	mut output := ''
+	mut count := 0
+	runes := s.runes()
+
+	for r in runes {
+		if r == `\t` {
+			for {
+				output += space
+				count += 1
+				if count % tab_width == 0 {
+					break
+				}
+			}
+		} else {
+			output += r.str()
+			count += 1
+		}
+	}
+	return output
 }
 
 @[noreturn]
