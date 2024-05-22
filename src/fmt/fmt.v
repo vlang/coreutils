@@ -22,8 +22,9 @@ struct App {
 
 struct Paragraph {
 mut:
-	prefix bool
-	lines  []string = []string{}
+	prefix       bool
+	crown_indent int      = -1
+	lines        []string = []string{}
 }
 
 fn main() {
@@ -76,6 +77,7 @@ fn fmt_paragraph(paragraph Paragraph, app App) []string {
 
 	mut first_line := true
 	indent := ' '.repeat(get_indent(paragraph.lines[0])).runes()
+	crown_indent := ' '.repeat(if paragraph.crown_indent != -1 { paragraph.crown_indent } else { 0 }).runes()
 
 	// join all lines in paragraph into a single string
 	for line in paragraph.lines {
@@ -113,7 +115,7 @@ fn fmt_paragraph(paragraph Paragraph, app App) []string {
 		for rn.len > 0 && is_white_space(rn[0]) {
 			rn.delete(0)
 		}
-		rn.prepend(indent)
+		rn.prepend(if crown_indent.len > 0 { crown_indent } else { indent })
 		if paragraph.prefix {
 			rn.prepend(app.prefix_str.runes())
 		}
@@ -191,11 +193,16 @@ fn get_paragraphs(lines []string, app App) []Paragraph {
 
 		if last_indent != indent {
 			last_indent = indent
-			paragraphs << Paragraph{
-				prefix: has_prefix
-				lines: [np]
+			if app.crown_marg && paragraphs.last().crown_indent == -1 {
+				paragraphs.last().crown_indent = indent
+			} else {
+				paragraphs << Paragraph{
+					prefix: has_prefix
+					crown_indent: if app.crown_marg { indent } else { -1 }
+					lines: [np]
+				}
+				continue
 			}
-			continue
 		}
 
 		paragraphs.last().prefix = has_prefix

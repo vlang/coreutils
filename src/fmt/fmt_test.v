@@ -192,7 +192,19 @@ fn test_uniform_spacing_with_prefix_and_width() {
 		'> it pleasure of debating.',
 		'> Court front maids forty if',
 		'> aware their at. Chicken use',
-		'> are pressed removed.'
+		'> are pressed removed.',
 	]
 	assert output == expected
+}
+
+fn test_crown_and_uniform_options() {
+	println(@METHOD)
+	output := run_fmt(['fmt', '-c', '-u', 'testdata/crown.txt'])
+	expected := [
+		'By default, blank lines, spaces between words, and indentation are',
+		'    preserved in the output; successive input lines with different',
+		'    indentation are not joined; tabs are expanded on input and',
+		'introduced on output.',
+	]
+	assert expected == output
 }
