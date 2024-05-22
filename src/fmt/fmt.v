@@ -1,4 +1,5 @@
-// fmt -- simple text formatter
+// fmt -- V version of POSIX fmt that works with UNICODE
+
 import common
 import flag
 import io
@@ -6,6 +7,7 @@ import os
 
 const app_name = 'fmt'
 const tab_width = 8
+const tagged_indent = 4
 const default_width = 75
 const white_space = ' \n\f\t\v\r'
 const end_of_sentence = [`.`, `!`, `?`]
@@ -76,8 +78,7 @@ fn fmt_paragraph(paragraph Paragraph, app App) []string {
 	}
 
 	mut first_line := true
-	indent := ' '.repeat(get_indent(paragraph.lines[0])).runes()
-	crown_indent := ' '.repeat(if paragraph.crown_indent != -1 { paragraph.crown_indent } else { 0 }).runes()
+	mut indent := ' '.repeat(get_indent(paragraph.lines[0])).runes()
 
 	// join all lines in paragraph into a single string
 	for line in paragraph.lines {
@@ -108,6 +109,12 @@ fn fmt_paragraph(paragraph Paragraph, app App) []string {
 
 	mut rn := ta.runes()
 
+	if paragraph.crown_indent != -1 {
+		indent = ' '.repeat(paragraph.crown_indent).runes()
+	} else if app.tagged_par {
+		indent = ' '.repeat(indent.len + tagged_indent).runes()
+	}
+
 	for rn.len > app.width {
 		mut break_index := find_break(rn, app.width)
 		pa << rn[0..break_index].string()
@@ -115,7 +122,7 @@ fn fmt_paragraph(paragraph Paragraph, app App) []string {
 		for rn.len > 0 && is_white_space(rn[0]) {
 			rn.delete(0)
 		}
-		rn.prepend(if crown_indent.len > 0 { crown_indent } else { indent })
+		rn.prepend(indent)
 		if paragraph.prefix {
 			rn.prepend(app.prefix_str.runes())
 		}

@@ -208,3 +208,16 @@ fn test_crown_and_uniform_options() {
 	]
 	assert expected == output
 }
+
+fn test_tagged_and_width_options() {
+	println(@METHOD)
+	output := run_fmt(['fmt', '-t', '-w', '40', 'testdata/simple.txt'])
+	expected := [
+		'Now is the time for all good men to come',
+		'    to the aid of their country.',
+		'',
+		'Now is the time for all good men to come',
+		'    to the aid of their country.',
+	]
+	assert expected == output
+}
