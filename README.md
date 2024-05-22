@@ -82,7 +82,7 @@ compare against the true GNU coreutils version on the Linux-based tests first.
 | &check; | expr      | Evaluate expressions                             |
 | &check; | factor    | Print prime factors                              |
 | &check; | false     | Do nothing, unsuccessfully                       |
-|         | fmt       | Reformat paragraph text                          |
+| &check; | fmt       | Reformat paragraph text                          |
 | &check; | fold      | Wrap input lines to fit in specified width       |
 |         | groups    | Print group names a user is in                   |
 | &check; | head      | Output the first part of files                   |
