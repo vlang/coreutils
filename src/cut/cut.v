@@ -6,8 +6,15 @@ import os
 const app_name = 'cut'
 
 struct Args {
-	bytes     [2]int
-	character [2]int
+	byte_range       [2]int
+	character_range  [2]int
+	delimiter        string
+	fields           string
+	only_delimited   bool
+	zero_terminated  bool
+	complement       string
+	output_delimiter string
+
 	file_args []string
 }
 
@@ -20,22 +27,25 @@ fn cut(lines []string, arg Args) []string {
 }
 
 fn make_args() Args {
-	mut fp := common.flag_parser(os.args)
+	mut fp := flag.new_flag_parser(os.args)
 	eol := common.eol()
 	wrap := eol + flag.space
 
 	fp.application(app_name)
-	fp.description('Print selected parts of lines from each FILE to standard output.${eol}')
-	fp.description('With no FILE, or when FILE is -, read standard input.${eol}')
+	fp.version(common.coreutils_version())
+	fp.skip_executable()
+	fp.description('Print selected parts of lines from each FILE to standard output.')
 
-	fp.description('Use one, and only one of -b, -c or -f.  Each LIST is made up of one${eol}' +
-		'range, or many ranges separated by commas.  Selected input is written${eol}' +
+	fp.footer('${eol}With no FILE, or when FILE is -, read standard input.${eol}${eol}' +
+		'Use one, and only one of -b, -c or -f.  Each LIST is made up of one${eol}' +
+		'range, or many ranges separated by commas. Selected input is written${eol}' +
 		'in the same order that it is read, and is written exactly once.${eol}${eol}' +
 		'Each range is one of:${eol}${eol}' +
 		'  N     N\'th byte, character or field, counted from 1${eol}' +
 		'  N-    from N\'th byte, character or field, to end of line${eol}' +
 		'  N-M   from N\'th to M\'th (included) byte, character or field${eol}' +
-		'  -M    from first to M\'th (included) byte, character or field${eol}')
+		"  -M    from first to M'th (included) byte, character or field")
+	fp.footer(common.coreutils_footer())
 
 	bytes := fp.string('bytes', `b`, '', 'select only <string> range of bytes')
 	characters := fp.string('characters', `c`, '', 'select only <string> range of characters')
@@ -61,10 +71,21 @@ fn make_args() Args {
 		success_exit('${app_name} ${common.coreutils_version()}')
 	}
 
-	// translate args
+	// translate range arguments
+	byte_range := get_range(bytes) or { common.exit_with_error_message(app_name, err.msg()) }
+	character_range := get_range(characters) or {
+		common.exit_with_error_message(app_name, err.msg())
+	}
 
 	return Args{
-		bytes: get_range(bytes) or { common.exit_with_error_message(app_name, err.msg()) }
+		byte_range: byte_range
+		character_range: character_range
+		delimiter: delimiter
+		fields: fields
+		only_delimited: only_delimited
+		zero_terminated: zero_terminated
+		complement: complement
+		output_delimiter: output_delimiter
 		file_args: file_args
 	}
 }
