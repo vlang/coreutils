@@ -6,6 +6,8 @@ import os
 const app_name = 'cut'
 
 struct Args {
+	bytes     [2]int
+	character [2]int
 	file_args []string
 }
 
@@ -20,7 +22,7 @@ fn cut(lines []string, arg Args) []string {
 fn make_args() Args {
 	mut fp := common.flag_parser(os.args)
 	eol := common.eol()
-	wrap := common.eol() + flag.space
+	wrap := eol + flag.space
 
 	fp.application(app_name)
 	fp.description('Print selected parts of lines from each FILE to standard output.${eol}')
@@ -35,16 +37,17 @@ fn make_args() Args {
 		'  N-M   from N\'th to M\'th (included) byte, character or field${eol}' +
 		'  -M    from first to M\'th (included) byte, character or field${eol}')
 
-	fp.string('bytes', `b`, '', 'select only <string> range of bytes')
-	fp.string('characters', `c`, '', 'select only <string> range of characters')
-	fp.string('delimter', `d`, '', 'use <string> instead of TAB for field delimter')
-	fp.string('fields', `f`, '', 'select only <string> fields; also print any line${wrap}' +
+	bytes := fp.string('bytes', `b`, '', 'select only <string> range of bytes')
+	characters := fp.string('characters', `c`, '', 'select only <string> range of characters')
+	delimiter := fp.string('delimter', `d`, '', 'use <string> instead of TAB for field delimter')
+	fields := fp.string('fields', `f`, '',
+		'select only <string> fields; also print any line${wrap}' +
 		'that contains no delimiter character, unless the${wrap}-s option is specified')
 	fp.bool('', `n`, false, '(ignored)')
-	fp.bool('only-delimited', `s`, false, 'do not print lines not containing delimiters')
-	fp.bool('zero-terminated', `z`, false, 'line delimiter is NUL, not newline')
-	fp.string('complement', ` `, '', 'complement the set of selected bytes, characters${wrap}or fields')
-	fp.string('output-delimiter', ` `, '', 'use <string> as the output delimiter, default is${wrap}input delimiter')
+	only_delimited := fp.bool('only-delimited', `s`, false, 'do not print lines not containing delimiters')
+	zero_terminated := fp.bool('zero-terminated', `z`, false, 'line delimiter is NUL, not newline')
+	complement := fp.string('complement', ` `, '', 'complement the set of selected bytes, characters${wrap}or fields')
+	output_delimiter := fp.string('output-delimiter', ` `, '', 'use <string> as the output delimiter, default is${wrap}input delimiter')
 
 	help := fp.bool('help', 0, false, 'display this help')
 	version := fp.bool('version', 0, false, 'output version information')
@@ -58,9 +61,52 @@ fn make_args() Args {
 		success_exit('${app_name} ${common.coreutils_version()}')
 	}
 
+	// translate args
+
 	return Args{
+		bytes: get_range(bytes) or { common.exit_with_error_message(app_name, err.msg()) }
 		file_args: file_args
 	}
+}
+
+// range values interpreted as follows:
+//  [s>=0, e>0]   simple range
+//  [s>=0, e==-1] from s to end of string
+//  [s>=0, e==0]  s'th byte only
+fn get_range(arg string) ![2]int {
+	mut idx := 0
+	mut s := ''
+	mut e := ''
+	err_msg := 'invalid range syntax (--help for more info)'
+
+	for idx < arg.len && arg[idx].is_digit() {
+		s += arg[idx].ascii_str()
+		idx += 1
+	}
+
+	start := if s.len > 0 { s.int() } else { 0 }
+
+	if idx == arg.len && start != -1 {
+		return [start, 0]!
+	}
+
+	if arg[idx] != `-` {
+		return error(err_msg)
+	}
+
+	idx += 1
+
+	for idx < arg.len && arg[idx].is_digit() {
+		e += arg[idx].ascii_str()
+		idx += 1
+	}
+
+	if idx != arg.len {
+		return error(err_msg)
+	}
+
+	end := if e.len > 0 { e.int() } else { -1 }
+	return [start, end]!
 }
 
 @[noreturn]
