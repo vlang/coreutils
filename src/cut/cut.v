@@ -1,33 +1,48 @@
 // Cut - extract sections from each line of input
 import common
 import flag
+import io
 import os
 
 const app_name = 'cut'
 
 struct Args {
-	byte_range       [2]int
-	character_range  [2]int
-	delimiter        string
-	fields           string
-	only_delimited   bool
-	zero_terminated  bool
-	complement       string
-	output_delimiter string
+	byte_range_list      []Range
+	character_range_list []Range
+	fields_list          []string
+	delimiter            string
+	only_delimited       bool
+	zero_terminated      bool
+	complement           string
+	output_delimiter     string
+	file_args            []string
+}
 
-	file_args []string
+// range values interpreted as follows:
+//  [s>=0, e>0]   simple range
+//  [s>=0, e==-1] from s to end of string
+//  [s>=0, e==0]  s'th byte only
+struct Range {
+	start int
+	end   int
 }
 
 fn main() {
-	make_args()
+	args := get_args(os.args)
+	validate_args(args) or { common.exit_with_error_message(app_name, err.msg()) }
+
+	for file in args.file_args {
+		lines := read_all_lines(file)
+		cut(lines, args)
+	}
 }
 
 fn cut(lines []string, arg Args) []string {
 	return []string{}
 }
 
-fn make_args() Args {
-	mut fp := flag.new_flag_parser(os.args)
+fn get_args(args []string) Args {
+	mut fp := flag.new_flag_parser(args)
 	eol := common.eol()
 	wrap := eol + flag.space
 
@@ -72,16 +87,17 @@ fn make_args() Args {
 	}
 
 	// translate range arguments
-	byte_range := get_range(bytes) or { common.exit_with_error_message(app_name, err.msg()) }
-	character_range := get_range(characters) or {
+	byte_range_list := get_ranges(bytes) or { common.exit_with_error_message(app_name, err.msg()) }
+	character_range_list := get_ranges(characters) or {
 		common.exit_with_error_message(app_name, err.msg())
 	}
+	fields_list := [fields]
 
 	return Args{
-		byte_range: byte_range
-		character_range: character_range
+		byte_range_list: byte_range_list
+		character_range_list: character_range_list
+		fields_list: fields_list
 		delimiter: delimiter
-		fields: fields
 		only_delimited: only_delimited
 		zero_terminated: zero_terminated
 		complement: complement
@@ -90,11 +106,17 @@ fn make_args() Args {
 	}
 }
 
-// range values interpreted as follows:
-//  [s>=0, e>0]   simple range
-//  [s>=0, e==-1] from s to end of string
-//  [s>=0, e==0]  s'th byte only
-fn get_range(arg string) ![2]int {
+fn get_ranges(arg string) ![]Range {
+	space_comma := ' ,'
+	args := arg.split_any(space_comma).filter(it.len > 0)
+	mut ranges := []Range{}
+	for ar in args {
+		ranges << get_range(ar)!
+	}
+	return ranges
+}
+
+fn get_range(arg string) !Range {
 	mut idx := 0
 	mut s := ''
 	mut e := ''
@@ -108,7 +130,7 @@ fn get_range(arg string) ![2]int {
 	start := if s.len > 0 { s.int() } else { 0 }
 
 	if idx == arg.len && start != -1 {
-		return [start, 0]!
+		return Range{start, 0}
 	}
 
 	if arg[idx] != `-` {
@@ -127,7 +149,34 @@ fn get_range(arg string) ![2]int {
 	}
 
 	end := if e.len > 0 { e.int() } else { -1 }
-	return [start, end]!
+	return Range{start, end}
+}
+
+fn validate_args(args Args) ! {
+	mut has_byte_range_list := false
+	mut has_character_range_list := false
+	mut has_fields := false
+
+	if !has_byte_range_list && !has_character_range_list && !has_fields {
+		return error('must specify a list of bytes, characters, or fields')
+	}
+}
+
+fn read_all_lines(file string) []string {
+	return if file == '-' {
+		mut br := io.new_buffered_reader(io.BufferedReaderConfig{ reader: os.stdin() })
+		buffered_read_lines(mut br)
+	} else {
+		os.read_lines(file) or { common.exit_with_error_message(app_name, err.msg()) }
+	}
+}
+
+fn buffered_read_lines(mut br io.BufferedReader) []string {
+	mut lines := []string{}
+	for {
+		lines << br.read_line() or { break }
+	}
+	return lines
 }
 
 @[noreturn]
