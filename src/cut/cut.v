@@ -3,6 +3,7 @@ import common
 import flag
 import io
 import os
+import v.mathutil
 
 const app_name = 'cut'
 const space_comma = ' ,'
@@ -20,9 +21,8 @@ struct Args {
 }
 
 // range values interpreted as follows:
-//  [s>=0, e>0]   simple range
-//  [s>=0, e==-1] from s to end of string
-//  [s>=0, e==0]  s'th byte only
+//  [s>=1, e>=1]   simple range
+//  [s>=1, e==-1] from s to end of string
 struct Range {
 	start int
 	end   int
@@ -34,12 +34,67 @@ fn main() {
 
 	for file in args.file_args {
 		lines := read_all_lines(file)
-		cut(lines, args)
+		for line in cut_lines(lines, args) {
+			println(line)
+		}
 	}
 }
 
-fn cut(lines []string, arg Args) []string {
-	return []string{}
+fn cut_lines(lines []string, args Args) []string {
+	mut output := []string{}
+	for line in lines {
+		output << cut(line, args)
+	}
+	return output
+}
+
+fn cut(line string, args Args) string {
+	mut output := ''
+
+	if args.byte_range_list.len > 0 {
+		ranges := combine_ranges(args.byte_range_list, line.len)
+		for range in ranges {
+			output += if range.end == 0 {
+				line[range.start].ascii_str()
+			} else {
+				line.substr(range.start, range.end)
+			}
+		}
+	}
+
+	return output
+}
+
+// Combines ranges where they overlap, order low to high
+//
+// Rant: It is really odd and not obvious that CUT combines
+//       overlapping ranges. Seems much simpler and user
+//       friendly to treat each range as independent. Almost
+//       seems like a bug that never got fixed.
+fn combine_ranges(ranges []Range, max int) []Range {
+	mut combined_ranges := []Range{}
+
+	outer: for range in ranges {
+		start := range.start - 1
+		end := if range.end == -1 { max } else { mathutil.min(max, range.end) }
+		for mut combined_range in combined_ranges {
+			if range_overlaps_range(start, end, combined_range.start, combined_range.end) {
+				combined_range = Range{
+					start: mathutil.min(start, combined_range.start)
+					end: mathutil.max(end, combined_range.end)
+				}
+				continue outer
+			}
+		}
+		combined_ranges << Range{start, end}
+	}
+
+	combined_ranges.sort(a.start < b.start)
+	return combined_ranges
+}
+
+fn range_overlaps_range(start1 int, end1 int, start2 int, end2 int) bool {
+	return (start1 >= start2 && start1 <= end2) || (end1 >= start2 && end1 <= end2)
 }
 
 fn get_args(args []string) Args {
@@ -125,10 +180,13 @@ fn get_range(arg string) !Range {
 		idx += 1
 	}
 
-	start := if s.len > 0 { s.int() } else { 0 }
+	start := if s.len > 0 { s.int() } else { 1 }
+	if start < 1 {
+		return error('start of range less than 1')
+	}
 
-	if idx == arg.len && start != -1 {
-		return Range{start, 0}
+	if idx == arg.len {
+		return Range{start, start}
 	}
 
 	if arg[idx] != `-` {
@@ -151,12 +209,13 @@ fn get_range(arg string) !Range {
 }
 
 fn validate_args(args Args) ! {
-	mut has_byte_range_list := false
-	mut has_char_range_list := false
-	mut has_fields := false
+	has_byte_range_list := if args.byte_range_list.len > 0 { 1 } else { 0 }
+	has_char_range_list := if args.char_range_list.len > 0 { 1 } else { 0 }
+	has_fields := if args.fields_list.len > 0 { 1 } else { 0 }
+	count := has_byte_range_list + has_char_range_list + has_fields
 
-	if !has_byte_range_list && !has_char_range_list && !has_fields {
-		return error('must specify a list of bytes, characters, or fields')
+	if count == 0 {
+		return error('must specify one, and only one of -b, -c, or -f')
 	}
 }
 
@@ -178,10 +237,8 @@ fn buffered_read_lines(mut br io.BufferedReader) []string {
 }
 
 @[noreturn]
-fn exit_success(messages ...string) {
-	for message in messages {
-		println(message)
-	}
+fn exit_success(msg string) {
+	println(msg)
 	exit(0)
 }
 
