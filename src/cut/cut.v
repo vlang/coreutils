@@ -74,7 +74,7 @@ fn cut(line string, args Args) string {
 fn combine_ranges(ranges []Range, max int) []Range {
 	mut combined_ranges := []Range{}
 
-	outer: for range in ranges {
+	outer: for range in ranges.sorted(a.start < b.start) {
 		start := range.start - 1
 		end := if range.end == -1 { max } else { mathutil.min(max, range.end) }
 		for mut combined_range in combined_ranges {
@@ -89,7 +89,6 @@ fn combine_ranges(ranges []Range, max int) []Range {
 		combined_ranges << Range{start, end}
 	}
 
-	combined_ranges.sort(a.start < b.start)
 	return combined_ranges
 }
 
