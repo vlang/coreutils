@@ -5,17 +5,18 @@ import io
 import os
 
 const app_name = 'cut'
+const space_comma = ' ,'
 
 struct Args {
-	byte_range_list      []Range
-	character_range_list []Range
-	fields_list          []string
-	delimiter            string
-	only_delimited       bool
-	zero_terminated      bool
-	complement           string
-	output_delimiter     string
-	file_args            []string
+	byte_range_list  []Range
+	char_range_list  []Range
+	fields_list      []string
+	delimiter        string
+	only_delimited   bool
+	zero_terminated  bool
+	complement       string
+	output_delimiter string
+	file_args        []string
 }
 
 // range values interpreted as follows:
@@ -29,7 +30,7 @@ struct Range {
 
 fn main() {
 	args := get_args(os.args)
-	validate_args(args) or { common.exit_with_error_message(app_name, err.msg()) }
+	validate_args(args) or { exit_error(err.msg()) }
 
 	for file in args.file_args {
 		lines := read_all_lines(file)
@@ -51,17 +52,6 @@ fn get_args(args []string) Args {
 	fp.skip_executable()
 	fp.description('Print selected parts of lines from each FILE to standard output.')
 
-	fp.footer('${eol}With no FILE, or when FILE is -, read standard input.${eol}${eol}' +
-		'Use one, and only one of -b, -c or -f.  Each LIST is made up of one${eol}' +
-		'range, or many ranges separated by commas. Selected input is written${eol}' +
-		'in the same order that it is read, and is written exactly once.${eol}${eol}' +
-		'Each range is one of:${eol}${eol}' +
-		'  N     N\'th byte, character or field, counted from 1${eol}' +
-		'  N-    from N\'th byte, character or field, to end of line${eol}' +
-		'  N-M   from N\'th to M\'th (included) byte, character or field${eol}' +
-		"  -M    from first to M'th (included) byte, character or field")
-	fp.footer(common.coreutils_footer())
-
 	bytes := fp.string('bytes', `b`, '', 'select only <string> range of bytes')
 	characters := fp.string('characters', `c`, '', 'select only <string> range of characters')
 	delimiter := fp.string('delimter', `d`, '', 'use <string> instead of TAB for field delimter')
@@ -77,25 +67,34 @@ fn get_args(args []string) Args {
 	help := fp.bool('help', 0, false, 'display this help')
 	version := fp.bool('version', 0, false, 'output version information')
 
-	file_args := fp.finalize() or { common.exit_with_error_message(app_name, err.msg()) }
+	fp.footer('${eol}With no FILE, or when FILE is -, read standard input.${eol}${eol}' +
+		'Use one, and only one of -b, -c or -f.  Each LIST is made up of one${eol}' +
+		'range, or many ranges separated by commas. Selected input is written${eol}' +
+		'in the same order that it is read, and is written exactly once.${eol}${eol}' +
+		'Each range is one of:${eol}${eol}' +
+		'  N     N\'th byte, character or field, counted from 1${eol}' +
+		'  N-    from N\'th byte, character or field, to end of line${eol}' +
+		'  N-M   from N\'th to M\'th (included) byte, character or field${eol}' +
+		"  -M    from first to M'th (included) byte, character or field")
+	fp.footer(common.coreutils_footer())
+
+	file_args := fp.finalize() or { exit_error(err.msg()) }
 
 	if help {
-		success_exit(fp.usage())
+		exit_success(fp.usage())
 	}
 	if version {
-		success_exit('${app_name} ${common.coreutils_version()}')
+		exit_success('${app_name} ${common.coreutils_version()}')
 	}
 
 	// translate range arguments
-	byte_range_list := get_ranges(bytes) or { common.exit_with_error_message(app_name, err.msg()) }
-	character_range_list := get_ranges(characters) or {
-		common.exit_with_error_message(app_name, err.msg())
-	}
-	fields_list := [fields]
+	byte_range_list := get_ranges(bytes) or { exit_error(err.msg()) }
+	char_range_list := get_ranges(characters) or { exit_error(err.msg()) }
+	fields_list := fields.split_any(space_comma).filter(it.len > 0)
 
 	return Args{
 		byte_range_list: byte_range_list
-		character_range_list: character_range_list
+		char_range_list: char_range_list
 		fields_list: fields_list
 		delimiter: delimiter
 		only_delimited: only_delimited
@@ -107,7 +106,6 @@ fn get_args(args []string) Args {
 }
 
 fn get_ranges(arg string) ![]Range {
-	space_comma := ' ,'
 	args := arg.split_any(space_comma).filter(it.len > 0)
 	mut ranges := []Range{}
 	for ar in args {
@@ -154,10 +152,10 @@ fn get_range(arg string) !Range {
 
 fn validate_args(args Args) ! {
 	mut has_byte_range_list := false
-	mut has_character_range_list := false
+	mut has_char_range_list := false
 	mut has_fields := false
 
-	if !has_byte_range_list && !has_character_range_list && !has_fields {
+	if !has_byte_range_list && !has_char_range_list && !has_fields {
 		return error('must specify a list of bytes, characters, or fields')
 	}
 }
@@ -167,7 +165,7 @@ fn read_all_lines(file string) []string {
 		mut br := io.new_buffered_reader(io.BufferedReaderConfig{ reader: os.stdin() })
 		buffered_read_lines(mut br)
 	} else {
-		os.read_lines(file) or { common.exit_with_error_message(app_name, err.msg()) }
+		os.read_lines(file) or { exit_error(err.msg()) }
 	}
 }
 
@@ -180,9 +178,14 @@ fn buffered_read_lines(mut br io.BufferedReader) []string {
 }
 
 @[noreturn]
-fn success_exit(messages ...string) {
+fn exit_success(messages ...string) {
 	for message in messages {
 		println(message)
 	}
 	exit(0)
+}
+
+@[noreturn]
+fn exit_error(msg string) {
+	common.exit_with_error_message(app_name, msg)
 }
