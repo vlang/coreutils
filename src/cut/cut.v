@@ -16,7 +16,7 @@ struct Args {
 	delimiter        string
 	only_delimited   bool
 	zero_terminated  bool
-	complement       string
+	complement       bool
 	output_delimiter string
 	file_args        []string
 }
@@ -51,7 +51,8 @@ fn cut_lines(lines []string, args Args) []string {
 			else { exit_error('Invalid internal state') }
 		}
 	}
-	return output
+
+	return output.filter(it.len > 0)
 }
 
 fn cut_bytes(line string, args Args) string {
@@ -81,8 +82,7 @@ fn cut_chars(line string, args Args) string {
 fn cut_fields(line string, args Args) string {
 	mut output := ''
 	mut runes := [][]rune{}
-	chars := line.runes()
-	fields := get_fields(chars)
+	fields := get_fields(line.runes())
 	ranges := combine_ranges_and_zero_index(args.field_range_list, fields.len)
 
 	for range in ranges {
@@ -93,6 +93,10 @@ fn cut_fields(line string, args Args) string {
 		s := c.string()
 		return if a.len > 0 { a + '\t' + s } else { a + s }
 	})
+
+	if !output.contains('\t') && args.only_delimited {
+		return ''
+	}
 
 	return output
 }
@@ -118,6 +122,7 @@ fn combine_ranges_and_zero_index(ranges []Range, max int) []Range {
 	outer: for range in ranges.sorted(a.start < b.start) {
 		start := range.start - 1
 		end := if range.end == -1 { max } else { mathutil.min(max, range.end) }
+
 		for mut combined_range in combined_ranges {
 			if range_overlaps_range(start, end, combined_range.start, combined_range.end) {
 				combined_range = Range{
@@ -127,6 +132,7 @@ fn combine_ranges_and_zero_index(ranges []Range, max int) []Range {
 				continue outer
 			}
 		}
+
 		combined_ranges << Range{start, end}
 	}
 
@@ -174,10 +180,10 @@ fn get_args(args []string) Args {
 		'select only <string> fields; also print any line${wrap}' +
 		'that contains no delimiter character, unless the${wrap}-s option is specified')
 	fp.bool('', `n`, false, '(ignored)')
-	only_delimited := fp.bool('only-delimited', `s`, false, 'do not print lines not containing delimiters')
-	zero_terminated := fp.bool('zero-terminated', `z`, false, 'line delimiter is NUL, not newline')
-	complement := fp.string('complement', ` `, '', 'complement the set of selected bytes, characters${wrap}or fields')
+	complement := fp.bool('complement', ` `, false, 'complement the set of selected bytes, characters${wrap}or fields')
 	output_delimiter := fp.string('output-delimiter', ` `, '', 'use <string> as the output delimiter, default is${wrap}input delimiter')
+	only_delimited := fp.bool('only-delimited', `s`, false, 'print only lines containing delimiters')
+	zero_terminated := fp.bool('zero-terminated', `z`, false, 'line delimiter is NUL, not newline')
 
 	help := fp.bool('help', 0, false, 'display this help')
 	version := fp.bool('version', 0, false, 'output version information')

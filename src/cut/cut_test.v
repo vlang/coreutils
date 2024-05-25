@@ -179,3 +179,33 @@ fn test_disjoint_ranges_fields() {
 	]
 	assert cut_lines(text_f, args) == expected
 }
+
+fn test_no_delimiter_line_printed() {
+	args := Args{
+		field_range_list: [Range{1, 1}, Range{3, 3}]
+	}
+	input := [
+		'Name Age Department',
+		'Name\tAge\tDepartment',
+	]
+	expected := [
+		'Name Age Department',
+		'Name\tDepartment',
+	]
+	assert cut_lines(input, args) == expected
+}
+
+fn test_no_delimiter_line_not_printed() {
+	args := Args{
+		only_delimited: true
+		field_range_list: [Range{1, 1}, Range{3, 3}]
+	}
+	input := [
+		'Name Age Department',
+		'Name\tAge\tDepartment',
+	]
+	expected := [
+		'Name\tDepartment',
+	]
+	assert cut_lines(input, args) == expected
+}
