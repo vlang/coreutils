@@ -3,6 +3,14 @@ module main
 const text_a = 'Now is the time for all good men to come the aid of their country.'
 const text_u = 'Now 任意的 随机的 胡乱的'
 
+const text_f = [
+	'Name\tAge\tDepartment',
+	'John Smith\t36\tHR',
+	'John Wayne\t48\tFinance',
+	'Edward King\t40\tFinance',
+	'Stephen Fry\t50\tIT',
+]
+
 fn test_get_range_start_end() {
 	range := get_range('10-20')!
 	assert range == Range{10, 20}
@@ -126,4 +134,34 @@ fn test_mutiple_overlapping_ranges_unordered_chars() {
 		char_range_list: [Range{1, 3}, Range{5, 6}, Range{1, 15}]
 	}
 	assert cut_chars(text_u, args) == 'Now 任意的 随机的 胡乱的'
+}
+
+fn test_single_range_fields() {
+	args := Args{
+		field_range_list: [Range{2, 2}]
+	}
+	expected := [
+		'Age',
+		'36',
+		'48',
+		'40',
+		'50',
+	]
+	assert cut_lines(text_f, args) == expected
+}
+
+fn test_multiple_range_fields() {
+	args := Args{
+		// set range end past last field to
+		// test range clamping
+		field_range_list: [Range{2, 5}]
+	}
+	expected := [
+		'Age\tDepartment',
+		'36\tHR',
+		'48\tFinance',
+		'40\tFinance',
+		'50\tIT',
+	]
+	assert cut_lines(text_f, args) == expected
 }

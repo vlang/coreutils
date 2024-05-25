@@ -1,4 +1,5 @@
 // Cut - extract sections from each line of input
+import arrays
 import common
 import flag
 import io
@@ -11,7 +12,7 @@ const space_comma = ' ,'
 struct Args {
 	byte_range_list  []Range
 	char_range_list  []Range
-	fields_list      []string
+	field_range_list []Range
 	delimiter        string
 	only_delimited   bool
 	zero_terminated  bool
@@ -21,7 +22,7 @@ struct Args {
 }
 
 // range values interpreted as follows:
-//  [s>=1, e>=1]   simple range
+//  [s>=1, e>=1]  simple range
 //  [s>=1, e==-1] from s to end of string
 struct Range {
 	start int
@@ -46,6 +47,7 @@ fn cut_lines(lines []string, args Args) []string {
 		output << match true {
 			args.byte_range_list.len > 0 { cut_bytes(line, args) }
 			args.char_range_list.len > 0 { cut_chars(line, args) }
+			args.field_range_list.len > 0 { cut_fields(line, args) }
 			else { exit_error('Invalid internal state') }
 		}
 	}
@@ -63,14 +65,31 @@ fn cut_bytes(line string, args Args) string {
 	return output
 }
 
-// Like cut_bytes() but handles unicode unlike gnu cut
+// Like cut_bytes() but handles unicode
 fn cut_chars(line string, args Args) string {
 	mut output := ''
 	chars := line.runes()
-
 	ranges := combine_ranges_and_zero_index(args.char_range_list, chars.len)
+
 	for range in ranges {
 		output += chars[range.start..range.end].string()
+	}
+
+	return output
+}
+
+fn cut_fields(line string, args Args) string {
+	mut output := ''
+	chars := line.runes()
+	fields := get_fields(chars)
+	ranges := combine_ranges_and_zero_index(args.field_range_list, fields.len)
+
+	for range in ranges {
+		fs := fields[range.start..range.end]
+		st := arrays.fold[[]rune, string](fs, '', fn (a string, c []rune) string {
+			return if a.len > 0 { a + '\t' + c.string() } else { a + c.string() }
+		})
+		output += st
 	}
 
 	return output
@@ -114,6 +133,26 @@ fn combine_ranges_and_zero_index(ranges []Range, max int) []Range {
 
 fn range_overlaps_range(start1 int, end1 int, start2 int, end2 int) bool {
 	return (start1 >= start2 && start1 <= end2) || (end1 >= start2 && end1 <= end2)
+}
+
+fn get_fields(chars []rune) [][]rune {
+	mut field := []rune{}
+	mut fields := [][]rune{}
+
+	for c in chars {
+		if c != `\t` {
+			field << c
+		} else {
+			fields << field
+			field = []rune{}
+		}
+	}
+
+	if field.len > 0 {
+		fields << field
+	}
+
+	return fields
 }
 
 fn get_args(args []string) Args {
@@ -164,12 +203,12 @@ fn get_args(args []string) Args {
 	// translate range arguments
 	byte_range_list := get_ranges(bytes) or { exit_error(err.msg()) }
 	char_range_list := get_ranges(characters) or { exit_error(err.msg()) }
-	fields_list := fields.split_any(space_comma).filter(it.len > 0)
+	field_list := get_ranges(fields) or { exit_error(err.msg()) }
 
 	return Args{
 		byte_range_list: byte_range_list
 		char_range_list: char_range_list
-		fields_list: fields_list
+		field_range_list: field_list
 		delimiter: delimiter
 		only_delimited: only_delimited
 		zero_terminated: zero_terminated
@@ -230,7 +269,7 @@ fn get_range(arg string) !Range {
 fn validate_args(args Args) ! {
 	has_byte_range_list := if args.byte_range_list.len > 0 { 1 } else { 0 }
 	has_char_range_list := if args.char_range_list.len > 0 { 1 } else { 0 }
-	has_fields := if args.fields_list.len > 0 { 1 } else { 0 }
+	has_fields := if args.field_range_list.len > 0 { 1 } else { 0 }
 	count := has_byte_range_list + has_char_range_list + has_fields
 
 	if count == 0 {
