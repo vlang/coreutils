@@ -43,35 +43,55 @@ fn main() {
 fn cut_lines(lines []string, args Args) []string {
 	mut output := []string{}
 	for line in lines {
-		output << cut(line, args)
-	}
-	return output
-}
-
-fn cut(line string, args Args) string {
-	mut output := ''
-
-	if args.byte_range_list.len > 0 {
-		ranges := combine_ranges(args.byte_range_list, line.len)
-		for range in ranges {
-			output += if range.end == 0 {
-				line[range.start].ascii_str()
-			} else {
-				line.substr(range.start, range.end)
-			}
+		output << match true {
+			args.byte_range_list.len > 0 { cut_bytes(line, args) }
+			args.char_range_list.len > 0 { cut_chars(line, args) }
+			else { exit_error('Invalid internal state') }
 		}
 	}
+	return output
+}
+
+fn cut_bytes(line string, args Args) string {
+	mut output := ''
+
+	ranges := combine_ranges_and_zero_index(args.byte_range_list, line.len)
+	for range in ranges {
+		output += line.substr(range.start, range.end)
+	}
 
 	return output
 }
 
-// Combines ranges where they overlap, order low to high
+// Like cut_bytes() but handles unicode unlike gnu cut
+fn cut_chars(line string, args Args) string {
+	mut output := ''
+	chars := line.runes()
+
+	ranges := combine_ranges_and_zero_index(args.char_range_list, chars.len)
+	for range in ranges {
+		output += chars[range.start..range.end].string()
+	}
+
+	return output
+}
+
+// Combines ranges where they overlap, ordered low to high
 //
-// Rant: It is really odd and not obvious that CUT combines
-//       overlapping ranges. Seems much simpler and user
-//       friendly to treat each range as independent. Almost
-//       seems like a bug that never got fixed.
-fn combine_ranges(ranges []Range, max int) []Range {
+// CUT unintuitively combines overlapping ranges. Not sure
+// what the use case here. Seems like it would be more
+// useful to treat each range indepentently and append to
+// the results to the output. Documentation does not
+// comment on how or why overlapping ranges are combined.
+//
+// Example:
+//   echo "Now is the time" | cut -b 1-3,1-6
+//
+//   returns "Now is". I expected "NowNow is"
+//
+// Furthermore, the order of ranges is not considered.
+// Again, it appears CUT reorders ranges from low to high.
+fn combine_ranges_and_zero_index(ranges []Range, max int) []Range {
 	mut combined_ranges := []Range{}
 
 	outer: for range in ranges.sorted(a.start < b.start) {

@@ -1,6 +1,7 @@
 module main
 
 const text_a = 'Now is the time for all good men to come the aid of their country.'
+const text_u = 'Now 任意的 随机的 胡乱的'
 
 fn test_get_range_start_end() {
 	range := get_range('10-20')!
@@ -43,37 +44,86 @@ fn test_validate_args_missing_required() {
 	assert false
 }
 
+fn test_single_range_bytes() {
+	args := Args{
+		byte_range_list: [Range{5, 5}]
+	}
+	assert cut_bytes(text_a, args) == 'i'
+}
+
+fn test_single_range_chars() {
+	args := Args{
+		char_range_list: [Range{5, 5}]
+	}
+	assert cut_chars(text_u, args) == '任'
+}
+
 fn test_simple_range_cut_bytes() {
 	args := Args{
 		byte_range_list: [Range{8, 15}]
 	}
-	assert cut(text_a, args) == 'the time'
+	assert cut_bytes(text_a, args) == 'the time'
+}
+
+fn test_simple_range_cut_chars() {
+	args := Args{
+		char_range_list: [Range{8, 15}]
+	}
+	assert cut_chars(text_u, args) == ' 随机的 胡乱的'
 }
 
 fn test_index_to_end_bytes() {
 	args := Args{
 		byte_range_list: [Range{8, -1}]
 	}
-	assert cut(text_a, args) == 'the time for all good men to come the aid of their country.'
+	assert cut_bytes(text_a, args) == 'the time for all good men to come the aid of their country.'
 }
 
-fn test_multiple_index_to_index() {
+fn test_index_to_end_chars() {
+	args := Args{
+		char_range_list: [Range{8, -1}]
+	}
+	assert cut_chars(text_u, args) == ' 随机的 胡乱的'
+}
+
+fn test_multiple_index_to_index_bytes() {
 	args := Args{
 		byte_range_list: [Range{1, 3}, Range{5, 7}]
 	}
-	assert cut(text_a, args) == 'Nowis '
+	assert cut_bytes(text_a, args) == 'Nowis '
 }
 
-fn test_mutiple_overlapping_ranges() {
+fn test_multiple_index_to_index_chars() {
+	args := Args{
+		char_range_list: [Range{1, 3}, Range{5, 7}]
+	}
+	assert cut_chars(text_u, args) == 'Now任意的'
+}
+
+fn test_mutiple_overlapping_ranges_bytes() {
 	args := Args{
 		byte_range_list: [Range{4, 3}, Range{2, 6}]
 	}
-	assert cut(text_a, args) == 'ow is'
+	assert cut_bytes(text_a, args) == 'ow is'
 }
 
-fn test_mutiple_overlapping_ranges_unordered() {
+fn test_mutiple_overlapping_ranges_chars() {
+	args := Args{
+		char_range_list: [Range{4, 3}, Range{2, 6}]
+	}
+	assert cut_chars(text_u, args) == 'ow 任意'
+}
+
+fn test_mutiple_overlapping_ranges_unordered_bytes() {
 	args := Args{
 		byte_range_list: [Range{1, 3}, Range{5, 6}, Range{1, 15}]
 	}
-	assert cut(text_a, args) == 'Now is the time'
+	assert cut_bytes(text_a, args) == 'Now is the time'
+}
+
+fn test_mutiple_overlapping_ranges_unordered_chars() {
+	args := Args{
+		char_range_list: [Range{1, 3}, Range{5, 6}, Range{1, 15}]
+	}
+	assert cut_chars(text_u, args) == 'Now 任意的 随机的 胡乱的'
 }
