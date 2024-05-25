@@ -80,17 +80,19 @@ fn cut_chars(line string, args Args) string {
 
 fn cut_fields(line string, args Args) string {
 	mut output := ''
+	mut runes := [][]rune{}
 	chars := line.runes()
 	fields := get_fields(chars)
 	ranges := combine_ranges_and_zero_index(args.field_range_list, fields.len)
 
 	for range in ranges {
-		fs := fields[range.start..range.end]
-		st := arrays.fold[[]rune, string](fs, '', fn (a string, c []rune) string {
-			return if a.len > 0 { a + '\t' + c.string() } else { a + c.string() }
-		})
-		output += st
+		runes << fields[range.start..range.end]
 	}
+
+	output += arrays.fold[[]rune, string](runes, '', fn (a string, c []rune) string {
+		s := c.string()
+		return if a.len > 0 { a + '\t' + s } else { a + s }
+	})
 
 	return output
 }

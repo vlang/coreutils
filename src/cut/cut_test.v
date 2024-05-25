@@ -150,7 +150,7 @@ fn test_single_range_fields() {
 	assert cut_lines(text_f, args) == expected
 }
 
-fn test_multiple_range_fields() {
+fn test_range_fields() {
 	args := Args{
 		// set range end past last field to
 		// test range clamping
@@ -162,6 +162,20 @@ fn test_multiple_range_fields() {
 		'48\tFinance',
 		'40\tFinance',
 		'50\tIT',
+	]
+	assert cut_lines(text_f, args) == expected
+}
+
+fn test_disjoint_ranges_fields() {
+	args := Args{
+		field_range_list: [Range{1, 1}, Range{3, 3}]
+	}
+	expected := [
+		'Name\tDepartment',
+		'John Smith\tHR',
+		'John Wayne\tFinance',
+		'Edward King\tFinance',
+		'Stephen Fry\tIT',
 	]
 	assert cut_lines(text_f, args) == expected
 }
