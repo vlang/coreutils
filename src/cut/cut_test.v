@@ -1,16 +1,5 @@
 module main
 
-const text_a = 'Now is the time for all good men to come the aid of their country.'
-const text_u = 'Now 任意的 随机的 胡乱的'
-
-const text_f = [
-	'Name\tAge\tDepartment',
-	'John Smith\t36\tHR',
-	'John Wayne\t48\tFinance',
-	'Edward King\t40\tFinance',
-	'Stephen Fry\t50\tIT',
-]
-
 fn test_get_range_start_end() {
 	range := get_range('10-20')!
 	assert range == Range{10, 20}
@@ -51,6 +40,9 @@ fn test_validate_args_missing_required() {
 	}
 	assert false
 }
+
+const text_a = 'Now is the time for all good men to come the aid of their country.'
+const text_u = 'Now 任意的 随机的 胡乱的'
 
 fn test_single_range_bytes() {
 	args := Args{
@@ -136,6 +128,14 @@ fn test_mutiple_overlapping_ranges_unordered_chars() {
 	assert cut_chars(text_u, args) == 'Now 任意的 随机的 胡乱的'
 }
 
+const text_f = [
+	'Name\tAge\tDepartment',
+	'John Smith\t36\tHR',
+	'John Wayne\t48\tFinance',
+	'Edward King\t40\tFinance',
+	'Stephen Fry\t50\tIT',
+]
+
 fn test_single_range_fields() {
 	args := Args{
 		field_range_list: [Range{2, 2}]
@@ -208,4 +208,44 @@ fn test_no_delimiter_line_not_printed() {
 		'Name\tDepartment',
 	]
 	assert cut_lines(input, args) == expected
+}
+
+const text_f_empty_no_tab = [
+	'Name	Age	Department',
+	'this has no tabs',
+	'John Smith	36	HR',
+	'',
+	'Stephen Fry	50	IT',
+]
+
+fn test_empty_and_no_delimiters_fields() {
+	args := Args{
+		field_range_list: [Range{1, 1}, Range{2, 2}]
+	}
+	// keep no tab line, and empty line
+	expected := [
+		'Name	Age',
+		'this has no tabs',
+		'John Smith	36',
+		'',
+		'Stephen Fry	50',
+	]
+
+	assert cut_lines(text_f_empty_no_tab, args) == expected
+}
+
+fn test_empty_and_no_delimiters_only_delimited_fields() {
+	args := Args{
+		only_delimited: true
+		field_range_list: [Range{1, 1}, Range{2, 2}]
+	}
+	// drop no tab line, and empty line
+	expected := [
+		'Name	Age',
+		'John Smith	36',
+		'',
+		'Stephen Fry	50',
+	]
+
+	assert cut_lines(text_f_empty_no_tab, args) == expected
 }

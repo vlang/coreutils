@@ -45,14 +45,15 @@ fn cut_lines(lines []string, args Args) []string {
 	mut output := []string{}
 	for line in lines {
 		output << match true {
+			line.len == 0 { '' }
 			args.byte_range_list.len > 0 { cut_bytes(line, args) }
 			args.char_range_list.len > 0 { cut_chars(line, args) }
-			args.field_range_list.len > 0 { cut_fields(line, args) }
+			args.field_range_list.len > 0 { cut_fields(line, args) or { continue } }
 			else { exit_error('Invalid internal state') }
 		}
 	}
 
-	return output.filter(it.len > 0)
+	return output
 }
 
 fn cut_bytes(line string, args Args) string {
@@ -79,10 +80,15 @@ fn cut_chars(line string, args Args) string {
 	return output
 }
 
-fn cut_fields(line string, args Args) string {
+fn cut_fields(line string, args Args) ?string {
 	mut output := ''
 	mut runes := [][]rune{}
 	fields := get_fields(line.runes())
+
+	if fields.len == 0 {
+		return if args.only_delimited { none } else { line }
+	}
+
 	ranges := combine_ranges_and_zero_index(args.field_range_list, fields.len)
 
 	for range in ranges {
@@ -93,10 +99,6 @@ fn cut_fields(line string, args Args) string {
 		s := c.string()
 		return if a.len > 0 { a + '\t' + s } else { a + s }
 	})
-
-	if !output.contains('\t') && args.only_delimited {
-		return ''
-	}
 
 	return output
 }
@@ -146,6 +148,10 @@ fn range_overlaps_range(start1 int, end1 int, start2 int, end2 int) bool {
 fn get_fields(chars []rune) [][]rune {
 	mut field := []rune{}
 	mut fields := [][]rune{}
+
+	if !chars.contains(`\t`) {
+		return fields
+	}
 
 	for c in chars {
 		if c != `\t` {
