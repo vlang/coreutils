@@ -249,3 +249,38 @@ fn test_empty_and_no_delimiters_only_delimited_fields() {
 
 	assert cut_lines(text_f_empty_no_tab, args) == expected
 }
+
+const csv = [
+	'Name, Age, Department',
+	'John Smith, 23, R&D',
+]
+
+fn test_custom_input_delimiter() {
+	args := Args{
+		delimiter: `,`
+		output_delimiter: ','
+		field_range_list: [Range{1, 1}, Range{2, 2}]
+	}
+
+	expected := [
+		'Name, Age',
+		'John Smith, 23',
+	]
+
+	assert cut_lines(csv, args) == expected
+}
+
+fn test_custom_output_delimiter() {
+	args := Args{
+		delimiter: `,`
+		output_delimiter: '::'
+		field_range_list: [Range{1, 1}, Range{2, 2}]
+	}
+
+	expected := [
+		'Name:: Age',
+		'John Smith:: 23',
+	]
+
+	assert cut_lines(csv, args) == expected
+}

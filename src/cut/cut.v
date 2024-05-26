@@ -13,11 +13,11 @@ struct Args {
 	byte_range_list  []Range
 	char_range_list  []Range
 	field_range_list []Range
-	delimiter        string
+	delimiter        rune = `\t`
 	only_delimited   bool
 	zero_terminated  bool
 	complement       bool
-	output_delimiter string
+	output_delimiter string = '\t'
 	file_args        []string
 }
 
@@ -43,6 +43,7 @@ fn main() {
 
 fn cut_lines(lines []string, args Args) []string {
 	mut output := []string{}
+
 	for line in lines {
 		output << match true {
 			line.len == 0 { '' }
@@ -58,10 +59,10 @@ fn cut_lines(lines []string, args Args) []string {
 
 fn cut_bytes(line string, args Args) string {
 	mut output := ''
-
 	ranges := combine_ranges_and_zero_index(args.byte_range_list, line.len)
+
 	for range in ranges {
-		output += line.substr(range.start, range.end)
+		output += if range.start <= line.len { line.substr(range.start, range.end) } else { '' }
 	}
 
 	return output
@@ -74,16 +75,15 @@ fn cut_chars(line string, args Args) string {
 	ranges := combine_ranges_and_zero_index(args.char_range_list, chars.len)
 
 	for range in ranges {
-		output += chars[range.start..range.end].string()
+		output += if range.start <= line.len { chars[range.start..range.end].string() } else { '' }
 	}
 
 	return output
 }
 
 fn cut_fields(line string, args Args) ?string {
-	mut output := ''
 	mut runes := [][]rune{}
-	fields := get_fields(line.runes())
+	fields := get_fields(line.runes(), args.delimiter)
 
 	if fields.len == 0 {
 		return if args.only_delimited { none } else { line }
@@ -92,12 +92,12 @@ fn cut_fields(line string, args Args) ?string {
 	ranges := combine_ranges_and_zero_index(args.field_range_list, fields.len)
 
 	for range in ranges {
-		runes << fields[range.start..range.end]
+		runes << if range.start <= fields.len { fields[range.start..range.end] } else { [][]rune{} }
 	}
 
-	output += arrays.fold[[]rune, string](runes, '', fn (a string, c []rune) string {
+	output := arrays.fold[[]rune, string](runes, '', fn [args] (a string, c []rune) string {
 		s := c.string()
-		return if a.len > 0 { a + '\t' + s } else { a + s }
+		return if a.len > 0 { a + args.output_delimiter + s } else { a + s }
 	})
 
 	return output
@@ -145,16 +145,16 @@ fn range_overlaps_range(start1 int, end1 int, start2 int, end2 int) bool {
 	return (start1 >= start2 && start1 <= end2) || (end1 >= start2 && end1 <= end2)
 }
 
-fn get_fields(chars []rune) [][]rune {
+fn get_fields(chars []rune, delimiter rune) [][]rune {
 	mut field := []rune{}
 	mut fields := [][]rune{}
 
-	if !chars.contains(`\t`) {
+	if !chars.contains(delimiter) {
 		return fields
 	}
 
 	for c in chars {
-		if c != `\t` {
+		if c != delimiter {
 			field << c
 		} else {
 			fields << field
@@ -219,15 +219,21 @@ fn get_args(args []string) Args {
 	char_range_list := get_ranges(characters) or { exit_error(err.msg()) }
 	field_list := get_ranges(fields) or { exit_error(err.msg()) }
 
+	if delimiter.len > 1 {
+		exit_error('delimiter must be a single character')
+	}
+
+	output_delim := if output_delimiter.len == 0 { delimiter } else { output_delimiter }
+
 	return Args{
 		byte_range_list: byte_range_list
 		char_range_list: char_range_list
 		field_range_list: field_list
-		delimiter: delimiter
+		delimiter: delimiter.runes()[0]
 		only_delimited: only_delimited
 		zero_terminated: zero_terminated
 		complement: complement
-		output_delimiter: output_delimiter
+		output_delimiter: output_delim
 		file_args: file_args
 	}
 }
