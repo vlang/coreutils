@@ -18,7 +18,7 @@ struct Args {
 	zero_terminated  bool
 	complement       bool
 	output_delimiter string = '\t'
-	file_args        []string
+	file_list        []string
 }
 
 // range values interpreted as follows:
@@ -33,8 +33,13 @@ fn main() {
 	args := get_args(os.args)
 	validate_args(args) or { exit_error(err.msg()) }
 
-	for file in args.file_args {
-		lines := read_all_lines(file)
+	for file in args.file_list {
+		lines := if args.zero_terminated {
+			read_all_lines(file)
+		} else {
+			read_all_lines_zero_terminated(file)
+		}
+
 		for line in cut_lines(lines, args) {
 			println(line)
 		}
@@ -50,7 +55,7 @@ fn cut_lines(lines []string, args Args) []string {
 			args.byte_range_list.len > 0 { cut_bytes(line, args) }
 			args.char_range_list.len > 0 { cut_chars(line, args) }
 			args.field_range_list.len > 0 { cut_fields(line, args) or { continue } }
-			else { exit_error('Invalid internal state') }
+			else { exit_error('Invalid internal state') } // should never get here
 		}
 	}
 
@@ -95,9 +100,8 @@ fn cut_fields(line string, args Args) ?string {
 		runes << if range.start <= fields.len { fields[range.start..range.end] } else { [][]rune{} }
 	}
 
-	output := arrays.fold[[]rune, string](runes, '', fn [args] (a string, c []rune) string {
-		s := c.string()
-		return if a.len > 0 { a + args.output_delimiter + s } else { a + s }
+	output := arrays.join_to_string[[]rune](runes, args.output_delimiter, fn (c []rune) string {
+		return c.string()
 	})
 
 	return output
@@ -139,13 +143,8 @@ fn combine_ranges_and_zero_index(ranges []Range, max int, complement bool) []Ran
 	}
 
 	if complement {
-		mut combined_complement_ranges := []Range{}
-
-		for range in combined_ranges {
-			combined_complement_ranges << complement_range(range, max)
-		}
-
-		return combined_complement_ranges
+		combined_ranges = arrays.flatten[Range](combined_ranges.map(complement_range(it,
+			max)))
 	}
 
 	return combined_ranges
@@ -216,10 +215,12 @@ fn get_args(args []string) Args {
 	fp.footer(common.coreutils_footer())
 
 	file_args := fp.finalize() or { exit_error(err.msg()) }
+	file_list := if file_args.len > 0 { file_args } else { ['-'] }
 
 	if help {
 		exit_success(fp.usage())
 	}
+
 	if version {
 		exit_success('${app_name} ${common.coreutils_version()}')
 	}
@@ -251,7 +252,7 @@ fn get_args(args []string) Args {
 		zero_terminated: zero_terminated
 		complement: complement
 		output_delimiter: output_delim
-		file_args: file_args
+		file_list: file_list
 	}
 }
 
@@ -333,6 +334,34 @@ fn read_all_lines(file string) []string {
 	} else {
 		os.read_lines(file) or { exit_error(err.msg()) }
 	}
+}
+
+fn read_all_lines_zero_terminated(file string) []string {
+	if file == '-' {
+		exit_error('--zero-terminated with stdin not supported')
+	}
+
+	bytes := os.read_bytes(file) or { exit_error(err.msg()) }
+	return read_lines_zero_terminated(bytes)
+}
+
+fn read_lines_zero_terminated(bytes []u8) []string {
+	mut lines := []string{}
+	mut start := 0
+	mut index := 0
+	for b in bytes {
+		index += 1
+		if b == 0 {
+			lines << bytes[start..index - 1].bytestr()
+			start = index
+		}
+	}
+
+	if start != index {
+		lines << bytes[start..index].bytestr()
+	}
+
+	return lines
 }
 
 fn buffered_read_lines(mut br io.BufferedReader) []string {

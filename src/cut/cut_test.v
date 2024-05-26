@@ -294,3 +294,15 @@ fn test_complement_of_range_bytes() {
 		'Now time for all good men to come the aid of their country.',
 	]
 }
+
+fn test_zero_terminiated_lines() {
+	bytes := 'Now is the time\0for all good men\0to come to the aid\0of their country'.bytes()
+	lines := read_lines_zero_terminated(bytes)
+	expected := [
+		'Now is the time',
+		'for all good men',
+		'to come to the aid',
+		'of their country',
+	]
+	assert lines == expected
+}
