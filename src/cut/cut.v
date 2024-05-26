@@ -59,7 +59,7 @@ fn cut_lines(lines []string, args Args) []string {
 
 fn cut_bytes(line string, args Args) string {
 	mut output := ''
-	ranges := combine_ranges_and_zero_index(args.byte_range_list, line.len)
+	ranges := combine_ranges_and_zero_index(args.byte_range_list, line.len, args.complement)
 
 	for range in ranges {
 		output += if range.start <= line.len { line.substr(range.start, range.end) } else { '' }
@@ -72,7 +72,7 @@ fn cut_bytes(line string, args Args) string {
 fn cut_chars(line string, args Args) string {
 	mut output := ''
 	chars := line.runes()
-	ranges := combine_ranges_and_zero_index(args.char_range_list, chars.len)
+	ranges := combine_ranges_and_zero_index(args.char_range_list, chars.len, args.complement)
 
 	for range in ranges {
 		output += if range.start <= line.len { chars[range.start..range.end].string() } else { '' }
@@ -89,7 +89,7 @@ fn cut_fields(line string, args Args) ?string {
 		return if args.only_delimited { none } else { line }
 	}
 
-	ranges := combine_ranges_and_zero_index(args.field_range_list, fields.len)
+	ranges := combine_ranges_and_zero_index(args.field_range_list, fields.len, args.complement)
 
 	for range in ranges {
 		runes << if range.start <= fields.len { fields[range.start..range.end] } else { [][]rune{} }
@@ -118,7 +118,7 @@ fn cut_fields(line string, args Args) ?string {
 //
 // Furthermore, the order of ranges is not considered.
 // Again, it appears CUT reorders ranges from low to high.
-fn combine_ranges_and_zero_index(ranges []Range, max int) []Range {
+fn combine_ranges_and_zero_index(ranges []Range, max int, complement bool) []Range {
 	mut combined_ranges := []Range{}
 
 	outer: for range in ranges.sorted(a.start < b.start) {
@@ -136,6 +136,16 @@ fn combine_ranges_and_zero_index(ranges []Range, max int) []Range {
 		}
 
 		combined_ranges << Range{start, end}
+	}
+
+	if complement {
+		mut combined_complement_ranges := []Range{}
+
+		for range in combined_ranges {
+			combined_complement_ranges << complement_range(range, max)
+		}
+
+		return combined_complement_ranges
 	}
 
 	return combined_ranges
@@ -219,17 +229,24 @@ fn get_args(args []string) Args {
 	char_range_list := get_ranges(characters) or { exit_error(err.msg()) }
 	field_list := get_ranges(fields) or { exit_error(err.msg()) }
 
+	// delimiter handling is messy. If specified, it must be a
+	// single character and only valid when operating on fields
 	if delimiter.len > 1 {
 		exit_error('delimiter must be a single character')
 	}
 
+	if delimiter.len == 1 && fields.len == 0 {
+		exit_error('input delimiter may be specified only when operating on fields')
+	}
+
+	input_delim := if delimiter.len != 0 { delimiter.runes()[0] } else { 0 }
 	output_delim := if output_delimiter.len == 0 { delimiter } else { output_delimiter }
 
 	return Args{
 		byte_range_list: byte_range_list
 		char_range_list: char_range_list
 		field_range_list: field_list
-		delimiter: delimiter.runes()[0]
+		delimiter: input_delim
 		only_delimited: only_delimited
 		zero_terminated: zero_terminated
 		complement: complement
@@ -284,6 +301,18 @@ fn get_range(arg string) !Range {
 
 	end := if e.len > 0 { e.int() } else { -1 }
 	return Range{start, end}
+}
+
+// Range is zero indexed
+fn complement_range(range Range, max int) []Range {
+	mut ranges := []Range{}
+	if range.start > 0 {
+		ranges << Range{0, range.start}
+	}
+	if range.end < max {
+		ranges << Range{range.end, max}
+	}
+	return ranges
 }
 
 fn validate_args(args Args) ! {

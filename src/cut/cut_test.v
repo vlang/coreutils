@@ -284,3 +284,13 @@ fn test_custom_output_delimiter() {
 
 	assert cut_lines(csv, args) == expected
 }
+
+fn test_complement_of_range_bytes() {
+	args := Args{
+		complement: true
+		byte_range_list: [Range{4, 10}]
+	}
+	assert cut_lines([text_a], args) == [
+		'Now time for all good men to come the aid of their country.',
+	]
+}
