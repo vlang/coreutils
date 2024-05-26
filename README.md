@@ -46,7 +46,7 @@ count below and mark it as done in this README.md. Thanks!
 GNU coreutils. They are not 100% compatiable. If you encounter different behaviors, 
 compare against the true GNU coreutils version on the Linux-based tests first.
 
-## Completed (55/109)
+## Completed (58/109)
 
 |  Done   | Cmd       | Descripton                                       |
 | :-----: | --------- | ------------------------------------------------ |
@@ -68,7 +68,7 @@ compare against the true GNU coreutils version on the Linux-based tests first.
 |         | coreutils | Multi-call program                               |
 | &check; | cp        | Copy files and directories                       |
 |         | csplit    | Split a file into context-determined pieces      |
-|         | cut       | Print selected parts of lines                    |
+| &check; | cut       | Print selected parts of lines                    |
 |         | date      | Print or set system date and time                |
 |         | dd        | Convert and copy a file                          |
 |         | df        | Report file system disk space usage              |
