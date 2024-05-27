@@ -19,21 +19,29 @@ const test_text_content = [
 	'01: Output Box - Combination results will display here.',
 ]
 
-fn test_lines_opt_equals_two() {
-	args := Args{
-		lines: 2
-		files: ['test.txt']
-	}
+fn setup() (fn (s string), fn () []string) {
+	os.chdir(os.dir(@FILE))!
+
 	mut result := []string{}
 	mut result_ref := &result
 	out_fn := fn [mut result_ref] (s string) {
 		result_ref << s
 	}
+	result_fn := fn [mut result_ref] () []string {
+		return *result_ref
+	}
+	return out_fn, result_fn
+}
 
-	os.chdir(os.dir(@FILE))!
+fn test_lines_opt_equals_two() {
+	args := Args{
+		lines: 2
+		files: ['test.txt']
+	}
+	out_fn, result_fn := setup()
 	tail_(args, out_fn)
 
-	assert result == [
+	assert result_fn() == [
 		'02: This tool will not produce all possible combination.',
 		'01: Output Box - Combination results will display here.',
 	]
