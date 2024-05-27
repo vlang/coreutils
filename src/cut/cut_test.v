@@ -48,84 +48,156 @@ fn test_single_range_bytes() {
 	args := Args{
 		byte_range_list: [Range{5, 5}]
 	}
-	assert cut_bytes(text_a, args) == 'i'
+	mut result := []string{}
+	mut result_ref := &result
+	out_fn := fn [mut result_ref] (s string) {
+		result_ref << s
+	}
+	cut_bytes(text_a, args, out_fn)
+	assert result == ['i']
 }
 
 fn test_single_range_chars() {
 	args := Args{
 		char_range_list: [Range{5, 5}]
 	}
-	assert cut_chars(text_u, args) == '任'
+	mut result := []string{}
+	mut result_ref := &result
+	out_fn := fn [mut result_ref] (s string) {
+		result_ref << s
+	}
+	cut_chars(text_u, args, out_fn)
+	assert result == ['任']
 }
 
 fn test_simple_range_cut_bytes() {
 	args := Args{
 		byte_range_list: [Range{8, 15}]
 	}
-	assert cut_bytes(text_a, args) == 'the time'
+	mut result := []string{}
+	mut result_ref := &result
+	out_fn := fn [mut result_ref] (s string) {
+		result_ref << s
+	}
+	cut_bytes(text_a, args, out_fn)
+	assert result == ['the time']
 }
 
 fn test_simple_range_cut_chars() {
 	args := Args{
 		char_range_list: [Range{8, 15}]
 	}
-	assert cut_chars(text_u, args) == ' 随机的 胡乱的'
+	mut result := []string{}
+	mut result_ref := &result
+	out_fn := fn [mut result_ref] (s string) {
+		result_ref << s
+	}
+	cut_chars(text_u, args, out_fn)
+	assert result == [' 随机的 胡乱的']
 }
 
 fn test_index_to_end_bytes() {
 	args := Args{
 		byte_range_list: [Range{8, -1}]
 	}
-	assert cut_bytes(text_a, args) == 'the time for all good men to come the aid of their country.'
+	mut result := []string{}
+	mut result_ref := &result
+	out_fn := fn [mut result_ref] (s string) {
+		result_ref << s
+	}
+	cut_bytes(text_a, args, out_fn)
+	assert result == ['the time for all good men to come the aid of their country.']
 }
 
 fn test_index_to_end_chars() {
 	args := Args{
 		char_range_list: [Range{8, -1}]
 	}
-	assert cut_chars(text_u, args) == ' 随机的 胡乱的'
+	mut result := []string{}
+	mut result_ref := &result
+	out_fn := fn [mut result_ref] (s string) {
+		result_ref << s
+	}
+	cut_chars(text_u, args, out_fn)
+	assert result == [' 随机的 胡乱的']
 }
 
 fn test_multiple_index_to_index_bytes() {
 	args := Args{
 		byte_range_list: [Range{1, 3}, Range{5, 7}]
 	}
-	assert cut_bytes(text_a, args) == 'Nowis '
+	mut result := []string{}
+	mut result_ref := &result
+	out_fn := fn [mut result_ref] (s string) {
+		result_ref << s
+	}
+	cut_bytes(text_a, args, out_fn)
+	assert result == ['Nowis ']
 }
 
 fn test_multiple_index_to_index_chars() {
 	args := Args{
 		char_range_list: [Range{1, 3}, Range{5, 7}]
 	}
-	assert cut_chars(text_u, args) == 'Now任意的'
+	mut result := []string{}
+	mut result_ref := &result
+	out_fn := fn [mut result_ref] (s string) {
+		result_ref << s
+	}
+	cut_chars(text_u, args, out_fn)
+	assert result == ['Now任意的']
 }
 
 fn test_mutiple_overlapping_ranges_bytes() {
 	args := Args{
 		byte_range_list: [Range{4, 3}, Range{2, 6}]
 	}
-	assert cut_bytes(text_a, args) == 'ow is'
+	mut result := []string{}
+	mut result_ref := &result
+	out_fn := fn [mut result_ref] (s string) {
+		result_ref << s
+	}
+	cut_bytes(text_a, args, out_fn)
+	assert result == ['ow is']
 }
 
 fn test_mutiple_overlapping_ranges_chars() {
 	args := Args{
 		char_range_list: [Range{4, 3}, Range{2, 6}]
 	}
-	assert cut_chars(text_u, args) == 'ow 任意'
+	mut result := []string{}
+	mut result_ref := &result
+	out_fn := fn [mut result_ref] (s string) {
+		result_ref << s
+	}
+	cut_chars(text_u, args, out_fn)
+	assert result == ['ow 任意']
 }
 
 fn test_mutiple_overlapping_ranges_unordered_bytes() {
 	args := Args{
 		byte_range_list: [Range{1, 3}, Range{5, 6}, Range{1, 15}]
 	}
-	assert cut_bytes(text_a, args) == 'Now is the time'
+	mut result := []string{}
+	mut result_ref := &result
+	out_fn := fn [mut result_ref] (s string) {
+		result_ref << s
+	}
+	cut_bytes(text_a, args, out_fn)
+	assert result == ['Now is the time']
 }
 
 fn test_mutiple_overlapping_ranges_unordered_chars() {
 	args := Args{
 		char_range_list: [Range{1, 3}, Range{5, 6}, Range{1, 15}]
 	}
-	assert cut_chars(text_u, args) == 'Now 任意的 随机的 胡乱的'
+	mut result := []string{}
+	mut result_ref := &result
+	out_fn := fn [mut result_ref] (s string) {
+		result_ref << s
+	}
+	cut_chars(text_u, args, out_fn)
+	assert result == ['Now 任意的 随机的 胡乱的']
 }
 
 const text_f = [
@@ -147,7 +219,13 @@ fn test_single_range_fields() {
 		'40',
 		'50',
 	]
-	assert cut_lines(text_f, args) == expected
+	mut result := []string{}
+	mut result_ref := &result
+	out_fn := fn [mut result_ref] (s string) {
+		result_ref << s
+	}
+	cut_lines(text_f, args, out_fn)
+	assert result == expected
 }
 
 fn test_range_fields() {
@@ -163,7 +241,13 @@ fn test_range_fields() {
 		'40\tFinance',
 		'50\tIT',
 	]
-	assert cut_lines(text_f, args) == expected
+	mut result := []string{}
+	mut result_ref := &result
+	out_fn := fn [mut result_ref] (s string) {
+		result_ref << s
+	}
+	cut_lines(text_f, args, out_fn)
+	assert result == expected
 }
 
 fn test_disjoint_ranges_fields() {
@@ -177,7 +261,13 @@ fn test_disjoint_ranges_fields() {
 		'Edward King\tFinance',
 		'Stephen Fry\tIT',
 	]
-	assert cut_lines(text_f, args) == expected
+	mut result := []string{}
+	mut result_ref := &result
+	out_fn := fn [mut result_ref] (s string) {
+		result_ref << s
+	}
+	cut_lines(text_f, args, out_fn)
+	assert result == expected
 }
 
 fn test_no_delimiter_line_printed() {
@@ -192,7 +282,13 @@ fn test_no_delimiter_line_printed() {
 		'Name Age Department',
 		'Name\tDepartment',
 	]
-	assert cut_lines(input, args) == expected
+	mut result := []string{}
+	mut result_ref := &result
+	out_fn := fn [mut result_ref] (s string) {
+		result_ref << s
+	}
+	cut_lines(input, args, out_fn)
+	assert result == expected
 }
 
 fn test_no_delimiter_line_not_printed() {
@@ -207,7 +303,13 @@ fn test_no_delimiter_line_not_printed() {
 	expected := [
 		'Name\tDepartment',
 	]
-	assert cut_lines(input, args) == expected
+	mut result := []string{}
+	mut result_ref := &result
+	out_fn := fn [mut result_ref] (s string) {
+		result_ref << s
+	}
+	cut_lines(input, args, out_fn)
+	assert result == expected
 }
 
 const text_f_empty_no_tab = [
@@ -230,8 +332,13 @@ fn test_empty_and_no_delimiters_fields() {
 		'',
 		'Stephen Fry	50',
 	]
-
-	assert cut_lines(text_f_empty_no_tab, args) == expected
+	mut result := []string{}
+	mut result_ref := &result
+	out_fn := fn [mut result_ref] (s string) {
+		result_ref << s
+	}
+	cut_lines(text_f_empty_no_tab, args, out_fn)
+	assert result == expected
 }
 
 fn test_empty_and_no_delimiters_only_delimited_fields() {
@@ -246,8 +353,13 @@ fn test_empty_and_no_delimiters_only_delimited_fields() {
 		'',
 		'Stephen Fry	50',
 	]
-
-	assert cut_lines(text_f_empty_no_tab, args) == expected
+	mut result := []string{}
+	mut result_ref := &result
+	out_fn := fn [mut result_ref] (s string) {
+		result_ref << s
+	}
+	cut_lines(text_f_empty_no_tab, args, out_fn)
+	assert result == expected
 }
 
 const csv = [
@@ -261,13 +373,17 @@ fn test_custom_input_delimiter() {
 		output_delimiter: ','
 		field_range_list: [Range{1, 1}, Range{2, 2}]
 	}
-
 	expected := [
 		'Name, Age',
 		'John Smith, 23',
 	]
-
-	assert cut_lines(csv, args) == expected
+	mut result := []string{}
+	mut result_ref := &result
+	out_fn := fn [mut result_ref] (s string) {
+		result_ref << s
+	}
+	cut_lines(csv, args, out_fn)
+	assert result == expected
 }
 
 fn test_custom_output_delimiter() {
@@ -276,13 +392,17 @@ fn test_custom_output_delimiter() {
 		output_delimiter: '::'
 		field_range_list: [Range{1, 1}, Range{2, 2}]
 	}
-
 	expected := [
 		'Name:: Age',
 		'John Smith:: 23',
 	]
-
-	assert cut_lines(csv, args) == expected
+	mut result := []string{}
+	mut result_ref := &result
+	out_fn := fn [mut result_ref] (s string) {
+		result_ref << s
+	}
+	cut_lines(csv, args, out_fn)
+	assert result == expected
 }
 
 fn test_complement_of_range_bytes() {
@@ -290,9 +410,13 @@ fn test_complement_of_range_bytes() {
 		complement: true
 		byte_range_list: [Range{4, 10}]
 	}
-	assert cut_lines([text_a], args) == [
-		'Now time for all good men to come the aid of their country.',
-	]
+	mut result := []string{}
+	mut result_ref := &result
+	out_fn := fn [mut result_ref] (s string) {
+		result_ref << s
+	}
+	cut_lines([text_a], args, out_fn)
+	assert result == ['Now time for all good men to come the aid of their country.']
 }
 
 fn test_zero_terminiated_lines() {
