@@ -1,5 +1,40 @@
 module main
 
-fn test_stub() {
-	assert true
+import os
+
+const test_text_content = [
+	'14: Privacy of Data: This tool is built-with and functi.',
+	'13: This will prevent browser lock-up from trying to lo.',
+	'12: When generating large amounts of combinations check.',
+	'11: Be aware of the number of combinations generated. O.',
+	'10: Entering \\x into any field will produce a line brea.',
+	'09: Empty object, prefix, suffix, join and delimiter fi.',
+	'09: More input boxes can be added via the "Add box." bu.',
+	'07: Combination sets are delimited via the "Join sets w.',
+	'06: Add a prefix and/or suffix to each set via the pref.',
+	'05: Enter object delimiter into "Delimiter" field.',
+	'04: Each input object must be on a new line.',
+	'03: *Combinations are produced from left to right i.e. .',
+	'02: This tool will not produce all possible combination.',
+	'01: Output Box - Combination results will display here.',
+]
+
+fn test_lines_opt_equals_two() {
+	args := Args{
+		lines: 2
+		files: ['test.txt']
+	}
+	mut result := []string{}
+	mut result_ref := &result
+	out_fn := fn [mut result_ref] (s string) {
+		result_ref << s
+	}
+
+	os.chdir(os.dir(@FILE))!
+	tail_(args, out_fn)
+
+	assert result == [
+		'02: This tool will not produce all possible combination.',
+		'01: Output Box - Combination results will display here.',
+	]
 }
