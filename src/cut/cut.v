@@ -35,63 +35,60 @@ fn main() {
 
 	for file in args.file_list {
 		lines := if args.zero_terminated {
-			read_all_lines(file)
-		} else {
 			read_all_lines_zero_terminated(file)
+		} else {
+			read_all_lines(file)
 		}
 
-		for line in cut_lines(lines, args) {
-			println(line)
-		}
+		cut_lines(lines, args, fn (s string) {
+			println(s)
+		})
 	}
 }
 
-fn cut_lines(lines []string, args Args) []string {
-	mut output := []string{}
-
+fn cut_lines(lines []string, args Args, out_fn fn (s string)) {
 	for line in lines {
-		output << match true {
-			line.len == 0 { '' }
-			args.byte_range_list.len > 0 { cut_bytes(line, args) }
-			args.char_range_list.len > 0 { cut_chars(line, args) }
-			args.field_range_list.len > 0 { cut_fields(line, args) or { continue } }
+		match true {
+			line.len == 0 { out_fn('') }
+			args.byte_range_list.len > 0 { cut_bytes(line, args, out_fn) }
+			args.char_range_list.len > 0 { cut_chars(line, args, out_fn) }
+			args.field_range_list.len > 0 { cut_fields(line, args, out_fn) }
 			else { exit_error('Invalid internal state') } // should never get here
 		}
 	}
-
-	return output
 }
 
-fn cut_bytes(line string, args Args) string {
-	mut output := ''
+fn cut_bytes(line string, args Args, out_fn fn (s string)) {
 	ranges := combine_ranges_and_zero_index(args.byte_range_list, line.len, args.complement)
-
+	mut output := ''
 	for range in ranges {
 		output += if range.start <= line.len { line.substr(range.start, range.end) } else { '' }
 	}
-
-	return output
+	out_fn(output)
 }
 
 // Like cut_bytes() but handles unicode
-fn cut_chars(line string, args Args) string {
-	mut output := ''
+fn cut_chars(line string, args Args, out_fn fn (s string)) {
 	chars := line.runes()
 	ranges := combine_ranges_and_zero_index(args.char_range_list, chars.len, args.complement)
+	mut output := ''
 
 	for range in ranges {
 		output += if range.start <= line.len { chars[range.start..range.end].string() } else { '' }
 	}
 
-	return output
+	out_fn(output)
 }
 
-fn cut_fields(line string, args Args) ?string {
+fn cut_fields(line string, args Args, out_fn fn (s string)) {
 	mut runes := [][]rune{}
 	fields := get_fields(line.runes(), args.delimiter)
 
 	if fields.len == 0 {
-		return if args.only_delimited { none } else { line }
+		if !args.only_delimited {
+			out_fn(line)
+		}
+		return
 	}
 
 	ranges := combine_ranges_and_zero_index(args.field_range_list, fields.len, args.complement)
@@ -104,7 +101,7 @@ fn cut_fields(line string, args Args) ?string {
 		return c.string()
 	})
 
-	return output
+	out_fn(output)
 }
 
 // Combines ranges where they overlap, ordered low to high
