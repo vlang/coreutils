@@ -2,7 +2,6 @@
 import common
 import flag
 import os
-import strconv
 import v.mathutil
 
 const app_name = 'tail'
@@ -19,9 +18,21 @@ fn tail(args Args) {
 }
 
 fn tail_(args Args, out_fn fn (s string)) {
-	for file in args.files {
+	for i, file in args.files {
+		file_header(file, i == 0, args.files.len, out_fn)
 		tail_file(file, args, out_fn)
 	}
+}
+
+fn file_header(file string, first bool, number_of_files int, out_fn fn (s string)) {
+	if number_of_files == 1 {
+		return
+	}
+	if !first {
+		out_fn('')
+	}
+	out_fn('===> ${file} <===')
+	out_fn('')
 }
 
 fn tail_file(file string, args Args, out_fn fn (s string)) {
@@ -41,9 +52,9 @@ fn tail_lines(lines []string, args Args, out_fn fn (s string)) {
 }
 
 struct Args {
-	bytes               int
+	bytes               i64
 	follow              string
-	lines               int
+	lines               i64
 	max_unchanged_stats int
 	pid                 string
 	quiet               bool
@@ -99,24 +110,24 @@ fn get_args(args []string) Args {
 
 		NUM may have a multiplier suffix: b 512, kB 1000, K 1024, MB
 		1000*1000, M 1024*1024, GB 1000*1000*1000, G 1024*1024*1024, and
-		so on for T, P, E, Z, Y, R, Q.  Binary prefixes can be used, too:
+		so on for T, P, E, Z, Y, R, Q. Binary prefixes can be used, too:
 		KiB=K, MiB=M, and so on.
 
 		With --follow (-f), tail defaults to following the file
 		descriptor, which means that even if a tail'ed file is renamed,
-		tail will continue to track its end.  This default behavior is
+		tail will continue to track its end. This default behavior is
 		not desirable when you really want to track the actual name of
-		the file, not the file descriptor (e.g., log rotation).  Use
-		--follow=name in that case.  That causes tail to track the named
+		the file, not the file descriptor (e.g., log rotation). Use
+		--follow=name in that case. That causes tail to track the named
 		file in a way that accommodates renaming, removal and creation.".trim_indent())
 
 	fp.footer(common.coreutils_footer())
 	file_args := fp.finalize() or { exit_error(err.msg()) }
 
 	return Args{
-		bytes: strconv.atoi(bytes_arg) or { exit_error(err.msg()) }
+		bytes: string_to_i64(bytes_arg) or { exit_error(err.msg()) }
 		follow: if f_arg { 'descriptor' } else { follow_arg }
-		lines: strconv.atoi(lines_arg) or { exit_error(err.msg()) }
+		lines: string_to_i64(lines_arg) or { exit_error(err.msg()) }
 		max_unchanged_stats: max_unchanged_stats_arg
 		pid: pid_arg
 		quiet: quiet_arg || silent_arg

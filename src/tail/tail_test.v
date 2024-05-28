@@ -20,7 +20,7 @@ const test_text_content = [
 ]
 
 fn setup() (fn (s string), fn () []string) {
-	os.chdir(os.dir(@FILE))!
+	os.chdir(os.dir(@FILE)) or { exit_error(err.msg()) }
 
 	mut result := []string{}
 	mut result_ref := &result
@@ -42,6 +42,27 @@ fn test_lines_opt_equals_two() {
 	tail_(args, out_fn)
 
 	assert result_fn() == [
+		'02: This tool will not produce all possible combination.',
+		'01: Output Box - Combination results will display here.',
+	]
+}
+
+fn test_two_files_have_headers_separating_output() {
+	args := Args{
+		lines: 2
+		files: ['test.txt', 'test.txt']
+	}
+	out_fn, result_fn := setup()
+	tail_(args, out_fn)
+
+	assert result_fn() == [
+		'===> test.txt <===',
+		'',
+		'02: This tool will not produce all possible combination.',
+		'01: Output Box - Combination results will display here.',
+		'',
+		'===> test.txt <===',
+		'',
 		'02: This tool will not produce all possible combination.',
 		'01: Output Box - Combination results will display here.',
 	]
