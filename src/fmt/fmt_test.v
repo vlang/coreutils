@@ -23,6 +23,18 @@ fn to_tmp_file(data []string) string {
 	return file
 }
 
+fn setup() (fn (s string), fn () []string) {
+	mut result := []string{}
+	mut result_ref := &result
+	out_fn := fn [mut result_ref] (s string) {
+		result_ref << s
+	}
+	result_fn := fn [mut result_ref] () []string {
+		return *result_ref
+	}
+	return out_fn, result_fn
+}
+
 fn test_basic_wrap() {
 	println(@METHOD)
 	input := [
@@ -31,7 +43,8 @@ fn test_basic_wrap() {
 		'Now is the time for all good men to come to the aid of their country.',
 	]
 	tmp := to_tmp_file(input)
-	output := run_fmt(['fmt', '-w', '30', tmp])
+	out_fn, result_fn := setup()
+	run_fmt(['fmt', '-w', '30', tmp], out_fn)
 	os.rm(tmp)!
 	// print_lines(output)
 	expected := [
@@ -43,7 +56,7 @@ fn test_basic_wrap() {
 		'men to come to the aid of',
 		'their country.',
 	]
-	assert output == expected
+	assert result_fn() == expected
 }
 
 fn test_narrow_to_formatted() {
@@ -66,7 +79,8 @@ fn test_narrow_to_formatted() {
 		'Adios amigo.',
 	]
 	tmp := to_tmp_file(input)
-	output := run_fmt(['fmt', tmp])
+	out_fn, result_fn := setup()
+	run_fmt(['fmt', tmp], out_fn)
 	os.rm(tmp)!
 	// print_lines(output)
 	expected := [
@@ -80,7 +94,7 @@ fn test_narrow_to_formatted() {
 		'',
 		'Much ado about nothing.  He he he.  Adios amigo.',
 	]
-	assert output == expected
+	assert result_fn() == expected
 }
 
 fn test_line_indents_denote_new_paragraph() {
@@ -93,7 +107,8 @@ fn test_line_indents_denote_new_paragraph() {
 		'multline paragraph.',
 	]
 	tmp := to_tmp_file(input)
-	output := run_fmt(['fmt', '-w', '35', tmp])
+	out_fn, result_fn := setup()
+	run_fmt(['fmt', '-w', '35', tmp], out_fn)
 	os.rm(tmp)!
 	expected := [
 		'This is a single line paragraph',
@@ -104,7 +119,7 @@ fn test_line_indents_denote_new_paragraph() {
 		'comprise a simple multline',
 		'paragraph.',
 	]
-	assert output == expected
+	assert result_fn() == expected
 }
 
 fn test_numbered_list_no_options() {
@@ -118,7 +133,8 @@ fn test_numbered_list_no_options() {
 		'    4. Now is the time for all good men to come to the aid of their country.',
 	]
 	tmp := to_tmp_file(input)
-	output := run_fmt(['fmt', tmp])
+	out_fn, result_fn := setup()
+	run_fmt(['fmt', tmp], out_fn)
 	os.rm(tmp)!
 	// print_lines(output)
 	expected := [
@@ -130,7 +146,7 @@ fn test_numbered_list_no_options() {
 		'    of their country.  4. Now is the time for all good men to come to the',
 		'    aid of their country.',
 	]
-	assert output == expected
+	assert result_fn() == expected
 }
 
 fn test_numbered_list_w_40() {
@@ -144,7 +160,8 @@ fn test_numbered_list_w_40() {
 		'    4. Now is the time for all good men to come to the aid of their country.',
 	]
 	tmp := to_tmp_file(input)
-	output := run_fmt(['fmt', '-w', '40', tmp])
+	out_fn, result_fn := setup()
+	run_fmt(['fmt', '-w', '40', tmp], out_fn)
 	os.rm(tmp)!
 	// print_lines(output)
 	expected := [
@@ -159,7 +176,7 @@ fn test_numbered_list_w_40() {
 		'    4. Now is the time for all good men',
 		'    to come to the aid of their country.',
 	]
-	assert output == expected
+	assert result_fn() == expected
 }
 
 fn test_split_only() {
@@ -180,7 +197,8 @@ fn test_split_only() {
 		'fringilla ut, venenatis ut, neque.',
 	]
 	tmp := to_tmp_file(input)
-	output := run_fmt(['fmt', '-s', tmp])
+	out_fn, result_fn := setup()
+	run_fmt(['fmt', '-s', tmp], out_fn)
 	os.rm(tmp)!
 	expected := [
 		'Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Curabitur',
@@ -202,7 +220,7 @@ fn test_split_only() {
 		'lacinia. Morbi fringilla lacus quis arcu. Vestibulum sem quam, dapibus in,',
 		'fringilla ut, venenatis ut, neque.',
 	]
-	assert output == expected
+	assert result_fn() == expected
 }
 
 fn test_indents_no_blank_lines() {
@@ -217,7 +235,8 @@ fn test_indents_no_blank_lines() {
 		'Love never fails.',
 	]
 	tmp := to_tmp_file(input)
-	output := run_fmt(['fmt', tmp])
+	out_fn, result_fn := setup()
+	run_fmt(['fmt', tmp], out_fn)
 	os.rm(tmp)!
 	expected := [
 		'Love is patient, love is kind. It does not envy,',
@@ -228,7 +247,7 @@ fn test_indents_no_blank_lines() {
 		' always trusts, always hopes, always perseveres.',
 		'Love never fails.',
 	]
-	assert output == expected
+	assert result_fn() == expected
 }
 
 fn test_prefix_str_option() {
@@ -243,7 +262,8 @@ fn test_prefix_str_option() {
 		'> Court front maids forty if aware their at. Chicken use are pressed removed.',
 	]
 	tmp := to_tmp_file(input)
-	output := run_fmt(['fmt', '-p', '> ', tmp])
+	out_fn, result_fn := setup()
+	run_fmt(['fmt', '-p', '> ', tmp], out_fn)
 	os.rm(tmp)!
 	expected := [
 		'Prefix lines test',
@@ -257,7 +277,7 @@ fn test_prefix_str_option() {
 		'> opinions it pleasure of debating.  Court front maids forty if aware their',
 		'> at. Chicken use are pressed removed.',
 	]
-	assert output == expected
+	assert result_fn() == expected
 }
 
 fn test_uniform_spacing_option() {
@@ -267,22 +287,24 @@ fn test_uniform_spacing_option() {
 	]
 	tmp := to_tmp_file(input)
 	// non-uniform case
-	output1 := run_fmt(['fmt', tmp])
+	out_fn1, result_fn1 := setup()
+	run_fmt(['fmt', tmp], out_fn1)
 	expected1 := [
 		'venenatis pede. Quisque dui     dui, ultricies ut, facilisis   non,',
 		'pulvinar non. Duis         quis arcu a purus volutpat iaculis. Morbi id dui',
 		'in    diam ornare',
 	]
-	assert output1 == expected1
+	assert result_fn1() == expected1
 
 	// uniform spacing case
-	output2 := run_fmt(['fmt', '-u', tmp])
+	out_fn2, result_fn2 := setup()
+	run_fmt(['fmt', '-u', tmp], out_fn2)
 	os.rm(tmp)!
 	expected2 := [
 		'venenatis pede. Quisque dui dui, ultricies ut, facilisis non, pulvinar non.',
 		'Duis quis arcu a purus volutpat iaculis. Morbi id dui in diam ornare',
 	]
-	assert output2 == expected2
+	assert result_fn2() == expected2
 }
 
 fn test_uniform_spacing_with_prefix_and_width() {
@@ -297,7 +319,8 @@ fn test_uniform_spacing_with_prefix_and_width() {
 		'> Court front maids forty if aware their at. Chicken use are pressed removed.',
 	]
 	tmp := to_tmp_file(input)
-	output := run_fmt(['fmt', '-u', '-p', '> ', '-w', '30', tmp])
+	out_fn, result_fn := setup()
+	run_fmt(['fmt', '-u', '-p', '> ', '-w', '30', tmp], out_fn)
 	os.rm(tmp)!
 	expected := [
 		'> Prefix lines test',
@@ -319,7 +342,7 @@ fn test_uniform_spacing_with_prefix_and_width() {
 		'> aware their at. Chicken use',
 		'> are pressed removed.',
 	]
-	assert output == expected
+	assert result_fn() == expected
 }
 
 fn test_crown_and_uniform_options() {
@@ -330,7 +353,8 @@ fn test_crown_and_uniform_options() {
 		'introduced on output.',
 	]
 	tmp := to_tmp_file(input)
-	output := run_fmt(['fmt', '-c', '-u', tmp])
+	out_fn, result_fn := setup()
+	run_fmt(['fmt', '-c', '-u', tmp], out_fn)
 	os.rm(tmp)!
 	expected := [
 		'By default, blank lines, spaces between words, and indentation are',
@@ -338,7 +362,7 @@ fn test_crown_and_uniform_options() {
 		'    indentation are not joined; tabs are expanded on input and',
 		'introduced on output.',
 	]
-	assert expected == output
+	assert result_fn() == expected
 }
 
 fn test_tagged_and_width_options() {
@@ -349,7 +373,8 @@ fn test_tagged_and_width_options() {
 		'Now is the time for all good men to come to the aid of their country.',
 	]
 	tmp := to_tmp_file(input)
-	output := run_fmt(['fmt', '-t', '-w', '40', tmp])
+	out_fn, result_fn := setup()
+	run_fmt(['fmt', '-t', '-w', '40', tmp], out_fn)
 	os.rm(tmp)!
 	expected := [
 		'Now is the time for all good men to come',
@@ -358,7 +383,7 @@ fn test_tagged_and_width_options() {
 		'Now is the time for all good men to come',
 		'    to the aid of their country.',
 	]
-	assert expected == output
+	assert result_fn() == expected
 }
 
 fn test_unicode_handling() {
@@ -367,7 +392,8 @@ fn test_unicode_handling() {
 		"I can do without ⑰ lobsters, you know. Come on!' So they ⼘≺↩⌝⚙⠃ couldn't get them out again. The Mock Turtle went on again:-- 'I didn't mean it!' Ⓡpleaded.",
 	]
 	tmp := to_tmp_file(input)
-	output := run_fmt(['fmt', '-w', '40', tmp])
+	out_fn, result_fn := setup()
+	run_fmt(['fmt', '-w', '40', tmp], out_fn)
 	os.rm(tmp)!
 	expected := [
 		'I can do without ⑰ lobsters, you know.',
@@ -375,7 +401,7 @@ fn test_unicode_handling() {
 		'them out again. The Mock Turtle went on',
 		"again:-- 'I didn't mean it!' Ⓡpleaded.",
 	]
-	assert output == expected
+	assert result_fn() == expected
 }
 
 fn test_unicode__tab_handling() {
@@ -384,7 +410,8 @@ fn test_unicode__tab_handling() {
 		"I can do without ⑰ lobsters, \tyou know. Come on!' So they ⼘≺↩⌝⚙⠃ couldn't get them out again. The Mock Turtle went on again:-- 'I didn't mean it!' Ⓡpleaded.",
 	]
 	tmp := to_tmp_file(input)
-	output := run_fmt(['fmt', '-w', '40', tmp])
+	out_fn, result_fn := setup()
+	run_fmt(['fmt', '-w', '40', tmp], out_fn)
 	os.rm(tmp)!
 	expected := [
 		'I can do without ⑰ lobsters,    you',
@@ -393,5 +420,5 @@ fn test_unicode__tab_handling() {
 		"on again:-- 'I didn't mean it!'",
 		'Ⓡpleaded.',
 	]
-	assert output == expected
+	assert result_fn() == expected
 }
