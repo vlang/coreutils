@@ -30,22 +30,18 @@ mut:
 }
 
 fn main() {
-	output := run_fmt(os.args)
-
-	for line in output {
-		println(line)
-	}
+	run_fmt(os.args, fn (s string) {
+		println(s)
+	})
 }
 
-fn run_fmt(args []string) []string {
-	mut output := []string{}
+fn run_fmt(args []string, out_fn fn (string)) {
 	app := process_args(args)
 
 	for file in app.file_args {
 		lines := read_all_lines(file)
-		output << fmt(lines, app)
+		fmt(lines, app, out_fn)
 	}
-	return output
 }
 
 fn read_all_lines(file string) []string {
@@ -57,24 +53,20 @@ fn read_all_lines(file string) []string {
 	}
 }
 
-fn fmt(lines []string, app App) []string {
-	mut output := []string{}
+fn fmt(lines []string, app App, out_fn fn (string)) {
 	paragraphs := get_paragraphs(lines, app)
 
 	for paragraph in paragraphs {
-		for line in fmt_paragraph(paragraph, app) {
-			output << line
-		}
+		fmt_paragraph(paragraph, app, out_fn)
 	}
-	return output
 }
 
-fn fmt_paragraph(paragraph Paragraph, app App) []string {
+fn fmt_paragraph(paragraph Paragraph, app App, out_fn fn (string)) {
 	mut ta := ''
-	mut pa := []string{}
 
 	if paragraph.lines.len == 0 {
-		return ['']
+		out_fn('')
+		return
 	}
 
 	mut first_line := true
@@ -117,7 +109,8 @@ fn fmt_paragraph(paragraph Paragraph, app App) []string {
 
 	for rn.len > app.width {
 		mut break_index := find_break(rn, app.width)
-		pa << rn[0..break_index].string()
+		slice := rn[0..break_index].string()
+		out_fn(slice)
 		rn = rn[break_index + 1..].clone()
 		for rn.len > 0 && is_white_space(rn[0]) {
 			rn.delete(0)
@@ -131,9 +124,8 @@ fn fmt_paragraph(paragraph Paragraph, app App) []string {
 	last := rn.string().trim_right(white_space)
 
 	if last.len > 0 {
-		pa << rn.string().trim_right(white_space)
+		out_fn(rn.string().trim_right(white_space))
 	}
-	return pa
 }
 
 fn find_break(ln []rune, max int) int {
