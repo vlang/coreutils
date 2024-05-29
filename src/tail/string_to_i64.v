@@ -1,5 +1,4 @@
 // convert strings like 10K to i164
-
 const block = 512
 
 // **1
@@ -60,8 +59,6 @@ fn string_to_i64(s string) ?i64 {
 
 	number := s[0..index].i64()
 	suffix := if index < s.len { s[index..] } else { 'c' }
-
-	println("${number}. ${suffix}")
 
 	multiplier := match suffix.to_lower() {
 		'b' { block }

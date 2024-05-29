@@ -57,11 +57,43 @@ fn test_two_files_have_headers_separating_output() {
 
 	assert result_fn() == [
 		'===> test.txt <===',
-		'',
 		'02: This tool will not produce all possible combination.',
 		'01: Output Box - Combination results will display here.',
 		'',
 		'===> test.txt <===',
+		'02: This tool will not produce all possible combination.',
+		'01: Output Box - Combination results will display here.',
+	]
+}
+
+fn test_lines_opt_equals_two_verbose() {
+	args := Args{
+		lines: 2
+		verbose: true
+		files: ['test.txt']
+	}
+	out_fn, result_fn := setup()
+	tail_(args, out_fn)
+
+	assert result_fn() == [
+		'===> test.txt <===',
+		'02: This tool will not produce all possible combination.',
+		'01: Output Box - Combination results will display here.',
+	]
+}
+
+fn test_two_files_no_headers_quiet_option() {
+	args := Args{
+		lines: 2
+		quiet: true
+		files: ['test.txt', 'test.txt']
+	}
+	out_fn, result_fn := setup()
+	tail_(args, out_fn)
+
+	assert result_fn() == [
+		'02: This tool will not produce all possible combination.',
+		'01: Output Box - Combination results will display here.',
 		'',
 		'02: This tool will not produce all possible combination.',
 		'01: Output Box - Combination results will display here.',

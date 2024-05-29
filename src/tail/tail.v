@@ -19,20 +19,21 @@ fn tail(args Args) {
 
 fn tail_(args Args, out_fn fn (s string)) {
 	for i, file in args.files {
-		file_header(file, i == 0, args.files.len, out_fn)
+		file_header(file, i == 0, args, out_fn)
 		tail_file(file, args, out_fn)
 	}
 }
 
-fn file_header(file string, first bool, number_of_files int, out_fn fn (s string)) {
-	if number_of_files == 1 {
-		return
-	}
+fn file_header(file string, first bool, args Args, out_fn fn (s string)) {
 	if !first {
 		out_fn('')
 	}
-	out_fn('===> ${file} <===')
-	out_fn('')
+	if args.quiet {
+		return
+	}
+	if args.files.len > 1 || args.verbose {
+		out_fn('===> ${file} <===')
+	}
 }
 
 fn tail_file(file string, args Args, out_fn fn (s string)) {
