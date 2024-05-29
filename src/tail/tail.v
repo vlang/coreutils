@@ -20,11 +20,14 @@ fn tail(args Args) {
 fn tail_(args Args, out_fn fn (s string)) {
 	for i, file in args.files {
 		file_header(file, i == 0, args, out_fn)
-		tail_file(file, args, out_fn)
+		match true {
+			args.bytes > 0 { tail_bytes(file, args, out_fn) }
+			else { tail_file(file, args, out_fn) }
+		}
 	}
 }
 
-fn file_header(file string, first bool, args Args, out_fn fn (s string)) {
+fn file_header(file string, first bool, args Args, out_fn fn (string)) {
 	if !first {
 		out_fn('')
 	}
@@ -36,15 +39,33 @@ fn file_header(file string, first bool, args Args, out_fn fn (s string)) {
 	}
 }
 
-fn tail_file(file string, args Args, out_fn fn (s string)) {
+fn tail_bytes(file string, args Args, out_fn fn (string)) {
+	// simple for now
+	stat := os.stat(file) or { exit_error(err.msg()) }
+	pos := mathutil.max(u64(0), stat.size - u64(args.bytes))
+	siz := int(args.bytes)
+	mut f := os.open(file) or { exit_error(err.msg()) }
+	buffer := if args.from_start {
+		f.read_bytes_at(int(pos), u64(siz))
+	} else {
+		f.read_bytes_at(siz, pos)
+	}
+	out_fn(buffer.bytestr())
+}
+
+fn tail_file(file string, args Args, out_fn fn (string)) {
 	// simple for now
 	lines := os.read_lines(file) or { exit_error(err.msg()) }
 	tail_lines(lines, args, out_fn)
 }
 
-fn tail_lines(lines []string, args Args, out_fn fn (s string)) {
+fn tail_lines(lines []string, args Args, out_fn fn (string)) {
 	count := mathutil.min(args.lines, lines.len)
-	mut index := lines.len - count
+	mut index := if args.from_start {
+		count
+	} else {
+		lines.len - count
+	}
 
 	for index < lines.len {
 		out_fn(lines[index])
@@ -63,6 +84,7 @@ struct Args {
 	sleep_interval      f64
 	verbose             bool
 	zero_terminated     bool
+	from_start          bool
 	files               []string
 }
 
@@ -84,27 +106,35 @@ fn get_args(args []string) Args {
 	bytes_arg := fp.string('bytes', `c`, '-1',
 		'output the last NUM bytes; or use -c +<int> to output      ${wrap}' +
 		'starting with byte <int> of each file')
+
 	follow_arg := fp.string('follow', `f`, 'descriptor',
 		'output appended data as the file grows        ${wrap}' +
 		"an absent option argument means 'descriptor'")
+
 	f_arg := fp.bool('', `F`, false, 'same as --follow=name --retry')
+
 	lines_arg := fp.string('lines', `n`, '10',
 		'output the last NUM lines, instead of the last 10; or us${wrap}' +
 		'-n +NUM to skip NUM-1 lines at the start')
+
 	max_unchanged_stats_arg := fp.int('max-unchanged-stats', ` `, 5,
 		'with --follow=name, reopen a FILE which has not${wrap}' +
 		'changed size after N (default 5) iterations to see if it${wrap}' +
 		'has been unlinked or renamed (this is the usual case of${wrap}' +
 		'rotated log files); with inotify, this option is rarely usefule')
+
 	pid_arg := fp.string('pid', ` `, '', 'with -f, terminate after process ID, PID dies')
 	quiet_arg := fp.bool('quiet', `q`, false, 'never output headers giving file names')
 	silent_arg := fp.bool('silent', ` `, false, 'same as --quiet')
 	retry_arg := fp.bool('retry', ` `, false, 'keep trying to open a file if it is inaccessible')
+
 	sleep_interval_arg := fp.float('sleep-interval', `s`, 1.0,
 		'with -f, sleep for approximately N seconds (default 1.0)${wrap}' +
 		'between iterations; with inotify and --pid=P, check${wrap}' +
 		'process P at least once every N seconds')
+
 	verbose_arg := fp.bool('verbose', `v`, false, 'always output headers giving file names')
+
 	zero_terminated_arg := fp.bool('zero-terminated', `z`, false, 'line delimiter is NUL, not newline')
 
 	fp.footer("
@@ -124,6 +154,7 @@ fn get_args(args []string) Args {
 
 	fp.footer(common.coreutils_footer())
 	file_args := fp.finalize() or { exit_error(err.msg()) }
+	from_start := bytes_arg.starts_with('+') || lines_arg.starts_with('+')
 
 	return Args{
 		bytes: string_to_i64(bytes_arg) or { exit_error(err.msg()) }
@@ -136,6 +167,7 @@ fn get_args(args []string) Args {
 		verbose: verbose_arg
 		sleep_interval: sleep_interval_arg
 		zero_terminated: zero_terminated_arg
+		from_start: from_start
 		files: if file_args.len > 0 { file_args } else { ['-'] }
 	}
 }

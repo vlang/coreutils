@@ -99,3 +99,31 @@ fn test_two_files_no_headers_quiet_option() {
 		'01: Output Box - Combination results will display here.',
 	]
 }
+
+fn test_from_start_lines() {
+	args := Args{
+		lines: 13
+		from_start: true
+		files: ['test.txt']
+	}
+	out_fn, result_fn := setup()
+	tail_(args, out_fn)
+
+	assert result_fn() == [
+		'01: Output Box - Combination results will display here.',
+	]
+}
+
+fn test_from_start_bytes() {
+	args := Args{
+		bytes: 666
+		from_start: true
+		files: ['test.txt']
+	}
+	out_fn, result_fn := setup()
+	tail_(args, out_fn)
+
+	assert result_fn() == [
+		'02: This tool will not produce all possible combination.\n01: Output Box - Combination results will display here.',
+	]
+}
