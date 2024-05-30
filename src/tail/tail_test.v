@@ -19,7 +19,7 @@ const test_text_content = [
 	'01: Output Box - Combination results will display here.',
 ]
 
-fn setup() (fn (s string), fn () []string) {
+fn setup() (fn (s string), fn () string) {
 	os.chdir(os.dir(@FILE)) or { exit_error(err.msg()) }
 
 	mut result := []string{}
@@ -27,8 +27,8 @@ fn setup() (fn (s string), fn () []string) {
 	out_fn := fn [mut result_ref] (s string) {
 		result_ref << s
 	}
-	result_fn := fn [mut result_ref] () []string {
-		return *result_ref
+	result_fn := fn [mut result_ref] () string {
+		return result_ref.join('')
 	}
 	return out_fn, result_fn
 }
@@ -41,10 +41,9 @@ fn test_lines_opt_equals_two() {
 	out_fn, result_fn := setup()
 	tail_(args, out_fn)
 
-	assert result_fn() == [
-		'02: This tool will not produce all possible combination.',
-		'01: Output Box - Combination results will display here.',
-	]
+	assert result_fn() == '
+		02: This tool will not produce all possible combination.
+		01: Output Box - Combination results will display here.'.trim_indent()
 }
 
 fn test_two_files_have_headers_separating_output() {
@@ -55,15 +54,14 @@ fn test_two_files_have_headers_separating_output() {
 	out_fn, result_fn := setup()
 	tail_(args, out_fn)
 
-	assert result_fn() == [
-		'===> test.txt <===',
-		'02: This tool will not produce all possible combination.',
-		'01: Output Box - Combination results will display here.',
-		'',
-		'===> test.txt <===',
-		'02: This tool will not produce all possible combination.',
-		'01: Output Box - Combination results will display here.',
-	]
+	assert result_fn() == '
+		===> test.txt <===
+		02: This tool will not produce all possible combination.
+		01: Output Box - Combination results will display here.
+
+		===> test.txt <===
+		02: This tool will not produce all possible combination.
+		01: Output Box - Combination results will display here.'.trim_indent()
 }
 
 fn test_lines_opt_equals_two_verbose() {
@@ -75,11 +73,10 @@ fn test_lines_opt_equals_two_verbose() {
 	out_fn, result_fn := setup()
 	tail_(args, out_fn)
 
-	assert result_fn() == [
-		'===> test.txt <===',
-		'02: This tool will not produce all possible combination.',
-		'01: Output Box - Combination results will display here.',
-	]
+	assert result_fn() == '
+		===> test.txt <===
+		02: This tool will not produce all possible combination.
+		01: Output Box - Combination results will display here.'.trim_indent()
 }
 
 fn test_two_files_no_headers_quiet_option() {
@@ -91,13 +88,12 @@ fn test_two_files_no_headers_quiet_option() {
 	out_fn, result_fn := setup()
 	tail_(args, out_fn)
 
-	assert result_fn() == [
-		'02: This tool will not produce all possible combination.',
-		'01: Output Box - Combination results will display here.',
-		'',
-		'02: This tool will not produce all possible combination.',
-		'01: Output Box - Combination results will display here.',
-	]
+	assert result_fn() == '
+		02: This tool will not produce all possible combination.
+		01: Output Box - Combination results will display here.
+
+		02: This tool will not produce all possible combination.
+		01: Output Box - Combination results will display here.'.trim_indent()
 }
 
 fn test_from_start_lines() {
@@ -109,9 +105,9 @@ fn test_from_start_lines() {
 	out_fn, result_fn := setup()
 	tail_(args, out_fn)
 
-	assert result_fn() == [
-		'01: Output Box - Combination results will display here.',
-	]
+	assert result_fn() == '
+		02: This tool will not produce all possible combination.
+		01: Output Box - Combination results will display here.'.trim_indent()
 }
 
 fn test_from_start_bytes() {
@@ -122,8 +118,5 @@ fn test_from_start_bytes() {
 	}
 	out_fn, result_fn := setup()
 	tail_(args, out_fn)
-
-	assert result_fn() == [
-		'02: This tool will not produce all possible combination.\n01: Output Box - Combination results will display here.',
-	]
+	assert result_fn() == '02: This tool will not produce all possible combination.\n01: Output Box - Combination results will display here.'
 }

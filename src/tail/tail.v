@@ -60,13 +60,13 @@ fn tail_(args Args, out_fn fn (string)) {
 
 fn file_header(file string, first bool, args Args, out_fn fn (string)) {
 	if !first {
-		out_fn('')
+		out_fn('\n\n')
 	}
 	if args.quiet {
 		return
 	}
 	if args.files.len > 1 || args.verbose {
-		out_fn('===> ${file} <===')
+		out_fn('===> ${file} <===\n')
 	}
 }
 
