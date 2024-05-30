@@ -2,6 +2,7 @@
 import common
 import flag
 import os
+import time
 import v.mathutil
 
 const app_name = 'tail'
@@ -17,13 +18,42 @@ fn tail(args Args) {
 	})
 }
 
-fn tail_(args Args, out_fn fn (s string)) {
-	for i, file in args.files {
-		file_header(file, i == 0, args, out_fn)
-		match true {
-			args.bytes > 0 { tail_bytes(file, args, out_fn) }
-			else { tail_file(file, args, out_fn) }
+fn tail_(args Args, out_fn fn (string)) {
+	mut append_only := false
+	mut files := args.files.map(FileInfo{ name: it })
+
+	for {
+		for i, mut file in files {
+			match file_changed(file) {
+				.no_change {
+					continue
+				}
+				.shrunk {
+					shrunk_handler(mut file, out_fn)
+					continue
+				}
+				.grown {}
+			}
+
+			file_header(file.name, i == 0, args, out_fn)
+
+			match true {
+				append_only { append_new_lines(file, out_fn) }
+				args.bytes > 0 { tail_bytes(file, args, append_only, out_fn) }
+				else { tail_file(file, args, append_only, out_fn) }
+			}
+
+			stat := os.stat(file.name) or { exit_error(err.msg()) }
+			file.size = stat.size
 		}
+
+		if args.follow {
+			time.sleep(time.second)
+			append_only = true
+			continue
+		}
+
+		break
 	}
 }
 
@@ -39,23 +69,21 @@ fn file_header(file string, first bool, args Args, out_fn fn (string)) {
 	}
 }
 
-fn tail_bytes(file string, args Args, out_fn fn (string)) {
-	// simple for now
-	stat := os.stat(file) or { exit_error(err.msg()) }
+fn tail_bytes(file FileInfo, args Args, append bool, out_fn fn (string)) {
+	stat := os.stat(file.name) or { exit_error(err.msg()) }
 	pos := mathutil.max(u64(0), stat.size - u64(args.bytes))
 	siz := int(args.bytes)
-	mut f := os.open(file) or { exit_error(err.msg()) }
-	buffer := if args.from_start {
+	mut f := os.open(file.name) or { exit_error(err.msg()) }
+	bytes := if args.from_start {
 		f.read_bytes_at(int(pos), u64(siz))
 	} else {
 		f.read_bytes_at(siz, pos)
 	}
-	out_fn(buffer.bytestr())
+	out_fn(bytes.bytestr())
 }
 
-fn tail_file(file string, args Args, out_fn fn (string)) {
-	// simple for now
-	lines := os.read_lines(file) or { exit_error(err.msg()) }
+fn tail_file(file FileInfo, args Args, append bool, out_fn fn (string)) {
+	lines := os.read_lines(file.name) or { exit_error(err.msg()) }
 	tail_lines(lines, args, out_fn)
 }
 
@@ -73,9 +101,50 @@ fn tail_lines(lines []string, args Args, out_fn fn (string)) {
 	}
 }
 
+struct FileInfo {
+	name string
+pub mut:
+	size u64
+}
+
+enum StatusChange {
+	no_change
+	shrunk
+	grown
+}
+
+fn file_changed(file FileInfo) StatusChange {
+	stat := os.stat(file.name) or { exit_error(err.msg()) }
+	return match true {
+		stat.size > file.size { .grown }
+		stat.size < file.size { .shrunk }
+		else { .no_change }
+	}
+}
+
+fn append_new_lines(file FileInfo, out_fn fn (string)) {
+	stat := os.stat(file.name) or { exit_error(err.msg()) }
+	f := os.open(file.name) or { exit_error(err.msg()) }
+	if stat.size > file.size {
+		size := stat.size - file.size
+		bytes := f.read_bytes_at(int(size), u64(file.size + 1))
+		strng := bytes.bytestr()
+		lines := strng.split_into_lines()
+		for line in lines {
+			out_fn(line)
+		}
+	}
+}
+
+fn shrunk_handler(mut file FileInfo, out_fn fn (string)) {
+	stat := os.stat(file.name) or { exit_error(err.msg()) }
+	file.size = stat.size
+	out_fn('===> ${file.name} has shrunk <===')
+}
+
 struct Args {
 	bytes               i64
-	follow              string
+	follow              bool
 	lines               i64
 	max_unchanged_stats int
 	pid                 string
@@ -107,10 +176,7 @@ fn get_args(args []string) Args {
 		'output the last NUM bytes; or use -c +<int> to output      ${wrap}' +
 		'starting with byte <int> of each file')
 
-	follow_arg := fp.string('follow', `f`, 'descriptor',
-		'output appended data as the file grows        ${wrap}' +
-		"an absent option argument means 'descriptor'")
-
+	follow_arg := fp.bool('follow', `f`, false, 'output appended data as the file grows')
 	f_arg := fp.bool('', `F`, false, 'same as --follow=name --retry')
 
 	lines_arg := fp.string('lines', `n`, '10',
@@ -158,7 +224,7 @@ fn get_args(args []string) Args {
 
 	return Args{
 		bytes: string_to_i64(bytes_arg) or { exit_error(err.msg()) }
-		follow: if f_arg { 'descriptor' } else { follow_arg }
+		follow: follow_arg
 		lines: string_to_i64(lines_arg) or { exit_error(err.msg()) }
 		max_unchanged_stats: max_unchanged_stats_arg
 		pid: pid_arg
@@ -168,7 +234,7 @@ fn get_args(args []string) Args {
 		sleep_interval: sleep_interval_arg
 		zero_terminated: zero_terminated_arg
 		from_start: from_start
-		files: if file_args.len > 0 { file_args } else { ['-'] }
+		files: file_args
 	}
 }
 
