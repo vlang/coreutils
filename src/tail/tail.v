@@ -14,12 +14,13 @@ fn main() {
 
 fn tail(args Args) {
 	tail_(args, fn (s string) {
-		println(s)
+		print(s)
+		flush_stdout()
 	})
 }
 
 fn tail_(args Args, out_fn fn (string)) {
-	mut append_only := false
+	mut appending := false
 	mut files := args.files.map(FileInfo{ name: it })
 
 	for {
@@ -38,9 +39,9 @@ fn tail_(args Args, out_fn fn (string)) {
 			file_header(file.name, i == 0, args, out_fn)
 
 			match true {
-				append_only { append_new_lines(file, out_fn) }
-				args.bytes > 0 { tail_bytes(file, args, append_only, out_fn) }
-				else { tail_file(file, args, append_only, out_fn) }
+				appending { append_new_lines(file, out_fn) }
+				args.bytes > 0 { tail_bytes(file, args, out_fn) }
+				else { tail_file(file, args, out_fn) }
 			}
 
 			stat := os.stat(file.name) or { exit_error(err.msg()) }
@@ -49,7 +50,7 @@ fn tail_(args Args, out_fn fn (string)) {
 
 		if args.follow {
 			time.sleep(time.second)
-			append_only = true
+			appending = true
 			continue
 		}
 
@@ -69,11 +70,12 @@ fn file_header(file string, first bool, args Args, out_fn fn (string)) {
 	}
 }
 
-fn tail_bytes(file FileInfo, args Args, append bool, out_fn fn (string)) {
+fn tail_bytes(file FileInfo, args Args, out_fn fn (string)) {
 	stat := os.stat(file.name) or { exit_error(err.msg()) }
 	pos := mathutil.max(u64(0), stat.size - u64(args.bytes))
 	siz := int(args.bytes)
 	mut f := os.open(file.name) or { exit_error(err.msg()) }
+	defer { f.close() }
 	bytes := if args.from_start {
 		f.read_bytes_at(int(pos), u64(siz))
 	} else {
@@ -82,7 +84,59 @@ fn tail_bytes(file FileInfo, args Args, append bool, out_fn fn (string)) {
 	out_fn(bytes.bytestr())
 }
 
-fn tail_file(file FileInfo, args Args, append bool, out_fn fn (string)) {
+fn tail_file(file FileInfo, args Args, out_fn fn (string)) {
+	mut f := os.open(file.name) or { exit_error(err.msg()) }
+	defer { f.close() }
+	buf_size := i64(4096)
+	mut count := 0
+
+	f.seek(0, .end) or { exit_error(err.msg()) }
+	end := f.tell() or { exit_error(err.msg()) }
+
+	if args.from_start {
+		mut pos := i64(0)
+		f.seek(0, .start) or { exit_error(err.msg()) }
+		loop1: for pos <= end {
+			len := mathutil.min(end - pos, buf_size)
+			buf := f.read_bytes_at(int(len), u64(pos))
+			for i := 0; i < len; i += 1 {
+				if buf[i] == `\n` {
+					count += 1
+					if count >= args.lines - 1 {
+						pos = pos + i + 1
+						break loop1
+					}
+				}
+			}
+			pos += buf_size + 1
+		}
+
+		bytes := f.read_bytes_at(int(end - pos), u64(pos))
+		out_fn(bytes.bytestr())
+	} else {
+		mut pos := end
+		loop2: for pos > 0 {
+			len := mathutil.min(pos, buf_size)
+			pos = mathutil.max(pos - buf_size, 0)
+			buf := f.read_bytes_at(int(len), u64(pos))
+			for i := len - 1; i >= 0; i -= 1 {
+				if buf[i] == `\n` {
+					count += 1
+					if count >= args.lines {
+						pos = pos + i + 1
+						break loop2
+					}
+				}
+			}
+		}
+
+		size := int(end - pos)
+		bytes := f.read_bytes_at(size, u64(pos))
+		out_fn(bytes.bytestr())
+	}
+}
+
+fn tail_file_(file FileInfo, args Args, out_fn fn (string)) {
 	lines := os.read_lines(file.name) or { exit_error(err.msg()) }
 	tail_lines(lines, args, out_fn)
 }
@@ -127,7 +181,7 @@ fn append_new_lines(file FileInfo, out_fn fn (string)) {
 	f := os.open(file.name) or { exit_error(err.msg()) }
 	if stat.size > file.size {
 		size := stat.size - file.size
-		bytes := f.read_bytes_at(int(size), u64(file.size + 1))
+		bytes := f.read_bytes_at(int(size), u64(file.size))
 		strng := bytes.bytestr()
 		lines := strng.split_into_lines()
 		for line in lines {
