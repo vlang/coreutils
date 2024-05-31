@@ -9,23 +9,24 @@ const app_name = 'tail'
 
 fn main() {
 	args := get_args(os.args)
-	tail(args)
-}
-
-fn tail(args Args) {
-	tail_(args, fn (s string) {
+	tail(args, fn (s string) {
 		print(s)
 		flush_stdout()
 	})
 }
 
-fn tail_(args Args, out_fn fn (string)) {
+fn tail(args Args, out_fn fn (string)) {
 	mut tail_forever := false
 	mut files := args.files.map(FileInfo{ name: it })
 
 	for {
 		for i, mut file in files {
-			stat := os.stat(file.name) or { exit_error(err.msg()) }
+			stat := os.stat(file.name) or {
+				if args.retry {
+					continue
+				}
+				exit_error(err.msg())
+			}
 
 			if stat.size < file.size {
 				out_fn('\n===> ${file.name} truncated <===\n')
@@ -77,13 +78,23 @@ fn tail_bytes(file FileInfo, args Args, stat_size u64, out_fn fn (string)) {
 	} else {
 		mathutil.max(u64(0), stat_size - u64(args.bytes))
 	}
-	mut f := os.open(file.name) or { exit_error(err.msg()) }
+	mut f := os.open(file.name) or {
+		if args.retry {
+			return
+		}
+		exit_error(err.msg())
+	}
 	defer { f.close() }
 	print_file_at(f, pos, out_fn)
 }
 
 fn tail_file(file FileInfo, args Args, stat_size u64, out_fn fn (string)) {
-	mut f := os.open(file.name) or { exit_error(err.msg()) }
+	mut f := os.open(file.name) or {
+		if args.retry {
+			return
+		}
+		exit_error(err.msg())
+	}
 	defer { f.close() }
 
 	buf_size := i64(4096)

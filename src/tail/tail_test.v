@@ -22,7 +22,7 @@ fn test_lines_opt_equals_two() {
 		files: ['test.txt']
 	}
 	out_fn, result_fn := setup()
-	tail_(args, out_fn)
+	tail(args, out_fn)
 
 	assert result_fn() == '
 		02: This tool will not produce all possible combination.
@@ -35,7 +35,7 @@ fn test_two_files_have_headers_separating_output() {
 		files: ['test.txt', 'test.txt']
 	}
 	out_fn, result_fn := setup()
-	tail_(args, out_fn)
+	tail(args, out_fn)
 
 	assert result_fn() == '
 		===> test.txt <===
@@ -54,7 +54,7 @@ fn test_lines_opt_equals_two_verbose() {
 		files: ['test.txt']
 	}
 	out_fn, result_fn := setup()
-	tail_(args, out_fn)
+	tail(args, out_fn)
 
 	assert result_fn() == '
 		===> test.txt <===
@@ -69,7 +69,7 @@ fn test_two_files_no_headers_quiet_option() {
 		files: ['test.txt', 'test.txt']
 	}
 	out_fn, result_fn := setup()
-	tail_(args, out_fn)
+	tail(args, out_fn)
 
 	assert result_fn() == '
 		02: This tool will not produce all possible combination.
@@ -86,7 +86,7 @@ fn test_from_start_lines() {
 		files: ['test.txt']
 	}
 	out_fn, result_fn := setup()
-	tail_(args, out_fn)
+	tail(args, out_fn)
 
 	assert result_fn() == '
 		02: This tool will not produce all possible combination.
@@ -100,6 +100,6 @@ fn test_from_start_bytes() {
 		files: ['test.txt']
 	}
 	out_fn, result_fn := setup()
-	tail_(args, out_fn)
+	tail(args, out_fn)
 	assert result_fn() == '02: This tool will not produce all possible combination.\n01: Output Box - Combination results will display here.'
 }
