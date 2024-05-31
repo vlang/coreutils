@@ -25,26 +25,20 @@ fn tail_(args Args, out_fn fn (string)) {
 
 	for {
 		for i, mut file in files {
-			match file_changed(file) {
-				.no_change {
-					continue
-				}
-				.shrunk {
-					shrunk_handler(mut file, out_fn)
-					continue
-				}
-				.grown {}
-			}
-
-			file_header(file.name, i == 0, args, out_fn)
-
-			match true {
-				appending { append_new_lines(file, out_fn) }
-				args.bytes > 0 { tail_bytes(file, args, out_fn) }
-				else { tail_file(file, args, out_fn) }
-			}
-
 			stat := os.stat(file.name) or { exit_error(err.msg()) }
+
+			if stat.size < file.size {
+				out_fn('\n===> ${file.name} truncated <===\n')
+			} else if stat.size != file.size {
+				file_header(file.name, i == 0, args, out_fn)
+				match true {
+					appending { append_new_bytes(file, out_fn) }
+					args.lines > 0 { tail_file(file, args, out_fn) }
+					args.bytes > 0 { tail_bytes(file, args, out_fn) }
+					else { exit_error('invalid state') }
+				}
+			}
+
 			file.size = stat.size
 		}
 
@@ -53,7 +47,6 @@ fn tail_(args Args, out_fn fn (string)) {
 			appending = true
 			continue
 		}
-
 		break
 	}
 }
@@ -87,6 +80,7 @@ fn tail_bytes(file FileInfo, args Args, out_fn fn (string)) {
 fn tail_file(file FileInfo, args Args, out_fn fn (string)) {
 	mut f := os.open(file.name) or { exit_error(err.msg()) }
 	defer { f.close() }
+	
 	buf_size := i64(4096)
 	mut count := 0
 
@@ -96,9 +90,11 @@ fn tail_file(file FileInfo, args Args, out_fn fn (string)) {
 	if args.from_start {
 		mut pos := i64(0)
 		f.seek(0, .start) or { exit_error(err.msg()) }
+
 		loop1: for pos <= end {
 			len := mathutil.min(end - pos, buf_size)
 			buf := f.read_bytes_at(int(len), u64(pos))
+
 			for i := 0; i < len; i += 1 {
 				if buf[i] == `\n` {
 					count += 1
@@ -108,16 +104,19 @@ fn tail_file(file FileInfo, args Args, out_fn fn (string)) {
 					}
 				}
 			}
+
 			pos += buf_size + 1
 		}
 
-		buffered_print(mut f, pos, end - pos, out_fn)
+		print_file_at(f, pos, out_fn)
 	} else {
 		mut pos := end
+
 		loop2: for pos > 0 {
 			len := mathutil.min(pos, buf_size)
 			pos = mathutil.max(pos - buf_size, 0)
 			buf := f.read_bytes_at(int(len), u64(pos))
+
 			for i := len - 1; i >= 0; i -= 1 {
 				if buf[i] == `\n` {
 					count += 1
@@ -129,18 +128,20 @@ fn tail_file(file FileInfo, args Args, out_fn fn (string)) {
 			}
 		}
 
-		buffered_print(mut f, pos, end - pos, out_fn)
+		print_file_at(f, pos, out_fn)
 	}
 }
 
-fn buffered_print(mut file os.File, pos i64, len i64, out_fn fn (string)) {
-	size := 4096
-	mut read := size
-	mut buf := []u8{len: size}
+fn print_file_at(file os.File, pos i64, out_fn fn (string)) {
+	mut idx := pos
+	buf_size := 4096
+	mut buf := []u8{len: buf_size}
+	mut bytes_read := buf_size
 
-	for read == size {
-		read = file.read_bytes_into(u64(pos), mut buf) or { exit_error(err.msg()) }
-		out_fn(buf[0..read].bytestr())
+	for bytes_read == buf_size {
+		bytes_read = file.read_bytes_into(u64(idx), mut buf) or { exit_error(err.msg()) }
+		out_fn(buf[0..bytes_read].bytestr())
+		idx += bytes_read
 	}
 }
 
@@ -150,40 +151,10 @@ pub mut:
 	size u64
 }
 
-enum StatusChange {
-	no_change
-	shrunk
-	grown
-}
-
-fn file_changed(file FileInfo) StatusChange {
-	stat := os.stat(file.name) or { exit_error(err.msg()) }
-	return match true {
-		stat.size > file.size { .grown }
-		stat.size < file.size { .shrunk }
-		else { .no_change }
-	}
-}
-
-fn append_new_lines(file FileInfo, out_fn fn (string)) {
-	stat := os.stat(file.name) or { exit_error(err.msg()) }
+fn append_new_bytes(file FileInfo, out_fn fn (string)) {
 	mut f := os.open(file.name) or { exit_error(err.msg()) }
-	if stat.size > file.size {
-		size := stat.size - file.size
-		buffered_print(mut f, file.size, size, out_fn)
-		// bytes := f.read_bytes_at(int(size), u64(file.size))
-		// strng := bytes.bytestr()
-		// lines := strng.split_into_lines()
-		// for line in lines {
-		// 	out_fn(line)
-		// }
-	}
-}
-
-fn shrunk_handler(mut file FileInfo, out_fn fn (string)) {
-	stat := os.stat(file.name) or { exit_error(err.msg()) }
-	file.size = stat.size
-	out_fn('\n===> ${file.name} has shrunk <===\n')
+	defer { f.close() }
+	print_file_at(f, file.size, out_fn)
 }
 
 struct Args {
