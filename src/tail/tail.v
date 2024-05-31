@@ -19,6 +19,14 @@ fn tail(args Args, out_fn fn (string)) {
 	mut tail_forever := false
 	mut files := args.files.map(FileInfo{ name: it })
 
+	if args.files.len == 0 || args.files[0] == '-' {
+		tmp := tmp_from_stdin()
+		files = [FileInfo{
+			name: tmp
+			stdin: true
+		}]
+	}
+
 	for {
 		for i, mut file in files {
 			stat := os.stat(file.name) or {
@@ -32,7 +40,7 @@ fn tail(args Args, out_fn fn (string)) {
 				out_fn('\n===> ${file.name} truncated <===\n')
 			} else if stat.size != file.size {
 				leading_line_feeds := i > 0 || (tail_forever && args.files.len > 1)
-				file_header(file.name, leading_line_feeds, args, out_fn)
+				file_header(file, leading_line_feeds, args, out_fn)
 
 				match true {
 					tail_forever { append_new_bytes(file, out_fn) }
@@ -60,15 +68,16 @@ fn tail(args Args, out_fn fn (string)) {
 	}
 }
 
-fn file_header(file string, leading_line_feeds bool, args Args, out_fn fn (string)) {
+fn file_header(file FileInfo, leading_line_feeds bool, args Args, out_fn fn (string)) {
 	if leading_line_feeds {
 		out_fn('\n\n')
 	}
 	if args.quiet {
 		return
 	}
+	name := if file.stdin { 'standard input' } else { file.name }
 	if args.files.len > 1 || args.verbose {
-		out_fn('===> ${file} <===\n')
+		out_fn('===> ${name} <===\n')
 	}
 }
 
@@ -159,10 +168,33 @@ fn print_file_at(file os.File, pos i64, out_fn fn (string)) {
 	}
 }
 
+fn tmp_from_stdin() string {
+	tmp := temp_file_name()
+	os.create(tmp) or { exit_error(err.msg()) }
+	mut f := os.open_append(tmp) or { exit_error(err.msg()) }
+	defer { f.close() }
+
+	for {
+		s := os.get_raw_line()
+		if s.len == 0 {
+			break
+		}
+		f.write_string(s) or { exit_error(err.msg()) }
+	}
+	return tmp
+}
+
+fn temp_file_name() string {
+	dir := os.temp_dir()
+	name := '${dir}/t${time.ticks()}'
+	return name
+}
+
 struct FileInfo {
 	name string
 pub mut:
-	size u64
+	size  u64
+	stdin bool
 }
 
 fn append_new_bytes(file FileInfo, out_fn fn (string)) {
@@ -172,17 +204,17 @@ fn append_new_bytes(file FileInfo, out_fn fn (string)) {
 }
 
 struct Args {
-	bytes               i64
-	follow              bool
-	lines               i64
-	pid                 string
-	quiet               bool
-	retry               bool
-	sleep_interval      f64
-	verbose             bool
-	from_start          bool
-	delimiter           u8 = `\n`
-	files               []string
+	bytes          i64
+	follow         bool
+	lines          i64
+	pid            string
+	quiet          bool
+	retry          bool
+	sleep_interval f64
+	verbose        bool
+	from_start     bool
+	delimiter      u8 = `\n`
+	files          []string
 }
 
 fn get_args(args []string) Args {
@@ -224,7 +256,7 @@ fn get_args(args []string) Args {
 	verbose_arg := fp.bool('verbose', `v`, false, 'always output headers giving file names')
 	zero_terminated_arg := fp.bool('zero-terminated', `z`, false, 'line delimiter is NUL, not newline')
 
-	fp.footer("
+	fp.footer('
 
 		NUM may have a multiplier suffix: b 512, kB 1000, K 1024, MB
 		1000*1000, M 1024*1024, GB 1000*1000*1000, G 1024*1024*1024, and
@@ -232,12 +264,12 @@ fn get_args(args []string) Args {
 		KiB=K, MiB=M, and so on.
 
 		This implementation of TAIL follows files by name only. File
-		descriptors are not supported".trim_indent())
+		descriptors are not supported'.trim_indent())
 
 	fp.footer(common.coreutils_footer())
 	file_args := fp.finalize() or { exit_error(err.msg()) }
 	from_start := bytes_arg.starts_with('+') || lines_arg.starts_with('+')
-	delimiter := if zero_terminated_arg { `\0` } else { `\n`}
+	delimiter := if zero_terminated_arg { `\0` } else { `\n` }
 
 	return Args{
 		bytes: string_to_i64(bytes_arg) or { exit_error(err.msg()) }
