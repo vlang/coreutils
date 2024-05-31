@@ -110,7 +110,7 @@ fn tail_file(file FileInfo, args Args, stat_size u64, out_fn fn (string)) {
 			f.read_bytes_into(u64(pos), mut buf) or { exit_error(err.msg()) }
 
 			for i := 0; i < len; i += 1 {
-				if buf[i] == `\n` {
+				if buf[i] == args.delimiter {
 					count += 1
 					if count >= args.lines - 1 {
 						pos = pos + i + 1
@@ -132,7 +132,7 @@ fn tail_file(file FileInfo, args Args, stat_size u64, out_fn fn (string)) {
 			f.read_bytes_into(u64(pos), mut buf) or { exit_error(err.msg()) }
 
 			for i := len - 1; i >= 0; i -= 1 {
-				if buf[i] == `\n` {
+				if buf[i] == args.delimiter {
 					count += 1
 					if count >= args.lines {
 						pos = pos + i + 1
@@ -175,14 +175,13 @@ struct Args {
 	bytes               i64
 	follow              bool
 	lines               i64
-	max_unchanged_stats int
 	pid                 string
 	quiet               bool
 	retry               bool
 	sleep_interval      f64
 	verbose             bool
-	zero_terminated     bool
 	from_start          bool
+	delimiter           u8 = `\n`
 	files               []string
 }
 
@@ -212,12 +211,6 @@ fn get_args(args []string) Args {
 		'output the last NUM lines, instead of the last 10; or us${wrap}' +
 		'-n +NUM to skip NUM-1 lines at the start')
 
-	max_unchanged_stats_arg := fp.int('max-unchanged-stats', ` `, 5,
-		'with --follow=name, reopen a FILE which has not${wrap}' +
-		'changed size after N (default 5) iterations to see if it${wrap}' +
-		'has been unlinked or renamed (this is the usual case of${wrap}' +
-		'rotated log files); with inotify, this option is rarely usefule')
-
 	pid_arg := fp.string('pid', ` `, '', 'with -f, terminate after process ID, PID dies')
 	quiet_arg := fp.bool('quiet', `q`, false, 'never output headers giving file names')
 	silent_arg := fp.bool('silent', ` `, false, 'same as --quiet')
@@ -229,7 +222,6 @@ fn get_args(args []string) Args {
 		'process P at least once every N seconds')
 
 	verbose_arg := fp.bool('verbose', `v`, false, 'always output headers giving file names')
-
 	zero_terminated_arg := fp.bool('zero-terminated', `z`, false, 'line delimiter is NUL, not newline')
 
 	fp.footer("
@@ -239,30 +231,25 @@ fn get_args(args []string) Args {
 		so on for T, P, E, Z, Y, R, Q. Binary prefixes can be used, too:
 		KiB=K, MiB=M, and so on.
 
-		With --follow (-f), tail defaults to following the file
-		descriptor, which means that even if a tail'ed file is renamed,
-		tail will continue to track its end. This default behavior is
-		not desirable when you really want to track the actual name of
-		the file, not the file descriptor (e.g., log rotation). Use
-		--follow=name in that case. That causes tail to track the named
-		file in a way that accommodates renaming, removal and creation.".trim_indent())
+		This implementation of TAIL follows files by name only. File
+		descriptors are not supported".trim_indent())
 
 	fp.footer(common.coreutils_footer())
 	file_args := fp.finalize() or { exit_error(err.msg()) }
 	from_start := bytes_arg.starts_with('+') || lines_arg.starts_with('+')
+	delimiter := if zero_terminated_arg { `\0` } else { `\n`}
 
 	return Args{
 		bytes: string_to_i64(bytes_arg) or { exit_error(err.msg()) }
 		follow: follow_arg
 		lines: string_to_i64(lines_arg) or { exit_error(err.msg()) }
-		max_unchanged_stats: max_unchanged_stats_arg
 		pid: pid_arg
 		quiet: quiet_arg || silent_arg
 		retry: f_arg || retry_arg
 		verbose: verbose_arg
 		sleep_interval: sleep_interval_arg
-		zero_terminated: zero_terminated_arg
 		from_start: from_start
+		delimiter: delimiter
 		files: file_args
 	}
 }
