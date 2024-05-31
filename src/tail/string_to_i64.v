@@ -1,5 +1,5 @@
 // convert strings like 10K to i164
-const block = 512
+const block = i64(512)
 
 // **1
 const kilo = i64(1024)
@@ -89,6 +89,7 @@ fn string_to_i64(s string) ?i64 {
 	}
 
 	result := number * multiplier
+	//println('${number} * ${multiplier} = ${result}')
 	if result == 0 && number != 0 {
 		return none
 	}

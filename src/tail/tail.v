@@ -82,6 +82,7 @@ fn tail_file(file FileInfo, args Args, out_fn fn (string)) {
 	defer { f.close() }
 	
 	buf_size := i64(4096)
+	mut buf := []u8{len: int(buf_size)}
 	mut count := 0
 
 	f.seek(0, .end) or { exit_error(err.msg()) }
@@ -93,7 +94,7 @@ fn tail_file(file FileInfo, args Args, out_fn fn (string)) {
 
 		loop1: for pos <= end {
 			len := mathutil.min(end - pos, buf_size)
-			buf := f.read_bytes_at(int(len), u64(pos))
+			f.read_bytes_into(u64(pos), mut buf) or { exit_error(err.msg()) }
 
 			for i := 0; i < len; i += 1 {
 				if buf[i] == `\n` {
@@ -115,7 +116,7 @@ fn tail_file(file FileInfo, args Args, out_fn fn (string)) {
 		loop2: for pos > 0 {
 			len := mathutil.min(pos, buf_size)
 			pos = mathutil.max(pos - buf_size, 0)
-			buf := f.read_bytes_at(int(len), u64(pos))
+			f.read_bytes_into(u64(pos), mut buf) or { exit_error(err.msg()) }
 
 			for i := len - 1; i >= 0; i -= 1 {
 				if buf[i] == `\n` {

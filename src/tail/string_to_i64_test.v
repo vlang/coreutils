@@ -16,9 +16,29 @@ fn test_string_to_i64_conversions() {
 	assert string_to_i64('16MB')! == 16 * megabyte
 	assert string_to_i64('17mib')! == 17 * megabyte
 
-	// anything bigger overflows an i64
-	overflow := string_to_i64('18T') or { -1 }
-	assert overflow == -1
+	assert string_to_i64('18T')! == 18 * terra
+	assert string_to_i64('18TB')! == 18 * terrabyte
+	assert string_to_i64('18TiB')! == 18 * terrabyte
+
+	assert string_to_i64('10P')! == 10 * peta
+	assert string_to_i64('10PB')! == 10 * petabyte
+	assert string_to_i64('10PiB')! == 10 * petabyte
+
+	assert string_to_i64('5E')! == 5 * exa
+	assert string_to_i64('5EB')! == 5 * exabyte
+	assert string_to_i64('5EiB')! == 5 * exabyte
+
+	assert string_to_i64('5Z')! == 5 * zetta
+
+	assert string_to_i64('5Y')! == 5 * yotta
+	assert string_to_i64('5YB')! == 5 * yottabyte
+	assert string_to_i64('5YiB')! == 5 * yottabyte
+
+	overflow_r := string_to_i64('5R') or { -1 }
+	assert overflow_r == -1
+
+	overflow_q := string_to_i64('5Q') or { -1 }
+	assert overflow_q == -1
 
 	// invalid checks
 	t0 := string_to_i64('') or { -1 }
