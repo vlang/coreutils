@@ -111,8 +111,7 @@ fn tail_file(file FileInfo, args Args, out_fn fn (string)) {
 			pos += buf_size + 1
 		}
 
-		bytes := f.read_bytes_at(int(end - pos), u64(pos))
-		out_fn(bytes.bytestr())
+		buffered_print(mut f, pos, end - pos, out_fn)
 	} else {
 		mut pos := end
 		loop2: for pos > 0 {
@@ -130,28 +129,18 @@ fn tail_file(file FileInfo, args Args, out_fn fn (string)) {
 			}
 		}
 
-		size := int(end - pos)
-		bytes := f.read_bytes_at(size, u64(pos))
-		out_fn(bytes.bytestr())
+		buffered_print(mut f, pos, end - pos, out_fn)
 	}
 }
 
-fn tail_file_(file FileInfo, args Args, out_fn fn (string)) {
-	lines := os.read_lines(file.name) or { exit_error(err.msg()) }
-	tail_lines(lines, args, out_fn)
-}
+fn buffered_print(mut file os.File, pos i64, len i64, out_fn fn (string)) {
+	size := 4096
+	mut read := size
+	mut buf := []u8{len: size}
 
-fn tail_lines(lines []string, args Args, out_fn fn (string)) {
-	count := mathutil.min(args.lines, lines.len)
-	mut index := if args.from_start {
-		count
-	} else {
-		lines.len - count
-	}
-
-	for index < lines.len {
-		out_fn(lines[index])
-		index += 1
+	for read == size {
+		read = file.read_bytes_into(u64(pos), mut buf) or { exit_error(err.msg()) }
+		out_fn(buf[0..read].bytestr())
 	}
 }
 
@@ -178,22 +167,23 @@ fn file_changed(file FileInfo) StatusChange {
 
 fn append_new_lines(file FileInfo, out_fn fn (string)) {
 	stat := os.stat(file.name) or { exit_error(err.msg()) }
-	f := os.open(file.name) or { exit_error(err.msg()) }
+	mut f := os.open(file.name) or { exit_error(err.msg()) }
 	if stat.size > file.size {
 		size := stat.size - file.size
-		bytes := f.read_bytes_at(int(size), u64(file.size))
-		strng := bytes.bytestr()
-		lines := strng.split_into_lines()
-		for line in lines {
-			out_fn(line)
-		}
+		buffered_print(mut f, file.size, size, out_fn)
+		// bytes := f.read_bytes_at(int(size), u64(file.size))
+		// strng := bytes.bytestr()
+		// lines := strng.split_into_lines()
+		// for line in lines {
+		// 	out_fn(line)
+		// }
 	}
 }
 
 fn shrunk_handler(mut file FileInfo, out_fn fn (string)) {
 	stat := os.stat(file.name) or { exit_error(err.msg()) }
 	file.size = stat.size
-	out_fn('===> ${file.name} has shrunk <===')
+	out_fn('\n===> ${file.name} has shrunk <===\n')
 }
 
 struct Args {
