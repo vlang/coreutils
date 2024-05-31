@@ -20,7 +20,7 @@ fn tail(args Args) {
 }
 
 fn tail_(args Args, out_fn fn (string)) {
-	mut appending := false
+	mut tail_forever := false
 	mut files := args.files.map(FileInfo{ name: it })
 
 	for {
@@ -30,10 +30,12 @@ fn tail_(args Args, out_fn fn (string)) {
 			if stat.size < file.size {
 				out_fn('\n===> ${file.name} truncated <===\n')
 			} else if stat.size != file.size {
-				file_header(file.name, i == 0, args, out_fn)
+				leading_line_feeds := i > 0 || (tail_forever && args.files.len > 1)
+				file_header(file.name, leading_line_feeds, args, out_fn)
+
 				match true {
-					appending { append_new_bytes(file, out_fn) }
-					args.bytes > 0 { tail_bytes(file, args, stat.size out_fn) }
+					tail_forever { append_new_bytes(file, out_fn) }
+					args.bytes > 0 { tail_bytes(file, args, stat.size, out_fn) }
 					args.lines > 0 { tail_file(file, args, stat.size, out_fn) }
 					else { exit_error('invalid state') }
 				}
@@ -43,16 +45,22 @@ fn tail_(args Args, out_fn fn (string)) {
 		}
 
 		if args.follow {
-			time.sleep(time.second)
-			appending = true
+			tail_forever = true
+			time.sleep(i64(args.sleep_interval * time.second))
+			if args.pid.len > 0 {
+				result := os.execute('ps ${args.pid}')
+				if result.exit_code != 0 {
+					break
+				}
+			}
 			continue
 		}
 		break
 	}
 }
 
-fn file_header(file string, first bool, args Args, out_fn fn (string)) {
-	if !first {
+fn file_header(file string, leading_line_feeds bool, args Args, out_fn fn (string)) {
+	if leading_line_feeds {
 		out_fn('\n\n')
 	}
 	if args.quiet {
