@@ -33,8 +33,8 @@ fn tail_(args Args, out_fn fn (string)) {
 				file_header(file.name, i == 0, args, out_fn)
 				match true {
 					appending { append_new_bytes(file, out_fn) }
-					args.lines > 0 { tail_file(file, args, out_fn) }
-					args.bytes > 0 { tail_bytes(file, args, out_fn) }
+					args.bytes > 0 { tail_bytes(file, args, stat.size out_fn) }
+					args.lines > 0 { tail_file(file, args, stat.size, out_fn) }
 					else { exit_error('invalid state') }
 				}
 			}
@@ -63,34 +63,28 @@ fn file_header(file string, first bool, args Args, out_fn fn (string)) {
 	}
 }
 
-fn tail_bytes(file FileInfo, args Args, out_fn fn (string)) {
-	stat := os.stat(file.name) or { exit_error(err.msg()) }
-	pos := mathutil.max(u64(0), stat.size - u64(args.bytes))
-	siz := int(args.bytes)
+fn tail_bytes(file FileInfo, args Args, stat_size u64, out_fn fn (string)) {
+	pos := if args.from_start {
+		args.bytes
+	} else {
+		mathutil.max(u64(0), stat_size - u64(args.bytes))
+	}
 	mut f := os.open(file.name) or { exit_error(err.msg()) }
 	defer { f.close() }
-	bytes := if args.from_start {
-		f.read_bytes_at(int(pos), u64(siz))
-	} else {
-		f.read_bytes_at(siz, pos)
-	}
-	out_fn(bytes.bytestr())
+	print_file_at(f, pos, out_fn)
 }
 
-fn tail_file(file FileInfo, args Args, out_fn fn (string)) {
+fn tail_file(file FileInfo, args Args, stat_size u64, out_fn fn (string)) {
 	mut f := os.open(file.name) or { exit_error(err.msg()) }
 	defer { f.close() }
-	
+
 	buf_size := i64(4096)
 	mut buf := []u8{len: int(buf_size)}
 	mut count := 0
-
-	f.seek(0, .end) or { exit_error(err.msg()) }
-	end := f.tell() or { exit_error(err.msg()) }
+	end := i64(stat_size)
 
 	if args.from_start {
 		mut pos := i64(0)
-		f.seek(0, .start) or { exit_error(err.msg()) }
 
 		loop1: for pos <= end {
 			len := mathutil.min(end - pos, buf_size)
