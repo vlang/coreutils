@@ -46,7 +46,7 @@ count below and mark it as done in this README.md. Thanks!
 GNU coreutils. They are not 100% compatiable. If you encounter different behaviors, 
 compare against the true GNU coreutils version on the Linux-based tests first.
 
-## Completed (58/109)
+## Completed (59/109)
 
 |  Done   | Cmd       | Descripton                                       |
 | :-----: | --------- | ------------------------------------------------ |
@@ -138,7 +138,7 @@ compare against the true GNU coreutils version on the Linux-based tests first.
 |         | sum       | Print checksum and block counts                  |
 | &check; | sync      | Synchronize cached writes to persistent storage  |
 | &check; | tac       | Concatenate and write files in reverse           |
-|         | tail      | Output the last part of files                    |
+| &check; | tail      | Output the last part of files                    |
 |         | tee       | Redirect output to multiple files or processes   |
 | &check; | test      | Check file types and compare values              |
 |         | timeout   | Run a command with a time limit                  |
