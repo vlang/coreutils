@@ -29,18 +29,6 @@ const exabyte = peta * kilo
 const zetta = exa * kilo
 const zettabyte = exabyte * kilobyte
 
-// **8
-const yotta = zetta * kilo
-const yottabyte = zettabyte * kilobyte
-
-// **9
-const ronna = yotta * kilo
-const ronnabyte = yottabyte * kilobyte
-
-// **10
-const quetta = ronna * kilo
-const quettabyte = ronnabyte * kilobyte
-
 fn string_to_i64(s string) ?i64 {
 	if s.len == 0 {
 		return none
@@ -74,14 +62,6 @@ fn string_to_i64(s string) ?i64 {
 		'pb', 'pib' { petabyte }
 		'e' { exa }
 		'eb', 'eib' { exabyte }
-		'z' { zetta }
-		'zb', 'zib' { zettabyte }
-		'y' { yotta }
-		'yb', 'yib' { yottabyte }
-		'r' { ronna }
-		'rb', 'rib' { ronnabyte }
-		'q' { quetta }
-		'qb', 'qib' { quettabyte }
 		// oddball formats found in __xstrtol source
 		'c' { 1 }
 		'w' { 2 }
