@@ -28,12 +28,6 @@ fn test_string_to_i64_conversions() {
 	assert string_to_i64('5EB')! == 5 * exabyte
 	assert string_to_i64('5EiB')! == 5 * exabyte
 
-	assert string_to_i64('5Z')! == 5 * zetta
-
-	assert string_to_i64('5Y')! == 5 * yotta
-	assert string_to_i64('5YB')! == 5 * yottabyte
-	assert string_to_i64('5YiB')! == 5 * yottabyte
-
 	overflow_r := string_to_i64('5R') or { -1 }
 	assert overflow_r == -1
 

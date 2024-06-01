@@ -18,8 +18,8 @@ const terra = giga * kilo
 const terrabyte = gigabyte * kilobyte
 
 // **5
-const peta = mega * kilo
-const petabyte = megabyte * kilobyte
+const peta = terra * kilo
+const petabyte = terra * kilobyte
 
 // **6
 const exa = peta * kilo
