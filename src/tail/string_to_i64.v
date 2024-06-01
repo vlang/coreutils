@@ -89,7 +89,6 @@ fn string_to_i64(s string) ?i64 {
 	}
 
 	result := number * multiplier
-	// println('${number} * ${multiplier} = ${result}')
 	if result == 0 && number != 0 {
 		return none
 	}
