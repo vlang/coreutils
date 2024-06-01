@@ -71,7 +71,7 @@ fn get_args(args []string) Args {
 
 	return Args{
 		bytes: string_to_i64(bytes_arg) or { exit_error(err.msg()) }
-		follow: follow_arg
+		follow: follow_arg || f_arg
 		lines: string_to_i64(lines_arg) or { exit_error(err.msg()) }
 		pid: pid_arg
 		quiet: quiet_arg || silent_arg
