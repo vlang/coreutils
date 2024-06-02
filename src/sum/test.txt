@@ -1,0 +1,5 @@
+sum is a legacy utility available on some Unix and Unix-like operating
+systems. This utility outputs a 16-bit checksum of each argument
+file, as well as the number of blocks they take on disk. Two different
+checksum algorithms are in use. POSIX abandoned sum in favor of
+cksum.
