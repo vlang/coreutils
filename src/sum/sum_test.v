@@ -21,6 +21,7 @@ const test2_txt = os.join_path(testing.temp_folder, 'test2.txt')
 const test3_txt = os.join_path(testing.temp_folder, 'test3.txt')
 const long_line = os.join_path(testing.temp_folder, 'long_line')
 const large_file = os.join_path(testing.temp_folder, 'large_file')
+const main_txt = os.join_path(testing.temp_folder, 'test.txt')
 
 fn test_help_and_version() {
 	cmd.ensure_help_and_version_options_work()!
@@ -32,6 +33,9 @@ fn testsuite_begin() {
 	os.write_file(test3_txt, 'dummy')!
 	os.write_file(long_line, 'z'.repeat(1024 * 151))!
 	os.write_file(large_file, 'z'.repeat(110 * 1024 * 1024))!
+
+	sample_file_name := @FILE.trim_right('sum_test.v') + 'test.txt'
+	os.cp(sample_file_name, main_txt)!
 }
 
 fn testsuite_end() {
@@ -40,6 +44,24 @@ fn testsuite_end() {
 	os.rm(test3_txt)!
 	os.rm(long_line)!
 	os.rm(large_file)!
+	os.rm(main_txt)!
+}
+
+/*
+	tests from main branch for completeness
+*/
+fn test_bsd() {
+	res := os.execute('cat ${main_txt} | ${executable_under_test} -r')
+
+	assert res.exit_code == 0
+	assert res.output == '38039     1${eol}'
+}
+
+fn test_sysv() {
+	res := os.execute('cat ${main_txt} | ${executable_under_test} -s')
+
+	assert res.exit_code == 0
+	assert res.output == '25426 1${eol}'
 }
 
 /*
@@ -166,20 +188,4 @@ fn test_bsd_block_col_width_more_than_5_not_aligned() {
 
 	assert res.exit_code == 0
 	assert res.output == '59852     1 ${test1_txt}${eol}62707 112640 ${large_file}${eol}11628     1 ${test2_txt}${eol}'
-}
-
-module main
-
-import os
-
-fn testsuite_begin() {
-	os.chdir(os.dir(@FILE))!
-}
-
-fn test_bsd() {
-	assert sum('test.txt', false) == '38039     1 test.txt'
-}
-
-fn test_sysv() {
-	assert sum('test.txt', true) == '25426     1 test.txt'
 }
