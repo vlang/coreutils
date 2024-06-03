@@ -3,13 +3,12 @@ import os
 struct Sum {
 	checksum    u16
 	block_count u64
-	mut:
+mut:
 	file_name string
 }
 
 const bsd_block_size = 1024
 const sysv_block_size = 512
-
 
 fn main() {
 	args := parse_args(os.args)
@@ -21,7 +20,7 @@ fn main() {
 
 	for file in args.files {
 		checksum, mut blocks, file_name := sum(file, args.sys_v)
-		blocks  = get_file_block_count(file, block_size)
+		blocks = get_file_block_count(file, block_size)
 		sums << Sum{checksum, blocks, file_name}
 	}
 
@@ -48,7 +47,6 @@ fn get_stream_block_count(read_byte_count int, block_size int, current_count u64
 		return current_count + u64(read_byte_count / block_size)
 	}
 }
-
 
 fn print_sysv(sums []Sum) {
 	for sum in sums {
