@@ -40,7 +40,6 @@ fn get_file_block_count(file string, block_size int) u64 {
 	return blocks
 }
 
-
 fn print_sysv(sums []Sum) {
 	for sum in sums {
 		println('${sum.checksum} ${sum.block_count}${sum.file_name}'.trim_space())
