@@ -14,6 +14,7 @@ pub struct C.timeval {
 
 // <time.h>
 pub struct C.timeval {
+pub:
 	tv_sec  u64 // Seconds.
 	tv_usec u64 // Microseconds.
 }
@@ -55,7 +56,9 @@ pub enum ReadUtmpOptions {
 // readutmp.h : IS_USER_PROCESS(U)
 pub fn is_user_process(u &C.utmpx) bool {
 	// C.USER_PROCESS = 7
-	return !isnil(u.ut_user[0]) && u.ut_type == C.USER_PROCESS
+	unsafe {
+		return !isnil(u.ut_user[0]) && u.ut_type == C.USER_PROCESS
+	}
 }
 
 fn desirable_utmp_entry(u &C.utmpx, options ReadUtmpOptions) bool {

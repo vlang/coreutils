@@ -348,7 +348,7 @@ fn (v Value) str() string {
 
 fn (v Value) i64() i64 {
 	match v {
-		string { return strconv.parse_int(v, 0, 64) or { my_panic(err.msg, 2) } }
+		string { return strconv.parse_int(v, 0, 64) or { my_panic(err.msg(), 2) } }
 		i64 { return v }
 	}
 }

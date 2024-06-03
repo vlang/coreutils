@@ -111,7 +111,7 @@ fn decode_and_print(mut file os.File) {
 		// using slice magic to overwrite possible '\n' and fill the single
 		// buffer with base64 encoded data only.
 		for {
-			read_bytes := file.read_bytes_into_newline(mut in_buffer[n_bytes..]) or {
+			read_bytes := file.read_bytes_with_newline(mut in_buffer[n_bytes..]) or {
 				eprintln('${application_name}: Cannot read file')
 				exit(1)
 			}

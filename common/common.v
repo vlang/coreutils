@@ -1,20 +1,26 @@
 module common
 
 import flag
+import os
 
 pub const version = '0.0.1'
+pub const err_programming_error = 0x7c
+pub const err_not_implemented = 0x7d
+pub const err_platform_not_supported = 0x7F
 
 pub struct CoreutilInfo {
 pub:
 	name        string
 	description string
+	help        string
 }
 
 pub struct CoreutilExitDetail {
+pub:
 	message string
-mut:
-	return_code      int = 1
+pub mut:
 	show_help_advice bool // defaults to false
+	return_code      int = 1
 }
 
 // coreutils_version returns formatted coreutils tool version
@@ -72,15 +78,48 @@ pub fn (app CoreutilInfo) quit(detail CoreutilExitDetail) {
 	exit(detail.return_code)
 }
 
+// strip_error_code_from_msg strips the final semicolon and code
+// ("<msg>; code: <code>") away from a POSIX and Win32 error to make
+// it match what GNU coreutils return
+pub fn strip_error_code_from_msg(msg string) string {
+	j := msg.last_index('; code: ') or { -1 }
+	if j > 0 {
+		return msg[0..j]
+	} else {
+		return msg
+	}
+}
+
+pub fn (app CoreutilInfo) eprintln(message string) {
+	eprintln('${app.name}: ${strip_error_code_from_msg(message)}')
+}
+
+pub fn (app CoreutilInfo) eprintln_posix(message string) {
+	app.eprintln('${message}: ${os.error_posix()}')
+}
+
 // flag_parser returns a flag.FlagParser, with the common
 // options already set, reducing the boilerplate code in
 // each individual utility.
 pub fn (app CoreutilInfo) make_flag_parser(args []string) &flag.FlagParser {
 	mut fp := flag.new_flag_parser(args)
 	fp.version(coreutils_version())
+	if app.help != '' {
+		fp.footer(app.help)
+	}
 	fp.footer(coreutils_footer())
 	fp.skip_executable()
 	fp.application(app.name)
 	fp.description(app.description)
 	return fp
+}
+
+@[inline]
+pub fn eol() string {
+	$if windows {
+		// WinOS => CRLF
+		return '\r\n'
+	}
+	// POSIX => LF
+	return '\n'
 }

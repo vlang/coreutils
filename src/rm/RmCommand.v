@@ -44,7 +44,7 @@ fn (r RmCommand) rm_dir(path string) {
 			return
 		}
 
-		os.rmdir(path) or { eprintln(err.msg) }
+		os.rmdir(path) or { eprintln(err.msg()) }
 		return
 	}
 
@@ -123,7 +123,7 @@ fn (r RmCommand) rm_path(path string) {
 		return
 	}
 	if r.int_yes(prompt_file(path)) {
-		os.rm(path) or { error_message(name, err.msg) }
+		os.rm(path) or { error_message(name, err.msg()) }
 		if r.verbose {
 			println(rem(path))
 		}

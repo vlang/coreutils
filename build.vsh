@@ -2,25 +2,29 @@
 
 import os // v has a bug that you can't use args
 
-const ignore_dirs = $if windows {
-	[
+const ignore_dirs = {
+	'windows': [
 		// avoid *nix-dependent utils
 		'nohup',
+		'stat',
+		'tty',
 		// avoid utmp-dependent utils (WinOS has no utmp support)
 		'uptime',
 		'users',
 		'who',
 	]
-} $else {
-	[]string{}
-}
+	'macos':   ['stat', 'sync', 'uptime']
+}[os.user_os()] or { [] }
+
+dump(os.user_os())
+dump(ignore_dirs)
 
 vargs := if os.args.len > 1 { os.args[1..] } else { []string{} }
 
 curdir := getwd()
 chdir('src')!
 
-dirs := ls('.')!.filter(is_dir(it))
+dirs := ls('.')!.filter(is_dir(it)).sorted()
 
 if !exists('${curdir}/bin') {
 	mkdir('${curdir}/bin')!

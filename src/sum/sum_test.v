@@ -167,3 +167,19 @@ fn test_bsd_block_col_width_more_than_5_not_aligned() {
 	assert res.exit_code == 0
 	assert res.output == '59852     1 ${test1_txt}${eol}62707 112640 ${large_file}${eol}11628     1 ${test2_txt}${eol}'
 }
+
+module main
+
+import os
+
+fn testsuite_begin() {
+	os.chdir(os.dir(@FILE))!
+}
+
+fn test_bsd() {
+	assert sum('test.txt', false) == '38039     1 test.txt'
+}
+
+fn test_sysv() {
+	assert sum('test.txt', true) == '25426     1 test.txt'
+}

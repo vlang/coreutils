@@ -2,7 +2,7 @@ import os
 import common
 
 const tool_name = 'nohup'
-const out_files = ['nohup.out', '${os.getenv_opt('HOME')!}/nohup.out']
+const out_files = ['nohup.out', '${os.getenv_opt('HOME')?}/nohup.out']
 
 fn open_nohup_out(mut f os.File, print_message bool) ! {
 	for file in out_files {
@@ -61,12 +61,12 @@ fn main() {
 	}
 	if stdout_is_tty == 1 {
 		mut f := os.stdout()
-		open_nohup_out(mut f, true) or { common.exit_with_error_message(tool_name, err.msg) }
+		open_nohup_out(mut f, true) or { common.exit_with_error_message(tool_name, err.msg()) }
 	}
 	if os.is_atty(os.stderr().fd) == 1 {
 		if os.stdout().is_opened == false {
 			mut f := os.stderr()
-			open_nohup_out(mut f, false) or { common.exit_with_error_message(tool_name, err.msg) }
+			open_nohup_out(mut f, false) or { common.exit_with_error_message(tool_name, err.msg()) }
 		} else {
 			// couldn't find a v equilavent of this
 			C.dup2(os.stdout().fd, os.stderr().fd)

@@ -115,7 +115,7 @@ fn check_interactive(interactive string) !Interactive {
 fn setup_rm_command(args []string) !(RmCommand, []string) {
 	mut fp := common.flag_parser(args)
 	fp.application('rm')
-	fp.limit_free_args_to_at_least(1) or { common.exit_with_error_message(name, err.msg) }
+	fp.limit_free_args_to_at_least(1) or { common.exit_with_error_message(name, err.msg()) }
 
 	dir := fp.bool('dir', `d`, false, 'dir')
 	force := fp.bool('force', `f`, false, 'force')
@@ -155,7 +155,7 @@ fn setup_rm_command(args []string) !(RmCommand, []string) {
 // Entry point for all logic. Must be called from main
 pub fn run_rm(args []string) {
 	// Create command struct and accept flags and files
-	rm, files := setup_rm_command(args) or { common.exit_with_error_message(name, err.msg) }
+	rm, files := setup_rm_command(args) or { common.exit_with_error_message(name, err.msg()) }
 
 	// Take confirmation if necessary
 	if rm.confirm_int_once(files.len) {

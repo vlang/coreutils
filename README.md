@@ -46,7 +46,7 @@ count below and mark it as done in this README.md. Thanks!
 GNU coreutils. They are not 100% compatiable. If you encounter different behaviors, 
 compare against the true GNU coreutils version on the Linux-based tests first.
 
-## Completed (51/109)
+## Completed (60/109)
 
 |  Done   | Cmd       | Descripton                                       |
 | :-----: | --------- | ------------------------------------------------ |
@@ -68,7 +68,7 @@ compare against the true GNU coreutils version on the Linux-based tests first.
 |         | coreutils | Multi-call program                               |
 | &check; | cp        | Copy files and directories                       |
 |         | csplit    | Split a file into context-determined pieces      |
-|         | cut       | Print selected parts of lines                    |
+| &check; | cut       | Print selected parts of lines                    |
 |         | date      | Print or set system date and time                |
 |         | dd        | Convert and copy a file                          |
 |         | df        | Report file system disk space usage              |
@@ -82,7 +82,7 @@ compare against the true GNU coreutils version on the Linux-based tests first.
 | &check; | expr      | Evaluate expressions                             |
 | &check; | factor    | Print prime factors                              |
 | &check; | false     | Do nothing, unsuccessfully                       |
-|         | fmt       | Reformat paragraph text                          |
+| &check; | fmt       | Reformat paragraph text                          |
 | &check; | fold      | Wrap input lines to fit in specified width       |
 |         | groups    | Print group names a user is in                   |
 | &check; | head      | Output the first part of files                   |
@@ -116,7 +116,7 @@ compare against the true GNU coreutils version on the Linux-based tests first.
 | &check; | printf    | Format and print data                            |
 |         | ptx       | Produce permuted indexes                         |
 | &check; | pwd       | Print working directory                          |
-|         | readlink  | Print value of a symlink or canonical file name  |
+| &check; | readlink  | Print value of a symlink or canonical file name  |
 |         | realpath  | Print the resolved file name                     |
 | &check; | rm        | Remove files or directories                      |
 | &check; | rmdir     | Remove empty directories                         |
@@ -132,28 +132,28 @@ compare against the true GNU coreutils version on the Linux-based tests first.
 | &check; | sleep     | Delay for a specified time                       |
 |         | sort      | Sort text files                                  |
 |         | split     | Split a file into pieces                         |
-|         | stat      | Report file or file system status                |
+| &check; | stat      | Report file or file system status                |
 |         | stdbuf    | Run a command with modified I/O stream buffering |
 |         | stty      | Print or change terminal characteristics         |
-|         | sum       | Print checksum and block counts                  |
+| &check; | sum       | Print checksum and block counts                  |
 | &check; | sync      | Synchronize cached writes to persistent storage  |
 | &check; | tac       | Concatenate and write files in reverse           |
-|         | tail      | Output the last part of files                    |
+| &check; | tail      | Output the last part of files                    |
 |         | tee       | Redirect output to multiple files or processes   |
 | &check; | test      | Check file types and compare values              |
 |         | timeout   | Run a command with a time limit                  |
-|         | touch     | Change file timestamps                           |
+| &check; | touch     | Change file timestamps                           |
 |         | tr        | Translate, squeeze, and/or delete characters     |
 | &check; | true      | Do nothing, successfully                         |
 | &check; | truncate  | Shrink or extend the size of a file              |
 |         | tsort     | Topological sort                                 |
-|         | tty       | Print file name of terminal on standard input    |
+| &check; | tty       | Print file name of terminal on standard input    |
 | &check; | uname     | Print system information                         |
 |         | unexpand  | Convert spaces to tabs                           |
 | &check; | uniq      | Uniquify files                                   |
 | &check; | unlink    | Remove files via the unlink syscall              |
 | &check; | uptime    | Print system uptime and load                     |
-|         | users     | Print login names of users currently logged in   |
+| &check; | users     | Print login names of users currently logged in   |
 |         | vdir      | Verbosely list directory contents                |
 | &check; | wc        | Print newline, word, and byte counts             |
 |         | who       | Print who is currently logged in                 |
