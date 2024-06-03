@@ -40,13 +40,6 @@ fn get_file_block_count(file string, block_size int) u64 {
 	return blocks
 }
 
-fn get_stream_block_count(read_byte_count int, block_size int, current_count u64) u64 {
-	if read_byte_count % block_size != 0 {
-		return current_count + u64(read_byte_count / block_size) + 1
-	} else {
-		return current_count + u64(read_byte_count / block_size)
-	}
-}
 
 fn print_sysv(sums []Sum) {
 	for sum in sums {
@@ -86,7 +79,6 @@ fn sum(file string, sys_v bool) (u16, u64, string) {
 }
 
 fn sum_bsd(file string) (u16, u64) {
-	mut count := 0
 	mut checksum := u16(0)
 	mut blocks := u64(0)
 	mut f := os.open(file) or { exit_error(err.msg()) }
@@ -97,7 +89,6 @@ fn sum_bsd(file string) (u16, u64) {
 		checksum = (checksum >> 1) + ((checksum & 1) << 15)
 		checksum += c
 		checksum &= 0xffff
-		count += 1
 	}
 
 	return checksum, blocks
@@ -105,7 +96,6 @@ fn sum_bsd(file string) (u16, u64) {
 
 fn sum_sys_v(file string) (u16, u64) {
 	mut sum := u32(0)
-	mut count := u32(0)
 	mut blocks := u64(0)
 	mut f := os.open(file) or { exit_error(err.msg()) }
 	defer { f.close() }
@@ -113,7 +103,6 @@ fn sum_sys_v(file string) (u16, u64) {
 	for {
 		c := f.read_raw[u8]() or { break }
 		sum += c
-		count += 1
 	}
 
 	r := (sum & 0xffff) + ((sum & 0xffffffff) >> 16)
