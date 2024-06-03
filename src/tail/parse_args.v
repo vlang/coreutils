@@ -1,5 +1,7 @@
 import common
 import flag
+import os
+import time
 
 struct Args {
 	bytes          i64
@@ -15,7 +17,7 @@ struct Args {
 	files          []string
 }
 
-fn get_args(args []string) Args {
+fn parse_args(args []string) Args {
 	mut fp := flag.new_flag_parser(args)
 
 	fp.application(app_name)
@@ -65,9 +67,10 @@ fn get_args(args []string) Args {
 		descriptors are not supported'.trim_indent())
 
 	fp.footer(common.coreutils_footer())
-	file_args := fp.finalize() or { exit_error(err.msg()) }
+	files_arg := fp.finalize() or { exit_error(err.msg()) }
 	from_start := bytes_arg.starts_with('+') || lines_arg.starts_with('+')
 	delimiter := if zero_terminated_arg { `\0` } else { `\n` }
+	files := scan_files_arg(files_arg)
 
 	return Args{
 		bytes: string_to_i64(bytes_arg) or { exit_error(err.msg()) }
@@ -80,8 +83,44 @@ fn get_args(args []string) Args {
 		sleep_interval: sleep_interval_arg
 		from_start: from_start
 		delimiter: delimiter
-		files: file_args
+		files: files
 	}
+}
+
+fn scan_files_arg(files_arg []string) []string {
+	mut files := []string{}
+
+	for file in files_arg {
+		if file == '-' {
+			files << stdin_to_tmp()
+			continue
+		}
+		files << file
+	}
+
+	if files.len == 0 {
+		files << stdin_to_tmp()
+	}
+
+	return files
+}
+
+const tmp_pattern = '/${app_name}-tmp-'
+
+fn stdin_to_tmp() string {
+	tmp := '${os.temp_dir()}/${tmp_pattern}${time.ticks()}'
+	os.create(tmp) or { exit_error(err.msg()) }
+	mut f := os.open_append(tmp) or { exit_error(err.msg()) }
+	defer { f.close() }
+
+	for {
+		s := os.get_raw_line()
+		if s.len == 0 {
+			break
+		}
+		f.write_string(s) or { exit_error(err.msg()) }
+	}
+	return tmp
 }
 
 @[noreturn]

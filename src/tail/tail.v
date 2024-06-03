@@ -13,7 +13,7 @@ pub mut:
 }
 
 fn main() {
-	args := get_args(os.args)
+	args := parse_args(os.args)
 	tail(args, fn (s string) {
 		print(s)
 		flush_stdout()
@@ -22,16 +22,7 @@ fn main() {
 
 fn tail(args Args, out_fn fn (string)) {
 	mut tail_forever := false
-	mut files := args.files.map(FileInfo{ name: it })
-
-	// Perhaps there is a better way to handle stdin?
-	if args.files.len == 0 || args.files[0] == '-' {
-		tmp := tmp_from_stdin()
-		files = [FileInfo{
-			name: tmp
-			stdin: true
-		}]
-	}
+	mut files := args.files.map(FileInfo{ name: it, stdin: it.contains(tmp_pattern) })
 
 	for {
 		for i, mut file in files {
