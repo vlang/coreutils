@@ -52,7 +52,7 @@ compare against the true GNU coreutils version on the Linux-based tests first.
 | :-----: | --------- | ------------------------------------------------ |
 | &check; | **[**     | Alternate form of `test`                         |
 | &check; | arch      | Print machine hardware name                      |
-|         | b2sum     | Print or check BLAKE2 digests                    |
+| &check; | b2sum     | Print or check BLAKE2 digests                    |
 | &check; | base32    | Transform data into printable data               |
 | &check; | base64    | Transform data into printable data               |
 | &check; | basename  | Strip directory and suffix from a file name      |
