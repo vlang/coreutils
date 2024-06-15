@@ -1,6 +1,7 @@
 module sums
 
 import common
+import flag
 import os
 
 // sum is the common routine for *sum commands: md5sum, sha1sum, sha224sum, ...
@@ -16,8 +17,7 @@ pub fn sum(args []string, sum_name string, sum_type string, num_chars_in_sum int
 	check := fp.bool('check', `c`, false, 'read ${sum_type} sums from the FILEs and check them')
 	tag := fp.bool('tag', 0, false, 'create a BSD-style checksum')
 	_ := fp.bool('text', `t`, false, 'read in text mode (default)') // accepted but ignored, just like GNU
-	// yes, the spaces are needed in the next line, to make the 'help' output line up
-	zero := fp.bool('zero', `z`, false, 'end each output line with NUL, not newline,\n                            and disable file name escaping')
+	zero := fp.bool('zero', `z`, false, 'end each output line with NUL, not newline,\n${flag.space}and disable file name escaping')
 
 	ignore_missing := fp.bool('ignore-missing', 0, false, "(only with -c) don't fail or report status for missing files")
 	quiet := fp.bool('quiet', 0, false, "(only with -c) don't print OK for each successfully verified file")
