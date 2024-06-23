@@ -38,15 +38,15 @@ Contributions are welcome!
 Please only contribute versions of the original utilities written in V.
 Contributions written in other languages will likely be rejected.
 
-When your contribution is finalized, don't forget to update the completed 
+When your contribution is finalized, don't forget to update the completed
 count below and mark it as done in this README.md. Thanks!
 
-**NOTE: When testing on Windows**, comparison tests are currently run against 
-[uutils/coreutils](https://github.com/uutils/coreutils), a Rust re-implementation of 
-GNU coreutils. They are not 100% compatiable. If you encounter different behaviors, 
+**NOTE: When testing on Windows**, comparison tests are currently run against
+[uutils/coreutils](https://github.com/uutils/coreutils), a Rust re-implementation of
+GNU coreutils. They are not 100% compatiable. If you encounter different behaviors,
 compare against the true GNU coreutils version on the Linux-based tests first.
 
-## Completed (60/109)
+## Completed (62/109)
 
 |  Done   | Cmd       | Descripton                                       |
 | :-----: | --------- | ------------------------------------------------ |
@@ -95,7 +95,7 @@ compare against the true GNU coreutils version on the Linux-based tests first.
 |         | link      | Make a hard link via the link syscall            |
 | &check; | ln        | Make links between files                         |
 | &check; | logname   | Print current login name                         |
-|         | ls        | List directory contents                          |
+| &check; | ls        | List directory contents                          |
 | &check; | md5sum    | Print or check MD5 digests                       |
 | &check; | mkdir     | Make directories                                 |
 |         | mkfifo    | Make FIFOs (named pipes)                         |
@@ -149,7 +149,7 @@ compare against the true GNU coreutils version on the Linux-based tests first.
 |         | tsort     | Topological sort                                 |
 | &check; | tty       | Print file name of terminal on standard input    |
 | &check; | uname     | Print system information                         |
-|         | unexpand  | Convert spaces to tabs                           |
+| &check; | unexpand  | Convert spaces to tabs                           |
 | &check; | uniq      | Uniquify files                                   |
 | &check; | unlink    | Remove files via the unlink syscall              |
 | &check; | uptime    | Print system uptime and load                     |
