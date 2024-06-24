@@ -46,7 +46,7 @@ count below and mark it as done in this README.md. Thanks!
 GNU coreutils. They are not 100% compatiable. If you encounter different behaviors,
 compare against the true GNU coreutils version on the Linux-based tests first.
 
-## Completed (62/109)
+## Completed (63/109)
 
 |  Done   | Cmd       | Descripton                                       |
 | :-----: | --------- | ------------------------------------------------ |
@@ -100,7 +100,7 @@ compare against the true GNU coreutils version on the Linux-based tests first.
 | &check; | mkdir     | Make directories                                 |
 |         | mkfifo    | Make FIFOs (named pipes)                         |
 |         | mknod     | Make block or character special files            |
-|         | mktemp    | Create temporary file or directory               |
+| &check; | mktemp    | Create temporary file or directory               |
 | &check; | mv        | Move (rename) files                              |
 |         | nice      | Run a command with modified niceness             |
 | &check; | nl        | Number lines and write files                     |
