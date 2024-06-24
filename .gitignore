@@ -10,6 +10,7 @@ build
 *.dll
 
 .idea/
+.zed/
 *.iml
 build
 src/touch/touch
