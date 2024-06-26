@@ -46,7 +46,7 @@ count below and mark it as done in this README.md. Thanks!
 GNU coreutils. They are not 100% compatiable. If you encounter different behaviors,
 compare against the true GNU coreutils version on the Linux-based tests first.
 
-## Completed (63/109)
+## Completed (65/109)
 
 |  Done   | Cmd       | Descripton                                       |
 | :-----: | --------- | ------------------------------------------------ |
@@ -56,7 +56,7 @@ compare against the true GNU coreutils version on the Linux-based tests first.
 | &check; | base32    | Transform data into printable data               |
 | &check; | base64    | Transform data into printable data               |
 | &check; | basename  | Strip directory and suffix from a file name      |
-|         | basenc    | Transform data into printable data               |
+| &check; | basenc    | Transform data into printable data               |
 | &check; | cat       | Concatenate and write files                      |
 |         | chcon     | Change SELinux context of file                   |
 |         | chgrp     | Change group ownership                           |
