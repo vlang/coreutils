@@ -95,7 +95,7 @@ compare against the true GNU coreutils version on the Linux-based tests first.
 |         | link      | Make a hard link via the link syscall            |
 | &check; | ln        | Make links between files                         |
 | &check; | logname   | Print current login name                         |
-| &check; | ls        | List directory contents                          |
+|         | ls        | List directory contents                          |
 | &check; | md5sum    | Print or check MD5 digests                       |
 | &check; | mkdir     | Make directories                                 |
 |         | mkfifo    | Make FIFOs (named pipes)                         |
@@ -130,7 +130,7 @@ compare against the true GNU coreutils version on the Linux-based tests first.
 |         | shred     | Remove files more securely                       |
 | &check; | shuf      | Shuffling text                                   |
 | &check; | sleep     | Delay for a specified time                       |
-|         | sort      | Sort text files                                  |
+| &check; | sort      | Sort text files                                  |
 |         | split     | Split a file into pieces                         |
 | &check; | stat      | Report file or file system status                |
 |         | stdbuf    | Run a command with modified I/O stream buffering |
