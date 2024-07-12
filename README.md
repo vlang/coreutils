@@ -46,7 +46,7 @@ count below and mark it as done in this README.md. Thanks!
 GNU coreutils. They are not 100% compatiable. If you encounter different behaviors,
 compare against the true GNU coreutils version on the Linux-based tests first.
 
-## Completed (65/109)
+## Completed (66/109)
 
 |  Done   | Cmd       | Descripton                                       |
 | :-----: | --------- | ------------------------------------------------ |
@@ -108,7 +108,7 @@ compare against the true GNU coreutils version on the Linux-based tests first.
 | &check; | nproc     | Print the number of available processors         |
 |         | numfmt    | Reformat numbers                                 |
 |         | od        | Write files in octal or other formats            |
-|         | paste     | Merge lines of files                             |
+| &check; | paste     | Merge lines of files                             |
 |         | pathchk   | Check file name validity and portability         |
 |         | pinky     | Lightweight finger                               |
 |         | pr        | Paginate or columnate files for printing         |
