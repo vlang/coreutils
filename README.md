@@ -95,7 +95,7 @@ compare against the true GNU coreutils version on the Linux-based tests first.
 |         | link      | Make a hard link via the link syscall            |
 | &check; | ln        | Make links between files                         |
 | &check; | logname   | Print current login name                         |
-|         | ls        | List directory contents                          |
+| &check; | ls        | List directory contents                          |
 | &check; | md5sum    | Print or check MD5 digests                       |
 | &check; | mkdir     | Make directories                                 |
 |         | mkfifo    | Make FIFOs (named pipes)                         |
