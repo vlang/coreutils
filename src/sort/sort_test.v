@@ -61,7 +61,7 @@ fn test_no_options() {
 fn test_reverse() {
 	options := Options{
 		reverse: true
-		files: [test_a]
+		files:   [test_a]
 	}
 	assert sort(options) == [
 		'to come to the aid',
@@ -74,7 +74,7 @@ fn test_reverse() {
 fn test_ignore_case() {
 	options := Options{
 		ignore_case: true
-		files: [test_a]
+		files:       [test_a]
 	}
 	assert sort(options) == [
 		'for all good men',
@@ -86,9 +86,9 @@ fn test_ignore_case() {
 
 fn test_ignore_case_reverse() {
 	options := Options{
-		reverse: true
+		reverse:     true
 		ignore_case: true
-		files: [test_a]
+		files:       [test_a]
 	}
 	assert sort(options) == [
 		'to come to the aid',
@@ -101,7 +101,7 @@ fn test_ignore_case_reverse() {
 fn test_ignore_leading_blanks() {
 	options := Options{
 		ignore_leading_blanks: true
-		files: [test_b]
+		files:                 [test_b]
 	}
 	assert sort(options) == [
 		' Now is the time',
@@ -113,9 +113,9 @@ fn test_ignore_leading_blanks() {
 
 fn test_ignore_leading_blanks_reverse() {
 	options := Options{
-		reverse: true
+		reverse:               true
 		ignore_leading_blanks: true
-		files: [test_b]
+		files:                 [test_b]
 	}
 	assert sort(options) == [
 		'      to come to the aid',
@@ -128,7 +128,7 @@ fn test_ignore_leading_blanks_reverse() {
 fn test_dictionary_order() {
 	options := Options{
 		dictionary_order: true
-		files: [test_c]
+		files:            [test_c]
 	}
 	assert sort(options) == [
 		'! Now is the time',
@@ -140,9 +140,9 @@ fn test_dictionary_order() {
 
 fn test_dictionary_order_everse() {
 	options := Options{
-		reverse: true
+		reverse:          true
 		dictionary_order: true
-		files: [test_c]
+		files:            [test_c]
 	}
 	assert sort(options) == [
 		'% to come to the aid',
@@ -155,7 +155,7 @@ fn test_dictionary_order_everse() {
 fn test_non_printing() {
 	options := Options{
 		ignore_non_printing: true
-		files: [test_d]
+		files:               [test_d]
 	}
 	assert sort(options) == [
 		'\xf1 Now is the time',
@@ -167,9 +167,9 @@ fn test_non_printing() {
 
 fn test_non_printing_reverse() {
 	options := Options{
-		reverse: true
+		reverse:             true
 		ignore_non_printing: true
-		files: [test_d]
+		files:               [test_d]
 	}
 	assert sort(options) == [
 		'\xf3 to come to the aid',
@@ -182,7 +182,7 @@ fn test_non_printing_reverse() {
 fn test_numeric() {
 	options := Options{
 		numeric: true
-		files: [test_e]
+		files:   [test_e]
 	}
 	assert sort(options) == [
 		'to come to the aid',
@@ -196,7 +196,7 @@ fn test_numeric_reverse() {
 	options := Options{
 		numeric: true
 		reverse: true
-		files: [test_e]
+		files:   [test_e]
 	}
 	assert sort(options) == [
 		'100.1 Now is the time',

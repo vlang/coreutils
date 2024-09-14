@@ -2,7 +2,7 @@ import common
 import os
 
 const app = common.CoreutilInfo{
-	name: 'tty'
+	name:        'tty'
 	description: 'print the file name of the terminal connected to standard input'
 }
 

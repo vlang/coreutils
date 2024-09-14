@@ -72,7 +72,7 @@ fn main() {
 	}
 	mut parser := Parser{
 		tokens: os.args[1..]
-		idx: 0
+		idx:    0
 	}
 	result := if parser.expr() { 0 } else { 1 }
 	if parser.idx + u64(is_lsb) < parser.tokens.len {

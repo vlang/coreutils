@@ -293,7 +293,7 @@ fn test_no_delimiter_line_printed() {
 
 fn test_no_delimiter_line_not_printed() {
 	args := Args{
-		only_delimited: true
+		only_delimited:   true
 		field_range_list: [Range{1, 1}, Range{3, 3}]
 	}
 	input := [
@@ -343,7 +343,7 @@ fn test_empty_and_no_delimiters_fields() {
 
 fn test_empty_and_no_delimiters_only_delimited_fields() {
 	args := Args{
-		only_delimited: true
+		only_delimited:   true
 		field_range_list: [Range{1, 1}, Range{2, 2}]
 	}
 	// drop no tab line, and empty line
@@ -369,7 +369,7 @@ const csv = [
 
 fn test_custom_input_delimiter() {
 	args := Args{
-		delimiter: `,`
+		delimiter:        `,`
 		output_delimiter: ','
 		field_range_list: [Range{1, 1}, Range{2, 2}]
 	}
@@ -388,7 +388,7 @@ fn test_custom_input_delimiter() {
 
 fn test_custom_output_delimiter() {
 	args := Args{
-		delimiter: `,`
+		delimiter:        `,`
 		output_delimiter: '::'
 		field_range_list: [Range{1, 1}, Range{2, 2}]
 	}
@@ -407,7 +407,7 @@ fn test_custom_output_delimiter() {
 
 fn test_complement_of_range_bytes() {
 	args := Args{
-		complement: true
+		complement:      true
 		byte_range_list: [Range{4, 10}]
 	}
 	mut result := []string{}

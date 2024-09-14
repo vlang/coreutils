@@ -196,9 +196,9 @@ fn get_paragraphs(lines []string, app App) []Paragraph {
 				paragraphs.last().crown_indent = indent
 			} else {
 				paragraphs << Paragraph{
-					prefix: has_prefix
+					prefix:       has_prefix
 					crown_indent: if app.crown_marg { indent } else { -1 }
-					lines: [np]
+					lines:        [np]
 				}
 				continue
 			}
@@ -270,8 +270,8 @@ fn process_args(args []string) App {
 		split_only: split_only
 		tagged_par: tagged_par
 		uniform_sp: uniform_sp
-		width: width
-		file_args: if file_args.len > 0 { file_args } else { ['-'] }
+		width:      width
+		file_args:  if file_args.len > 0 { file_args } else { ['-'] }
 	}
 }
 

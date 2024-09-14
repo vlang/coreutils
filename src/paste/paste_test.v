@@ -41,7 +41,7 @@ fn add(s string, cb fn (string)) {
 fn test_serialize_option() {
 	options := Options{
 		serial: true
-		files: [file_a, file_b]
+		files:  [file_a, file_b]
 	}
 	mut lines := []string{}
 	mut rlines := &lines
@@ -54,7 +54,7 @@ fn test_serialize_option() {
 fn test_serialize_option2() {
 	options := Options{
 		serial: true
-		files: [file_c, file_d]
+		files:  [file_c, file_d]
 	}
 	mut lines := []string{}
 	mut rlines := &lines
@@ -86,7 +86,7 @@ fn test_single_delimiter() {
 fn test_multiple_delimiters() {
 	options := Options{
 		next_delimiter: next_delimiter('%|')
-		files: [file_c, file_d, file_c]
+		files:          [file_c, file_d, file_c]
 	}
 	mut lines := []string{}
 	mut rlines := &lines

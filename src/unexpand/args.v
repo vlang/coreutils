@@ -30,10 +30,10 @@ fn get_options() Options {
 	files := fp.finalize() or { exit_error(err.msg()) }
 
 	return Options{
-		all: all
+		all:        all
 		first_only: first_only
-		tabs: tabs
-		files: scan_files_arg(files)
+		tabs:       tabs
+		files:      scan_files_arg(files)
 	}
 }
 

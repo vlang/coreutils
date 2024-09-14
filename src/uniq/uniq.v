@@ -121,7 +121,7 @@ fn uniq(settings Settings) {
 	}
 
 	mut s := Buffer{
-		seen: ''
+		seen:  ''
 		count: 0
 	}
 	for {

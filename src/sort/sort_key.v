@@ -185,10 +185,10 @@ fn parse_sort_key(k string) SortKey {
 	}
 
 	return SortKey{
-		f1: f1
-		c1: c1
-		f2: f2
-		c2: c2
+		f1:        f1
+		c1:        c1
+		f2:        f2
+		c2:        c2
 		sort_type: sort_type
 	}
 }

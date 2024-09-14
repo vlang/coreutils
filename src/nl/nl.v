@@ -38,13 +38,13 @@ enum Style {
 
 struct Settings {
 mut:
-	ini_lno    i64    // -v
-	inc_lno    i64    // -i
-	width      int    // -w
-	separator  string // -s
-	reset_lno  bool   // -p
-	join_blank int    // -l
-	format     Format // -n
+	ini_lno    i64                  // -v
+	inc_lno    i64                  // -i
+	width      int                  // -w
+	separator  string               // -s
+	reset_lno  bool                 // -p
+	join_blank int                  // -l
+	format     Format               // -n
 	styles     map[Section]Style    // -b, -h, -f
 	delimiters map[Section]string   // -d
 	res        map[Section]regex.RE // -b pRE, -h pRE, -f pRE

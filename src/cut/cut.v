@@ -130,7 +130,7 @@ fn combine_ranges_and_zero_index(ranges []Range, max int, complement bool) []Ran
 			if range_overlaps_range(start, end, combined_range.start, combined_range.end) {
 				combined_range = Range{
 					start: mathutil.min(start, combined_range.start)
-					end: mathutil.max(end, combined_range.end)
+					end:   mathutil.max(end, combined_range.end)
 				}
 				continue outer
 			}
@@ -241,15 +241,15 @@ fn get_args(args []string) Args {
 	output_delim := if output_delimiter.len == 0 { delimiter } else { output_delimiter }
 
 	return Args{
-		byte_range_list: byte_range_list
-		char_range_list: char_range_list
+		byte_range_list:  byte_range_list
+		char_range_list:  char_range_list
 		field_range_list: field_list
-		delimiter: input_delim
-		only_delimited: only_delimited
-		zero_terminated: zero_terminated
-		complement: complement
+		delimiter:        input_delim
+		only_delimited:   only_delimited
+		zero_terminated:  zero_terminated
+		complement:       complement
 		output_delimiter: output_delim
-		file_list: file_list
+		file_list:        file_list
 	}
 }
 

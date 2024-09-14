@@ -41,7 +41,7 @@ fn test_encode_base64url() {
 fn test_decode_base64url() {
 	options := Options{
 		base64url: true
-		decode: true
+		decode:    true
 	}
 	assert decode('Zg', options) == 'f'
 	assert decode('Zm8', options) == 'fo'
@@ -97,7 +97,7 @@ fn test_encode_base32hex() {
 fn test_decode_base32hex() {
 	options := Options{
 		base32hex: true
-		decode: true
+		decode:    true
 	}
 	assert decode('CO======', options) == 'f'
 	assert decode('CPNG====', options) == 'fo'
@@ -146,7 +146,7 @@ fn test_encode_base2lbsf() {
 fn test_dncode_base2lbsf() {
 	options := Options{
 		base2lsbf: true
-		decode: true
+		decode:    true
 	}
 	assert decode('011001101111011011110110010001101000011001001110', options) == 'foobar'
 }
@@ -163,7 +163,7 @@ fn test_encode_base2mbsf() {
 fn test_decode_base2mbsf() {
 	options := Options{
 		base2msbf: true
-		decode: true
+		decode:    true
 	}
 	assert decode('011001100110111101101111011000100110000101110010', options) == 'foobar'
 }
@@ -180,7 +180,7 @@ fn test_encode_z85() {
 
 fn test_decode_z85() {
 	options := Options{
-		z85: true
+		z85:    true
 		decode: true
 	}
 	assert decode('HelloWorld', options).bytes() == [u8(0x86), 0x4F, 0xD2, 0x6F, 0xB5, 0x59, 0xF7,

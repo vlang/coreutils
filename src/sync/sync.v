@@ -2,7 +2,7 @@ import common
 import os
 
 const app = common.CoreutilInfo{
-	name: 'sync'
+	name:        'sync'
 	description: 'Synchronize cached writes to persistent storage'
 }
 

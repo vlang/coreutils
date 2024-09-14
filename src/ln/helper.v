@@ -32,12 +32,12 @@ fn run_ln(args []string) {
 	files := fp.finalize() or { common.exit_with_error_message(name, err.msg()) }
 
 	mut ln := Linker{
-		force: force
-		follow_symbolic: follow_symbolic
+		force:              force
+		follow_symbolic:    follow_symbolic
 		no_follow_symbolic: no_follow_symbolic
-		symbolic: symbolic
-		target: files.last()
-		sources: files[..files.len - 1]
+		symbolic:           symbolic
+		target:             files.last()
+		sources:            files[..files.len - 1]
 	}
 	ln.run()
 }

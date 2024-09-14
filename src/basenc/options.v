@@ -45,17 +45,17 @@ fn get_options() Options {
 	files := fp.finalize() or { exit_error(err.msg()) }
 
 	return Options{
-		base64: base64
+		base64:    base64
 		base64url: base64url
-		base32: base32
+		base32:    base32
 		base32hex: base32hex
-		base16: base16
+		base16:    base16
 		base2msbf: base2msbf
 		base2lsbf: base2lsbf
-		decode: decode
-		wrap: wrap
-		z85: z85
-		files: scan_files_arg(files)
+		decode:    decode
+		wrap:      wrap
+		z85:       z85
+		files:     scan_files_arg(files)
 	}
 }
 

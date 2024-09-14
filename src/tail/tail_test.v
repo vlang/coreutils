@@ -49,9 +49,9 @@ fn test_two_files_have_headers_separating_output() {
 
 fn test_lines_opt_equals_two_verbose() {
 	args := Args{
-		lines: 2
+		lines:   2
 		verbose: true
-		files: ['test.txt']
+		files:   ['test.txt']
 	}
 	out_fn, result_fn := setup()
 	tail(args, out_fn)
@@ -81,9 +81,9 @@ fn test_two_files_no_headers_quiet_option() {
 
 fn test_from_start_lines() {
 	args := Args{
-		lines: 13
+		lines:      13
 		from_start: true
-		files: ['test.txt']
+		files:      ['test.txt']
 	}
 	out_fn, result_fn := setup()
 	tail(args, out_fn)
@@ -95,9 +95,9 @@ fn test_from_start_lines() {
 
 fn test_from_start_bytes() {
 	args := Args{
-		bytes: 666
+		bytes:      666
 		from_start: true
-		files: ['test.txt']
+		files:      ['test.txt']
 	}
 	out_fn, result_fn := setup()
 	tail(args, out_fn)

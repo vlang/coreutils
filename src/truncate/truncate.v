@@ -6,7 +6,7 @@ import os
 import regex
 
 const app = common.CoreutilInfo{
-	name: 'truncate'
+	name:        'truncate'
 	description: 'shrink or extend the size of a file to the specified size'
 }
 

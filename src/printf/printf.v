@@ -563,12 +563,12 @@ fn v_sprintf(str string, _pt []string) (string, int, bool) {
 					}
 				}
 				res.write_string(format_dec_old(d1,
-					pad_ch: pad_ch
-					len0: len0
-					len1: 0
-					positive: positive
+					pad_ch:    pad_ch
+					len0:      len0
+					len1:      0
+					positive:  positive
 					sign_flag: sign
-					align: align
+					align:     align
 				))
 				status = .reset_params
 				p_index++
@@ -612,12 +612,12 @@ fn v_sprintf(str string, _pt []string) (string, int, bool) {
 				}
 
 				res.write_string(format_dec_old(d1,
-					pad_ch: pad_ch
-					len0: len0
-					len1: 0
-					positive: positive
+					pad_ch:    pad_ch
+					len0:      len0
+					len1:      0
+					positive:  positive
 					sign_flag: sign
-					align: align
+					align:     align
 				))
 				status = .reset_params
 				p_index++
@@ -667,12 +667,12 @@ fn v_sprintf(str string, _pt []string) (string, int, bool) {
 				}
 
 				res.write_string(strconv.format_str(s,
-					pad_ch: pad_ch
-					len0: len0
-					len1: 0
-					positive: true
+					pad_ch:    pad_ch
+					len0:      len0
+					len1:      0
+					positive:  true
 					sign_flag: false
-					align: align
+					align:     align
 				))
 				status = .reset_params
 				p_index++
@@ -687,12 +687,12 @@ fn v_sprintf(str string, _pt []string) (string, int, bool) {
 				positive := x >= f64(0.0)
 				len1 = if len1 >= 0 { len1 } else { def_len1 }
 				s := format_fl_old(f64(x),
-					pad_ch: pad_ch
-					len0: len0
-					len1: len1
-					positive: positive
+					pad_ch:    pad_ch
+					len0:      len0
+					len1:      len1
+					positive:  positive
 					sign_flag: sign
-					align: align
+					align:     align
 				)
 				res.write_string(if ch == `F` { s.to_upper() } else { s })
 				status = .reset_params
@@ -705,12 +705,12 @@ fn v_sprintf(str string, _pt []string) (string, int, bool) {
 				positive := x >= f64(0.0)
 				len1 = if len1 >= 0 { len1 } else { def_len1 }
 				s := format_es_old(f64(x),
-					pad_ch: pad_ch
-					len0: len0
-					len1: len1
-					positive: positive
+					pad_ch:    pad_ch
+					len0:      len0
+					len1:      len1
+					positive:  positive
 					sign_flag: sign
-					align: align
+					align:     align
 				)
 				res.write_string(if ch == `E` { s.to_upper() } else { s })
 				status = .reset_params
@@ -727,23 +727,23 @@ fn v_sprintf(str string, _pt []string) (string, int, bool) {
 					// println("Here g format_fl [$tx]")
 					len1 = if len1 >= 0 { len1 + 1 } else { def_len1 }
 					s = format_fl_old(x,
-						pad_ch: pad_ch
-						len0: len0
-						len1: len1
-						positive: positive
-						sign_flag: sign
-						align: align
+						pad_ch:       pad_ch
+						len0:         len0
+						len1:         len1
+						positive:     positive
+						sign_flag:    sign
+						align:        align
 						rm_tail_zero: true
 					)
 				} else {
 					len1 = if len1 >= 0 { len1 + 1 } else { def_len1 }
 					s = format_es_old(x,
-						pad_ch: pad_ch
-						len0: len0
-						len1: len1
-						positive: positive
-						sign_flag: sign
-						align: align
+						pad_ch:       pad_ch
+						len0:         len0
+						len1:         len1
+						positive:     positive
+						sign_flag:    sign
+						align:        align
 						rm_tail_zero: true
 					)
 				}
@@ -775,12 +775,12 @@ fn v_sprintf(str string, _pt []string) (string, int, bool) {
 				}
 				pad_ch = ` `
 				res.write_string(strconv.format_str(s1,
-					pad_ch: pad_ch
-					len0: len0
-					len1: 0
-					positive: true
+					pad_ch:    pad_ch
+					len0:      len0
+					len1:      0
+					positive:  true
 					sign_flag: false
-					align: align
+					align:     align
 				))
 				status = .reset_params
 				p_index++
