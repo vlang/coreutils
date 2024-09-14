@@ -46,7 +46,7 @@ count below and mark it as done in this README.md. Thanks!
 GNU coreutils. They are not 100% compatiable. If you encounter different behaviors,
 compare against the true GNU coreutils version on the Linux-based tests first.
 
-## Completed (66/109)
+## Completed (67/109)
 
 |  Done   | Cmd       | Descripton                                       |
 | :-----: | --------- | ------------------------------------------------ |
@@ -77,7 +77,7 @@ compare against the true GNU coreutils version on the Linux-based tests first.
 | &check; | dirname   | Strip last file name component                   |
 |         | du        | Estimate file space usage                        |
 | &check; | echo      | Print a line of text                             |
-|         | env       | Run a command in a modified environment          |
+| &check; | env       | Run a command in a modified environment          |
 | &check; | expand    | Convert tabs to spaces                           |
 | &check; | expr      | Evaluate expressions                             |
 | &check; | factor    | Print prime factors                              |
