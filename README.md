@@ -77,7 +77,7 @@ compare against the true GNU coreutils version on the Linux-based tests first.
 | &check; | dirname   | Strip last file name component                   |
 |         | du        | Estimate file space usage                        |
 | &check; | echo      | Print a line of text                             |
-|         | env       | Run a command in a modified environment          |
+| &check; | env       | Run a command in a modified environment          |
 | &check; | expand    | Convert tabs to spaces                           |
 | &check; | expr      | Evaluate expressions                             |
 | &check; | factor    | Print prime factors                              |
