@@ -8,16 +8,7 @@ fn set_hostname(hostname string) int {
 	if hostname.len > 256 {
 		return -1
 	}
-
-	hostname_arr := unsafe { malloc(hostname.len) + 1 }
-
-	unsafe {
-		for i in 0 .. hostname.len {
-			hostname_arr[i] = hostname[i]
-		}
-		hostname_arr[hostname.len] = 0
-	}
-	return C.sethostname(hostname_arr, hostname.len)
+	return C.sethostname(&char(hostname.str), hostname.len)
 }
 
 // Fancy wrapper for error codes if set_hostname returns -1
