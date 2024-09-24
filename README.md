@@ -98,7 +98,7 @@ compare against the true GNU coreutils version on the Linux-based tests first.
 | &check; | ls        | List directory contents                          |
 | &check; | md5sum    | Print or check MD5 digests                       |
 | &check; | mkdir     | Make directories                                 |
-|         | mkfifo    | Make FIFOs (named pipes)                         |
+| &check; | mkfifo    | Make FIFOs (named pipes)                         |
 |         | mknod     | Make block or character special files            |
 | &check; | mktemp    | Create temporary file or directory               |
 | &check; | mv        | Move (rename) files                              |
