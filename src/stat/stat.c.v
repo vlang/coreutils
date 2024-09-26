@@ -115,14 +115,14 @@ pub fn get_filetype(mode u16) FileType {
 
 pub fn get_mode2(mode u16) FileMode {
 	return FileMode{
-		typ:   get_filetype(mode)
-		owner: FilePermission{
+		typ:    get_filetype(mode)
+		owner:  FilePermission{
 			read:    (mode & u32(C.S_IRUSR)) != 0
 			write:   (mode & u32(C.S_IWUSR)) != 0
 			execute: (mode & u32(C.S_IXUSR)) != 0
 			special: (mode & u32(C.S_ISUID)) != 0
 		}
-		group: FilePermission{
+		group:  FilePermission{
 			read:    (mode & u32(C.S_IRGRP)) != 0
 			write:   (mode & u32(C.S_IWGRP)) != 0
 			execute: (mode & u32(C.S_IXGRP)) != 0
