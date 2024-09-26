@@ -1,6 +1,6 @@
 import common.testing
 
-const rig = testing.prepare_rig(util:'env')
+const rig = testing.prepare_rig(util: 'env')
 
 fn testsuite_begin() {
 	rig.assert_platform_util()
