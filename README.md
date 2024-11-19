@@ -46,7 +46,7 @@ count below and mark it as done in this README.md. Thanks!
 GNU coreutils. They are not 100% compatiable. If you encounter different behaviors,
 compare against the true GNU coreutils version on the Linux-based tests first.
 
-## Completed (66/109)
+## Completed (67/109)
 
 |  Done   | Cmd       | Descripton                                       |
 | :-----: | --------- | ------------------------------------------------ |
@@ -127,7 +127,7 @@ compare against the true GNU coreutils version on the Linux-based tests first.
 | &check; | sha256sum | Print or check SHA-2 256 bit digests             |
 | &check; | sha384sum | Print or check SHA-2 384 bit digests             |
 | &check; | sha512sum | Print or check SHA-2 512 bit digests             |
-|         | shred     | Remove files more securely                       |
+| &check; | shred     | Remove files more securely                       |
 | &check; | shuf      | Shuffling text                                   |
 | &check; | sleep     | Delay for a specified time                       |
 | &check; | sort      | Sort text files                                  |
