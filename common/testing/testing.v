@@ -9,7 +9,7 @@ import regex
 // in place of `return error(message)`
 struct DidNotFailError implements IError {
 	Error
-	msg  string
+	msg string
 }
 
 pub fn (err DidNotFailError) msg() string {
@@ -18,7 +18,7 @@ pub fn (err DidNotFailError) msg() string {
 
 struct DoesNotWorkError implements IError {
 	Error
-	msg  string
+	msg string
 }
 
 pub fn (err DoesNotWorkError) msg() string {
@@ -27,7 +27,7 @@ pub fn (err DoesNotWorkError) msg() string {
 
 struct ExitCodesDifferError implements IError {
 	Error
-	msg  string
+	msg string
 }
 
 pub fn (err ExitCodesDifferError) msg() string {
