@@ -127,7 +127,7 @@ compare against the true GNU coreutils version on the Linux-based tests first.
 | &check; | sha256sum | Print or check SHA-2 256 bit digests             |
 | &check; | sha384sum | Print or check SHA-2 384 bit digests             |
 | &check; | sha512sum | Print or check SHA-2 512 bit digests             |
-|         | shred     | Remove files more securely                       |
+| &check; | shred     | Remove files more securely                       |
 | &check; | shuf      | Shuffling text                                   |
 | &check; | sleep     | Delay for a specified time                       |
 | &check; | sort      | Sort text files                                  |
