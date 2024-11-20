@@ -7,46 +7,31 @@ import regex
 // The ...Error structs here implement IError,
 // so that they can be used as more specific errors,
 // in place of `return error(message)`
-struct DidNotFailError {
+struct DidNotFailError implements IError {
 	Error
 	msg  string
-	code int
 }
 
 pub fn (err DidNotFailError) msg() string {
 	return err.msg()
 }
 
-pub fn (err DidNotFailError) code() int {
-	return err.code
-}
-
-struct DoesNotWorkError {
+struct DoesNotWorkError implements IError {
 	Error
 	msg  string
-	code int
 }
 
 pub fn (err DoesNotWorkError) msg() string {
 	return err.msg()
 }
 
-pub fn (err DoesNotWorkError) code() int {
-	return err.code
-}
-
-struct ExitCodesDifferError {
+struct ExitCodesDifferError implements IError {
 	Error
 	msg  string
-	code int
 }
 
 pub fn (err ExitCodesDifferError) msg() string {
 	return err.msg()
-}
-
-pub fn (err ExitCodesDifferError) code() int {
-	return err.code
 }
 
 // CommandPair remembers what original command we are trying to test against
