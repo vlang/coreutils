@@ -31,11 +31,11 @@ fn test_number_grouping() {
 
 fn test_numfmt() {
 	mut app := App{}
-	assert numfmt('2K', mut app, Options{}) or {} == '2000'
-	assert numfmt('-2M', mut app, Options{}) or {} == '-2000000'
-	assert numfmt('-2.0M', mut app, Options{ grouping: true }) or {} == '-2,000,000'
-	assert numfmt('20G', mut app, Options{}) or {} == '20000000000'
-	assert numfmt('20G', mut app, Options{ grouping: true }) or {} == '20,000,000,000'
+	assert numfmt('2K', mut app, Options{}) or { '' } == '2000'
+	assert numfmt('-2M', mut app, Options{}) or { '' } == '-2000000'
+	assert numfmt('-2.0M', mut app, Options{ grouping: true }) or { '' } == '-2,000,000'
+	assert numfmt('20G', mut app, Options{}) or { '' } == '20000000000'
+	assert numfmt('20G', mut app, Options{ grouping: true }) or { '' } == '20,000,000,000'
 }
 
 fn test_fields() {
@@ -46,19 +46,19 @@ fn test_fields() {
 
 fn test_to_options() {
 	mut app := App{}
-	assert numfmt('200000', mut app, Options{ to: 'si' }) or {} == '200k'
-	assert numfmt('2000000', mut app, Options{ to: 'si' }) or {} == '2.0m'
-	assert numfmt('200000', mut app, Options{ to: 'iec' }) or {} == '196K'
-	assert numfmt('2000000', mut app, Options{ to: 'iec' }) or {} == '2.0M'
-	assert numfmt('200000', mut app, Options{ to: 'iec-i' }) or {} == '196Ki'
-	assert numfmt('2000000', mut app, Options{ to: 'iec-i' }) or {} == '2.0Mi'
-	assert numfmt('2000000', mut app, Options{ to: 'none' }) or {} == '2000000'
+	assert numfmt('200000', mut app, Options{ to: 'si' }) or { '' } == '200k'
+	assert numfmt('2000000', mut app, Options{ to: 'si' }) or { '' } == '2.0m'
+	assert numfmt('200000', mut app, Options{ to: 'iec' }) or { '' } == '196K'
+	assert numfmt('2000000', mut app, Options{ to: 'iec' }) or { '' } == '2.0M'
+	assert numfmt('200000', mut app, Options{ to: 'iec-i' }) or { '' } == '196Ki'
+	assert numfmt('2000000', mut app, Options{ to: 'iec-i' }) or { '' } == '2.0Mi'
+	assert numfmt('2000000', mut app, Options{ to: 'none' }) or { '' } == '2000000'
 
-	assert numfmt('200000.1', mut app, Options{ to: 'si' }) or {} == '201k'
-	assert numfmt('2000000.2', mut app, Options{ to: 'si' }) or {} == '2.1m'
-	assert numfmt('200000.3', mut app, Options{ to: 'iec' }) or {} == '196K'
-	assert numfmt('2000000.4', mut app, Options{ to: 'iec' }) or {} == '2.0M'
-	assert numfmt('200000.5', mut app, Options{ to: 'iec-i' }) or {} == '196Ki'
-	assert numfmt('2000000.6', mut app, Options{ to: 'iec-i' }) or {} == '2.0Mi'
-	assert numfmt('2000000.6', mut app, Options{ to: 'none' }) or {} == '2000001'
+	assert numfmt('200000.1', mut app, Options{ to: 'si' }) or { '' } == '201k'
+	assert numfmt('2000000.2', mut app, Options{ to: 'si' }) or { '' } == '2.1m'
+	assert numfmt('200000.3', mut app, Options{ to: 'iec' }) or { '' } == '196K'
+	assert numfmt('2000000.4', mut app, Options{ to: 'iec' }) or { '' } == '2.0M'
+	assert numfmt('200000.5', mut app, Options{ to: 'iec-i' }) or { '' } == '196Ki'
+	assert numfmt('2000000.6', mut app, Options{ to: 'iec-i' }) or { '' } == '2.0Mi'
+	assert numfmt('2000000.6', mut app, Options{ to: 'none' }) or { '' } == '2000001'
 }
