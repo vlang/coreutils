@@ -1,5 +1,6 @@
 import os
 import common
+import common.pwd
 import encoding.csv
 
 const tool_name = 'groups'
@@ -25,6 +26,10 @@ fn main() {
 		input = args.join(' ')
 	}
 
+	gid := os.getegid()
+	gid_name := pwd.get_name_for_gid(gid)
+
+	// TODO: Base on common.pwd instead
 	mut ret := []string{}
 	raw_data := os.read_file(group_file)! // v does not have a dedicated func for finding groups *yet*
 	mut parser := csv.new_reader(raw_data, delimiter: `:`)

@@ -10,6 +10,10 @@ pub fn get_name_for_uid(uid int) !string {
 	return error('Not supported on Windows')
 }
 
+pub fn get_groups() ![]int {
+	return error('Not supported on Windows')
+}
+
 pub fn whoami() !string {
 	username := os.loginname() or { '' }
 	if username == '' {
