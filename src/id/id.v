@@ -120,7 +120,8 @@ fn print_info(uid int, gid int, settings Settings) ! {
 	}
 }
 
-fn id(settings Settings) ! {
+fn id(settings Settings) !int {
+	mut exit_code := 0
 	if settings.users.len == 0 {
 		ruid := os.getuid()
 		if ruid == -1 {
@@ -174,7 +175,11 @@ fn id(settings Settings) ! {
 		print(settings.line_sep)
 	} else {
 		for user in settings.users {
-			u := pwd.get_userinfo_for_name(user)!
+			u := pwd.get_userinfo_for_name(user) or {
+				app.eprintln("'${user}': no such user")
+				exit_code = 1
+				continue
+			}
 			print_info(u.uid, u.gid, settings)!
 			print(settings.line_sep)
 			if settings.zero && settings.groups && settings.users.len > 1 {
@@ -184,8 +189,10 @@ fn id(settings Settings) ! {
 			}
 		}
 	}
+
+	return exit_code
 }
 
 fn main() {
-	id(args())!
+	exit(id(args()) or { common.err_programming_error })
 }

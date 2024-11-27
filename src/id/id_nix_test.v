@@ -19,10 +19,9 @@ fn test_current_user() {
 	compare('')
 }
 
-/*
 fn test_non_existing_users() {
 	compare('does_not_exist_1 does_not_exist_2 does_not_exist_3 root does_not_exist_4')
-}*/
+}
 
 fn test_all_users() {
 	passwd_content := os.read_file('/etc/passwd') or {
