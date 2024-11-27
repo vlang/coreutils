@@ -46,7 +46,7 @@ count below and mark it as done in this README.md. Thanks!
 GNU coreutils. They are not 100% compatiable. If you encounter different behaviors,
 compare against the true GNU coreutils version on the Linux-based tests first.
 
-## Completed (67/109)
+## Completed (72/109) - 66% done!
 
 |  Done   | Cmd       | Descripton                                       |
 | :-----: | --------- | ------------------------------------------------ |
@@ -84,11 +84,11 @@ compare against the true GNU coreutils version on the Linux-based tests first.
 | &check; | false     | Do nothing, unsuccessfully                       |
 | &check; | fmt       | Reformat paragraph text                          |
 | &check; | fold      | Wrap input lines to fit in specified width       |
-|         | groups    | Print group names a user is in                   |
+| &check; | groups    | Print group names a user is in                   |
 | &check; | head      | Output the first part of files                   |
 | &check; | hostid    | Print numeric host identifier                    |
 | &check; | hostname  | Print or set system name                         |
-|         | id        | Print user identity                              |
+| &check; | id        | Print user identity                              |
 |         | install   | Copy files and set attributes                    |
 |         | join      | Join lines on a common field                     |
 |         | kill      | Send a signal to processes                       |
