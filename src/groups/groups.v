@@ -35,11 +35,15 @@ fn get_group_list(username string) !string {
 	return groups.map(get_group_name).join(' ')
 }
 
+fn get_effective_group_list() !string {
+	groups := pwd.get_effective_groups()!
+	return groups.map(get_group_name).join(' ')
+}
+
 fn groups(settings Settings) !int {
 	mut exit_code := 0
 	if settings.users == [] {
-		// TODO: Should probably be based on effective UID instead
-		println(get_group_list(os.loginname()!)!)
+		println(get_effective_group_list()!)
 	} else {
 		for user in settings.users {
 			group_list := get_group_list(user)!
