@@ -186,7 +186,7 @@ pub fn same_results(cmd1 string, cmd2 string) bool {
 	return cmd1_res.exit_code == cmd2_res.exit_code && noutput1 == noutput2
 }
 
-fn normalise(s string) string {
+pub fn normalise(s string) string {
 	return s.replace_each(['‘', "'", '’', "'"]).replace('  ', ' ').replace('  ', ' ').replace('  ',
 		' ').replace(', ', ' ').split_into_lines().join('\n').trim_space()
 }
