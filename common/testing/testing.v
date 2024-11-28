@@ -8,30 +8,15 @@ import regex
 // so that they can be used as more specific errors,
 // in place of `return error(message)`
 struct DidNotFailError implements IError {
-	Error
-	msg string
-}
-
-pub fn (err DidNotFailError) msg() string {
-	return err.msg()
+	MessageError
 }
 
 struct DoesNotWorkError implements IError {
-	Error
-	msg string
-}
-
-pub fn (err DoesNotWorkError) msg() string {
-	return err.msg()
+	MessageError
 }
 
 struct ExitCodesDifferError implements IError {
-	Error
-	msg string
-}
-
-pub fn (err ExitCodesDifferError) msg() string {
-	return err.msg()
+	MessageError
 }
 
 // CommandPair remembers what original command we are trying to test against
@@ -64,7 +49,7 @@ pub fn (p CommandPair) same_results(options string) bool {
 // expected_failure - given some options, execute both the original
 // and the deputy commands with them, and ensure that they both fail
 // with the same exit_code
-pub fn (p CommandPair) expected_failure(options string) ?os.Result {
+pub fn (p CommandPair) expected_failure(options string) !os.Result {
 	ores := os.execute('${p.original} ${options}')
 	if ores.exit_code == 0 {
 		return DidNotFailError{
