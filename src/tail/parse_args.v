@@ -73,17 +73,17 @@ fn parse_args(args []string) Args {
 	files := scan_files_arg(files_arg)
 
 	return Args{
-		bytes: string_to_i64(bytes_arg) or { exit_error(err.msg()) }
-		follow: follow_arg || f_arg
-		lines: string_to_i64(lines_arg) or { exit_error(err.msg()) }
-		pid: pid_arg
-		quiet: quiet_arg || silent_arg
-		retry: f_arg || retry_arg
-		verbose: verbose_arg
+		bytes:          string_to_i64(bytes_arg) or { exit_error(err.msg()) }
+		follow:         follow_arg || f_arg
+		lines:          string_to_i64(lines_arg) or { exit_error(err.msg()) }
+		pid:            pid_arg
+		quiet:          quiet_arg || silent_arg
+		retry:          f_arg || retry_arg
+		verbose:        verbose_arg
 		sleep_interval: sleep_interval_arg
-		from_start: from_start
-		delimiter: delimiter
-		files: files
+		from_start:     from_start
+		delimiter:      delimiter
+		files:          files
 	}
 }
 

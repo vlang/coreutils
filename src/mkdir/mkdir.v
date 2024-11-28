@@ -67,8 +67,8 @@ fn run_mkdir(args []string) {
 	fp.description('Mandatory arguments to long options are mandatory for short options too.')
 
 	mut opts := Options{
-		mode: u32(fp.int('mode', `m`, int(default_mode), 'set file mode (as in chmod), not a=rxw - umask'))
-		parent: fp.bool('parents', `p`, false, 'no error if existing, make parent directories as needed')
+		mode:    u32(fp.int('mode', `m`, int(default_mode), 'set file mode (as in chmod), not a=rxw - umask'))
+		parent:  fp.bool('parents', `p`, false, 'no error if existing, make parent directories as needed')
 		verbose: fp.bool('verbose', `v`, false, 'print a message for each created directory')
 	}
 

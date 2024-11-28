@@ -14,12 +14,12 @@ mut:
 pub const temp_folder = os.join_path(os.temp_dir(), 'v', 'coreutils', os.getpid().str())
 
 fn init() {
-	os.mkdir_all(testing.temp_folder) or { panic(err) }
+	os.mkdir_all(temp_folder) or { panic(err) }
 	C.atexit(fn () {
-		for p in testing.prepared_executables.paths {
+		for p in prepared_executables.paths {
 			os.rm(p) or {}
 		}
-		os.rmdir_all(testing.temp_folder) or {}
+		os.rmdir_all(temp_folder) or {}
 	})
 }
 
@@ -45,7 +45,7 @@ pub fn prepare_executable(tool_name string) string {
 		eprintln('Tool ${tool_name} was compiled, but ${tool_executable_path} does not exist.')
 		exit(2)
 	}
-	mut executables := unsafe { testing.prepared_executables }
+	mut executables := unsafe { prepared_executables }
 	executables.paths << tool_executable_path
 	return tool_executable_path
 }

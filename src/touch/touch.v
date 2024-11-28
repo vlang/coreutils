@@ -61,13 +61,13 @@ fn touch(args []string) {
 
 	touch_args := TouchArgs{
 		access_only: access_only
-		mod_only: mod_only
-		no_create: no_create
-		time_arg: time_arg
-		date_arg: date_arg
-		reference: reference
-		no_ref: no_ref
-		path_args: path_args
+		mod_only:    mod_only
+		no_create:   no_create
+		time_arg:    time_arg
+		date_arg:    date_arg
+		reference:   reference
+		no_ref:      no_ref
+		path_args:   path_args
 	}
 
 	process_touch(touch_args)

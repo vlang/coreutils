@@ -5,7 +5,7 @@ import regex
 import os
 
 const app = common.CoreutilInfo{
-	name: 'tac'
+	name:        'tac'
 	description: 'concatenate and print files in reverse'
 }
 

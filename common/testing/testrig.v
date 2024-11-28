@@ -52,12 +52,12 @@ pub fn prepare_rig(config TestRigConfig) TestRig {
 	os.mkdir(temp_dir) or { panic('Unable to make test directory: ${temp_dir}') }
 	os.chdir(temp_dir) or { panic('Unable to set working directory: ${temp_dir}') }
 	rig := TestRig{
-		util: config.util
-		platform_util: platform_util
-		platform_util_path: platform_util_path
-		cmd: new_paired_command(platform_util, exec_under_test)
+		util:                  config.util
+		platform_util:         platform_util
+		platform_util_path:    platform_util_path
+		cmd:                   new_paired_command(platform_util, exec_under_test)
 		executable_under_test: exec_under_test
-		temp_dir: temp_dir
+		temp_dir:              temp_dir
 	}
 	wire_clean_up_at_exit(rig)
 	return rig
@@ -113,7 +113,7 @@ pub fn (rig TestRig) call_new(args string) os.Result {
 // print_small_diff eprints only differing small results that differ
 // usually just vary by newlines or NULs
 fn eprintln_small_diff(a string, b string) {
-	if a != b && (a.len < testing.small_diff_size && b.len < testing.small_diff_size) {
+	if a != b && (a.len < small_diff_size && b.len < small_diff_size) {
 		eprintln('Output 1: [${a}] (${a.len} bytes)')
 		eprintln(' - bytes: ${a.bytes()}')
 		eprintln('Output 2: [${b}] (${b.len} bytes)')

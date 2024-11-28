@@ -1,47 +1,62 @@
+module main
+
 import os
 import common
-import encoding.csv
+import common.pwd
 
-const tool_name = 'groups'
-const group_file = '/etc/group'
+const app = common.CoreutilInfo{
+	name:        'groups'
+	description: 'Print group memberships for each USERNAME or, if no USERNAME is specified, for
+the current process (which may differ if the groups database has changed).'
+}
 
-fn main() {
-	mut fp := common.flag_parser(os.args)
-	fp.application(tool_name)
-	fp.description('Show which groups a user belongs to')
-	fp.arguments_description('[user]')
-	fp.limit_free_args(0, 1)!
-	mut args := fp.finalize() or {
-		eprintln(err)
-		println(fp.usage())
-		return
+struct Settings {
+mut:
+	users []string
+}
+
+fn args() Settings {
+	mut fp := app.make_flag_parser(os.args)
+	mut st := Settings{}
+	st.users = fp.remaining_parameters()
+	return st
+}
+
+fn get_group_name(gid int) string {
+	return pwd.get_name_for_gid(gid) or { '' }
+}
+
+fn get_group_list(username string) !string {
+	_ := pwd.get_userinfo_for_name(username) or {
+		app.eprintln("'${username}': no such user")
+		return ''
 	}
+	groups := pwd.get_groups(username)!
+	return groups.map(get_group_name).join(' ')
+}
 
-	mut input := ''
+fn get_effective_group_list() !string {
+	groups := pwd.get_effective_groups()!
+	return groups.map(get_group_name).join(' ')
+}
 
-	if args == [] {
-		input = os.loginname() or { '' }
+fn groups(settings Settings) !int {
+	mut exit_code := 0
+	if settings.users == [] {
+		println(get_effective_group_list()!)
 	} else {
-		input = args.join(' ')
-	}
-
-	mut ret := []string{}
-	raw_data := os.read_file(group_file)! // v does not have a dedicated func for finding groups *yet*
-	mut parser := csv.new_reader(raw_data, delimiter: `:`)
-
-	for {
-		line := parser.read() or { break }
-		if line.len == 4 {
-			if line[3].contains(input) {
-				ret << line[0]
+		for user in settings.users {
+			group_list := get_group_list(user)!
+			if group_list != '' {
+				println('${user} : ${group_list}')
+			} else {
+				exit_code = 1
 			}
-		} else if line.len > 4 || line.len < 3 {
-			common.exit_with_error_message(tool_name, '${group_file} is formatted incorrectly')
 		}
 	}
+	return exit_code
+}
 
-	if args != [] {
-		print('${input}: ')
-	}
-	println(ret.join(' '))
+fn main() {
+	exit(groups(args()) or { common.err_programming_error })
 }

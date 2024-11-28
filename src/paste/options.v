@@ -26,10 +26,10 @@ fn get_options() Options {
 	files := fp.finalize() or { exit_error(err.msg()) }
 
 	return Options{
-		serial: serial
-		next_delimiter: next_delimiter(delimiters)
+		serial:          serial
+		next_delimiter:  next_delimiter(delimiters)
 		zero_terminated: zero_terminated
-		files: files
+		files:           files
 	}
 }
 

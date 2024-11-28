@@ -70,20 +70,20 @@ fn get_options() Options {
 
 	return Options{
 		ignore_leading_blanks: ignore_leading_blanks
-		dictionary_order: dictionary_order
-		ignore_case: ignore_case
-		ignore_non_printing: ignore_non_printing
-		numeric: numeric
-		reverse: reverse
+		dictionary_order:      dictionary_order
+		ignore_case:           ignore_case
+		ignore_non_printing:   ignore_non_printing
+		numeric:               numeric
+		reverse:               reverse
 		// other options
-		check_diagnose: check_diagnose
-		check_quiet: check_quiet
-		sort_keys: sort_keys
+		check_diagnose:  check_diagnose
+		check_quiet:     check_quiet
+		sort_keys:       sort_keys
 		field_separator: field_separator
-		merge: merge
-		output_file: output_file
-		unique: unique
-		files: scan_files_arg(files)
+		merge:           merge
+		output_file:     output_file
+		unique:          unique
+		files:           scan_files_arg(files)
 	}
 }
 

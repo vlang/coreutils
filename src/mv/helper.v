@@ -122,10 +122,10 @@ fn setup_mv_command(args []string) ?(MvCommand, []string, string) {
 	}
 
 	return MvCommand{
-		overwrite: overwrite
-		update: update
-		verbose: verbose
-		target_directory: target_directory
+		overwrite:           overwrite
+		update:              update
+		verbose:             verbose
+		target_directory:    target_directory
 		no_target_directory: no_target_directory
 	}, sources, dest
 }

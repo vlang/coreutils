@@ -5,6 +5,8 @@ import os // v has a bug that you can't use args
 const ignore_dirs = {
 	'windows': [
 		// avoid *nix-dependent utils
+		'id',
+		'group',
 		'nohup',
 		'stat',
 		'tty',

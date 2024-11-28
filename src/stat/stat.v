@@ -8,9 +8,9 @@ import strconv
 import time
 
 const app = common.CoreutilInfo{
-	name: 'stat'
+	name:        'stat'
 	description: 'Display file or file system status'
-	help: $embed_file('help.txt').to_string()
+	help:        $embed_file('help.txt').to_string()
 }
 
 // Settings for Utility: stat
@@ -151,7 +151,7 @@ fn process_token(token string, st Statx, path string, mtab []MountInfo) string {
 		}
 		'C' {
 			app.quit(
-				message: 'Sadly, SELinux is not supported yet.'
+				message:     'Sadly, SELinux is not supported yet.'
 				return_code: common.err_not_implemented
 			)
 		}
@@ -464,7 +464,7 @@ fn args() Settings {
 		}
 		else {
 			app.quit(
-				message: 'invalid argument ‘${cached}’ for ‘--cached’\nValid arguments are:\n  - ‘default’\n  - ‘never’\n  - ‘always’'
+				message:          'invalid argument ‘${cached}’ for ‘--cached’\nValid arguments are:\n  - ‘default’\n  - ‘never’\n  - ‘always’'
 				show_help_advice: true
 			)
 		}
@@ -506,7 +506,7 @@ fn args() Settings {
 		} else {
 			// [UNREACHBLE]
 			app.quit(
-				message: 'error in command line handling'
+				message:     'error in command line handling'
 				return_code: common.err_programming_error
 			)
 		}
@@ -521,7 +521,7 @@ fn main() {
 fn get_mount_list() []MountInfo {
 	$if !linux {
 		app.quit(
-			message: 'reading mounts is not supported on this platform'
+			message:     'reading mounts is not supported on this platform'
 			return_code: common.err_platform_not_supported
 		)
 	}
@@ -538,7 +538,7 @@ fn get_mount_list() []MountInfo {
 		line := br.read_line(delim: `\n`) or { break }
 		mi := line.split(' ')
 		mounts << MountInfo{
-			fs_type: mi[2]
+			fs_type:     mi[2]
 			mount_point: mi[1]
 		}
 	}
@@ -560,7 +560,7 @@ fn get_fs_list() map[string]u32 {
 		i = j + 1
 		fslist[fs_name] = u32(strconv.parse_uint(type_id, 16, 32) or {
 			app.quit(
-				message: 'Unable to parse fstype `${fs_name}`: [${type_id}]'
+				message:     'Unable to parse fstype `${fs_name}`: [${type_id}]'
 				return_code: common.err_programming_error
 			)
 		})

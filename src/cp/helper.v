@@ -133,12 +133,12 @@ fn setup_cp_command(args []string) ?(CpCommand, []string, string) {
 	}
 
 	return CpCommand{
-		overwrite: overwrite
-		update: update
-		verbose: verbose
-		target_directory: target_directory
+		overwrite:           overwrite
+		update:              update
+		verbose:             verbose
+		target_directory:    target_directory
 		no_target_directory: no_target_directory
-		recursive: recursive
+		recursive:           recursive
 	}, sources, dest
 }
 

@@ -2,7 +2,7 @@ import common
 import os
 
 const app = common.CoreutilInfo{
-	name: 'users'
+	name:        'users'
 	description: 'print login names of users currently logged in'
 }
 

@@ -25,7 +25,7 @@ pub mut:
 
 // coreutils_version returns formatted coreutils tool version
 pub fn coreutils_version() string {
-	return '(V coreutils) ${common.version}'
+	return '(V coreutils) ${version}'
 }
 
 // coreutils_footer returns a formatted coreutils footer

@@ -46,7 +46,7 @@ count below and mark it as done in this README.md. Thanks!
 GNU coreutils. They are not 100% compatiable. If you encounter different behaviors,
 compare against the true GNU coreutils version on the Linux-based tests first.
 
-## Completed (67/109)
+## Completed (73/109) - 67% done!
 
 |  Done   | Cmd       | Descripton                                       |
 | :-----: | --------- | ------------------------------------------------ |
@@ -77,28 +77,28 @@ compare against the true GNU coreutils version on the Linux-based tests first.
 | &check; | dirname   | Strip last file name component                   |
 |         | du        | Estimate file space usage                        |
 | &check; | echo      | Print a line of text                             |
-|         | env       | Run a command in a modified environment          |
+| &check; | env       | Run a command in a modified environment          |
 | &check; | expand    | Convert tabs to spaces                           |
 | &check; | expr      | Evaluate expressions                             |
 | &check; | factor    | Print prime factors                              |
 | &check; | false     | Do nothing, unsuccessfully                       |
 | &check; | fmt       | Reformat paragraph text                          |
 | &check; | fold      | Wrap input lines to fit in specified width       |
-|         | groups    | Print group names a user is in                   |
+| &check; | groups    | Print group names a user is in                   |
 | &check; | head      | Output the first part of files                   |
 | &check; | hostid    | Print numeric host identifier                    |
 | &check; | hostname  | Print or set system name                         |
-|         | id        | Print user identity                              |
+| &check; | id        | Print user identity                              |
 |         | install   | Copy files and set attributes                    |
 |         | join      | Join lines on a common field                     |
 |         | kill      | Send a signal to processes                       |
 |         | link      | Make a hard link via the link syscall            |
 | &check; | ln        | Make links between files                         |
 | &check; | logname   | Print current login name                         |
-|         | ls        | List directory contents                          |
+| &check; | ls        | List directory contents                          |
 | &check; | md5sum    | Print or check MD5 digests                       |
 | &check; | mkdir     | Make directories                                 |
-|         | mkfifo    | Make FIFOs (named pipes)                         |
+| &check; | mkfifo    | Make FIFOs (named pipes)                         |
 |         | mknod     | Make block or character special files            |
 | &check; | mktemp    | Create temporary file or directory               |
 | &check; | mv        | Move (rename) files                              |
@@ -106,7 +106,7 @@ compare against the true GNU coreutils version on the Linux-based tests first.
 | &check; | nl        | Number lines and write files                     |
 | &check; | nohup     | Run a command immune to hangups                  |
 | &check; | nproc     | Print the number of available processors         |
-|         | numfmt    | Reformat numbers                                 |
+| &check; | numfmt    | Reformat numbers                                 |
 |         | od        | Write files in octal or other formats            |
 | &check; | paste     | Merge lines of files                             |
 |         | pathchk   | Check file name validity and portability         |

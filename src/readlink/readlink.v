@@ -3,7 +3,7 @@ import os
 import strings
 
 const app = common.CoreutilInfo{
-	name: 'readlink'
+	name:        'readlink'
 	description: 'print resolved symbolic links or canonical file names'
 }
 

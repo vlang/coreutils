@@ -38,10 +38,10 @@ fn get_options() Options {
 
 	return Options{
 		directory: directory
-		dry_run: dry_run
-		quiet: quiet
-		suffix: suffix
-		tmp_dir: tmp_dir
+		dry_run:   dry_run
+		quiet:     quiet
+		suffix:    suffix
+		tmp_dir:   tmp_dir
 		templates: templates
 	}
 }
