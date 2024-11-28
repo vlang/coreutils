@@ -48,7 +48,7 @@ count below and mark it as done in this README.md. Thanks!
 GNU coreutils. They are not 100% compatiable. If you encounter different behaviors,
 compare against the true GNU coreutils version on the Linux-based tests first.
 
-## Completed (73/109) - 67% done!
+## Completed (74/109) - 68% done!
 
 |  Done   | Cmd       | Descripton                                       | Windows | 
 | :-----: | --------- | ------------------------------------------------ | ------- |
@@ -94,7 +94,7 @@ compare against the true GNU coreutils version on the Linux-based tests first.
 |         | install   | Copy files and set attributes                    |         |
 |         | join      | Join lines on a common field                     | &check; |
 |         | kill      | Send a signal to processes                       | &check; |
-|         | link      | Make a hard link via the link syscall            | &check; |
+| &check; | link      | Make a hard link via the link syscall            | &check; |
 | &check; | ln        | Make links between files                         | &check; |
 | &check; | logname   | Print current login name                         | &check; |
 | &check; | ls        | List directory contents                          |         |
@@ -129,7 +129,7 @@ compare against the true GNU coreutils version on the Linux-based tests first.
 | &check; | sha256sum | Print or check SHA-2 256 bit digests             | &check; |
 | &check; | sha384sum | Print or check SHA-2 384 bit digests             | &check; |
 | &check; | sha512sum | Print or check SHA-2 512 bit digests             | &check; |
-|         | shred     | Remove files more securely                       | &check; |
+| &check; | shred     | Remove files more securely                       | &check; |
 | &check; | shuf      | Shuffling text                                   | &check; |
 | &check; | sleep     | Delay for a specified time                       | &check; |
 | &check; | sort      | Sort text files                                  | &check; |
