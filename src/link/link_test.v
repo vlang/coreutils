@@ -16,13 +16,25 @@ fn test_help_and_version() {
 }
 
 fn test_compare() {
-	rig.assert_same_results('a')
-	// rig.assert_same_results('a b')
-	rig.assert_same_results('a b c')
-	rig.assert_same_results('a b c d e f')
-	os.mkdir('d')!
-	rig.assert_same_results('d e')
-	os.rmdir('d')!
+	$if windows {
+		// The coreutils used on Windows does not produce the exact
+		// same error messages
+		rig.assert_same_exit_code('a')
+		rig.assert_same_exit_code('a b')
+		rig.assert_same_exit_code('a b c')
+		rig.assert_same_exit_code('a b c d e f')
+		os.mkdir('d')!
+		rig.assert_same_exit_code('d e')
+		os.rmdir('d')!
+	} $else {
+		rig.assert_same_results('a')
+		rig.assert_same_results('a b')
+		rig.assert_same_results('a b c')
+		rig.assert_same_results('a b c d e f')
+		os.mkdir('d')!
+		rig.assert_same_results('d e')
+		os.rmdir('d')!
+	}
 
 	// We can't use assert_same_results here because the hard link will already
 	// exist when the second util is called

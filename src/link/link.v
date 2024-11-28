@@ -19,9 +19,9 @@ fn args() Settings {
 	st.files = fp.remaining_parameters()
 	match st.files.len {
 		0 { app.quit(message: 'missing operand') }
-		1 { app.quit(message: 'missing operand after ‘${st.files[0]}’', show_help_advice: true) }
+		1 { app.quit(message: "missing operand after '${st.files[0]}'", show_help_advice: true) }
 		2 {}
-		else { app.quit(message: 'extra operand ‘${st.files[2]}’', show_help_advice: true) }
+		else { app.quit(message: "extra operand '${st.files[2]}'", show_help_advice: true) }
 	}
 
 	return st
