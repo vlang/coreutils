@@ -10,7 +10,7 @@ pub fn get_name_for_uid(uid int) !string {
 	return error('Not supported on Windows')
 }
 
-pub fn get_groups() ![]int {
+pub fn get_groups(username string) ![]int {
 	return error('Not supported on Windows')
 }
 
