@@ -94,7 +94,7 @@ pub fn get_groups(username string) ![]int {
 	}
 }
 
-pub fn get_effective_groups_up_to(limit int) !(int, []int) {
+fn get_effective_groups_up_to(limit int) !(int, []int) {
 	mut groups := []int{len: init_group_buf_size}
 	unsafe {
 		num_groups := C.getgroups(limit, &groups[0])

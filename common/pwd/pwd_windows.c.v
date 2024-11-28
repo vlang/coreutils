@@ -18,6 +18,10 @@ pub fn get_userinfo_for_name(username string) !UserInfo {
 	return error('Not supported on Windows')
 }
 
+pub fn get_effective_groups() ![]int {
+	return error('Not supported on Windows')
+}
+
 pub fn whoami() !string {
 	username := os.loginname() or { '' }
 	if username == '' {
