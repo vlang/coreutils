@@ -48,7 +48,7 @@ count below and mark it as done in this README.md. Thanks!
 GNU coreutils. They are not 100% compatiable. If you encounter different behaviors,
 compare against the true GNU coreutils version on the Linux-based tests first.
 
-## Completed (72/109) - 66% done!
+## Completed (73/109) - 67% done!
 
 |  Done   | Cmd       | Descripton                                       | Windows | 
 | :-----: | --------- | ------------------------------------------------ | ------- |
