@@ -4,16 +4,37 @@ import os // v has a bug that you can't use args
 
 const ignore_dirs = {
 	'windows': [
-		// avoid *nix-dependent utils
+		// avoid *nix-dependent utils; the following are excluded
+		// from Win32 GNU coreutils 8.32:
+		'arch',
+		'chgrp',
+		'chmod',
+		'chown',
+		'chroot',
+		'df',
+		'dir',
+		'groups',
+		'hostid',
+		'hostname',
 		'id',
-		'group',
-		'nohup',
+		'install',
+		'ls',
+		'nice',
+		'pinky',
 		'stat',
+		'stdbuf',
+		'stty',
+		'sync',
+		'timeout',
 		'tty',
-		// avoid utmp-dependent utils (WinOS has no utmp support)
+		'vdir',
+		// The following are excluded because utmp-dependent
+		// (and also not part of Win32 GNU coreutils):
 		'uptime',
 		'users',
 		'who',
+		// TODO: nohup is included in Win32 version
+		'nohup',
 	]
 	'macos':   ['stat', 'sync', 'uptime']
 }[os.user_os()] or { [] }
