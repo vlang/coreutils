@@ -79,12 +79,14 @@ pub fn (p CommandPair) ensure_help_and_version_options_work() ! {
 	// and that they already work correctly.
 	if os.execute('${p.deputy} --help').exit_code != 0 {
 		return DoesNotWorkError{
-			msg: '--help'
+			msg:  '--help'
+			code: 1
 		}
 	}
 	if os.execute('${p.deputy} --version').exit_code != 0 {
 		return DoesNotWorkError{
-			msg: '--version'
+			msg:  '--version'
+			code: 2
 		}
 	}
 	assert true
@@ -98,7 +100,8 @@ pub fn command_fails(cmd string) !os.Result {
 	res := os.execute(cmd)
 	if res.exit_code == 0 {
 		return DidNotFailError{
-			msg: cmd
+			msg:  cmd
+			code: 3
 		}
 	}
 	assert true
