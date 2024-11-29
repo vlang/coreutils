@@ -104,7 +104,7 @@ fn sum_arbitrary_value_sysv(value string) !os.Result {
 	os.rm('a.txt')!
 	return res
 }
-		
+
 fn test_sysv_width_2_col_no_padding() {
 	res := sum_arbitrary_value_sysv('\x09')
 	assert res.exit_code == 0
@@ -169,7 +169,7 @@ fn sum_arbitrary_value_bsd(value string) !os.Result {
 	os.rm('a.txt')!
 	return res
 }
-		
+
 fn test_bsd_sum_col_width_2_padded_with_zero() {
 	res := sum_arbitrary_value_bsd('\x02')!
 	assert res.exit_code == 0
