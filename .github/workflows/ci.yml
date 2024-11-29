@@ -27,7 +27,7 @@ jobs:
           echo "adding '${PWD}' to PATH"
           echo "${PWD}" >> $GITHUB_PATH
       - name: Download uutils/coreutils
-        uses: engineerd/configurator@v0.0.8
+        uses: engineerd/configurator@v0.0.10 
         with:
           name: 'coreutils.exe'
           url: 'https://github.com/uutils/coreutils/releases/download/0.0.17/coreutils-0.0.17-x86_64-pc-windows-msvc.zip'
