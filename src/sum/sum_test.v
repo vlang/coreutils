@@ -101,7 +101,7 @@ fn sum_arbitrary_value(value string, arg string) !os.Result {
 	f.write_string('${value}\n')!
 	f.close()
 	res := $if windows {
-		os.execute("cat ${path} | tr -d '\r' | ${executable_under_test} ${arg}")
+		os.execute("cat ${path} | tr -d '\\r' | ${executable_under_test} ${arg}")
 	} $else {
 		os.execute('cat ${path} | ${executable_under_test} ${arg}')
 	}
