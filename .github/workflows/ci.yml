@@ -1,7 +1,6 @@
 name: Build and Test
 
-on:
-  workflow_dispatch:
+on: [push, pull_request]
 
 jobs:
   winos-test:
@@ -59,7 +58,7 @@ jobs:
         shell: bash
         run: |
           # Run tests
-          cd coreutils && v test .
+          cd coreutils && v USE_MULTI_BINARY_TO_TEST=coreutils test .
 
   ubuntu-fast-build:
     runs-on: ubuntu-latest
@@ -75,7 +74,6 @@ jobs:
         uses: actions/checkout@v2
         with:
           path: coreutils
-
       - name: V doctor
         run: v doctor
       - name: Ensure everything is formatted
@@ -101,7 +99,6 @@ jobs:
         uses: actions/checkout@v2
         with:
           path: coreutils
-
       - name: Build all with -prod
         run: cd coreutils && v run build.vsh -prod
       - name: Run tests
@@ -121,10 +118,8 @@ jobs:
         uses: actions/checkout@v2
         with:
           path: coreutils
-
       - name: Build all
         run: cd coreutils && v run build.vsh
-
       - name: Native utils diagnostics (before GNU coreutils)
         run: |
           sleep --version
@@ -133,6 +128,5 @@ jobs:
         uses: ShenTengTu/setup-gnu-coreutils-action@v1
       - name: Test GNU coreutils uptime
         run: uptime --version
-
       - name: Run tests
         run: cd coreutils && GNU_COREUTILS_INSTALLED=1 make test
