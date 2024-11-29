@@ -1,4 +1,5 @@
 import os
+import io.util
 import common.testing
 
 const eol = testing.output_eol()
@@ -95,36 +96,42 @@ fn test_sysv_several_files_succeeds() {
 	assert res.output == '2185 1 ${test1_txt}${eol}3372 1 ${test2_txt}${eol}556 1 ${test3_txt}${eol}'
 }
 
-/*
-	test SysV output quirks
-*/
-fn sum_arbitrary_value_sysv(value string) !os.Result {
-	os.write_file('a.txt', value)!
-	res := os.execute('${executable_under_test} -s a.txt')
-	os.rm('a.txt')!
+fn sum_arbitrary_value(value string, arg string) !os.Result {
+	mut f, path := util.temp_file()!
+	f.write_string('${value}\n')!
+	f.close()
+	res := os.execute('cat ${path} | ${executable_under_test} ${arg}')
+	os.rm(path)!
 	return res
 }
 
+/*
+	test SysV output quirks
+*/
 fn test_sysv_width_2_col_no_padding() {
-	res := sum_arbitrary_value_sysv('\x09')
+	res := sum_arbitrary_value('', '-s')!
+
 	assert res.exit_code == 0
 	assert res.output == '10 1${eol}'
 }
 
 fn test_sysv_width_3_col_no_padding() {
-	res := sum_arbitrary_value_sysv('\x61')
+	res := sum_arbitrary_value('\x61', '-s')!
+
 	assert res.exit_code == 0
 	assert res.output == '107 1${eol}'
 }
 
 fn test_sysv_width_4_col_no_padding() {
-	res := sum_arbitrary_value_sysv('zzzzzzzzz')
+	res := sum_arbitrary_value('zzzzzzzzz', '-s')!
+
 	assert res.exit_code == 0
 	assert res.output == '1108 1${eol}'
 }
 
 fn test_sysv_different_col_widths_no_alignment() {
 	res := os.execute('${executable_under_test} -s ${long_line} ${test1_txt} ${test2_txt} ${test3_txt}')
+
 	assert res.exit_code == 0
 	assert res.output == '55583 302 ${long_line}${eol}2185 1 ${test1_txt}${eol}3372 1 ${test2_txt}${eol}556 1 ${test3_txt}${eol}'
 }
@@ -163,27 +170,23 @@ fn test_bsd_sum_several_files_succeeds() {
 /*
 	test BSD output quirks
 */
-fn sum_arbitrary_value_bsd(value string) !os.Result {
-	os.write_file('a.txt', value)!
-	res := os.execute('${executable_under_test} -r a.txt')
-	os.rm('a.txt')!
-	return res
-}
-
 fn test_bsd_sum_col_width_2_padded_with_zero() {
-	res := sum_arbitrary_value_bsd('\x02')!
+	res := sum_arbitrary_value('\x02', '-r')!
+
 	assert res.exit_code == 0
 	assert res.output == '00011     1${eol}'
 }
 
 fn test_bsd_sum_col_width_3_padded_with_zero() {
-	res := sum_arbitrary_value_bsd('hhh')!
+	res := sum_arbitrary_value('hhh', '-r')!
+
 	assert res.exit_code == 0
 	assert res.output == '00101     1${eol}'
 }
 
 fn test_bsd_sum_col_width_4_padded_with_zero() {
-	res := sum_arbitrary_value_bsd('hhh')!
+	res := sum_arbitrary_value('hhh', '-r')!
+
 	assert res.exit_code == 0
 	assert res.output == '00101     1${eol}'
 }
