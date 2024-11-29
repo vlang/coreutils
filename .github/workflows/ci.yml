@@ -58,7 +58,7 @@ jobs:
         shell: bash
         run: |
           # Run tests
-          cd coreutils && v USE_MULTI_BINARY_TO_TEST=coreutils test .
+          cd coreutils && USE_MULTI_BINARY_TO_TEST=coreutils v test .
 
   ubuntu-fast-build:
     runs-on: ubuntu-latest
