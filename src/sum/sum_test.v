@@ -98,30 +98,33 @@ fn test_sysv_several_files_succeeds() {
 /*
 	test SysV output quirks
 */
+fn sum_arbitrary_value_sysv(value string) !os.Result {
+	os.write_file('a.txt', value)!
+	res := os.execute('${executable_under_test} -s a.txt')
+	os.rm('a.txt')!
+	return res
+}
+		
 fn test_sysv_width_2_col_no_padding() {
-	res := os.execute('echo \x09 | ${executable_under_test} -s')
-
+	res := sum_arbitrary_value_sysv('\x09')
 	assert res.exit_code == 0
 	assert res.output == '10 1${eol}'
 }
 
 fn test_sysv_width_3_col_no_padding() {
-	res := os.execute('echo \x61 | ${executable_under_test} -s')
-
+	res := sum_arbitrary_value_sysv('\x61')
 	assert res.exit_code == 0
 	assert res.output == '107 1${eol}'
 }
 
 fn test_sysv_width_4_col_no_padding() {
-	res := os.execute('echo zzzzzzzzz | ${executable_under_test} -s')
-
+	res := sum_arbitrary_value_sysv('zzzzzzzzz')
 	assert res.exit_code == 0
 	assert res.output == '1108 1${eol}'
 }
 
 fn test_sysv_different_col_widths_no_alignment() {
 	res := os.execute('${executable_under_test} -s ${long_line} ${test1_txt} ${test2_txt} ${test3_txt}')
-
 	assert res.exit_code == 0
 	assert res.output == '55583 302 ${long_line}${eol}2185 1 ${test1_txt}${eol}3372 1 ${test2_txt}${eol}556 1 ${test3_txt}${eol}'
 }
@@ -160,23 +163,27 @@ fn test_bsd_sum_several_files_succeeds() {
 /*
 	test BSD output quirks
 */
+fn sum_arbitrary_value_bsd(value string) !os.Result {
+	os.write_file('a.txt', value)!
+	res := os.execute('${executable_under_test} -r a.txt')
+	os.rm('a.txt')!
+	return res
+}
+		
 fn test_bsd_sum_col_width_2_padded_with_zero() {
-	res := os.execute('echo \x02 | ${executable_under_test} -r')
-
+	res := sum_arbitrary_value_bsd('\x02')!
 	assert res.exit_code == 0
 	assert res.output == '00011     1${eol}'
 }
 
 fn test_bsd_sum_col_width_3_padded_with_zero() {
-	res := os.execute('echo hhh | ${executable_under_test} -r')
-
+	res := sum_arbitrary_value_bsd('hhh')!
 	assert res.exit_code == 0
 	assert res.output == '00101     1${eol}'
 }
 
 fn test_bsd_sum_col_width_4_padded_with_zero() {
-	res := os.execute('echo hhh | ${executable_under_test} -r')
-
+	res := sum_arbitrary_value_bsd('hhh')!
 	assert res.exit_code == 0
 	assert res.output == '00101     1${eol}'
 }
@@ -185,7 +192,6 @@ fn test_bsd_block_col_width_more_than_5_not_aligned() {
 	// this test needs 100+MB input string and since there's no easy way to mock block count fn,
 	// we need to create an actual file
 	res := os.execute('${executable_under_test} -r ${test1_txt} ${large_file} ${test2_txt}')
-
 	assert res.exit_code == 0
 	assert res.output == '59852     1 ${test1_txt}${eol}62707 112640 ${large_file}${eol}11628     1 ${test2_txt}${eol}'
 }
