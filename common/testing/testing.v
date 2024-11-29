@@ -109,6 +109,7 @@ pub fn command_fails(cmd string) !os.Result {
 }
 
 const gnu_coreutils_installed = os.getenv('GNU_COREUTILS_INSTALLED').int() == 1
+const use_multi_binary_to_test = os.getenv('USE_MULTI_BINARY_TO_TEST')
 
 // same_results/2 executes the given commands, and ensures that
 // their results are exactly the same, both for their exit codes,

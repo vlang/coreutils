@@ -11,7 +11,7 @@ const small_diff_size = 64
 pub struct TestRig {
 pub:
 	util                  string
-	platform_util         string
+	platform_util_call    string
 	platform_util_path    string
 	executable_under_test string
 	temp_dir              string
@@ -30,18 +30,14 @@ pub fn (rig TestRig) call_for_test(args string) os.Result {
 }
 
 pub fn prepare_rig(config TestRigConfig) TestRig {
-	call_util := $if !windows {
-		config.util
-	} $else {
-		'coreutils'
-	}
+	call_util := if use_multi_binary_to_test != '' { use_multi_binary_to_test } else { config.util }
 
 	platform_util_path := os.find_abs_path_of_executable(call_util) or {
 		eprintln("ERROR: Local platform util '${call_util}' not found!")
 		exit(1)
 	}
 
-	platform_util := if call_util == 'coreutils' {
+	platform_util := if use_multi_binary_to_test != '' {
 		'${call_util} ${config.util}'
 	} else {
 		call_util
@@ -53,7 +49,7 @@ pub fn prepare_rig(config TestRigConfig) TestRig {
 	os.chdir(temp_dir) or { panic('Unable to set working directory: ${temp_dir}') }
 	rig := TestRig{
 		util:                  config.util
-		platform_util:         platform_util
+		platform_util_call:    platform_util
 		platform_util_path:    platform_util_path
 		cmd:                   new_paired_command(platform_util, exec_under_test)
 		executable_under_test: exec_under_test
@@ -70,13 +66,9 @@ pub fn (rig TestRig) clean_up() {
 }
 
 pub fn (rig TestRig) assert_platform_util() {
-	platform_ver := $if !windows {
-		os.execute('${rig.platform_util_path} --version')
-	} $else {
-		os.execute('${rig.platform_util_path} ${rig.util} --version')
-	}
+	platform_ver := os.execute('${rig.platform_util_call} --version')
+	eprintln('Platform util version: [${platform_ver.output}]')
 	assert platform_ver.exit_code == 0
-	eprintln('Platform util version: ${platform_ver.output}')
 
 	if platform_ver.output.len > rig.util.len {
 		assert platform_ver.output[..rig.util.len] == rig.util
@@ -99,11 +91,7 @@ pub fn (rig TestRig) assert_platform_util() {
 }
 
 pub fn (rig TestRig) call_orig(args string) os.Result {
-	return $if !windows {
-		os.execute('${rig.platform_util_path} ${args}')
-	} $else {
-		os.execute('${rig.platform_util_path} ${rig.util} ${args}')
-	}
+	return os.execute('${rig.platform_util_call} ${args}')
 }
 
 pub fn (rig TestRig) call_new(args string) os.Result {
@@ -127,18 +115,14 @@ pub fn (rig TestRig) assert_same_results(args string) {
 
 	// If the name of the executable appears in the returned message, shorten it to the util
 	// name because the paths are different for GNU coreutil and v-coreutil
-	cmd1_output := $if !windows {
-		cmd1_res.output.replace(rig.platform_util_path, rig.util)
-	} $else {
-		cmd1_res.output.replace('${rig.platform_util_path} ${rig.util}', '${rig.util}')
-	}
+	cmd1_output := cmd1_res.output.replace(rig.platform_util_call, rig.util)
 	cmd2_output := cmd2_res.output.replace(rig.executable_under_test, rig.util)
 	mut noutput1 := normalise(cmd1_output)
 	mut noutput2 := normalise(cmd2_output)
 
 	$if trace_same_results ? {
 		eprintln('------------------------------------')
-		eprintln('>> same_results cmd1: "${rig.platform_util_path} ${args}"')
+		eprintln('>> same_results cmd1: "${rig.platform_util_call} ${args}"')
 		eprintln('>> same_results cmd2: "${rig.executable_under_test} ${args}"')
 		eprintln('                cmd1_res.exit_code: ${cmd1_res.exit_code}')
 		eprintln('                cmd2_res.exit_code: ${cmd2_res.exit_code}')
