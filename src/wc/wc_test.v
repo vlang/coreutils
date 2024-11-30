@@ -14,7 +14,7 @@ const long_over_16k = os.join_path(rig.temp_dir, 'long_over_16k')
 const long_under_16k = os.join_path(rig.temp_dir, 'long_under_16k')
 
 // todo add tests
-// - long line (>16k) count max line
+// - test windows \r\n vs \n
 
 fn testsuite_begin() {
 	rig.assert_platform_util()

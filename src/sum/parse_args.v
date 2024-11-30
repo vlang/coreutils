@@ -2,18 +2,31 @@ import common
 import os
 import time
 
+const app_name = 'sum'
+const app_description = '
+Print checksum and block counts for each FILE.
+
+With no FILE, or when FILE is -, read standard input.'
+
+struct Args {
+	sys_v bool
+	files []string
+}
+
 fn parse_args(args []string) Args {
 	mut fp := common.flag_parser(args)
 	fp.application(app_name)
-	fp.description('
-	Print or check BSD (16-bit) checksums.
+	fp.description(app_description)
 
-	With no FILE, or when FILE is -, read standard input.'.trim_indent())
-
-	fp.bool('', `r`, true, 'use BSD sum algorithm (the default), use 1K blocks')
-	sys_v := fp.bool('sysv', `s`, false, 'use System V sum algorithm, use 512 bytes blocks')
+	fp.bool('', `r`, true, 'use BSD sum algorithm, use 1K blocks')
+	mut sys_v := fp.bool('sysv', `s`, false, 'use System V sum algorithm, use 512 bytes blocks')
 	files_arg := fp.finalize() or { exit_error(err.msg()) }
 	files := scan_files_arg(files_arg)
+
+	// emulate original algorithm switches behavior
+	if '-rs' in args {
+		sys_v = true
+	}
 
 	return Args{
 		sys_v: sys_v
