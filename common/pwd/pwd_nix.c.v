@@ -33,7 +33,7 @@ pub fn get_uid_for_name(username string) !int {
 	if isnil(r) {
 		return os.error_posix()
 	}
-	return r.pw_uid
+	return int(r.pw_uid)
 }
 
 pub fn get_userinfo_for_name(username string) !UserInfo {
@@ -44,8 +44,8 @@ pub fn get_userinfo_for_name(username string) !UserInfo {
 	unsafe {
 		return UserInfo{
 			username: cstring_to_vstring(r.pw_name)
-			uid:      r.pw_uid
-			gid:      r.pw_gid
+			uid:      int(r.pw_uid)
+			gid:      int(r.pw_gid)
 		}
 	}
 }

@@ -97,7 +97,7 @@ fn make_dev(major u32, minor u32) u32 {
 }
 
 fn datetime_for_humans(ts StatxTimestamp) string {
-	t := time.unix_nanosecond(ts.tv_sec, ts.tv_nsec).utc_to_local()
+	t := time.unix_nanosecond(ts.tv_sec, int(ts.tv_nsec)).utc_to_local()
 	return '${t.format_ss_nano()} ${dtoffset_for_humans(t)}'
 }
 
@@ -176,7 +176,7 @@ fn process_token(token string, st Statx, path string, mtab []MountInfo) string {
 			'${st.stx_gid}'
 		}
 		'G' {
-			name := pwd.get_name_for_gid(st.stx_gid) or { 'Unknown group ${st.stx_gid}' }
+			name := pwd.get_name_for_gid(int(st.stx_gid)) or { 'Unknown group ${st.stx_gid}' }
 			'${name}'
 		}
 		'h' {
@@ -228,7 +228,7 @@ fn process_token(token string, st Statx, path string, mtab []MountInfo) string {
 			'${st.stx_uid}'
 		}
 		'U' {
-			name := pwd.get_name_for_uid(st.stx_uid) or { 'Unknown user ${st.stx_uid}' }
+			name := pwd.get_name_for_uid(int(st.stx_uid)) or { 'Unknown user ${st.stx_uid}' }
 			'${name}'
 		}
 		'w' {
