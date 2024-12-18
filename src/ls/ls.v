@@ -1,132 +1,49 @@
+import arrays { group_by }
+import datatypes { Set }
 import os
-import common
-
-struct Directory {
-	name string
-mut:
-	contents []string
-}
-
-fn go_print(file_list []Directory, seperator string) {
-	mut constructed := ''
-	if file_list.len == 1 {
-		// Single directory
-		for i, contents in file_list[0].contents {
-			constructed += contents
-			if i == file_list[0].contents.len - 1 {
-				break
-			}
-			constructed += seperator
-		}
-	} else {
-		// Multiple directories
-		for i, dir in file_list {
-			constructed += dir.name + ':\n'
-			for j, contents in dir.contents {
-				constructed += contents
-				if j == dir.contents.len - 1 {
-					break
-				}
-				constructed += seperator
-			}
-			if i != file_list.len - 1 {
-				constructed += '\n\n'
-			}
-		}
-	}
-	print(constructed)
-}
+import math
 
 fn main() {
-	mut fp := common.flag_parser(os.args)
-	fp.application('ls')
-	fp.description('list directory contents')
+	options, files := get_args()
+	set_auto_wrap(options)
+	entries, status := get_entries(files, options)
+	mut cyclic := Set[string]{}
+	status1 := ls(entries, options, mut cyclic)
+	exit(math.max(status, status1))
+}
 
-	arg_1 := fp.bool('', `1`, false, 'list one file per line')
-	arg_all := fp.bool('all', `a`, false, 'do not ignore entries starting with .')
-	arg_almost_all := fp.bool('almost-all', `A`, false, 'do not list implied . and ..')
-	arg_comma_seperated := fp.bool('comma-seperated', `m`, false, 'fill width with a comma seperated list of entries')
-	arg_reverse := fp.bool('reverse', `r`, false, 'reverse order wile sorting')
-	arg_help := fp.bool('help', 0, false, 'display this help and exit')
+fn ls(entries []Entry, options Options, mut cyclic Set[string]) int {
+	mut status := 0
+	group_by_dirs := group_by[string, Entry](entries, fn (e Entry) string {
+		return e.dir_name
+	})
+	sorted_dirs := group_by_dirs.keys().sorted()
 
-	// Get folders
-	args := fp.finalize() or {
-		eprintln(err)
-		println(fp.usage())
-		exit(1)
-	}
-
-	// Help command
-	if arg_help {
-		println(fp.usage())
-		exit(0)
-	}
-
-	// Get dir / dirs
-	mut file_list := match args.len {
-		0 {
-			list := os.ls('.') or {
-				eprintln(err)
-				println("ls: cannot access '.': No such file or directory")
-				exit(1)
-			}
-
-			[Directory{'.', list}]
+	for dir in sorted_dirs {
+		files := group_by_dirs[dir]
+		filtered := filter(files, options)
+		sorted := sort(filtered, options)
+		if group_by_dirs.len > 1 || options.recursive {
+			print_dir_name(dir, options)
 		}
-		else {
-			// 1 or more dirs
-			mut dirs := []Directory{}
-			for arg in args {
-				name := if args.len > 1 {
-					arg
-				} else {
-					'.'
+		print_files(sorted, options)
+
+		if options.recursive {
+			for entry in sorted {
+				if entry.dir {
+					entry_path := os.join_path(entry.dir_name, entry.name)
+					if cyclic.exists(entry_path) {
+						println('===> cyclic reference detected <===')
+						continue
+					}
+					cyclic.add(entry_path)
+					dir_entries, status1 := get_entries([entry_path], options)
+					status2 := ls(dir_entries, options, mut cyclic)
+					cyclic.remove(entry_path)
+					status = math.max(status1, status2)
 				}
-				list := os.ls(arg) or {
-					eprintln(err)
-					println("ls: cannot access '" + arg + "': No such file or directory")
-					exit(1)
-				}
-				dirs << Directory{name.replace('/', ''), list}
 			}
-			dirs
 		}
 	}
-
-	// Define initial seperator
-	mut seperator := '  '
-
-	// Modify seperator
-	if arg_comma_seperated {
-		seperator = ', '
-	}
-	if arg_1 {
-		seperator += '\n'
-	}
-
-	// Do not list dotfiles by default
-	if !(arg_all || arg_almost_all) {
-		for i, dir in file_list {
-			file_list[i].contents = dir.contents.filter(fn (contents string) bool {
-				return contents[0] != `.`
-			})
-		}
-	}
-
-	// . and .. path listing
-	if arg_all {
-		for i, _ in file_list {
-			file_list[i].contents.prepend(['.', '..'])
-		}
-	}
-
-	// Reverse
-	if arg_reverse {
-		for i, _ in file_list {
-			file_list[i].contents.reverse_in_place()
-		}
-	}
-
-	// Print
-	go_print(file_list, seperator)
+	return status
 }
