@@ -11,11 +11,11 @@ jobs:
       VTEST_SHOW_START: 1
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
         with:
           path: coreutils
       - name: Checkout Latest V
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
         with:
           repository: vlang/v
           path: v
@@ -64,14 +64,14 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Latest V
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
         with:
           repository: vlang/v
           path: v
       - name: Build V
         run: cd v && make && sudo ./v symlink && cd -
       - name: Checkout Coreutils (for tests)
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
         with:
           path: coreutils
       - name: V doctor
@@ -89,14 +89,14 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Latest V
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
         with:
           repository: vlang/v
           path: v
       - name: Build V
         run: cd v && make && sudo ./v symlink && cd -
       - name: Checkout Coreutils (for tests)
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
         with:
           path: coreutils
       - name: Build all with -prod
@@ -108,14 +108,14 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Latest V
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
         with:
           repository: vlang/v
           path: v
       - name: Build V
         run: cd v && make && sudo ./v symlink && cd -
       - name: Checkout Coreutils (for tests)
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
         with:
           path: coreutils
       - name: Build all
