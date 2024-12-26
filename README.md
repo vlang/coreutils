@@ -138,7 +138,7 @@ compare against the true GNU coreutils version on the Linux-based tests first.
 |         | stdbuf    | Run a command with modified I/O stream buffering |         |
 |         | stty      | Print or change terminal characteristics         |         |
 | &check; | sum       | Print checksum and block counts                  | &check; |
-| &check; | sync      | Synchronize cached writes to persistent storage  |         |
+| &check; | sync      | Synchronize cached writes to persistent storage  | &check; |
 | &check; | tac       | Concatenate and write files in reverse           | &check; |
 | &check; | tail      | Output the last part of files                    | &check; |
 |         | tee       | Redirect output to multiple files or processes   | &check; |
