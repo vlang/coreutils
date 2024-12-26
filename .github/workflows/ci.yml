@@ -122,6 +122,7 @@ jobs:
         run: cd coreutils && v run build.vsh
       - name: Native utils diagnostics (before GNU coreutils)
         run: |
+          echo "::remove-matcher owner=v-problem-matcher::"
           sleep --version
           uptime --version
       - name: Setup the original GNU coreutils for comparison
