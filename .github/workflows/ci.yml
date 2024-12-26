@@ -61,7 +61,7 @@ jobs:
           cd coreutils && USE_MULTI_BINARY_TO_TEST=coreutils v test .
 
   ubuntu-fast-build:
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-22.04
     steps:
       - name: Checkout Latest V
         uses: actions/checkout@v4
@@ -86,7 +86,7 @@ jobs:
         run: cd coreutils && make test
 
   ubuntu-prod-build:
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-22.04
     steps:
       - name: Checkout Latest V
         uses: actions/checkout@v4
@@ -105,7 +105,7 @@ jobs:
         run: cd coreutils && make test
 
   ubuntu-gnu-coreutils:
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-22.04
     steps:
       - name: Checkout Latest V
         uses: actions/checkout@v4
