@@ -5,7 +5,7 @@ import time
 import v.mathutil { max }
 
 const inode_title = 'inode'
-const permissions_title = 'Permissions'
+const permissions_title = 'Permission'
 const mask_title = 'Mask'
 const links_title = 'Links'
 const owner_title = 'Owner'
@@ -18,7 +18,7 @@ const name_title = 'Name'
 const unknown = '?'
 const block_size = 5
 const space = ' '
-const date_format = 'MMM DD YYYY HH:mm:ss'
+const date_format = 'MMM DD HH:mm'
 const date_iso_format = 'YYYY-MM-DD HH:mm:ss'
 const date_compact_format = "DD MMM'YY HH:mm"
 const date_compact_format_with_day = "ddd DD MMM'YY HH:mm"
@@ -82,10 +82,6 @@ fn format_long_listing(entries []Entry, options Options) {
 
 		// permissions
 		if !options.no_permissions {
-			flag := file_flag(entry, options)
-			print(format_cell(flag, 1, .left, no_style, options))
-			print_space()
-
 			content := permissions(entry, options)
 			print(format_cell(content, permissions_title.len, .right, no_style, options))
 			print_space()
@@ -180,11 +176,6 @@ fn format_long_listing(entries []Entry, options Options) {
 
 	// bottom border
 	print_bottom_border(options, header_len, cols)
-
-	// stats
-	if !options.no_count {
-		statistics(entries, header_len, options)
-	}
 }
 
 fn longest_entries(entries []Entry, options Options) Longest {
@@ -355,8 +346,8 @@ fn file_flag(entry Entry, options Options) string {
 		entry.block 	{ style_string('b', options.style_bd, options) }
 		entry.character { style_string('c', options.style_cd, options) }
 		entry.socket 	{ style_string('s', options.style_so, options) }
-		entry.file	{ style_string('f', options.style_fi, options) }
-		else 		{ ' ' }
+		entry.file	{ style_string('-', options.style_fi, options) }
+		else 		{ '?' }
 		// vfmt on
 	}
 }
@@ -368,10 +359,11 @@ fn format_octal_permissions(entry Entry, options Options) string {
 
 fn permissions(entry Entry, options Options) string {
 	mode := entry.stat.get_mode()
+	flag := file_flag(entry, options)
 	owner := file_permission(mode.owner, options)
 	group := file_permission(mode.group, options)
 	other := file_permission(mode.others, options)
-	return '${owner} ${group} ${other}'
+	return '${flag}${owner}${group}${other}'
 }
 
 fn file_permission(file_permission os.FilePermission, options Options) string {

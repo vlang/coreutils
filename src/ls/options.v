@@ -28,7 +28,6 @@ mut:
 	long_no_owner         bool   @[only: 'g'; xdoc: 'like -l, but do not list owner']
 	dirs_first            bool   @[only: 'group-directories-first'; xdoc: 'group directories before files; can be augmented with a --sort option, but any use of --sort=none (-U) disables grouping']
 	icons                 bool   @[xdoc: 'show file icon (requires nerd fonts)']
-	no_count              bool   @[xdoc: 'hide file/dir counts']
 	no_date               bool   @[xdoc: 'hide data (modified)']
 	no_dim                bool   @[xdoc: 'hide shading; useful for light backgrounds']
 	no_group_name         bool   @[long: 'no-group'; short: 'G'; xdoc: 'in a long listing, don\'t print group names']
@@ -133,9 +132,8 @@ fn get_args() (Options, []string) {
 		options.no_owner_name = true
 	}
 
-	if options.table_format || options.header || options.checksum.len > 0 || options.no_count
-		|| options.no_date || options.no_permissions || options.no_size || options.no_count
-		|| options.octal_permissions {
+	if options.table_format || options.header || options.checksum.len > 0 || options.no_date
+		|| options.no_permissions || options.no_size || options.octal_permissions {
 		options.long_format = true
 	}
 
