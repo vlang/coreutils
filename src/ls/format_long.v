@@ -39,12 +39,20 @@ enum StatTime {
 	modified
 }
 
+fn print_total(entries []Entry, options Options) {
+	total := arrays.fold[Entry, u64](entries, 0, fn (a u64, e Entry) u64 {
+		return a + max(u64(1), e.size / 1024)
+	})
+	println('total: ${total}')
+}
+
 fn format_long_listing(entries []Entry, options Options) {
 	longest := longest_entries(entries, options)
 	header, cols := format_header(options, longest)
 	header_len := real_length(header)
 	term_cols, _ := term.get_terminal_size()
 
+	print_total(entries, options)
 	print_header(header, options, header_len, cols)
 	print_header_border(options, header_len, cols)
 
@@ -120,7 +128,6 @@ fn format_long_listing(entries []Entry, options Options) {
 			content := match true {
 				// vfmt off
 				entry.invalid 				{ unknown }
-				entry.dir || entry.socket || entry.fifo { '-' }
 				options.size_ki && !options.size_kb 	{ entry.size_ki }
 				options.size_kb 			{ entry.size_kb }
 				else 					{ entry.size.str() }
