@@ -555,7 +555,7 @@ fn get_fs_list() map[string]u32 {
 		assert s[i + 10] == ` `
 		type_id := s[i + 2..i + 10].trim_right(' ')
 		i += 11
-		j := s.index_after('\n', i)
+		j := s.index_after('\n', i) or { -1 }
 		fs_name := s[i..j]
 		i = j + 1
 		fslist[fs_name] = u32(strconv.parse_uint(type_id, 16, 32) or {
