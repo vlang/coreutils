@@ -1,6 +1,6 @@
 #!/bin/env v
 
-import os // v has a bug that you can't use args
+import time
 
 const ignore_dirs = {
 	'windows': [
@@ -37,12 +37,16 @@ const ignore_dirs = {
 		'nohup',
 	]
 	'macos':   ['stat', 'sync', 'uptime']
-}[os.user_os()] or { [] }
+}[user_os()] or { [] }
 
-dump(os.user_os())
+unbuffer_stdout()
+
+dump(user_os())
 dump(ignore_dirs)
 
-vargs := if os.args.len > 1 { os.args[1..] } else { []string{} }
+args := arguments()
+vargs := if args.len > 1 { args[1..] } else { [] }
+dump(vargs)
 
 curdir := getwd()
 chdir('src')!
@@ -64,13 +68,13 @@ for dir in dirs {
 	// Get all of the of v files in the directory and get unix modifed time
 	mut modification_time := []i64{}
 	for src_file in ls(dir)!.filter(it.ends_with('.v')) {
-		modification_time << os.file_last_mod_unix('${dir}/${src_file}')
+		modification_time << file_last_mod_unix('${dir}/${src_file}')
 	}
 
 	// Check if the binary exists and is newer than the source files
 	// If it is, skip it
 	if exists('${curdir}/bin/${dir}') {
-		bin_mod_time := os.file_last_mod_unix('${curdir}/bin/${dir}')
+		bin_mod_time := file_last_mod_unix('${curdir}/bin/${dir}')
 		// If the binary is newer than the source files, skip it
 		if modification_time.filter(it < bin_mod_time).len == modification_time.len {
 			continue
@@ -81,9 +85,11 @@ for dir in dirs {
 	for arg in vargs {
 		final_args += ' ' + arg
 	}
-	println('compiling ${dir}...')
+	print('compiling ${dir:-20s}...')
 	cmd := @VEXE + ' ${final_args} -o ${curdir}/bin/${dir} ./${dir}'
+	sw := time.new_stopwatch()
 	execute_or_panic(cmd)
+	println(' took ${sw.elapsed().milliseconds()}ms .')
 }
 
 chdir(curdir)!
