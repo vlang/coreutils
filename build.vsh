@@ -57,6 +57,9 @@ if !exists('${curdir}/bin') {
 	mkdir('${curdir}/bin')!
 }
 
+sw_total := time.new_stopwatch()
+mut compiled := 0
+mut already_compiled := 0
 for dir in dirs {
 	if dir in ignore_dirs {
 		continue
@@ -77,6 +80,7 @@ for dir in dirs {
 		bin_mod_time := file_last_mod_unix('${curdir}/bin/${dir}')
 		// If the binary is newer than the source files, skip it
 		if modification_time.filter(it < bin_mod_time).len == modification_time.len {
+			already_compiled++
 			continue
 		}
 	}
@@ -90,6 +94,7 @@ for dir in dirs {
 	sw := time.new_stopwatch()
 	execute_or_panic(cmd)
 	println(' took ${sw.elapsed().milliseconds()}ms .')
+	compiled++
 }
-
+println('> Compiled: ${compiled:3} tools in ${sw_total.elapsed().milliseconds()}ms. Already compiled and skipped: ${already_compiled} . All folders: ${dirs.len} .')
 chdir(curdir)!
