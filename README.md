@@ -48,7 +48,7 @@ count below and mark it as done in this README.md. Thanks!
 GNU coreutils. They are not 100% compatiable. If you encounter different behaviors,
 compare against the true GNU coreutils version on the Linux-based tests first.
 
-## Completed (74/109) - 68% done!
+## Completed (75/109) - 69% done!
 
 |  Done   | Cmd       | Descripton                                       | Windows | 
 | :-----: | --------- | ------------------------------------------------ | ------- |
@@ -66,7 +66,7 @@ compare against the true GNU coreutils version on the Linux-based tests first.
 |         | chown     | Change file owner and group                      |         |
 |         | chroot    | Run a command with a different root directory    |         |
 | &check; | cksum     | Print CRC checksum and byte counts               | &check; |
-|         | comm      | Compare two sorted files line by line            | &check; |
+| &check; | comm      | Compare two sorted files line by line            | &check; |
 |         | coreutils | Multi-call program                               | &check; |
 | &check; | cp        | Copy files and directories                       | &check; |
 |         | csplit    | Split a file into context-determined pieces      | &check; |
