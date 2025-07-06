@@ -108,17 +108,19 @@ fn test_comm_empty_files() {
 }
 
 fn test_comm_stdin() {
+	// Skip stdin test on Windows due to pipe command issues
+	$if windows {
+		return
+	}
+
 	file_path := os.temp_dir() + '/comm_stdin_test.txt'
 	stdin_file := os.temp_dir() + '/comm_stdin_content.txt'
 
 	os.write_lines(file_path, ['apple', 'banana'])!
 	os.write_lines(stdin_file, ['banana', 'cherry'])!
 
-	// Use type command on Windows, cat on Unix
-	cat_cmd := $if windows { 'type' } $else { 'cat' }
-
 	// Test stdin as first file
-	res1 := os.execute('${cat_cmd} ${stdin_file} | ${executable_under_test} - ${file_path}')
+	res1 := os.execute('cat ${stdin_file} | ${executable_under_test} - ${file_path}')
 	assert res1.exit_code == 0
 	// stdin has: banana, cherry
 	// file_path has: apple, banana
@@ -127,7 +129,7 @@ fn test_comm_stdin() {
 	assert res1.output.replace('\r\n', '\n') == expected1
 
 	// Test stdin as second file
-	res2 := os.execute('${cat_cmd} ${stdin_file} | ${executable_under_test} ${file_path} -')
+	res2 := os.execute('cat ${stdin_file} | ${executable_under_test} ${file_path} -')
 	assert res2.exit_code == 0
 	expected2 := 'apple\n\t\tbanana\n\tcherry\n'
 	assert res2.output.replace('\r\n', '\n') == expected2
