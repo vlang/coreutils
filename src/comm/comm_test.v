@@ -111,14 +111,17 @@ fn test_comm_stdin() {
 	os.write_lines(file_path, ['apple', 'banana'])!
 	os.write_lines(stdin_file, ['banana', 'cherry'])!
 
+	// Use type command on Windows, cat on Unix
+	cat_cmd := $if windows { 'type' } $else { 'cat' }
+
 	// Test stdin as first file
-	res1 := os.execute('cat ${stdin_file} | ${executable_under_test} - ${file_path}')
+	res1 := os.execute('${cat_cmd} ${stdin_file} | ${executable_under_test} - ${file_path}')
 	assert res1.exit_code == 0
 	expected1 := '\t\tbanana\n\tcherry\n'
 	assert res1.output == expected1
 
 	// Test stdin as second file
-	res2 := os.execute('cat ${stdin_file} | ${executable_under_test} ${file_path} -')
+	res2 := os.execute('${cat_cmd} ${stdin_file} | ${executable_under_test} ${file_path} -')
 	assert res2.exit_code == 0
 	expected2 := 'apple\n\t\tbanana\n\tcherry\n'
 	assert res2.output == expected2
@@ -132,7 +135,8 @@ fn test_comm_missing_file() {
 	// Missing file should produce error
 	res := os.execute('${executable_under_test} /nonexistent/file1 /nonexistent/file2')
 	assert res.exit_code == 1
-	assert res.output.contains('No such file or directory')
+	// Error message varies by platform, but should contain the filename
+	assert res.output.contains('/nonexistent/file1') || res.output.contains('\\nonexistent\\file1')
 }
 
 fn test_comm_missing_operand() {
