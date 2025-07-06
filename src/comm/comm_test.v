@@ -23,7 +23,7 @@ fn test_comm_basic() {
 	// Test basic functionality
 	res := os.execute('${executable_under_test} ${file1_path} ${file2_path}')
 	assert res.exit_code == 0
-	
+
 	// Normalize line endings for cross-platform compatibility
 	output := res.output.replace('\r\n', '\n')
 	expected := 'apple\n\t\tbanana\n\t\tcherry\n\t\tdate\n\tfig\n'
