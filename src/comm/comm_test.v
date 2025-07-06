@@ -23,8 +23,11 @@ fn test_comm_basic() {
 	// Test basic functionality
 	res := os.execute('${executable_under_test} ${file1_path} ${file2_path}')
 	assert res.exit_code == 0
+	
+	// Normalize line endings for cross-platform compatibility
+	output := res.output.replace('\r\n', '\n')
 	expected := 'apple\n\t\tbanana\n\t\tcherry\n\t\tdate\n\tfig\n'
-	assert res.output == expected
+	assert output == expected
 
 	// Compare with platform util
 	rig.assert_same_results('${file1_path} ${file2_path}')
@@ -44,22 +47,22 @@ fn test_comm_suppress_columns() {
 	// Test -1 flag
 	res1 := os.execute('${executable_under_test} -1 ${file1_path} ${file2_path}')
 	assert res1.exit_code == 0
-	assert res1.output == '\tb\n\tc\nd\n'
+	assert res1.output.replace('\r\n', '\n') == '\tb\n\tc\nd\n'
 
 	// Test -2 flag
 	res2 := os.execute('${executable_under_test} -2 ${file1_path} ${file2_path}')
 	assert res2.exit_code == 0
-	assert res2.output == 'a\n\tb\n\tc\n'
+	assert res2.output.replace('\r\n', '\n') == 'a\n\tb\n\tc\n'
 
 	// Test -3 flag
 	res3 := os.execute('${executable_under_test} -3 ${file1_path} ${file2_path}')
 	assert res3.exit_code == 0
-	assert res3.output == 'a\n\td\n'
+	assert res3.output.replace('\r\n', '\n') == 'a\n\td\n'
 
 	// Test -12 (show only common)
 	res12 := os.execute('${executable_under_test} -12 ${file1_path} ${file2_path}')
 	assert res12.exit_code == 0
-	assert res12.output == 'b\nc\n'
+	assert res12.output.replace('\r\n', '\n') == 'b\nc\n'
 
 	// Compare with platform util
 	rig.assert_same_results('-1 ${file1_path} ${file2_path}')
@@ -87,12 +90,12 @@ fn test_comm_empty_files() {
 	// First file empty
 	res2 := os.execute('${executable_under_test} ${empty_file} ${nonempty_file}')
 	assert res2.exit_code == 0
-	assert res2.output == '\thello\n\tworld\n'
+	assert res2.output.replace('\r\n', '\n') == '\thello\n\tworld\n'
 
 	// Second file empty
 	res3 := os.execute('${executable_under_test} ${nonempty_file} ${empty_file}')
 	assert res3.exit_code == 0
-	assert res3.output == 'hello\nworld\n'
+	assert res3.output.replace('\r\n', '\n') == 'hello\nworld\n'
 
 	// Compare with platform util
 	rig.assert_same_results('${empty_file} ${empty_file}')
@@ -117,14 +120,17 @@ fn test_comm_stdin() {
 	// Test stdin as first file
 	res1 := os.execute('${cat_cmd} ${stdin_file} | ${executable_under_test} - ${file_path}')
 	assert res1.exit_code == 0
-	expected1 := '\t\tbanana\n\tcherry\n'
-	assert res1.output == expected1
+	// stdin has: banana, cherry
+	// file_path has: apple, banana
+	// So: apple is only in file2 (1 tab), banana is in both (2 tabs), cherry is only in file1 (0 tabs)
+	expected1 := '\tapple\n\t\tbanana\ncherry\n'
+	assert res1.output.replace('\r\n', '\n') == expected1
 
 	// Test stdin as second file
 	res2 := os.execute('${cat_cmd} ${stdin_file} | ${executable_under_test} ${file_path} -')
 	assert res2.exit_code == 0
 	expected2 := 'apple\n\t\tbanana\n\tcherry\n'
-	assert res2.output == expected2
+	assert res2.output.replace('\r\n', '\n') == expected2
 
 	// Cleanup
 	os.rm(file_path)!
@@ -161,7 +167,7 @@ fn test_comm_delimiter() {
 	// Test custom delimiter
 	res := os.execute('${executable_under_test} --output-delimiter="|" ${file1_path} ${file2_path}')
 	assert res.exit_code == 0
-	assert res.output == 'a\n|b\n||c\n'
+	assert res.output.replace('\r\n', '\n') == 'a\n|b\n||c\n'
 
 	// Compare with platform util (if it supports this option)
 	// Note: Some platform utils may not support --output-delimiter
