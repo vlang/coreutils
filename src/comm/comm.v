@@ -5,14 +5,14 @@ import io
 import common
 
 struct Settings {
-	suppress_col1       bool
-	suppress_col2       bool
-	suppress_col3       bool
-	check_order         bool
-	nocheck_order       bool
-	output_delimiter    string
-	zero_terminated     bool
-	show_total          bool
+	suppress_col1    bool
+	suppress_col2    bool
+	suppress_col3    bool
+	check_order      bool
+	nocheck_order    bool
+	output_delimiter string
+	zero_terminated  bool
+	show_total       bool
 }
 
 fn main() {
@@ -43,14 +43,14 @@ fn main() {
 	}
 
 	settings := Settings{
-		suppress_col1: suppress_col1
-		suppress_col2: suppress_col2
-		suppress_col3: suppress_col3
-		check_order: check_order
-		nocheck_order: nocheck_order
+		suppress_col1:    suppress_col1
+		suppress_col2:    suppress_col2
+		suppress_col3:    suppress_col3
+		check_order:      check_order
+		nocheck_order:    nocheck_order
 		output_delimiter: output_delimiter
-		zero_terminated: zero_terminated
-		show_total: total
+		zero_terminated:  zero_terminated
+		show_total:       total
 	}
 
 	run(settings, positional_args[0], positional_args[1])
@@ -75,16 +75,16 @@ fn run(settings Settings, file1_path string, file2_path string) {
 	mut reader2 := io.new_buffered_reader(reader: file2)
 
 	delimiter := if settings.zero_terminated { `\0` } else { `\n` }
-	
+
 	mut line1 := read_line(mut reader1, delimiter) or { '' }
 	mut line2 := read_line(mut reader2, delimiter) or { '' }
 	mut prev_line1 := ''
 	mut prev_line2 := ''
-	
+
 	mut col1_count := 0
 	mut col2_count := 0
 	mut col3_count := 0
-	
+
 	check_order := !settings.nocheck_order && settings.check_order
 
 	for {
@@ -173,7 +173,7 @@ fn read_line(mut reader io.BufferedReader, delimiter u8) !string {
 
 fn print_column(column int, text string, settings Settings) {
 	mut prefix := ''
-	
+
 	// Add tabs based on which columns are being printed
 	match column {
 		1 {
@@ -196,7 +196,7 @@ fn print_column(column int, text string, settings Settings) {
 		}
 		else {}
 	}
-	
+
 	if settings.zero_terminated {
 		print('${prefix}${text}\0')
 	} else {

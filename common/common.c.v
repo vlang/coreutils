@@ -14,7 +14,7 @@ fn C.GetConsoleOutputCP() u32 // ref: <https://learn.microsoft.com/en-us/windows
 fn C.GetOEMCP() u32 // ref: <https://learn.microsoft.com/en-us/windows/win32/api/winnls/nf-winnls-getoemcp> @@ <https://archive.is/Cvtvm>
 
 fn init() {
-	C.setlocale(C.LC_ALL, ''.str)
+	C.setlocale(C.LC_ALL, c'')
 }
 
 // is_utf8 returns whether the locale supports UTF-8 or not

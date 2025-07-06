@@ -9,7 +9,7 @@ const app = common.CoreutilInfo{
 // Settings for Utility: users
 struct Settings {
 mut:
-	input_file &char = ''.str
+	input_file &char = c''
 }
 
 fn users(settings Settings) {
