@@ -26,7 +26,7 @@ fn C.getloadavg(loadavg [3]f64, nelem int) int
 fn print_uptime(utmp_buf []C.utmpx) ! {
 	// Get uptime
 	mut uptime := i64(0)
-	fp := C.fopen(&char('/proc/uptime'.str), &char('r'.str))
+	fp := C.fopen(&char(c'/proc/uptime'), &char(c'r'))
 	if !isnil(fp) {
 		buf := []u8{len: 4096}
 		unsafe {
