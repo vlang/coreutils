@@ -1,13 +1,11 @@
 import common
 
-const (
-	name              = 'rmdir'
-	valid_interactive = [
-		['never', 'no', 'none'],
-		['once'],
-		['always', 'yes'],
-	]
-)
+const name = 'rmdir'
+const valid_interactive = [
+	['never', 'no', 'none'],
+	['once'],
+	['always', 'yes'],
+]
 
 fn success_exit(msg string) {
 	println(msg)
@@ -28,7 +26,7 @@ fn setup_rmdir_command(args []string) !(RmdirCommand, []string) {
 		success_exit(fp.usage())
 	}
 	if version {
-		success_exit('rm $common.coreutils_version()')
+		success_exit('rm ${common.coreutils_version()}')
 	}
 	rmdir := RmdirCommand{verbose, parents}
 

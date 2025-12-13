@@ -8,3 +8,10 @@ build
 *.so
 *.dylib
 *.dll
+
+.idea/
+.zed/
+*.iml
+build
+src/touch/touch
+

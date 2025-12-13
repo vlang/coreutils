@@ -1,13 +1,9 @@
+import common
 import common.testing
 import os
 
-const the_executable = testing.prepare_executable('expr')
-
-const cmd = testing.new_paired_command('expr', the_executable)
-
-fn test_help_and_version() {
-	cmd.ensure_help_and_version_options_work()!
-}
+const rig = testing.prepare_rig(util: 'expr')
+const cmd = rig.cmd
 
 const tests = [
 	r'5 + 6',
@@ -49,9 +45,11 @@ const tests = [
 	r'"a)" : "a)"',
 	r'_ : "a\\)"'
 	//	r'_ : "\\)"',
-	r'"ab" : "a\\(\\)b"',
-	r'"a^b" : "a^b"',
-	r'"a\$b" : "a\$b"',
+	r'"ab" : "a\\(\\)b"'
+	// r'"a^b" : "a^b"',       // FixME: [2022-12-29; rivy] for WinOS comparison, `expr.exe` is bugged based on oniguruma bug (see GH:kkos/oniguruma/issues/279)
+	r'"a^b" : "a\^b"'
+	// r'"a\$b" : "a\\$b"',    // FixME: [2022-12-29; rivy] for WinOS comparison, `expr.exe` is bugged based on oniguruma bug (see GH:kkos/oniguruma/issues/279)
+	r'"a\$b" : a[$]b',
 	r'"" : "\\($\\)\\(^\\)"'
 	//	r'"b" : "a*\\(^b\$\\)c*"',
 	r'"X|" : "X\\(|\\)" : "(" "X|" : "X\\(|\\)" ")"'
@@ -102,7 +100,9 @@ const tests = [
 	//	r'"aa" : "a*\\{1\\}"',
 	//	r'"aa" : "a\\{1\\}*"'
 	//	r'"acd" : "a\\(b\\)?c\\1d"',
-	r'"-5" : "-\\{0,1\\}[0-9]*\$"',
+	// r'"-5" : "-\\{0,1\\}[0-9]*\$"', // DISABLED: escaping non-special characters in regex has undefined behavior
+	r'"-5" : "-\{0,1\}[0-9]*$"',
+	r'"-5" : "-\{0,1}[0-9]*$"',
 	r''
 	// big number is not supported for now
 	//	r'98782897298723498732987928734 + 1',
@@ -125,8 +125,8 @@ fn test_results() {
 	for test in tests {
 		res := cmd.same_results(test)
 		if !res {
-			if os.execute('$cmd.original $test').exit_code == 2
-				&& os.execute('$cmd.deputy $test').exit_code == 2 {
+			if os.execute('${cmd.original} ${test}').exit_code == 2
+				&& os.execute('${cmd.deputy} ${test}').exit_code == 2 {
 				continue
 			}
 			failed << test
@@ -175,24 +175,36 @@ const mb_tests = [
 ]
 
 fn test_multi_byte_results() {
+	use_utf := common.is_utf8()
 	mut failed := []string{}
-	for test in mb_tests {
-		res := cmd.same_results(test)
-		if !res {
-			original_cmd := '$cmd.original $test'
-			deputy_cmd := '$cmd.deputy $test'
-			ores := os.execute(original_cmd)
-			dres := os.execute(deputy_cmd)
-			if ores.exit_code == 2 && dres.exit_code == 2 {
-				continue
+	if use_utf {
+		// attempt multi-byte tests iff utf is enabled/used
+		for test in mb_tests {
+			res := cmd.same_results(test)
+			if !res {
+				original_cmd := '${cmd.original} ${test}'
+				deputy_cmd := '${cmd.deputy} ${test}'
+				ores := os.execute(original_cmd)
+				dres := os.execute(deputy_cmd)
+				if ores.exit_code == 2 && dres.exit_code == 2 {
+					continue
+				}
+				failed << test
+				eprintln('>>> original_cmd: `${original_cmd}`')
+				eprintln('>>>   deputy_cmd: `${deputy_cmd}`')
+				eprintln('>>>    fail_ores: ${ores}')
+				eprintln('>>>    fail_dres: ${dres}')
 			}
-			failed << test
-			eprintln('>>> original_cmd: `$original_cmd`')
-			eprintln('>>>   deputy_cmd: `$deputy_cmd`')
-			eprintln('>>>    fail_ores: $ores')
-			eprintln('>>>    fail_dres: $dres')
 		}
 	}
 	println(failed.join('\n'))
 	assert failed.len == 0
+}
+
+fn testsuite_begin() {
+	rig.assert_platform_util()
+}
+
+fn test_help_and_version() {
+	rig.assert_help_and_version_options_work()
 }

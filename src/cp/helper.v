@@ -1,38 +1,36 @@
 import os
 import common
 
-const (
-	name            = 'cp'
-	interactive_yes = ['y']
-	combine_t_no_t  = 'cannot combine --target-directory (-t) and --no-target-directory (-T)'
-)
+const name = 'cp'
+const interactive_yes = ['y']
+const combine_t_no_t = 'cannot combine --target-directory (-t) and --no-target-directory (-T)'
 
 fn prompt_file(path string) string {
-	return "overwrite '$path'? "
+	return "overwrite '${path}'? "
 }
 
 fn target_not_dir(path string) string {
-	return "target '$path' is not a directory"
+	return "target '${path}' is not a directory"
 }
 
 fn renamed(src string, dst string) string {
-	return "renamed '$src' -> '$dst'"
+	return "renamed '${src}' -> '${dst}'"
 }
 
 fn missing_dest(path string) string {
-	return "missing destination file operand after '$path'"
+	return "missing destination file operand after '${path}'"
 }
 
 fn no_dir_is_dir(path string) string {
-	return "cannot overwrite directory '$path' with non-directory"
+	return "cannot overwrite directory '${path}' with non-directory"
 }
 
 fn not_exist(path string) string {
-	return "$name: cannot stat '$path': No such file or directory"
+	return "${name}: cannot stat '${path}': No such file or directory"
 }
 
 fn extra_operand(operand string) string {
-	return "extra operand '$operand'"
+	return "extra operand '${operand}'"
 }
 
 fn valid_yes(input string) bool {
@@ -50,11 +48,11 @@ fn int_yes(prompt string) bool {
 }
 
 fn not_recursive(path string) string {
-	return "$name: -r not specified; omitting directory '$path'"
+	return "${name}: -r not specified; omitting directory '${path}'"
 }
 
 // Print messages and exit with error
-[noreturn]
+@[noreturn]
 fn error_exit(messages ...string) {
 	for message in messages {
 		eprintln(message)
@@ -63,7 +61,7 @@ fn error_exit(messages ...string) {
 }
 
 // Print messages and exit
-[noreturn]
+@[noreturn]
 fn success_exit(messages ...string) {
 	for message in messages {
 		println(message)
@@ -91,7 +89,7 @@ fn setup_cp_command(args []string) ?(CpCommand, []string, string) {
 		success_exit(fp.usage())
 	}
 	if version {
-		success_exit('$name $common.coreutils_version()')
+		success_exit('${name} ${common.coreutils_version()}')
 	}
 
 	options := fp.finalize() or { common.exit_with_error_message(name, 'error') }
@@ -135,12 +133,12 @@ fn setup_cp_command(args []string) ?(CpCommand, []string, string) {
 	}
 
 	return CpCommand{
-		overwrite: overwrite
-		update: update
-		verbose: verbose
-		target_directory: target_directory
+		overwrite:           overwrite
+		update:              update
+		verbose:             verbose
+		target_directory:    target_directory
 		no_target_directory: no_target_directory
-		recursive: recursive
+		recursive:           recursive
 	}, sources, dest
 }
 

@@ -5,9 +5,7 @@ import flag
 The following block has been created in this file, but should be extracted to a common module for use by all utils
 */
 
-const (
-	version_str = 'V Coreutils 0.0.1'
-)
+const version_str = 'V Coreutils 0.0.1'
 
 // A default error exit, when code is not important
 fn error_exit(errors ...string) {
@@ -84,7 +82,7 @@ fn main() {
 	// Main functionality
 
 	// Uses C.getlogin internally
-	lname := os.loginname()
+	lname := os.loginname() or { '' }
 	if lname == '' {
 		// C.getlogin failed
 		error_exit('no login name')

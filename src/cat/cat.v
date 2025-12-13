@@ -4,10 +4,8 @@ import common
 import os
 import io
 
-const (
-	app_name        = 'cat'
-	app_description = 'concatenate files and print on the standard output'
-)
+const app_name = 'cat'
+const app_description = 'concatenate files and print on the standard output'
 
 struct Settings {
 	number_nonblanks bool // both number_nonblank, and number_all can never be true together
@@ -43,7 +41,7 @@ fn cat(settings Settings) {
 			file = os.stdin()
 		} else {
 			file = os.open(fname) or {
-				eprintln('$app_name: $fname: No such file or directory')
+				eprintln('${app_name}: ${fname}: No such file or directory')
 				exit(1)
 			}
 		}
@@ -113,16 +111,16 @@ fn path_number_and_format(mut br io.BufferedReader, settings Settings) {
 // number_nonblanks bool
 // number_all       bool
 // squeeze_blank    bool
-fn number_lines(line string, last_line string, line_number int, settings Settings) ?(string, string, int) {
+fn number_lines(line string, last_line string, line_number int, settings Settings) !(string, string, int) {
 	// number_all has overrides number_nonblanks.
 	if settings.squeeze_blank && line == '' && last_line == '' {
 		return error('skip line')
 	}
 	if settings.number_nonblanks && line != '' {
-		return ' $line_number\t$line', line, line_number + 1
+		return ' ${line_number}\t${line}', line, line_number + 1
 	}
 	if settings.number_all {
-		return ' $line_number\t$line', line, line_number + 1
+		return ' ${line_number}\t${line}', line, line_number + 1
 	}
 	// no numbering, shouldn't happen since this path is always be numbered
 	return line, line, line_number
