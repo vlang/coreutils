@@ -1,6 +1,13 @@
 #!/bin/env v
 
 import time
+import runtime
+import flag
+import os
+
+struct Config {
+	jobs int @[short: 'j'; long: cpus]
+}
 
 const ignore_dirs = {
 	'windows': [
@@ -41,12 +48,10 @@ const ignore_dirs = {
 
 unbuffer_stdout()
 
-dump(user_os())
-dump(ignore_dirs)
-
-args := arguments()
-vargs := if args.len > 1 { args[1..] } else { [] }
-dump(vargs)
+config, remaining := flag.to_struct[Config](os.args, skip: 1)!
+mut jobs := if config.jobs > 0 { config.jobs } else { runtime.nr_cpus() }
+mut vargs := remaining.clone()
+println('Using ${jobs} parallel jobs')
 
 curdir := getwd()
 chdir('src')!
@@ -60,6 +65,8 @@ if !exists('${curdir}/bin') {
 sw_total := time.new_stopwatch()
 mut compiled := 0
 mut already_compiled := 0
+mut dirs_to_compile := []string{}
+
 for dir in dirs {
 	if dir in ignore_dirs {
 		continue
@@ -85,16 +92,48 @@ for dir in dirs {
 		}
 	}
 
-	mut final_args := '-Wimpure-v'
-	for arg in vargs {
-		final_args += ' ' + arg
-	}
-	print('compiling ${dir:-20s}...')
-	cmd := @VEXE + ' ${final_args} -o ${curdir}/bin/${dir} ./${dir}'
-	sw := time.new_stopwatch()
-	execute_or_panic(cmd)
-	println(' took ${sw.elapsed().milliseconds()}ms .')
-	compiled++
+	dirs_to_compile << dir
 }
+
+// Now compile in parallel
+ch := chan bool{cap: jobs}
+results_ch := chan bool{cap: dirs_to_compile.len}
+print_ch := chan string{cap: 100}
+
+// Start printer thread, avoiding garbled text when building
+spawn fn [print_ch] () {
+	for {
+		msg := <-print_ch or { break }
+		print(msg)
+	}
+}()
+
+for dir in dirs_to_compile {
+	// Acquire the current slot
+	ch <- true
+	spawn fn [ch, results_ch, dir, curdir, vargs, print_ch] () {
+		defer {
+			results_ch <- true
+			// Released
+			_ := <-ch
+		}
+		mut final_args := '-Wimpure-v'
+		for arg in vargs {
+			final_args += ' ' + arg
+		}
+		cmd := @VEXE + ' ${final_args} -o "${curdir}/bin/${dir}" "./${dir}"'
+		sw := time.new_stopwatch()
+		execute_or_panic(cmd)
+		print_ch <- 'compiling ${dir:-20s}... took ${sw.elapsed().milliseconds()}ms .\n'
+	}()
+}
+
+// Wait for all compilations to finish
+for _ in 0 .. dirs_to_compile.len {
+	_ := <-results_ch
+}
+
+print_ch.close()
+compiled = dirs_to_compile.len
 println('> Compiled: ${compiled:3} tools in ${sw_total.elapsed().milliseconds()}ms. Already compiled and skipped: ${already_compiled} . All folders: ${dirs.len} .')
 chdir(curdir)!
