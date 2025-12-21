@@ -28,6 +28,7 @@ the command input/output consistent across the tools.
 ## Building
 
 Running `make` or `v run build.vsh` will build all the programs in `bin/`.
+Use `JOBS=N make` or `v run build.vsh --cpus=N` to compile in parallel.
 
 Note: support for access to user account info (via utmp) is limited to POSIX-like platforms.
 And, so, for Windows, utilities requiring utmp support (uptime, users, who, whoami) are currently
