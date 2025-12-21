@@ -6,7 +6,7 @@ import flag
 import os
 
 struct Config {
-	jobs int @[short: 'j'; long: cpus]
+	jobs int @[long: cpus; short: 'j']
 }
 
 const ignore_dirs = {
