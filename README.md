@@ -49,7 +49,7 @@ count below and mark it as done in this README.md. Thanks!
 GNU coreutils. They are not 100% compatiable. If you encounter different behaviors,
 compare against the true GNU coreutils version on the Linux-based tests first.
 
-## Completed (75/109) - 69% done!
+## Completed (76/109) - 69% done!
 
 |  Done   | Cmd       | Descripton                                       | Windows | 
 | :-----: | --------- | ------------------------------------------------ | ------- |
@@ -144,7 +144,7 @@ compare against the true GNU coreutils version on the Linux-based tests first.
 | &check; | tail      | Output the last part of files                    | &check; |
 |         | tee       | Redirect output to multiple files or processes   | &check; |
 | &check; | test      | Check file types and compare values              | &check; |
-|         | timeout   | Run a command with a time limit                  |         |
+| &check; | timeout   | Run a command with a time limit                  |         |
 | &check; | touch     | Change file timestamps                           | &check; |
 |         | tr        | Translate, squeeze, and/or delete characters     | &check; |
 | &check; | true      | Do nothing, successfully                         | &check; |
