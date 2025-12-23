@@ -136,10 +136,9 @@ fn sort_general_numeric(mut lines []string, options Options) {
 const minus_infinity = f64(-0xFFFFFFFFFFFFFFF)
 
 fn numeric_rest(s string) (f64, string) {
-	mut num := 0.0
-	mut rest := s
 	mut allow_blanks := true
 	mut allow_sign := true
+	mut end := s.len
 	for i := 0; i < s.len; i++ {
 		c := s[i]
 		if allow_blanks && c == space {
@@ -155,9 +154,12 @@ fn numeric_rest(s string) (f64, string) {
 			allow_blanks = false
 			continue
 		}
-		num = strconv.atof64(s[0..i]) or { minus_infinity }
-		rest = s[i..].clone()
+		// non-numeric char found
+		end = i
+		break
 	}
+	num := strconv.atof64(s[0..end]) or { minus_infinity }
+	rest := s[end..]
 	return num, rest
 }
 
