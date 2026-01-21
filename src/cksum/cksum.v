@@ -36,7 +36,7 @@ fn calc_sums(args Args) {
 				eprintln('cksum: ${file}: No such file or directory')
 				exit(1)
 			}
-			defer {
+			defer(fn) {
 				f.close()
 			}
 		}
