@@ -58,7 +58,7 @@ fn numfmt(number string, mut app App, options Options) !string {
 	num := strconv.atof64(num_part)!
 	pow := suffix_to_power(scale_part)!
 	sca := scale_number(num, pow, options)
-	n := sca * options.from_unit / options.to_unit
+	n := f64(sca) * options.from_unit / options.to_unit
 	// apply formating
 	mut result := match true {
 		options.pformat.len != 0 { unsafe { strconv.v_sprintf(options.pformat, n) } }
