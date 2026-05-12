@@ -10,7 +10,7 @@ struct Options {
 
 fn mkfifo_cmd(list []string, opts &Options) {
 	for path in list {
-		ret := mkfifo(path, opts.mode)
+		ret := do_mkfifo(path, opts.mode)
 		if ret != 0 {
 			common.exit_with_error_message(name, os.posix_get_error_msg(ret))
 		}
@@ -25,7 +25,8 @@ fn run_mkfifo(args []string) {
 	fp.description('Mandatory arguments to long options are mandatory for short options too.')
 
 	mut opts := Options{
-		mode: u32(fp.int('mode', `m`, int(default_mode), 'set file permission bits to MODE, not a=rw - umask'))
+		mode: u32(fp.int('mode', `m`, int(default_mode),
+			'set file permission bits to MODE, not a=rw - umask'))
 	}
 
 	help := fp.bool('help', 0, false, 'display this help and exit')
