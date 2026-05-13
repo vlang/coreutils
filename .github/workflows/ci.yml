@@ -11,11 +11,11 @@ jobs:
       VTEST_SHOW_START: 1
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           path: coreutils
       - name: Checkout Latest V
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           repository: vlang/v
           path: v
@@ -61,17 +61,17 @@ jobs:
           cd coreutils && USE_MULTI_BINARY_TO_TEST=coreutils v test .
 
   ubuntu-fast-build:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout Latest V
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           repository: vlang/v
           path: v
       - name: Build V
         run: cd v && make && sudo ./v symlink && cd -
       - name: Checkout Coreutils (for tests)
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           path: coreutils
       - name: V doctor
@@ -86,17 +86,17 @@ jobs:
         run: cd coreutils && make test
 
   ubuntu-prod-build:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout Latest V
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           repository: vlang/v
           path: v
       - name: Build V
         run: cd v && make && sudo ./v symlink && cd -
       - name: Checkout Coreutils (for tests)
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           path: coreutils
       - name: Build all with -prod
@@ -105,10 +105,10 @@ jobs:
         run: cd coreutils && make test
 
   ubuntu-gnu-coreutils:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout Latest V
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           repository: vlang/v
           path: v
