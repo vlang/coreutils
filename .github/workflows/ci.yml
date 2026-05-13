@@ -23,7 +23,7 @@ jobs:
         shell: bash
         run: |
           # Build V
-          cd v && ./make.bat -tcc
+          cd v && ./makev.bat -tcc
           echo "adding '${PWD}' to PATH"
           echo "${PWD}" >> $GITHUB_PATH
       - name: Download uutils/coreutils
