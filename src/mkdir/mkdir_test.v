@@ -59,7 +59,8 @@ fn test_default_create_single_dir() {
 fn test_default_create_multiple_dirs() {
 	first_test_dir_to_make := 'testdir'
 	second_test_dir_to_make := 'secondtestdir'
-	res := os.execute('${executable_under_test} ${first_test_dir_to_make} ${second_test_dir_to_make}')
+	res :=
+		os.execute('${executable_under_test} ${first_test_dir_to_make} ${second_test_dir_to_make}')
 	assert res.exit_code == 0
 	assert res.output.trim_space() == ''
 	assert testing.check_dir_exists(first_test_dir_to_make)
@@ -76,7 +77,8 @@ fn test_default_create_multiple_dirs() {
 fn test_default_create_multiple_dirs_with_verbose() {
 	first_test_dir_to_make := 'testdir'
 	second_test_dir_to_make := 'secondtestdir'
-	res := os.execute('${executable_under_test} -v ${first_test_dir_to_make} ${second_test_dir_to_make}')
+	res :=
+		os.execute('${executable_under_test} -v ${first_test_dir_to_make} ${second_test_dir_to_make}')
 	assert res.exit_code == 0
 	assert res.output.trim_space() == "mkdir: created directory 'testdir'${eol}mkdir: created directory 'secondtestdir'"
 	assert testing.check_dir_exists(first_test_dir_to_make)

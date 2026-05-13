@@ -102,7 +102,8 @@ fn (mut file_reader FileReader) read_chunk(mut buffer []u8) ?FileChunk {
 		file_reader.mutex.unlock()
 	}
 
-	nbytes := file_reader.file.read(mut buffer) or { return none } // Propagate error. Either EOF or read error.
+	nbytes :=
+		file_reader.file.read(mut buffer) or { return none } // Propagate error. Either EOF or read error.
 	mut chunk := FileChunk{file_reader.last_char_is_space, buffer[..nbytes].clone(), false}
 	file_reader.last_char_is_space = is_space(buffer[nbytes - 1])
 	if nbytes < buffer.len {
@@ -128,6 +129,7 @@ fn file_reader_counter(mut file_reader FileReader) Count {
 					println(err)
 				}
 			}
+
 			exit(1)
 		}
 
@@ -203,7 +205,8 @@ fn main() {
 	mut lines_opt := fp.bool('lines', `l`, false, 'print the newline counts')
 	mut words_opt := fp.bool('words', `w`, false, 'print the words counts')
 	maxline_opt := fp.bool('max-line-length', `L`, false, 'print the maximum display width')
-	list_file := fp.string_opt('files0-from', 0, 'read input from the files specified by NUL-terminated names in file F; If F is - then read names from standard input') or {
+	list_file := fp.string_opt('files0-from', 0,
+		'read input from the files specified by NUL-terminated names in file F; If F is - then read names from standard input') or {
 		''
 	}
 

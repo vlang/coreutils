@@ -14,7 +14,8 @@ fn main() {
 	fp.arguments_description('[VARIABLE]...')
 	fp.description('Print the values of the specified environment VARIABLE(s).')
 	fp.description('If no VARIABLE is specified, print name and value pairs for them all.')
-	mut opt_nul_terminate := fp.bool('null', `0`, false, 'end each output line with NUL, not newline')
+	mut opt_nul_terminate := fp.bool('null', `0`, false,
+		'end each output line with NUL, not newline')
 	if opt_nul_terminate {
 		if os.args[1] !in ['-0', '--null'] {
 			// GNU printenv has a quirk,

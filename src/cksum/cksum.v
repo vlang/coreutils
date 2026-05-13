@@ -79,6 +79,7 @@ fn calc_sums(args Args) {
 			'-' { '' }
 			else { file }
 		}
+
 		println('${crc} ${total_length} ${file_str}')
 	}
 }

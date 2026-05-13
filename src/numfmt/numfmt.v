@@ -66,6 +66,7 @@ fn numfmt(number string, mut app App, options Options) !string {
 		options.to == 'none' { n.str() }
 		else { num_to_str(n, options) or { handle_error(err.msg(), mut app, options) } }
 	}
+
 	if options.suffix.len != 0 {
 		result += options.suffix
 	}
@@ -151,6 +152,7 @@ fn readable_size(size f64, unit Unit, rounding string) !string {
 		.iec_i { ['', 'Ki', 'Mi', 'Gi', 'Ti', 'Pi', 'Ei', 'Zi'] }
 		else { [''] }
 	}
+
 	if suffixes == [''] {
 		return error('invalid unit ${unit}')
 	}
@@ -163,6 +165,7 @@ fn readable_size(size f64, unit Unit, rounding string) !string {
 				true { '${rounded:.1f}' }
 				else { '${rounded:.0f}' }
 			}
+
 			return '${readable}${suffix}'
 		}
 		sz /= kb
@@ -199,6 +202,7 @@ fn round(val f64, rounding string) i64 {
 		else 		{ 0 }
 		// vfmt on
 	}
+
 	// println('${val}, ${rval}')
 	return rval
 }
@@ -243,6 +247,7 @@ fn handle_error(msg string, mut app App, options Options) string {
 			exit_message('assert', 2)
 		} // should never happen
 	}
+
 	return ''
 }
 

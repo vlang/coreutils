@@ -58,9 +58,11 @@ fn timeout_fn() int {
 
 	signal := fp.string('signal', `s`, 'TERM', 'specify the signal to send on timeout')
 	kill_after := fp.string('kill-after', `k`, '', 'also send a KILL signal after DURATION')
-	preserve_status := fp.bool('preserve-status', 0, false, 'exit with the same status as COMMAND, even when timeout occurs')
+	preserve_status := fp.bool('preserve-status', 0, false,
+		'exit with the same status as COMMAND, even when timeout occurs')
 	verbose := fp.bool('verbose', `v`, false, 'diagnose to stderr any signal sent upon timeout')
-	foreground := fp.bool('foreground', 0, false, 'run command in foreground without creating new process group')
+	foreground := fp.bool('foreground', 0, false,
+		'run command in foreground without creating new process group')
 	help := fp.bool('help', 0, false, 'display this help and exit')
 	version := fp.bool('version', 0, false, 'output version information and exit')
 

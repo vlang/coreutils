@@ -378,6 +378,7 @@ fn (v Value) is_null() bool {
 			}
 		}
 	}
+
 	return false
 }
 

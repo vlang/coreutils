@@ -147,8 +147,7 @@ fn main() {
 
 	decode_opt := fp.bool('decode', `d`, false, 'decode data')
 	wraping_opt := fp.int('wrap=', `w`, 76,
-		'wrap encoded lines after COLS character (default 76).' +
-		'\n\t\t\t\t\t\t\t\t\tUse 0 to disable line wrapping.')
+		'wrap encoded lines after COLS character (default 76).' + '\n\t\t\t\t\t\t\t\t\tUse 0 to disable line wrapping.')
 	args := fp.finalize() or {
 		eprintln(err)
 		exit(1)

@@ -154,16 +154,20 @@ fn args() Settings {
 	fp.description(app_description)
 
 	show_all := fp.bool('show-all', `A`, false, 'equivalent to -vET')
-	number_nonblanks := fp.bool('number-nonblank', `b`, false, "Number the lines, but don't count blank lines, override -n")
+	number_nonblanks := fp.bool('number-nonblank', `b`, false,
+		"Number the lines, but don't count blank lines, override -n")
 	show_ends_and_v := fp.bool('', `e`, false, 'equivalent to -vE')
 	mut show_ends := fp.bool('show-ends', `E`, false, 'display $ at end of each line')
 	mut number_all := fp.bool('number', `n`, false, 'Number the output lines, starting at 1.')
-	squeeze_blank := fp.bool('sqeeze-blank', `s`, false, 'Squeeze multiple adjacent empty lines, causing the output to be single spaced')
-	mut show_tabs := fp.bool('', `t`, false, 'Print tab characters as ‘^I’. Implies the -v option to display non-printing characters')
+	squeeze_blank := fp.bool('sqeeze-blank', `s`, false,
+		'Squeeze multiple adjacent empty lines, causing the output to be single spaced')
+	mut show_tabs := fp.bool('', `t`, false,
+		'Print tab characters as ‘^I’. Implies the -v option to display non-printing characters')
 	show_tabs_and_v := fp.bool('', `T`, false, 'equivalent to -vT')
 	// unbuffered        := fp.bool('', `u`, false, 'The output is guaranteed to be unbuffered')
 	unbuffered := fp.bool('', `u`, false, '(ignored)') // ignored in GNU cat!
-	mut show_nonprinting := fp.bool('show-nonprinting', `v`, false, 'use ^ and M- notation, except for LFD and TAB')
+	mut show_nonprinting := fp.bool('show-nonprinting', `v`, false,
+		'use ^ and M- notation, except for LFD and TAB')
 
 	fnames := fp.finalize() or {
 		eprintln(err)

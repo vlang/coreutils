@@ -82,8 +82,8 @@ fn unexpand_file(file string, mut app App) {
 				blank := c == ` ` || c == `\t`
 				if blank {
 					mut last_tab := false
-					next_tab_column, tab_index, last_tab = get_next_tab_column(column,
-						tab_index, mut app)
+					next_tab_column, tab_index, last_tab =
+						get_next_tab_column(column, tab_index, mut app)
 					// println('${next_tab_column} ${tab_index} ${last_tab}')
 
 					if last_tab {

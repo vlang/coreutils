@@ -115,13 +115,17 @@ fn readlink(settings Settings) {
 fn args() Settings {
 	mut fp := app.make_flag_parser(os.args)
 	mut st := Settings{}
-	canon := fp.bool('canonicalize', `f`, false, 'canonicalize by following every symlink in every component of the given name recursively; all but the last component must exist')
-	canon_all := fp.bool('canonicalize-existing', `e`, false, 'canonicalize by following every symlink in every component of the given name recursively, all components must exist')
-	canon_none := fp.bool('canonicalize-missing', `m`, false, 'canonicalize by following every symlink in every component of the given name recursively, without requirements on components existence')
+	canon := fp.bool('canonicalize', `f`, false,
+		'canonicalize by following every symlink in every component of the given name recursively; all but the last component must exist')
+	canon_all := fp.bool('canonicalize-existing', `e`, false,
+		'canonicalize by following every symlink in every component of the given name recursively, all components must exist')
+	canon_none := fp.bool('canonicalize-missing', `m`, false,
+		'canonicalize by following every symlink in every component of the given name recursively, without requirements on components existence')
 	st.no_newline = fp.bool('no-newline', `n`, false, 'do not output the trailing delimiter')
 	_ := fp.bool('quiet', `q`, false, '')
 	_ := fp.bool('silent', `s`, true, 'suppress most error messages (on by default)')
-	st.verbose = fp.bool('verbose', `v`, false, 'report error messages (overrides --quiet and --silent)')
+	st.verbose = fp.bool('verbose', `v`, false,
+		'report error messages (overrides --quiet and --silent)')
 	st.zero = fp.bool('zero', `f`, false, 'end each output line with NUL, not newline')
 	mut rem_pars := fp.remaining_parameters()
 	if st.no_newline && rem_pars.len > 1 {

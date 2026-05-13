@@ -70,6 +70,7 @@ fn main() {
 		}
 		else {}
 	}
+
 	mut parser := Parser{
 		tokens: os.args[1..]
 		idx:    0
@@ -293,6 +294,7 @@ fn test_unary(option u8, arg string) bool {
 		}
 		else {}
 	}
+
 	my_panic('unexpected unary operator')
 }
 

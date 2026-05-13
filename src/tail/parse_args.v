@@ -49,12 +49,11 @@ fn parse_args(args []string) Args {
 	retry_arg := fp.bool('retry', ` `, false, 'keep trying to open a file if it is inaccessible')
 
 	sleep_interval_arg := fp.float('sleep-interval', `s`, 1.0,
-		'with -f, sleep for approximately N seconds (default 1.0)${wrap}' +
-		'between iterations; with inotify and --pid=P, check${wrap}' +
-		'process P at least once every N seconds')
+		'with -f, sleep for approximately N seconds (default 1.0)${wrap}' + 'between iterations; with inotify and --pid=P, check${wrap}' + 'process P at least once every N seconds')
 
 	verbose_arg := fp.bool('verbose', `v`, false, 'always output headers giving file names')
-	zero_terminated_arg := fp.bool('zero-terminated', `z`, false, 'line delimiter is NUL, not newline')
+	zero_terminated_arg := fp.bool('zero-terminated', `z`, false,
+		'line delimiter is NUL, not newline')
 
 	fp.footer('
 

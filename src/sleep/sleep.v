@@ -29,6 +29,7 @@ fn apply_unit(n f64, unit string) !f64 {
 		}
 		else {}
 	}
+
 	return error(invalid_time_interval(n, unit))
 }
 

@@ -112,9 +112,8 @@ fn filetype_to_string(typ FileType) string {
 fn raw_to_printf_string(raw_string string) string {
 	mut sc := scanner.new_scanner("'${raw_string}'", .skip_comments, &pref.Preferences{})
 	return sc.scan().lit.replace(r'\a', '\a').replace(r'\b', '\b').replace(r'\e', '\e').replace(r'\f',
-		'\f').replace(r'\n', '\n').replace(r'\r', '\r').replace(r'\t', '\t').replace(r'\v',
-		'\v').replace(r'\\', '\\').replace(r"\'", "'").replace(r'\"', '"').replace(r'\?',
-		'\?')
+		'\f').replace(r'\n', '\n').replace(r'\r', '\r').replace(r'\t', '\t').replace(r'\v', '\v').replace(r'\\',
+		'\\').replace(r"\'", "'").replace(r'\"', '"').replace(r'\?', '\?')
 }
 
 fn filemode_to_string(mode u16) string {

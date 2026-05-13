@@ -33,9 +33,11 @@ fn get_options() Options {
 		'\nWith no FILE, or when FILE is -, read standard input.')
 
 	ignore_leading_blanks := fp.bool('ignore-leading-blanks', `b`, false, 'ignore leading blanks')
-	dictionary_order := fp.bool('dictionary-order', `d`, false, 'consider only blanks and alphanumeric characters')
+	dictionary_order := fp.bool('dictionary-order', `d`, false,
+		'consider only blanks and alphanumeric characters')
 	ignore_case := fp.bool('ignore-case', `f`, false, 'fold lower case to upper case characters')
-	ignore_non_printing := fp.bool('ignore-non-printing', `i`, false, 'consider only printable characters')
+	ignore_non_printing := fp.bool('ignore-non-printing', `i`, false,
+		'consider only printable characters')
 	numeric := fp.bool('numeric-sort', `n`, false,
 		'Restrict the sort key to an initial numeric\n${flag.space}' +
 		'string, consisting of optional <blank> characters,\n${flag.space}' +

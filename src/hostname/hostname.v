@@ -38,6 +38,7 @@ fn hst_set_hostname(hostname string) {
 			.unsupported { 'Setting hostname is not currently supported on your OS.' }
 			else { 'An unknown error occured' }
 		}
+
 		common.exit_with_error_message(app_name, message)
 	}
 }

@@ -36,11 +36,13 @@ fn get_options() Options {
 		Reformat NUMBER(s), or the numbers from standard input if none
 		are specified.'.trim_indent())
 
-	delimiter := fp.string('delimiter', `d`, ' ', 'use <string> instead of whitespace for delimiter')
+	delimiter := fp.string('delimiter', `d`, ' ',
+		'use <string> instead of whitespace for delimiter')
 	fields := fp.int_multi('fields', 0, 'replace the numbers in these input fields (default=1)')
 	pformat := fp.string('format', 0, '', 'use printf style floating-point <string>')
 	from_unit := fp.int('from-unit', 0, 1, 'specify the input unit size (instead of the default 1)')
-	grouping := fp.bool('grouping', 0, false, 'use locale-defined grouping of digits, e.g. 1,000,000')
+	grouping := fp.bool('grouping', 0, false,
+		'use locale-defined grouping of digits, e.g. 1,000,000')
 	header := fp.int('header', 0, 1,
 		'print (without converting) the first N header lines; <int>\n${flag.space}' +
 		'defaults to 1 if not specified')

@@ -16,14 +16,21 @@ pub fn sum(args []string, sum_name string, sum_type string, num_chars_in_sum int
 	binary := fp.bool('binary', `b`, false, 'read in binary mode')
 	check := fp.bool('check', `c`, false, 'read ${sum_type} sums from the FILEs and check them')
 	tag := fp.bool('tag', 0, false, 'create a BSD-style checksum')
-	_ := fp.bool('text', `t`, false, 'read in text mode (default)') // accepted but ignored, just like GNU
-	zero := fp.bool('zero', `z`, false, 'end each output line with NUL, not newline,\n${flag.space}and disable file name escaping')
+	_ :=
+		fp.bool('text', `t`, false, 'read in text mode (default)') // accepted but ignored, just like GNU
+	zero := fp.bool('zero', `z`, false,
+		'end each output line with NUL, not newline,\n${flag.space}and disable file name escaping')
 
-	ignore_missing := fp.bool('ignore-missing', 0, false, "(only with -c) don't fail or report status for missing files")
-	quiet := fp.bool('quiet', 0, false, "(only with -c) don't print OK for each successfully verified file")
-	status := fp.bool('status', 0, false, "(only with -c) don't output anything, status code shows success")
-	strict := fp.bool('strict', 0, false, '(only with -c) exit non-zero for improperly formatted checksum lines')
-	warn := fp.bool('warn', `w`, false, '(only with -c) warn about improperly formatted checksum lines')
+	ignore_missing := fp.bool('ignore-missing', 0, false,
+		"(only with -c) don't fail or report status for missing files")
+	quiet := fp.bool('quiet', 0, false,
+		"(only with -c) don't print OK for each successfully verified file")
+	status := fp.bool('status', 0, false,
+		"(only with -c) don't output anything, status code shows success")
+	strict := fp.bool('strict', 0, false,
+		'(only with -c) exit non-zero for improperly formatted checksum lines')
+	warn := fp.bool('warn', `w`, false,
+		'(only with -c) warn about improperly formatted checksum lines')
 
 	mut files := fp.finalize() or {
 		eprintln("${args[0]}: ${err.msg()}\nTry '${args[0]} --help' for more information.")

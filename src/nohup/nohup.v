@@ -49,7 +49,8 @@ fn main() {
 	command := os.args[1..]
 	// do this early before we loose access to stderr
 	if os.exists_in_system_path(command[0]) == false {
-		common.exit_with_error_message(tool_name, '${command[0]} does not exist or is not executable')
+		common.exit_with_error_message(tool_name,
+			'${command[0]} does not exist or is not executable')
 	}
 
 	stdout_is_tty := os.is_atty(os.stdout().fd)

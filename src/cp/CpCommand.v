@@ -33,7 +33,8 @@ fn (c CpCommand) run(source string, dest string) {
 
 fn (c CpCommand) copy(src string, dst string) {
 	ndst := if os.is_dir(dst) {
-		os.join_path(dst.trim_right(os.path_separator), os.file_name(src.trim_right(os.path_separator)))
+		os.join_path(dst.trim_right(os.path_separator),
+			os.file_name(src.trim_right(os.path_separator)))
 	} else {
 		dst
 	}

@@ -191,6 +191,7 @@ pub fn (rig TestRig) assert_same_results(args string) {
 			// in all other cases, compare the normalised output (less strict):
 		}
 	}
+
 	eprintln_small_diff(noutput1, noutput2)
 	eprintln('                cmd1_res.output.len: ${noutput1.len} | "${noutput1}"')
 	eprintln('                cmd2_res.output.len: ${noutput2.len} | "${noutput2}"')

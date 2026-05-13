@@ -27,7 +27,8 @@ fn args() Settings {
 	st.count = fp.bool('count', `c`, false, 'prefix lines by the number of occurrences')
 	st.repeated = fp.bool('repeated', `d`, false, 'only print duplicate lines, one for each group')
 	st.unique = fp.bool('unique', `u`, false, 'only print unique lines')
-	st.case_insensitive = fp.bool('ignore-case', `i`, false, 'ignore differences in case when comparing')
+	st.case_insensitive = fp.bool('ignore-case', `i`, false,
+		'ignore differences in case when comparing')
 	st.check_chars = fp.int('check-chars', `w`, -1, 'compare no more than N characters in lines')
 	st.skip_fields = fp.int('skip-fields', `f`, -1, 'avoid comparing the first N fields')
 	st.skip_chars = fp.int('skip-chars', `s`, -1, 'avoid comparing the first N characters')

@@ -45,7 +45,8 @@ fn main() {
 	arg_1 := fp.bool('', `1`, false, 'list one file per line')
 	arg_all := fp.bool('all', `a`, false, 'do not ignore entries starting with .')
 	arg_almost_all := fp.bool('almost-all', `A`, false, 'do not list implied . and ..')
-	arg_comma_seperated := fp.bool('comma-seperated', `m`, false, 'fill width with a comma seperated list of entries')
+	arg_comma_seperated := fp.bool('comma-seperated', `m`, false,
+		'fill width with a comma seperated list of entries')
 	arg_reverse := fp.bool('reverse', `r`, false, 'reverse order wile sorting')
 	arg_help := fp.bool('help', 0, false, 'display this help and exit')
 

@@ -421,6 +421,7 @@ fn v_sprintf(str string, _pt []string) (string, int, bool) {
 						''
 					}
 				}
+
 				s = if len < s.len { s[..len] } else { s }
 				p_index++
 				res.write_string(s)
@@ -562,6 +563,7 @@ fn v_sprintf(str string, _pt []string) (string, int, bool) {
 						d1 = if positive { u64(x) } else { u64(-x) }
 					}
 				}
+
 				res.write_string(format_dec_old(d1,
 					pad_ch:    pad_ch
 					len0:      len0
@@ -773,6 +775,7 @@ fn v_sprintf(str string, _pt []string) (string, int, bool) {
 						''
 					}
 				}
+
 				pad_ch = ` `
 				res.write_string(strconv.format_str(s1,
 					pad_ch:    pad_ch

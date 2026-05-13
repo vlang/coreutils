@@ -159,7 +159,8 @@ fn args() Settings {
 	mut fp := app.make_flag_parser(os.args)
 	mut st := Settings{}
 	st.no_create = fp.bool('no-create', `c`, false, 'do not create any files')
-	st.io_blocks = fp.bool('io-blocks', `o`, false, 'treat SIZE as number of IO blocks instead of bytes')
+	st.io_blocks = fp.bool('io-blocks', `o`, false,
+		'treat SIZE as number of IO blocks instead of bytes')
 	st.reference = fp.string('reference', `r`, '', 'base size on RFILE')
 	st.size = fp.string('size', `s`, '', 'set or adjust the file size by SIZE bytes')
 	st.output_files = fp.remaining_parameters()

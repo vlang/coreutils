@@ -128,6 +128,7 @@ pub fn get_effective_groups() ![]int {
 			groups.prepend(egid)
 		}
 	}
+
 	return groups[0..num_groups]
 }
 

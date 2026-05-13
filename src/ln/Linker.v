@@ -47,7 +47,8 @@ fn (ln Linker) link(source_path string, target_path string) {
 		os.symlink(source_path, target_path) or { common.exit_with_error_message(name, err.msg()) }
 	} else {
 		if os.is_dir(source_path) {
-			common.exit_with_error_message(name, 'only symbolic links are supported for directories')
+			common.exit_with_error_message(name,
+				'only symbolic links are supported for directories')
 		}
 		os.link(source_path, target_path) or { common.exit_with_error_message(name, err.msg()) }
 	}

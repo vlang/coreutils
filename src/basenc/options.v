@@ -29,18 +29,18 @@ fn get_options() Options {
 	base64 := fp.bool('base64', ` `, false, "same as 'base64' program (RFC4648 section 4)")
 	base64url := fp.bool('base64url', ` `, false, 'file- and url-safe base64 (RFC4648 section 5)')
 	base32 := fp.bool('base32', ` `, false, 'file- and url-safe base64 (RFC4648 section 5)')
-	base32hex := fp.bool('base32hex', ` `, false, 'extended hex alphabet base32 (RFC4648 section 7)')
+	base32hex := fp.bool('base32hex', ` `, false,
+		'extended hex alphabet base32 (RFC4648 section 7)')
 	base16 := fp.bool('base16', ` `, false, 'hex encoding (RFC4648 section 8)')
-	base2msbf := fp.bool('base2msbf', ` `, false, 'bit string with most significant bit (msb) first')
-	base2lsbf := fp.bool('base2lsbf', ` `, false, 'bit string with least significant bit (lsb) first')
+	base2msbf := fp.bool('base2msbf', ` `, false,
+		'bit string with most significant bit (msb) first')
+	base2lsbf := fp.bool('base2lsbf', ` `, false,
+		'bit string with least significant bit (lsb) first')
 	decode := fp.bool('decode', `d`, false, 'decode data')
 	wrap := fp.int('wrap', `w`, 76,
-		'wrap encoded lines after <int> COLS character (default 76)\n${flag.space}' +
-		'Use 0 to disable line wrapping')
+		'wrap encoded lines after <int> COLS character (default 76)\n${flag.space}' + 'Use 0 to disable line wrapping')
 	z85 := fp.bool('z85', ` `, false,
-		'ascii85-like encoding (ZeroMQ spec:32/Z85); when encoding,\n${flag.space}' +
-		'input length must be a multiple of 4; when decoding, input\n${flag.space}' +
-		'length must be a multiple of 5\n')
+		'ascii85-like encoding (ZeroMQ spec:32/Z85); when encoding,\n${flag.space}' + 'input length must be a multiple of 4; when decoding, input\n${flag.space}' + 'length must be a multiple of 5\n')
 
 	files := fp.finalize() or { exit_error(err.msg()) }
 

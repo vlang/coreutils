@@ -27,18 +27,7 @@ fn get_args() (Config, []string) {
 				'Overwrite the specified FILE(s) repeatedly, in order to make it harder\n' +
 				'for even very expensive hardware probing to recover the data.'
 			footer:
-				'\nDelete FILE(s) if --remove (-u) is specified. The default is not to remove\n' +
-				'the files because it is common to operate on device files like /dev/hda,\n' +
-				'and those files usually should not be removed.\n\n' +
-				'The --remove <string> parameter indicates how to remove a directory entry:\n' +
-				"  'unlink'   => use a standard unlink call.\n" +
-				"  'wipe'     => also first obfuscate bytes in the name.\n" +
-				"  'wipesync' => also sync each obfuscated byte to the device.\n" +
-				"The default mode is 'wipesync', but note it can be expensive.\n\n" +
-				'CAUTION: shred assumes the file system and hardware overwrite data in place.\n' +
-				'Although this is common, many platforms operate otherwise. Also, backups\n' +
-				'and mirrors may contain unremovable copies that will let a shredded file\n' +
-				'be recovered later.\n' + common.coreutils_footer()
+				'\nDelete FILE(s) if --remove (-u) is specified. The default is not to remove\n' + 'the files because it is common to operate on device files like /dev/hda,\n' + 'and those files usually should not be removed.\n\n' + 'The --remove <string> parameter indicates how to remove a directory entry:\n' + "  'unlink'   => use a standard unlink call.\n" + "  'wipe'     => also first obfuscate bytes in the name.\n" + "  'wipesync' => also sync each obfuscated byte to the device.\n" + "The default mode is 'wipesync', but note it can be expensive.\n\n" + 'CAUTION: shred assumes the file system and hardware overwrite data in place.\n' + 'Although this is common, many platforms operate otherwise. Also, backups\n' + 'and mirrors may contain unremovable copies that will let a shredded file\n' + 'be recovered later.\n' + common.coreutils_footer()
 		) or { panic(err) }
 		println(doc)
 		exit(0)

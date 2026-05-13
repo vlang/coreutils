@@ -5,8 +5,9 @@ fn lutime(path string, acctime int, modtime int) ! {
 	access_time := t2filetime(acctime)
 	modification_time := t2filetime(modtime)
 	path_wide := path.to_wide()
-	f_handle := C.CreateFileW(path_wide, C.GENERIC_READ | C.GENERIC_WRITE, C.FILE_SHARE_DELETE | C.FILE_SHARE_READ | C.FILE_SHARE_WRITE,
-		0, C.OPEN_ALWAYS, C.FILE_ATTRIBUTE_NORMAL, 0)
+	f_handle := C.CreateFileW(path_wide, C.GENERIC_READ | C.GENERIC_WRITE,
+		C.FILE_SHARE_DELETE | C.FILE_SHARE_READ | C.FILE_SHARE_WRITE, 0, C.OPEN_ALWAYS,
+		C.FILE_ATTRIBUTE_NORMAL, 0)
 	if f_handle == 0 {
 		return error('invalid file handle')
 	}

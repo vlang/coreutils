@@ -140,8 +140,7 @@ fn combine_ranges_and_zero_index(ranges []Range, max int, complement bool) []Ran
 	}
 
 	if complement {
-		combined_ranges = arrays.flatten[Range](combined_ranges.map(complement_range(it,
-			max)))
+		combined_ranges = arrays.flatten[Range](combined_ranges.map(complement_range(it, max)))
 	}
 
 	return combined_ranges
@@ -192,9 +191,12 @@ fn get_args(args []string) Args {
 		'select only <string> fields; also print any line${wrap}' +
 		'that contains no delimiter character, unless the${wrap}-s option is specified')
 	fp.bool('', `n`, false, '(ignored)')
-	complement := fp.bool('complement', ` `, false, 'complement the set of selected bytes, characters${wrap}or fields')
-	output_delimiter := fp.string('output-delimiter', ` `, '', 'use <string> as the output delimiter, default is${wrap}input delimiter')
-	only_delimited := fp.bool('only-delimited', `s`, false, 'print only lines containing delimiters')
+	complement := fp.bool('complement', ` `, false,
+		'complement the set of selected bytes, characters${wrap}or fields')
+	output_delimiter := fp.string('output-delimiter', ` `, '',
+		'use <string> as the output delimiter, default is${wrap}input delimiter')
+	only_delimited := fp.bool('only-delimited', `s`, false,
+		'print only lines containing delimiters')
 	zero_terminated := fp.bool('zero-terminated', `z`, false, 'line delimiter is NUL, not newline')
 
 	help := fp.bool('help', 0, false, 'display this help')
@@ -207,8 +209,7 @@ fn get_args(args []string) Args {
 		'Each range is one of:${eol}${eol}' +
 		'  N     N\'th byte, character or field, counted from 1${eol}' +
 		'  N-    from N\'th byte, character or field, to end of line${eol}' +
-		'  N-M   from N\'th to M\'th (included) byte, character or field${eol}' +
-		"  -M    from first to M'th (included) byte, character or field")
+		'  N-M   from N\'th to M\'th (included) byte, character or field${eol}' + "  -M    from first to M'th (included) byte, character or field")
 	fp.footer(common.coreutils_footer())
 
 	file_args := fp.finalize() or { exit_error(err.msg()) }

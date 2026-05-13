@@ -236,7 +236,8 @@ fn args() ?(Settings, []string) {
 	fp.description(app_description)
 
 	// -b
-	b_style := fp.string('body-numbering', `b`, 't', 'Select the numbering style for lines in the body section (a:all, n:none, t:only no blank, pRE: match for the regular expression)')
+	b_style := fp.string('body-numbering', `b`, 't',
+		'Select the numbering style for lines in the body section (a:all, n:none, t:only no blank, pRE: match for the regular expression)')
 	settings.styles[Section.body] = get_style(b_style) or {
 		common.exit_with_error_message(app_name, err.msg())
 	}
@@ -265,7 +266,8 @@ fn args() ?(Settings, []string) {
 	settings.delimiters[Section.footer] = delimiter
 
 	// -f
-	f_style := fp.string('footer-numbering', `f`, 'n', 'Select the numbering style for lines in the footer section')
+	f_style := fp.string('footer-numbering', `f`, 'n',
+		'Select the numbering style for lines in the footer section')
 	settings.styles[Section.footer] = get_style(f_style) or {
 		common.exit_with_error_message(app_name, err.msg())
 	}
@@ -276,7 +278,8 @@ fn args() ?(Settings, []string) {
 	}
 
 	// -h
-	h_style := fp.string('header-numbering', `h`, 'n', 'Select the numbering style for lines in the header section')
+	h_style := fp.string('header-numbering', `h`, 'n',
+		'Select the numbering style for lines in the header section')
 	settings.styles[Section.header] = get_style(h_style) or {
 		common.exit_with_error_message(app_name, err.msg())
 	}
@@ -287,24 +290,30 @@ fn args() ?(Settings, []string) {
 	}
 
 	// -i
-	settings.inc_lno = fp.string('line-increment', `i`, '1', 'Increment line numbers by number').i64()
+	settings.inc_lno =
+		fp.string('line-increment', `i`, '1', 'Increment line numbers by number').i64()
 
 	// -l
-	settings.join_blank = fp.int('join-blank-lines', `l`, 1, 'Join number consecutive empty lines to be one logical line for numbering')
+	settings.join_blank = fp.int('join-blank-lines', `l`, 1,
+		'Join number consecutive empty lines to be one logical line for numbering')
 
 	// -n
-	format := fp.string('number-format', `n`, 'rn', 'Select the line numbering format (ln:left-justified, rn:right-justified, rz:leading-zeros)')
+	format := fp.string('number-format', `n`, 'rn',
+		'Select the line numbering format (ln:left-justified, rn:right-justified, rz:leading-zeros)')
 	settings.format = get_format(format) or { common.exit_with_error_message(app_name, err.msg()) }
 
 	// -p
-	no_renumber := fp.bool('no-renumber', `p`, false, 'Do not reset the line number at the start of each logical page')
+	no_renumber := fp.bool('no-renumber', `p`, false,
+		'Do not reset the line number at the start of each logical page')
 	settings.reset_lno = !no_renumber
 
 	// -s
-	settings.separator = fp.string('number-separator', `s`, '\t', 'Set strings of separator between the line number and the text line')
+	settings.separator = fp.string('number-separator', `s`, '\t',
+		'Set strings of separator between the line number and the text line')
 
 	// -v
-	settings.ini_lno = fp.string('starting-line-number', `v`, '1', 'Set the initial line number on each logical page').i64()
+	settings.ini_lno = fp.string('starting-line-number', `v`, '1',
+		'Set the initial line number on each logical page').i64()
 
 	// -w
 	settings.width = fp.int('number-width', `w`, 6, 'Set number digits for line numbers')

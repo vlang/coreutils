@@ -32,7 +32,8 @@ fn get_options() Options {
 	directory := fp.bool('directory', `d`, false, 'create a directory, not a file')
 	dry_run := fp.bool('dry-run', `u`, false, 'do not create anything; merely print a name')
 	quiet := fp.bool('quiet', `q`, false, 'suppress diagnostics about file/dir-creation failure')
-	suffix := fp.string('suffix', ` `, '', 'append <string> to TEMPLATE; <string> must not contain a slash.')
+	suffix := fp.string('suffix', ` `, '',
+		'append <string> to TEMPLATE; <string> must not contain a slash.')
 	tmp_dir := fp.string('tmpdir', `p`, '', 'interpret TEMPLATE relative to directory <string>\n')
 	templates := fp.finalize() or { exit_error(err.msg()) }
 

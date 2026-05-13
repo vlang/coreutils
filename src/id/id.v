@@ -46,9 +46,11 @@ fn args() Settings {
 	st.group = fp.bool('group', `g`, false, 'print only the effective group ID')
 	st.groups = fp.bool('groups', `G`, false, 'print all group IDs')
 	st.name = fp.bool('name', `n`, false, 'print a name instead of a number, for -ugG')
-	st.real = fp.bool('real', `r`, false, 'print the real ID instead of the effective ID, with -ugG')
+	st.real = fp.bool('real', `r`, false,
+		'print the real ID instead of the effective ID, with -ugG')
 	st.user = fp.bool('user', `u`, false, 'print only the effective user ID')
-	st.zero = fp.bool('zero', `z`, false, 'delimit entries with NUL characters, not whitespace; not permitted in default format')
+	st.zero = fp.bool('zero', `z`, false,
+		'delimit entries with NUL characters, not whitespace; not permitted in default format')
 	st.users = fp.remaining_parameters()
 	if st.context {
 		app.quit(message: '--context (-Z) works only on an SELinux-enabled kernel')

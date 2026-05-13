@@ -27,8 +27,9 @@ fn statx(path string, dereference bool, cache_mode CacheMode) !Statx {
 			.always { c_at_statx_dont_sync }
 			.never { c_at_statx_force_sync }
 		}
-		res := C.statx(0, os.abs_path(path).str, sync_flag | symlink_flag, C.STATX_BASIC_STATS | C.STATX_BTIME,
-			ptr)
+
+		res := C.statx(0, os.abs_path(path).str, sync_flag | symlink_flag,
+			C.STATX_BASIC_STATS | C.STATX_BTIME, ptr)
 		if res != 0 {
 			return os.error_posix()
 		}

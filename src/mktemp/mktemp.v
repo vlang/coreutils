@@ -15,6 +15,7 @@ fn mktemp(options Options) string {
 		options.tmp_dir == '' { '.' }
 		else { options.tmp_dir }
 	}
+
 	template := if options.templates.len == 1 { options.templates[0] } else { 'tmp.XXXXXXXXXX' }
 	return match options.directory {
 		true { temp_dir(dir, template, options) or { exit_notify(err.msg(), options) } }

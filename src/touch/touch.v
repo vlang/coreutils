@@ -37,7 +37,8 @@ fn touch(args []string) {
 	no_create := fp.bool('no-create', `c`, false, 'do not create any files')
 	date_arg := fp.string('date_time', `d`, '', 'Use specified date. format=ISO-8601')
 	fp.bool('', `f`, false, 'ignored (for compatibility with BSD)')
-	no_ref := fp.bool('no-reference', `h`, false, 'affect each symbolic link instead of any referenced file')
+	no_ref := fp.bool('no-reference', `h`, false,
+		'affect each symbolic link instead of any referenced file')
 	mod_only := fp.bool('', `m`, false, 'change modifcation time only')
 	reference := fp.string('reference', `r`, '', 'use times from file <string>')
 	time_arg := fp.string('time', `t`, '', 'same as -d')
@@ -120,7 +121,8 @@ fn get_date_time(args TouchArgs) (int, int) {
 	if args.reference.len > 0 {
 		// os.stat follows links
 		stat := os.stat(args.reference) or {
-			common.exit_with_error_message(app_name, 'unable to find reference file ${args.reference}')
+			common.exit_with_error_message(app_name,
+				'unable to find reference file ${args.reference}')
 		}
 
 		return int(stat.atime), int(stat.mtime)

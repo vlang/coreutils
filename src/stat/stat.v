@@ -446,10 +446,14 @@ fn args() Settings {
 	mut fp := app.make_flag_parser(os.args)
 	mut st := Settings{}
 	st.dereference = fp.bool('dereference', `L`, false, 'follow links')
-	st.file_system = fp.bool('file-system', `f`, false, 'display file system status instead of file status')
-	cached := fp.string('cached', 0, 'default', 'specify how to use cached attributes; useful on remote file systems. See MODE below')
-	format := fp.string_multi('format', `c`, 'use the specified FORMAT instead of the default; output a newline after each use of FORMAT')
-	printf := fp.string_multi('printf', 0, 'like --format, but interpret backslash escapes, and do not output a mandatory trailing newline if you want a newline, include \n in FORMAT')
+	st.file_system = fp.bool('file-system', `f`, false,
+		'display file system status instead of file status')
+	cached := fp.string('cached', 0, 'default',
+		'specify how to use cached attributes; useful on remote file systems. See MODE below')
+	format := fp.string_multi('format', `c`,
+		'use the specified FORMAT instead of the default; output a newline after each use of FORMAT')
+	printf := fp.string_multi('printf', 0,
+		'like --format, but interpret backslash escapes, and do not output a mandatory trailing newline if you want a newline, include \n in FORMAT')
 	st.terse = fp.bool('terse', `t`, false, 'print the information in terse form')
 	st.input_files = fp.remaining_parameters()
 	match cached {
@@ -469,6 +473,7 @@ fn args() Settings {
 			)
 		}
 	}
+
 	if st.input_files.len == 0 {
 		app.quit(message: 'missing operand')
 	}

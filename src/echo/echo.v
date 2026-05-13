@@ -118,7 +118,8 @@ fn main() {
 	fp.description('Echo a string to standard output')
 	fp.limit_free_args_to_at_least(1)!
 	no_newline := fp.bool('no_newline', `n`, false, 'do not output a trailing newline')
-	interpret_escapes := fp.bool('interpret_escapes', `e`, false, 'enable interpretation of backslash escapes')
+	interpret_escapes := fp.bool('interpret_escapes', `e`, false,
+		'enable interpretation of backslash escapes')
 
 	mut str_a := fp.finalize() or {
 		eprintln(err)

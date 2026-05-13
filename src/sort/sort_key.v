@@ -38,6 +38,7 @@ fn sort_key(mut lines []string, options Options) {
 				.reverse { compare_strings(bb, aa) }
 				else { compare_strings(aa, bb) }
 			}
+
 			if result != 0 {
 				return result
 			}

@@ -24,8 +24,10 @@ fn main() {
 	suppress_col1 := fp.bool('', `1`, false, 'suppress column 1 (lines unique to FILE1)')
 	suppress_col2 := fp.bool('', `2`, false, 'suppress column 2 (lines unique to FILE2)')
 	suppress_col3 := fp.bool('', `3`, false, 'suppress column 3 (lines that appear in both files)')
-	check_order := fp.bool('check-order', 0, false, 'check that the input is correctly sorted, even if all input lines are pairable')
-	nocheck_order := fp.bool('nocheck-order', 0, false, 'do not check that the input is correctly sorted')
+	check_order := fp.bool('check-order', 0, false,
+		'check that the input is correctly sorted, even if all input lines are pairable')
+	nocheck_order := fp.bool('nocheck-order', 0, false,
+		'do not check that the input is correctly sorted')
 	output_delimiter := fp.string('output-delimiter', 0, '\t', 'separate columns with STRING')
 	zero_terminated := fp.bool('zero-terminated', `z`, false, 'line delimiter is NUL, not newline')
 	total := fp.bool('total', 0, false, 'output a summary')

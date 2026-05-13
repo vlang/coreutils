@@ -247,9 +247,11 @@ fn process_args(args []string) App {
 		'reformat only lines beginning with STRING, reattaching ' +
 		'${pad}the prefix to reformatted lines')
 	split_only := fp.bool('split-only', `s`, false, 'split long lines, but do not refill')
-	tagged_par := fp.bool('tagged-paragraph', `t`, false, 'indentation of first line different from second')
+	tagged_par := fp.bool('tagged-paragraph', `t`, false,
+		'indentation of first line different from second')
 	uniform_sp := fp.bool('uniform-spacing', `u`, false, 'one space between words')
-	width := fp.int('width', `w`, default_width, 'maximum line width (default of ${default_width} columns)')
+	width := fp.int('width', `w`, default_width,
+		'maximum line width (default of ${default_width} columns)')
 
 	help := fp.bool('help', 0, false, 'display this help')
 	version := fp.bool('version', 0, false, 'output version information')

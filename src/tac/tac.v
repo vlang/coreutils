@@ -95,7 +95,8 @@ fn args() Settings {
 	mut st := Settings{}
 	st.before = fp.bool('before', `b`, false, 'attach the separator before instead of after')
 	st.regex = fp.bool('regex', `r`, false, 'interpret the separator as a regular expression')
-	st.separator = fp.string('separator', `s`, '\n', 'use STRING as the separator instead of newline')
+	st.separator = fp.string('separator', `s`, '\n',
+		'use STRING as the separator instead of newline')
 	fnames := fp.remaining_parameters()
 
 	if st.separator.len == 0 {

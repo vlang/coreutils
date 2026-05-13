@@ -20,7 +20,8 @@ fn args() Settings {
 	mut fp := app.make_flag_parser(os.args)
 	mut st := Settings{}
 	st.data = fp.bool('data', `d`, false, 'sync only file data, no unneeded metadata')
-	st.file_system = fp.bool('file-system', `f`, false, 'sync the file systems that contain the files')
+	st.file_system = fp.bool('file-system', `f`, false,
+		'sync the file systems that contain the files')
 	st.target_files = fp.remaining_parameters()
 	if st.data && st.file_system {
 		app.quit(message: 'cannot specify both --data and --file-system')

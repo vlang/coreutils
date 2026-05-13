@@ -48,6 +48,7 @@ fn shred_file(file string, fill_pattern Fill_Pattern, iteration int, iterations 
 			.source { random_from_source(config.random_source) }
 			.zeros { []u8{len: block, init: 0} }
 		}
+
 		wrote := fp.write(pattern) or { panic(err) }
 		written += u64(wrote)
 		sz := math.min(size_arg, stat.size)
@@ -79,6 +80,7 @@ fn show_shred_progress(file string, iteration int, iterations int, fill_pattern 
 		.source { 'source' }
 		.zeros { '000000' }
 	}
+
 	println('${progress_prefix(file)}: pass ${iteration} of ${iterations} (${pattern})...')
 }
 

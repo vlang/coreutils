@@ -102,6 +102,7 @@ fn encode_and_output(file os.File, wrap int) {
 			4 { 1 }
 			else { 0 }
 		}
+
 		groups := get_groups(block, u8(num_equal))
 		mut result := strings.new_builder(groups.len)
 		result.write(groups) or { common.exit_with_error_message(name, err.msg()) }
@@ -126,8 +127,8 @@ fn run_base32(args []string) {
 	fp.description('If no FILE is specified on the command line or FILE is -, read them from standard input.')
 
 	decode := fp.bool('decode', `d`, false, 'decode data')
-	wrap := fp.int('wrap=', `w`, 76, 'wrap encoded lines after COLS character (default 76).' +
-		'\n\t\t\t\t\t\t\t\t\tUse 0 to disable line wrapping altogether.')
+	wrap := fp.int('wrap=', `w`, 76,
+		'wrap encoded lines after COLS character (default 76).' + '\n\t\t\t\t\t\t\t\t\tUse 0 to disable line wrapping altogether.')
 	help := fp.bool('help', 0, false, 'display this help and exit')
 	version := fp.bool('version', 0, false, 'output version information and exit')
 	if help {

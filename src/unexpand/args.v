@@ -20,7 +20,8 @@ fn get_options() Options {
 	fp.arguments_description('[files]')
 
 	all := fp.bool('all', `a`, false, 'convert all blanks instead of just initial blanks')
-	first_only := fp.bool('first-only', ` `, false, 'convert only leading sequences of blanks (overrides -a)')
+	first_only := fp.bool('first-only', ` `, false,
+		'convert only leading sequences of blanks (overrides -a)')
 	tabs := fp.string('list', `t`, '', 'use comma separated list of tab positions.\n${spaces}' +
 		"The last specified position can be prefixed with '/'\n${spaces}" +
 		'to specify a tab size to use after the last$\n${spaces}' +

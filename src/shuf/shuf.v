@@ -136,7 +136,8 @@ fn set_lines(lines []string, settings Settings) []string {
 			if settings.echo {
 				new_lines << fname
 			} else {
-				new_lines = register_lines_by_file(new_lines.clone(), fname, settings.zero_terminated)
+				new_lines = register_lines_by_file(new_lines.clone(), fname,
+					settings.zero_terminated)
 			}
 		}
 	}
@@ -183,12 +184,16 @@ fn args() Settings {
 	fp.description(app_description)
 
 	echo := fp.bool('echo', `e`, false, 'Treat each command-line operand as an input line')
-	input_range := fp.string('input-range', `i`, '', 'Act as if input came from a file containing the range of unsigned decimal integers lo…hi, one per line')
-	head_count := fp.int('head-count', `n`, 0, 'Output at most count lines. By default, all input lines are output')
+	input_range := fp.string('input-range', `i`, '',
+		'Act as if input came from a file containing the range of unsigned decimal integers lo…hi, one per line')
+	head_count := fp.int('head-count', `n`, 0,
+		'Output at most count lines. By default, all input lines are output')
 	output := fp.string('output', `o`, '', 'Write output to output-file instead of standard output')
-	random_source := fp.string('random-source', 0, '', 'Use file as a source of random data used to determine which permutation to generate')
+	random_source := fp.string('random-source', 0, '',
+		'Use file as a source of random data used to determine which permutation to generate')
 	repeat := fp.bool('repeat', `r`, false, 'Repeat output values')
-	zero_terminated := fp.bool('zero-terminated', `z`, false, 'Delimit items with a zero byte rather than a newline')
+	zero_terminated := fp.bool('zero-terminated', `z`, false,
+		'Delimit items with a zero byte rather than a newline')
 
 	fnames := fp.remaining_parameters()
 

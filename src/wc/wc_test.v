@@ -25,7 +25,8 @@ fn testsuite_begin() {
 	os.write_file(dummy, 'a'.repeat(50))!
 	os.write_file(long_over_16k, 'a'.repeat(16390))!
 	os.write_file(long_under_16k, 'a'.repeat(16383) + '\naaaaaaaaaaaaaaaaa')!
-	os.write_file(file_list_path, '${test1_txt_path}${file_list_sep}${test2_txt_path}${file_list_sep}${test3_txt_path}')!
+	os.write_file(file_list_path,
+		'${test1_txt_path}${file_list_sep}${test2_txt_path}${file_list_sep}${test3_txt_path}')!
 }
 
 fn testsuite_end() {
@@ -120,14 +121,16 @@ fn test_one_file_all_flags() {
 }
 
 fn test_several_files_all_flags() {
-	res := os.execute('${executable_under_test} -cmwlL ${test1_txt_path} ${test2_txt_path} ${test3_txt_path}')
+	res :=
+		os.execute('${executable_under_test} -cmwlL ${test1_txt_path} ${test2_txt_path} ${test3_txt_path}')
 
 	assert res.exit_code == 0
 	assert res.output.trim_space() == '1  5 25 25 12 ${test1_txt_path}${eol} 1  2 26 26 16 ${test2_txt_path}${eol} 2  2 28 28 17 ${test3_txt_path}${eol} 4  9 79 79 17 total'
 }
 
 fn test_several_same_files_all_flags() {
-	res := os.execute('${executable_under_test} -cmwlL ${test1_txt_path} ${test1_txt_path} ${test1_txt_path}')
+	res :=
+		os.execute('${executable_under_test} -cmwlL ${test1_txt_path} ${test1_txt_path} ${test1_txt_path}')
 
 	assert res.exit_code == 0
 	assert res.output.trim_space() == '1  5 25 25 12 ${test1_txt_path}${eol} 1  5 25 25 12 ${test1_txt_path}${eol} 1  5 25 25 12 ${test1_txt_path}${eol} 3 15 75 75 12 total'

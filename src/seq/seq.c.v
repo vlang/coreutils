@@ -116,7 +116,8 @@ fn args() !Settings {
 	// need to change this
 	format := fp.string('format', `f`, '', 'use printf style floating-point FORMAT')
 	separator := fp.string('separator', `s`, '\n', 'use STRING to separate numbers (default: \n)')
-	equal_width := fp.bool('equal-width', `w`, false, 'equalize width by padding with leading zeroes')
+	equal_width := fp.bool('equal-width', `w`, false,
+		'equalize width by padding with leading zeroes')
 
 	// extra arguments -a -b -c arg1 arg2 arg3
 	// arg1..3 will be taken
@@ -151,5 +152,6 @@ fn args() !Settings {
 			exit(1)
 		}
 	}
+
 	return error('invalid parameters')
 }

@@ -21,7 +21,8 @@ fn get_options() Options {
 
 	delimiters := fp.string('delimiters', `d`, '\t', 'reuse characters from LIST instead of TABs')
 	serial := fp.bool('serial', `s`, false, 'paste one file at a time instead of in parallel')
-	zero_terminated := fp.bool('zero-terminated', `z`, false, 'line delimiter is NUL, not newline\n')
+	zero_terminated := fp.bool('zero-terminated', `z`, false,
+		'line delimiter is NUL, not newline\n')
 
 	files := fp.finalize() or { exit_error(err.msg()) }
 

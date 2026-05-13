@@ -28,7 +28,8 @@ fn (m MvCommand) run(source string, dest string) {
 
 fn (m MvCommand) move(src string, dst string) {
 	ndst := if os.is_dir(dst) {
-		os.join_path(dst.trim_right(os.path_separator), os.file_name(src.trim_right(os.path_separator)))
+		os.join_path(dst.trim_right(os.path_separator),
+			os.file_name(src.trim_right(os.path_separator)))
 	} else {
 		dst
 	}

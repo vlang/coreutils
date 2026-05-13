@@ -41,6 +41,7 @@ fn test_expected() {
 	}
 	expected_result('textfile', 'SGVsbG8gV29ybGQhCkhvdyBhcmUgeW91Pw==\n')
 	expected_result('-w 0 textfile', 'SGVsbG8gV29ybGQhCkhvdyBhcmUgeW91Pw==')
-	expected_result('-w 1 textfile', 'S\nG\nV\ns\nb\nG\n8\ng\nV\n2\n9\ny\nb\nG\nQ\nh\nC\nk\nh\nv\nd\ny\nB\nh\nc\nm\nU\ng\ne\nW\n9\n1\nP\nw\n=\n=\n')
+	expected_result('-w 1 textfile',
+		'S\nG\nV\ns\nb\nG\n8\ng\nV\n2\n9\ny\nb\nG\nQ\nh\nC\nk\nh\nv\nd\ny\nB\nh\nc\nm\nU\ng\ne\nW\n9\n1\nP\nw\n=\n=\n')
 	expected_result('-d base64file', 'V coreutils is awesome!\n')
 }

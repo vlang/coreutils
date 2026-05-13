@@ -301,10 +301,10 @@ fn setup_command(args []string) ?(HeadCommand, []InputFile) {
 	fp.description('Wrap input lines in each FILE, writing to standard output.')
 	fp.description('With no FILE, or when FILE is -, read standard input.')
 
-	bytes := fp.int('bytes', `c`, 0, wrap_long_command_description("print the first NUM bytes of each file: with the leading '-', print all but the last NUM bytes of each file",
-		45))
-	lines := fp.int('lines', `n`, 10, wrap_long_command_description("print the first NUM lines instead of the first 10: with the leading '-' print all but the last NUM lines of each file",
-		48))
+	bytes := fp.int('bytes', `c`, 0,
+		wrap_long_command_description("print the first NUM bytes of each file: with the leading '-', print all but the last NUM bytes of each file", 45))
+	lines := fp.int('lines', `n`, 10,
+		wrap_long_command_description("print the first NUM lines instead of the first 10: with the leading '-' print all but the last NUM lines of each file", 48))
 	verbose := fp.bool('verbose', `v`, false, 'always print headers giving file names')
 	silent := fp.bool('silent', `q`, false, 'never print headers giving file names')
 	zero_terminated := fp.bool('zero-terminated', `z`, false, 'line delimiter is NUL, not newline')

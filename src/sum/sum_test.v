@@ -134,7 +134,8 @@ fn test_sysv_width_4_col_no_padding() {
 }
 
 fn test_sysv_different_col_widths_no_alignment() {
-	res := os.execute('${executable_under_test} -s ${long_line} ${test1_txt} ${test2_txt} ${test3_txt}')
+	res :=
+		os.execute('${executable_under_test} -s ${long_line} ${test1_txt} ${test2_txt} ${test3_txt}')
 
 	assert res.exit_code == 0
 	assert res.output == '55583 302 ${long_line}${eol}2185 1 ${test1_txt}${eol}3372 1 ${test2_txt}${eol}556 1 ${test3_txt}${eol}'

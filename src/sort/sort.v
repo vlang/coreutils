@@ -42,6 +42,7 @@ fn do_sort(file string, options Options) []string {
 		options.ignore_leading_blanks { sort_ignore_leading_blanks(mut lines, options) }
 		else { sort_lines(mut lines, options) }
 	}
+
 	if options.unique {
 		lines = arrays.distinct(lines)
 	}

@@ -146,8 +146,8 @@ fn (c FoldCommand) run(mut files []InputFile) {
 			open_fails_num++
 			continue
 		}
-		fold_content_to_fit_within_width(file.file, c.max_col_width, c.count_bytes_ignore_control_chars,
-			c.break_at_spaces)
+		fold_content_to_fit_within_width(file.file, c.max_col_width,
+			c.count_bytes_ignore_control_chars, c.break_at_spaces)
 		file.close()
 	}
 	if open_fails_num == files.len {

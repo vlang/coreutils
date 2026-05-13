@@ -27,5 +27,6 @@ fn args() Settings {
 			common.exit_with_error_message(app_name, 'extra operand ‘${fnames[1]}’')
 		}
 	}
+
 	return st
 }
