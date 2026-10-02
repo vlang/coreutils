@@ -1,5 +1,7 @@
 import os
-import io.util
+// Aliased: the module is called `util`, which would clash with the `util`
+// constant below holding this utility's name.
+import io.util as io_util
 import common.testing
 
 const eol = testing.output_eol()
@@ -97,7 +99,7 @@ fn test_sysv_several_files_succeeds() {
 }
 
 fn sum_arbitrary_value(value string, arg string) !os.Result {
-	mut f, path := util.temp_file()!
+	mut f, path := io_util.temp_file()!
 	f.write_string('${value}\n')!
 	f.close()
 	res := $if windows {
