@@ -2,7 +2,7 @@ import arrays
 import os
 import term
 import time
-import v.mathutil { max }
+import math
 
 const inode_title = 'inode'
 const permissions_title = 'Permission'
@@ -39,11 +39,20 @@ enum StatTime {
 	modified
 }
 
+// GNU prints `total 220`, with no colon, and the number is the sum of the disk
+// blocks the entries occupy in 1K units -- not the sum of their lengths. A
+// 200000 byte file on a 4K filesystem contributes 196, not 195. With -h the sum
+// is scaled like a size instead, giving `total 220K`. An empty directory gets
+// `total 0` rather than no line at all.
 fn print_total(entries []Entry, options Options) {
-	total := arrays.fold[Entry, u64](entries, 0, fn (a u64, e Entry) u64 {
-		return a + max(u64(1), e.size / 1024)
+	allocated := arrays.fold[Entry, u64](entries, 0, fn (a u64, e Entry) u64 {
+		return a + e.allocated
 	})
-	println('total: ${total}')
+	if options.size_kb || options.size_ki {
+		println('total ${readable_size(allocated, options.size_ki)}')
+		return
+	}
+	println('total ${allocated / 1024}')
 }
 
 fn format_long_listing(entries []Entry, options Options) {
@@ -348,7 +357,6 @@ fn file_flag(entry Entry, options Options) string {
 		entry.invalid 	{ unknown }
 		entry.link 	{ style_string('l', options.style_ln, options) }
 		entry.dir 	{ style_string('d', options.style_di, options) }
-		entry.exe 	{ style_string('x', options.style_ex, options) }
 		entry.fifo 	{ style_string('p', options.style_pi, options) }
 		entry.block 	{ style_string('b', options.style_bd, options) }
 		entry.character { style_string('c', options.style_cd, options) }
@@ -382,6 +390,37 @@ fn file_permission(file_permission os.FilePermission, options Options) string {
 	return '${r}${w}${x}'
 }
 
+// GNU shows the time of day for anything from the last six months and the year
+// for anything older. The boundary is calendar months rather than a fixed count
+// of days: measured on the reference with now = 2026-10-03, a file dated
+// 2026-04-04 showed a time and one dated 2026-04-01 showed a year, so the mark
+// sits on 2026-04-03.
+fn is_recent(t time.Time) bool {
+	now := time.now()
+	mut cy := now.year
+	mut cm := now.month - 6
+	if cm < 1 {
+		cm += 12
+		cy -= 1
+	}
+	// The day of the month may not exist six months back, the 31st of a month
+	// with 30 days being the case that bites.
+	cd := math.min(now.day, time.days_in_month(cm, cy) or { 31 })
+	if t.year != cy || t.month != cm {
+		return (t.year > cy) || (t.year == cy && t.month > cm)
+	}
+	if t.day != cd {
+		return t.day > cd
+	}
+	if t.hour != now.hour {
+		return t.hour > now.hour
+	}
+	if t.minute != now.minute {
+		return t.minute > now.minute
+	}
+	return t.second >= now.second
+}
+
 fn format_time(entry Entry, stat_time StatTime, options Options) string {
 	entry_time := match stat_time {
 		.accessed { entry.stat.atime }
@@ -389,12 +428,21 @@ fn format_time(entry Entry, stat_time StatTime, options Options) string {
 		.modified { entry.stat.mtime }
 	}
 
-	mut date := time.unix(entry_time)
-		.local()
-		.custom_format(time_format(options))
+	t := time.unix(entry_time).local()
+	// Only the default style switches to the year; the explicit --time-style
+	// ones are left to print what they were asked for.
+	mut date := if time_format(options) == date_format && !is_recent(t) {
+		// `Nov 15  2023`: the day is padded to width two and then two spaces
+		// separate it from the year.
+		day := if t.day < 10 { ' ${t.day}' } else { '${t.day}' }
+		'${t.smonth()} ${day}  ${t.year}'
+	} else {
+		t.custom_format(time_format(options))
+	}
 
-	if date.starts_with('0') {
-		date = ' ' + date[1..]
+	if date.len > 5 && date[4] == `0` && date[5] >= `0` && date[5] <= `9`
+		&& !date.starts_with('YYYY') {
+		date = date[..4] + ' ' + date[5..]
 	}
 
 	dim := if options.no_dim { no_style } else { dim_style }
@@ -404,20 +452,32 @@ fn format_time(entry Entry, stat_time StatTime, options Options) string {
 
 fn longest_nlink_len(entries []Entry, title string, options Options) int {
 	lengths := entries.map(it.stat.nlink.str().len)
-	max := arrays.max(lengths) or { 0 }
-	return if options.no_hard_links || !options.header { max } else { max(max, title.len) }
+	longest := arrays.max(lengths) or { 0 }
+	return if options.no_hard_links || !options.header {
+		longest
+	} else {
+		math.max(longest, title.len)
+	}
 }
 
 fn longest_owner_name_len(entries []Entry, title string, options Options) int {
 	lengths := entries.map(get_owner_name(it.stat.uid).len)
-	max := arrays.max(lengths) or { 0 }
-	return if options.no_owner_name || !options.header { max } else { max(max, title.len) }
+	longest := arrays.max(lengths) or { 0 }
+	return if options.no_owner_name || !options.header {
+		longest
+	} else {
+		math.max(longest, title.len)
+	}
 }
 
 fn longest_group_name_len(entries []Entry, title string, options Options) int {
 	lengths := entries.map(get_group_name(it.stat.gid).len)
-	max := arrays.max(lengths) or { 0 }
-	return if options.no_group_name || !options.header { max } else { max(max, title.len) }
+	longest := arrays.max(lengths) or { 0 }
+	return if options.no_group_name || !options.header {
+		longest
+	} else {
+		math.max(longest, title.len)
+	}
 }
 
 fn longest_size_len(entries []Entry, title string, options Options) int {
@@ -427,24 +487,24 @@ fn longest_size_len(entries []Entry, title string, options Options) int {
 		options.size_kb { it.size_kb.len }
 		else { it.size.str().len }
 	})
-	max := arrays.max(lengths) or { 0 }
-	return if options.no_size || !options.header { max } else { max(max, title.len) }
+	longest := arrays.max(lengths) or { 0 }
+	return if options.no_size || !options.header { longest } else { math.max(longest, title.len) }
 }
 
 fn longest_inode_len(entries []Entry, title string, options Options) int {
 	lengths := entries.map(it.stat.inode.str().len)
-	max := arrays.max(lengths) or { 0 }
-	return if !options.inode || !options.header { max } else { max(max, title.len) }
+	longest := arrays.max(lengths) or { 0 }
+	return if !options.inode || !options.header { longest } else { math.max(longest, title.len) }
 }
 
 fn longest_file_name_len(entries []Entry, title string, options Options) int {
 	lengths := entries.map(real_length(format_entry_name(it, options)))
-	max := arrays.max(lengths) or { 0 }
-	return if !options.header { max } else { max(max, title.len) }
+	longest := arrays.max(lengths) or { 0 }
+	return if !options.header { longest } else { math.max(longest, title.len) }
 }
 
 fn longest_checksum_len(entries []Entry, title string, options Options) int {
 	lengths := entries.map(it.checksum.len)
-	max := arrays.max(lengths) or { 0 }
-	return if !options.header { max } else { max(max, title.len) }
+	longest := arrays.max(lengths) or { 0 }
+	return if !options.header { longest } else { math.max(longest, title.len) }
 }
