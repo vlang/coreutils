@@ -15,3 +15,6 @@ build
 build
 src/touch/touch
 
+# Reference GNU coreutils archives, fetched locally for testing
+coreutils-*-win.zip
+
