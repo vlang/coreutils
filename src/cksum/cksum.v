@@ -1,128 +1,262 @@
 module main
 
 import os
+import flag
+import strconv
 import common
-import io
-import arrays
+import encoding.base64
 
 const app_name = 'cksum'
-const app_description = 'Print CRC checksum and byte counts of each FILE.'
-const buffer_length = 128 * 1024
 
-struct Args {
-	fnames []string
+const app_description = 'Print or verify checksums.'
+
+const app = common.CoreutilInfo{
+	name:        app_name
+	description: app_description
 }
 
-fn swap_32(x u32) u32 {
-	return ((x & 0xff000000) >> 24) | ((x & 0x00ff0000) >> 8) | ((x & 0x0000ff00) << 8) | ((x & 0x000000ff) << 24)
-}
-
-fn calc_sums(args Args) {
-	mut files := args.fnames.clone()
-
-	// read from stdin if no files supplied
-	if files.len < 1 {
-		files = ['-']
-	}
-
-	mut f := os.File{}
-	mut buf := []u8{len: buffer_length, cap: buffer_length}
-
-	for file in files {
-		if file == '-' {
-			f = os.stdin()
-		} else {
-			f = os.open(file) or {
-				eprintln('cksum: ${file}: No such file or directory')
-				exit(1)
-			}
-			defer(fn) {
-				f.close()
-			}
-		}
-
-		mut rd := io.new_buffered_reader(io.BufferedReaderConfig{ reader: f, cap: buffer_length })
-		mut crc := u64(0)
-		mut total_length := u64(0)
-
-		for {
-			res := u64(rd.read(mut buf) or { break })
-
-			chunks := res / 8
-			for outer := 0; outer < chunks; outer++ {
-				chunk := buf[outer * 8..outer * 8 + 8].clone()
-				first := four_bytes_to_int(chunk[..4])
-				mut second := four_bytes_to_int(chunk[4..])
-
-				crc ^= swap_32(first)
-				second = swap_32(second)
-				// println('${crc} ${second}')
-
-				crc = crctab[7][(crc >> 24) & 0xFF] ^ crctab[6][(crc >> 16) & 0xFF] ^ crctab[5][(crc >> 8) & 0xFF] ^ crctab[4][crc & 0xFF] ^ crctab[3][(second >> 24) & 0xFF] ^ crctab[2][(second >> 16) & 0xFF] ^ crctab[1][(second >> 8) & 0xFF] ^ crctab[0][second & 0xFF]
-			}
-
-			remaining_len := res - chunks * 8
-			if remaining_len > 0 {
-				rest := buf[8 * chunks..].clone()
-				crc = cksum_slice8(rest, crc, remaining_len)
-			}
-			total_length = u64(rd.total_read)
-		}
-
-		mut len_counter := total_length
-		for len_counter > 0 {
-			crc = (crc << 8) ^ crctab[0][((crc >> 24) ^ len_counter) & 0xFF]
-			len_counter >>= 8
-		}
-		crc = ~crc & 0xffff_ffff
-
-		file_str := match file {
-			'-' { '' }
-			else { file }
-		}
-
-		println('${crc} ${total_length} ${file_str}')
-	}
-}
-
-fn cksum_slice8(buf []u8, crc_in u64, remaining_len u64) u64 {
-	mut crc_tmp := crc_in
-
-	for i := 0; i < remaining_len; i++ {
-		cp := buf[i]
-		index := ((crc_tmp >> 24) ^ cp) & 0xFF
-		tab_value := crctab[0][index]
-		crc_shift := crc_tmp << 8
-		crc_tmp = crc_shift ^ tab_value
-	}
-
-	return crc_tmp
-}
-
-fn id[T](x T) T {
-	return x
-}
-
-fn four_bytes_to_int(bytes []u8) u32 {
-	// emulates original evil type punning
-	// TODO this is *damn* slow -- rewrite via evil bit hacking
-	mut tmp_bytes := []string{}
-	for c in bytes.reverse() {
-		tmp_bytes << c.hex()
-	}
-	return u32(arrays.join_to_string[string](tmp_bytes, '', id[string])
-		.parse_uint(16, 32) or { panic(err) })
-}
-
-fn parse_args() Args {
-	mut fp := common.flag_parser(os.args)
-	fp.application(app_name)
-	fp.description(app_description)
-
-	fnames := fp.remaining_parameters()
-	return Args{fnames}
+struct Settings {
+mut:
+	algorithm       Algorithm
+	algorithm_given bool
+	bit_length      int
+	check           bool
+	base64_output   bool
+	raw             bool
+	tag             bool
+	untagged        bool
+	zero            bool
+	ignore_missing  bool
+	quiet           bool
+	status          bool
+	strict          bool
+	warn            bool
+	files           []string
 }
 
 fn main() {
-	calc_sums(parse_args())
+	settings := args()
+	if settings.check {
+		check_files(settings)
+	} else {
+		print_checksums(settings)
+	}
+}
+
+// read_input returns the bytes of file, or of standard input for '-'. A file
+// that cannot be read is reported and ends the program, as in GNU.
+fn read_input(file string) []u8 {
+	if file == '-' {
+		mut data := []u8{}
+		mut buf := []u8{len: 64 * 1024}
+		mut stdin := os.stdin()
+		for {
+			n := stdin.read(mut buf) or { break }
+			data << buf[..n]
+		}
+		return data
+	}
+	if os.is_dir(file) {
+		app_quit('${quote_name(file)}: Is a directory')
+	}
+	return os.read_bytes(file) or {
+		app_quit('${quote_name(file)}: ${os.error_posix().msg()}')
+	}
+}
+
+// block_count is the size column of the sysv and bsd output: like sum(1),
+// sysv counts 512 byte blocks and bsd counts 1024 byte blocks, both rounding up.
+fn block_count(length int, block int) u64 {
+	return (u64(length) + u64(block) - 1) / u64(block)
+}
+
+// write_digest prints the checksum of one input in the form GNU uses for the
+// chosen algorithm and output options.
+fn write_digest(settings Settings, file string, show_name bool, data []u8) {
+	sum := checksum(settings.algorithm, data, settings.bit_length) or { return }
+
+	if settings.raw {
+		mut out := os.stdout()
+		if settings.algorithm.is_numeric() {
+			// 16 and 32 bit checksums go out in network byte order.
+			mut bytes := []u8{}
+			if settings.algorithm == .sysv || settings.algorithm == .bsd {
+				bytes << u8(sum.numeric >> 8)
+				bytes << u8(sum.numeric)
+			} else {
+				bytes << u8(sum.numeric >> 24)
+				bytes << u8(sum.numeric >> 16)
+				bytes << u8(sum.numeric >> 8)
+				bytes << u8(sum.numeric)
+			}
+			out.write(bytes) or {}
+			return
+		}
+		out.write(sum.digest) or {}
+		return
+	}
+
+	delim := if settings.zero { '\x00' } else { '\n' }
+
+	if settings.algorithm.is_numeric() {
+		// The numeric algorithms have no printable digest form, so neither
+		// --tag nor --untagged changes anything here.
+		name := if show_name { ' ${file}' } else { '' }
+		match settings.algorithm {
+			.bsd {
+				print('${sum.numeric:05} ${block_count(data.len, 1024):5}${name}')
+			}
+			.sysv {
+				print('${sum.numeric} ${block_count(data.len, 512)}${name}')
+			}
+			else {
+				print('${sum.numeric} ${data.len}${name}')
+			}
+		}
+		print(delim)
+		return
+	}
+
+	// The byte digests default to the tagged form. A file name that would break
+	// the one record per line rule is escaped, and the line is marked.
+	mut name := file
+	mut marker := ''
+	if !settings.zero {
+		escaped := escape_name(file)
+		name = escaped.text
+		marker = escaped.marker
+	}
+	value := if settings.base64_output { base64.encode(sum.digest) } else { sum.digest.hex() }
+	if settings.untagged {
+		// The reversed style carries no digest name. A binary marker is used
+		// when both --tag and --untagged are given.
+		star := if settings.tag { '*' } else { ' ' }
+		print('${marker}${value} ${star}${name}${delim}')
+		return
+	}
+	print('${marker}${settings.algorithm.tag(settings.bit_length)} (${name}) = ${value}${delim}')
+}
+
+fn print_checksums(settings Settings) {
+	mut files := settings.files.clone()
+	if files.len == 0 {
+		files << '-'
+	}
+	// GNU only prints the file name when it came from a command line operand.
+	show_names := settings.files.len > 0
+	for file in files {
+		write_digest(settings, file, show_names, read_input(file))
+	}
+}
+
+fn args() Settings {
+	mut fp := common.flag_parser(os.args)
+	fp.application(app_name)
+	fp.arguments_description('[OPTION]... [FILE]...')
+	fp.description(app_description)
+	fp.description('By default use the 32 bit CRC algorithm.')
+	fp.description('')
+	fp.description('With no FILE, or when FILE is -, read standard input.')
+
+	mut settings := Settings{}
+
+	algorithm := fp.string_opt('algorithm', `a`, 'select the digest type to use.  See DIGEST below',
+		flag.FlagConfig{
+			val_desc: 'TYPE'
+		}) or { 'crc' }
+	settings.algorithm_given = option_given(os.args, 'algorithm', 'a')
+	settings.algorithm = parse_algorithm(algorithm) or {
+		common.exit_with_error_message(app_name, invalid_algorithm(algorithm))
+	}
+
+	length := fp.string_opt('length', `l`, 'digest length in bits; must not exceed the max size',
+		flag.FlagConfig{
+			val_desc: 'BITS'
+		}) or { '' }
+	if length.len > 0 {
+		settings.bit_length = check_length(length, settings.algorithm)
+	} else {
+		settings.bit_length = settings.algorithm.bit_length()
+	}
+
+	settings.check = fp.bool_opt('check', `c`, 'read checksums from the FILEs and check them',
+		flag.FlagConfig{}) or { false }
+	settings.base64_output = fp.bool_opt('base64', 0,
+		'emit base64-encoded digests, not hexadecimal', flag.FlagConfig{}) or { false }
+	settings.raw = fp.bool_opt('raw', 0, 'emit a raw binary digest, not hexadecimal',
+		flag.FlagConfig{}) or { false }
+	settings.tag = fp.bool_opt('tag', 0, 'create a BSD-style checksum (the default)',
+		flag.FlagConfig{}) or { false }
+	settings.untagged = fp.bool_opt('untagged', 0,
+		'create a reversed style checksum, without digest type', flag.FlagConfig{}) or { false }
+	settings.zero = fp.bool_opt('zero', `z`, 'end each output line with NUL, not newline',
+		flag.FlagConfig{}) or { false }
+
+	settings.ignore_missing = fp.bool_opt('ignore-missing', 0,
+		"don't fail or report status for missing files", flag.FlagConfig{}) or { false }
+	settings.quiet = fp.bool_opt('quiet', 0,
+		"don't print OK for each successfully verified file", flag.FlagConfig{}) or { false }
+	settings.status = fp.bool_opt('status', 0,
+		"don't output anything, status code shows success", flag.FlagConfig{}) or { false }
+	settings.strict = fp.bool_opt('strict', 0,
+		'exit non-zero for improperly formatted checksum lines', flag.FlagConfig{}) or { false }
+	settings.warn = fp.bool_opt('warn', `w`, 'warn about improperly formatted checksum lines',
+		flag.FlagConfig{}) or { false }
+
+	settings.files = fp.remaining_parameters()
+	return settings
+}
+
+// option_given reports whether an option appeared on the command line. V's flag
+// module does not record this, and --check has to know whether --algorithm was
+// named explicitly, because otherwise the digest to verify with comes from the
+// list itself.
+fn option_given(args []string, long string, short string) bool {
+	for arg in args[1..] {
+		if arg == '--${long}' || arg.starts_with('--${long}=') {
+			return true
+		}
+		if short.len > 0 && arg.len > 1 && arg[0] == `-` && arg[1] != `-`
+			&& (arg[1] == short[0] || (arg.len > 2 && arg[2] == short[0])) {
+			return true
+		}
+	}
+	return false
+}
+
+// check_length validates --length. GNU only accepts it for BLAKE2b, whose
+// digest length is variable, and it has to be a multiple of 8.
+fn check_length(length string, algorithm Algorithm) int {
+	bits := strconv.atoi(length) or {
+		invalid_length(length, 'invalid number')
+	}
+	if bits % 8 != 0 {
+		invalid_length(length, 'length is not a multiple of 8')
+	}
+	if !algorithm.accepts_length() {
+		app_quit('--length is only supported with --algorithm=blake2b')
+	}
+	if bits < blake2b_min_bits || bits > blake2b_max_bits {
+		invalid_length(length, 'maximum digest length for ‘BLAKE2b’ is ${blake2b_max_bits} bits')
+	}
+	return bits
+}
+
+// invalid_length reports a bad --length. GNU prints two separate diagnostics for
+// this, each with its own prefix, and does not suggest --help.
+@[noreturn]
+fn invalid_length(length string, reason string) {
+	eprintln('${app_name}: invalid length: ‘${length}’')
+	eprintln('${app_name}: ${reason}')
+	exit(1)
+}
+
+// app_quit reports an error and exits without the "Try --help" advice, which is
+// what GNU does for everything except a bad option or argument.
+@[noreturn]
+fn app_quit(message string) {
+	app.quit(
+		message:     message
+		return_code: 1
+	)
 }
