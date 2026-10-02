@@ -3,8 +3,8 @@ import arrays
 import common
 import flag
 import io
+import math
 import os
-import v.mathutil
 
 const app_name = 'cut'
 const space_comma = ' ,'
@@ -124,13 +124,13 @@ fn combine_ranges_and_zero_index(ranges []Range, max int, complement bool) []Ran
 
 	outer: for range in ranges.sorted(a.start < b.start) {
 		start := range.start - 1
-		end := if range.end == -1 { max } else { mathutil.min(max, range.end) }
+		end := if range.end == -1 { max } else { math.min(max, range.end) }
 
 		for mut combined_range in combined_ranges {
 			if range_overlaps_range(start, end, combined_range.start, combined_range.end) {
 				combined_range = Range{
-					start: mathutil.min(start, combined_range.start)
-					end:   mathutil.max(end, combined_range.end)
+					start: math.min(start, combined_range.start)
+					end:   math.max(end, combined_range.end)
 				}
 				continue outer
 			}
@@ -189,7 +189,7 @@ fn get_args(args []string) Args {
 	delimiter := fp.string('delimter', `d`, '', 'use <string> instead of TAB for field delimter')
 	fields := fp.string('fields', `f`, '',
 		'select only <string> fields; also print any line${wrap}' +
-		'that contains no delimiter character, unless the${wrap}-s option is specified')
+			'that contains no delimiter character, unless the${wrap}-s option is specified')
 	fp.bool('', `n`, false, '(ignored)')
 	complement := fp.bool('complement', ` `, false,
 		'complement the set of selected bytes, characters${wrap}or fields')
@@ -207,9 +207,9 @@ fn get_args(args []string) Args {
 		'range, or many ranges separated by commas. Selected input is written${eol}' +
 		'in the same order that it is read, and is written exactly once.${eol}${eol}' +
 		'Each range is one of:${eol}${eol}' +
-		'  N     N\'th byte, character or field, counted from 1${eol}' +
-		'  N-    from N\'th byte, character or field, to end of line${eol}' +
-		'  N-M   from N\'th to M\'th (included) byte, character or field${eol}' + "  -M    from first to M'th (included) byte, character or field")
+		"  N     N'th byte, character or field, counted from 1${eol}" +
+		"  N-    from N'th byte, character or field, to end of line${eol}" +
+		"  N-M   from N'th to M'th (included) byte, character or field${eol}" + "  -M    from first to M'th (included) byte, character or field")
 	fp.footer(common.coreutils_footer())
 
 	file_args := fp.finalize() or { exit_error(err.msg()) }

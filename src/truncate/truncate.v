@@ -202,8 +202,13 @@ fn truncate(settings Settings) {
 				f.close()
 			}
 			if os.exists(fname) {
-				block_size := if settings.io_blocks { get_block_size(fname) or {
-						default_block_size} } else { 1 }
+				block_size := if settings.io_blocks {
+					get_block_size(fname) or {
+						default_block_size
+					}
+				} else {
+					1
+				}
 				size := calc_target_size(get_size(settings.reference), settings.size_opt,
 					block_size)
 				os.truncate(fname, size) or { app.quit(message: err.msg()) }
@@ -216,8 +221,13 @@ fn truncate(settings Settings) {
 			// If --no-create is set, nothing is done but no error is generated
 			// This is behavior from the original GNU coreutil.
 			if os.exists(fname) {
-				block_size := if settings.io_blocks { get_block_size(fname) or {
-						default_block_size} } else { 1 }
+				block_size := if settings.io_blocks {
+					get_block_size(fname) or {
+						default_block_size
+					}
+				} else {
+					1
+				}
 				size := calc_target_size(get_size(fname), settings.size_opt, block_size)
 				os.truncate(fname, size) or { app.quit(message: err.msg()) }
 			}

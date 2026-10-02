@@ -1,7 +1,9 @@
 import os
 import common
 
-const zero_byte = byte(0).ascii_str()
+fn zero_byte() string {
+	return u8(0).ascii_str()
+}
 
 // Exit status:
 // 0 if all variables specified were found
@@ -34,7 +36,7 @@ fn main() {
 			mut s := '${k}=${v}'
 			if opt_nul_terminate {
 				print(s)
-				print(zero_byte)
+				print(zero_byte())
 			} else {
 				println(s)
 			}
@@ -49,7 +51,7 @@ fn main() {
 			}
 			if opt_nul_terminate {
 				print(v)
-				print(zero_byte)
+				print(zero_byte())
 			} else {
 				println(v)
 			}

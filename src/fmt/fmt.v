@@ -241,11 +241,11 @@ fn process_args(args []string) App {
 
 	crown_marg := fp.bool('crown-margin', `c`, false,
 		'preserve the indentation of the first two lines within' +
-		'${pad}a paragraph, and align the left margin of each' +
-		'${pad}subsequent line with that of the second line')
+			'${pad}a paragraph, and align the left margin of each' +
+			'${pad}subsequent line with that of the second line')
 	prefix_str := fp.string('prefix', `p`, '',
 		'reformat only lines beginning with STRING, reattaching ' +
-		'${pad}the prefix to reformatted lines')
+			'${pad}the prefix to reformatted lines')
 	split_only := fp.bool('split-only', `s`, false, 'split long lines, but do not refill')
 	tagged_par := fp.bool('tagged-paragraph', `t`, false,
 		'indentation of first line different from second')

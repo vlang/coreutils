@@ -84,8 +84,7 @@ pub fn (rig TestRig) assert_platform_util() {
 		} else {
 			// uptime was moved to procps-ng and may not be available in coreutils
 
-			assert
-				ver == 'uptime (GNU coreut' || ver == 'uptime (coreutils)' || ver == 'uptime from procps'
+			assert ver == 'uptime (GNU coreut' || ver == 'uptime (coreutils)' || ver == 'uptime from procps'
 		}
 	}
 }

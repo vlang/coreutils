@@ -6,6 +6,11 @@ import common
 
 const cmd_ns = 'sleep'
 
+// max_duration is the largest sleep time.Duration we are willing to hand to
+// time.sleep(), and max_sleep_seconds is that same value expressed in seconds.
+const max_duration = time.Duration(max_i64)
+const max_sleep_seconds = 9223372036.854776
+
 // <stdlib.h>
 // str="-1.8e+308", ret = -inf, endptr => NULL
 // str="1.8e+308", ret = +inf, endptr => NULL
@@ -49,6 +54,22 @@ fn invalid_time_interval(n f64, unit string) string {
 
 fn invalid_time_interval_argument(s string) string {
 	return "${cmd_ns}: invalid time interval '${s}'"
+}
+
+// seconds_to_duration converts a possibly infinite number of seconds
+// into a time.Duration. A Duration is an integer nanosecond count, so
+// saturate instead of overflowing: an unbounded sleep must keep waiting
+// rather than wrap around to (near) zero.
+fn seconds_to_duration(seconds f64) time.Duration {
+	nanoseconds := seconds * 1e9
+	// `!(x < y)` also catches NaN and +inf, both of which must saturate
+	if !(nanoseconds < max_sleep_seconds) {
+		return max_duration
+	}
+	if nanoseconds <= 0.0 {
+		return 0
+	}
+	return time.Duration(nanoseconds)
 }
 
 fn main() {
@@ -103,7 +124,7 @@ fn main() {
 	// if seconds = +inf, it would not sleep
 	// but original `sleep` would sleep
 	t := time.ticks()
-	time.sleep(seconds * time.second)
+	time.sleep(seconds_to_duration(seconds))
 	$if trace_sleep_ticks ? {
 		println(time.ticks() - t)
 	}

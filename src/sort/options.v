@@ -40,11 +40,11 @@ fn get_options() Options {
 		'consider only printable characters')
 	numeric := fp.bool('numeric-sort', `n`, false,
 		'Restrict the sort key to an initial numeric\n${flag.space}' +
-		'string, consisting of optional <blank> characters,\n${flag.space}' +
-		'optional <hyphen-minus> character, and zero or\n${flag.space}' +
-		'more digits, which shall be sorted by arithmetic\n${flag.space}' +
-		'value. An empty digit string shall be treated as\n${flag.space}' +
-		'zero. Leading zeros shall not affect ordering.')
+			'string, consisting of optional <blank> characters,\n${flag.space}' +
+			'optional <hyphen-minus> character, and zero or\n${flag.space}' +
+			'more digits, which shall be sorted by arithmetic\n${flag.space}' +
+			'value. An empty digit string shall be treated as\n${flag.space}' +
+			'zero. Leading zeros shall not affect ordering.')
 	reverse := fp.bool('reverse', `r`, false, 'reverse the result of comparisons\n\nOther options:')
 
 	check_diagnose := fp.bool('', `c`, false, 'check for sorted input; do not sort')
@@ -78,14 +78,14 @@ fn get_options() Options {
 		numeric:               numeric
 		reverse:               reverse
 		// other options
-		check_diagnose:  check_diagnose
-		check_quiet:     check_quiet
-		sort_keys:       sort_keys
-		field_separator: field_separator
-		merge:           merge
-		output_file:     output_file
-		unique:          unique
-		files:           scan_files_arg(files)
+		check_diagnose:        check_diagnose
+		check_quiet:           check_quiet
+		sort_keys:             sort_keys
+		field_separator:       field_separator
+		merge:                 merge
+		output_file:           output_file
+		unique:                unique
+		files:                 scan_files_arg(files)
 	}
 }
 

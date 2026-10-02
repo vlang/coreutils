@@ -34,14 +34,14 @@ fn parse_args(args []string) Args {
 
 	bytes_arg := fp.string('bytes', `c`, '-1',
 		'output the last NUM bytes; or use -c +<int> to output      ${wrap}' +
-		'starting with byte <int> of each file')
+			'starting with byte <int> of each file')
 
 	follow_arg := fp.bool('follow', `f`, false, 'output appended data as the file grows')
 	f_arg := fp.bool('', `F`, false, 'same as --follow=name --retry')
 
 	lines_arg := fp.string('lines', `n`, '10',
 		'output the last NUM lines, instead of the last 10; or us${wrap}' +
-		'-n +NUM to skip NUM-1 lines at the start')
+			'-n +NUM to skip NUM-1 lines at the start')
 
 	pid_arg := fp.string('pid', ` `, '', 'with -f, terminate after process ID, PID dies')
 	quiet_arg := fp.bool('quiet', `q`, false, 'never output headers giving file names')
@@ -72,9 +72,9 @@ fn parse_args(args []string) Args {
 	files := scan_files_arg(files_arg)
 
 	return Args{
-		bytes:          string_to_i64(bytes_arg) or { exit_error(err.msg()) }
+		bytes:          string_to_i64(bytes_arg) or { exit_error(invalid_number('bytes', bytes_arg)) }
 		follow:         follow_arg || f_arg
-		lines:          string_to_i64(lines_arg) or { exit_error(err.msg()) }
+		lines:          string_to_i64(lines_arg) or { exit_error(invalid_number('lines', lines_arg)) }
 		pid:            pid_arg
 		quiet:          quiet_arg || silent_arg
 		retry:          f_arg || retry_arg
@@ -84,6 +84,12 @@ fn parse_args(args []string) Args {
 		delimiter:      delimiter
 		files:          files
 	}
+}
+
+// invalid_number matches the diagnostic GNU tail prints for a
+// -c/-n operand it cannot parse.
+fn invalid_number(kind string, value string) string {
+	return 'invalid number of ${kind}: ‘${value}’'
 }
 
 fn scan_files_arg(files_arg []string) []string {

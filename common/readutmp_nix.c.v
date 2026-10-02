@@ -4,30 +4,30 @@ module common
 #include <utmpx.h>
 #include <errno.h>
 
-// TODO: conflicts with `timeval` in <time.h>
-// <bits/types/struct_timeval.h>
-/*
-pub struct C.timeval {
-	tv_sec  i64 // Seconds.
-	tv_usec i64 // Microseconds.
-}*/
-
-// <time.h>
-pub struct C.timeval {
-pub:
-	tv_sec  u64 // Seconds.
-	tv_usec u64 // Microseconds.
+// `struct utmpx` was previously declared twice, once here and once in
+// src/users/users.c.v with a different (shorter) field list, which V rejects as
+// a redeclaration. Declare it once, here, with the glibc layout.
+//
+// The fixed size fields are UT_LINESIZE/UT_NAMESIZE/UT_HOSTSIZE (32/32/256) and
+// the element size has to match what getutxent() writes, because read_utmp()
+// copies entries into a []C.utmpx.
+pub struct C.exit_status {
+	et_code u16
+	et_term u16
 }
 
 pub struct C.utmpx {
-	ut_type    i16       // Type of login.
-	ut_pid     int       // Process ID of login process.
-	ut_line    [32]char  // Devicename.
-	ut_id      [4]char   // Inittab ID.
-	ut_user    [32]char  // Username.
-	ut_host    [256]char // Hostname for remote login.
-	ut_tv      C.timeval // TODO: Declare sub struct correctly
-	ut_addr_v6 [4]int    // Internet address of remote host.
+	ut_type       i16           // Type of login.
+	ut_pid        int           // Process ID of login process.
+	ut_line       [32]u8        // Devicename.
+	ut_id         [4]u8         // Inittab ID.
+	ut_user       [32]u8        // Username.
+	ut_host       [256]u8       // Hostname for remote login.
+	ut_exit       C.exit_status // Exit status of the process.
+	ut_session_id i32           // Session ID.
+	ut_tv         C.timeval     // Time entry.
+	ut_addr_v6    [4]i32        // Internet address of remote host.
+	__unused      [20]u8        // Reserved.
 }
 
 // sets the name of the utmp-format file for the other utmp functions to access.
