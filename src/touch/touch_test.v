@@ -3,6 +3,22 @@ module main
 import os
 import time
 
+// The expectations in this file were read off GNU touch 9.4, not derived from
+// the code under test. The previous version computed them with
+// time.parse_iso8601(date).unix(), which is the very call the implementation
+// makes, so it agreed with the code by construction and could not have caught
+// the bug it existed to guard. Every stamp below is a literal measured under
+// TZ=Asia/Tehran, a zone whose offset differs by a full hour between summer and
+// winter, which is what makes it worth testing on.
+//
+//	2022-12-01T11:00:01  ->  1669879801
+//	2022-12-01T11:50:02  ->  1669882802
+//	2023-01-01T20:00:35  ->  1672590635
+//
+// A zone with no rules available would make these meaningless, so the tests say
+// so rather than quietly passing.
+const tehran = 'Asia/Tehran'
+
 fn temp_file_name() string {
 	dir := os.temp_dir()
 	file := '${dir}/t${time.ticks()}'
@@ -15,6 +31,23 @@ fn p(msg string) {
 
 fn pass() {
 	assert true
+}
+
+// pin_zone sets TZ for the duration of a test and hands back what to restore.
+// The zone has to be forced: on a machine whose own zone happens to be UTC the
+// whole bug this file guards is invisible.
+fn pin_zone(zone string) string {
+	saved := os.getenv('TZ')
+	_ = os.setenv('TZ', zone, true)
+	return saved
+}
+
+fn zone_available() bool {
+	time.load_location('Local') or {
+		p('no local zone information on this machine, skipping the ${tehran} assertions')
+		return false
+	}
+	return true
 }
 
 fn test_touch_one_file_no_options() {
@@ -49,62 +82,151 @@ fn test_touch_no_create_option() {
 	pass()
 }
 
+// A string with no zone in it names a local time. Read as UTC it lands three
+// and a half hours late here, which is what these five used to do.
+fn test_parse_datetime_naive_string_is_local() {
+	p(@METHOD)
+	saved := pin_zone(tehran)
+	defer {
+		_ = os.setenv('TZ', saved, true)
+	}
+	if !zone_available() {
+		return
+	}
+	// A date with no time is local midnight, not UTC midnight.
+	assert parse_datetime('2020-01-02')! == 1_577_910_600
+	assert parse_datetime('2020-01-02 03:04:05')! == 1_577_921_645
+	assert parse_datetime('2020-01-02T03:04:05')! == 1_577_921_645
+	assert parse_datetime('2020-02-29 12:00:00')! == 1_582_965_000
+	assert parse_datetime('2025-01-01 00:00:00')! == 1_735_677_000
+	pass()
+}
+
+// The offset that applies is the one in force at that date, not the one in force
+// now. Tehran is +0430 in June and +0330 in October, so subtracting the current
+// offset puts this one an hour out: 08:09:10 - 4:30 = 03:39:10 UTC.
+fn test_parse_datetime_uses_the_offset_at_that_date() {
+	p(@METHOD)
+	saved := pin_zone(tehran)
+	defer {
+		_ = os.setenv('TZ', saved, true)
+	}
+	if !zone_available() {
+		return
+	}
+	assert parse_datetime('2021-06-07 08:09:10')! == 1_623_037_150
+	// And the same zone in its other period, to show both are in play.
+	assert parse_datetime('2020-01-02 03:04:05')! == 1_577_921_645
+	pass()
+}
+
+// A string that says its zone is already an instant and must not be shifted.
+fn test_parse_datetime_leaves_an_explicit_zone_alone() {
+	p(@METHOD)
+	saved := pin_zone(tehran)
+	defer {
+		_ = os.setenv('TZ', saved, true)
+	}
+	if !zone_available() {
+		return
+	}
+	assert parse_datetime('2020-01-02T03:04:05Z')! == 1_577_934_245
+	// +03:30 is the zone's own offset in January, so this lands where the naive
+	// spelling of the same wall clock does. It has to get there on its own.
+	assert parse_datetime('2020-01-02T03:04:05+03:30')! == 1_577_921_645
+	pass()
+}
+
+fn test_has_explicit_zone() {
+	p(@METHOD)
+	assert has_explicit_zone('2020-01-02T03:04:05Z')
+	assert has_explicit_zone('2020-01-02T03:04:05z')
+	assert has_explicit_zone('2020-01-02T03:04:05+03:30')
+	assert has_explicit_zone('2020-01-02T03:04:05-05:00')
+	assert has_explicit_zone('2020-01-02 03:04:05Z')
+	assert has_explicit_zone('2020-01-02 03:04:05+0330')
+
+	assert !has_explicit_zone('2020-01-02 03:04:05')
+	assert !has_explicit_zone('2020-01-02T03:04:05')
+	// The date carries two hyphens and no time part at all.
+	assert !has_explicit_zone('2020-01-02')
+	assert !has_explicit_zone('2020-01-02 03:04:05.678')
+	pass()
+}
+
 fn test_touch_create_with_d_option() {
 	p(@METHOD)
+	saved := pin_zone(tehran)
+	defer {
+		_ = os.setenv('TZ', saved, true)
+	}
+	if !zone_available() {
+		return
+	}
 	file := temp_file_name()
-	date := '2022-12-01T11:00:01'
-	unix := time.parse_iso8601(date)!.unix()
-	touch(['touch', '-d', date, file])
+	touch(['touch', '-d', '2022-12-01T11:00:01', file])
 	stat := os.lstat(file)!
-	assert stat.atime == unix
-	assert stat.mtime == unix
+	assert stat.atime == 1_669_879_801
+	assert stat.mtime == 1_669_879_801
 	os.rm(file)!
 	pass()
 }
 
 fn test_touch_create_with_a_d_option() {
 	p(@METHOD)
+	saved := pin_zone(tehran)
+	defer {
+		_ = os.setenv('TZ', saved, true)
+	}
+	if !zone_available() {
+		return
+	}
 	file := temp_file_name()
-	date := '2022-12-01T11:00:01'
-	unix := time.parse_iso8601(date)!.unix()
-	touch(['touch', '-a', '-d', date, file])
+	touch(['touch', '-a', '-d', '2022-12-01T11:00:01', file])
 	stat := os.lstat(file)!
-	assert stat.atime == unix
-	assert stat.mtime != unix
+	assert stat.atime == 1_669_879_801
+	assert stat.mtime != 1_669_879_801
 	os.rm(file)!
 	pass()
 }
 
 fn test_touch_create_with_m_d_option() {
 	p(@METHOD)
+	saved := pin_zone(tehran)
+	defer {
+		_ = os.setenv('TZ', saved, true)
+	}
+	if !zone_available() {
+		return
+	}
 	file := temp_file_name()
-	date := '2022-12-01T11:00:01'
-	unix := time.parse_iso8601(date)!.unix()
-	touch(['touch', '-m', '-d', date, file])
+	touch(['touch', '-m', '-d', '2022-12-01T11:00:01', file])
 	stat := os.lstat(file)!
-	assert stat.atime != unix
-	assert stat.mtime == unix
+	assert stat.atime != 1_669_879_801
+	assert stat.mtime == 1_669_879_801
 	os.rm(file)!
 	pass()
 }
 
 fn test_touch_with_reference_file() {
 	p(@METHOD)
+	saved := pin_zone(tehran)
+	defer {
+		_ = os.setenv('TZ', saved, true)
+	}
+	if !zone_available() {
+		return
+	}
 	rfile := temp_file_name()
-	mdate := '2022-12-01T11:00:01'
-	mtime := time.parse_iso8601(mdate)!.unix()
-	touch(['touch', '-d', mdate, rfile])
-
-	adate := '2022-12-01T11:50:02'
-	atime := time.parse_iso8601(adate)!.unix()
-	touch(['touch', '-a', '-d', adate, rfile])
+	touch(['touch', '-d', '2022-12-01T11:00:01', rfile])
+	touch(['touch', '-a', '-d', '2022-12-01T11:50:02', rfile])
 
 	file := rfile + 'x'
 	touch(['touch', '-r', rfile, file])
 
 	stat := os.lstat(file)!
-	assert stat.atime == atime
-	assert stat.mtime == mtime
+	assert stat.atime == 1_669_882_802
+	assert stat.mtime == 1_669_879_801
 
 	os.rm(file)!
 	os.rm(rfile)!
@@ -113,15 +235,20 @@ fn test_touch_with_reference_file() {
 
 fn test_touch_no_reference_option() {
 	p(@METHOD)
+	saved := pin_zone(tehran)
+	defer {
+		_ = os.setenv('TZ', saved, true)
+	}
+	if !zone_available() {
+		return
+	}
 	file := temp_file_name()
-	fdate := '2022-12-01T11:00:01'
-	ftime := time.parse_iso8601(fdate)!.unix()
-	touch(['touch', '-d', fdate, file])
+	touch(['touch', '-d', '2022-12-01T11:00:01', file])
 
 	// confirm correct start state
 	stat := os.lstat(file)!
-	assert stat.atime == ftime
-	assert stat.mtime == ftime
+	assert stat.atime == 1_669_879_801
+	assert stat.mtime == 1_669_879_801
 
 	if os.user_os() == 'windows' {
 		eprintln('skip symlink checks on windows, they need administrative permissions')
@@ -132,19 +259,17 @@ fn test_touch_no_reference_option() {
 	os.symlink(file, link)!
 
 	// touch the symlink
-	ldate := '2023-01-01T20:00:35'
-	ltime := time.parse_iso8601(ldate)!.unix()
-	touch(['touch', '-h', '-d', ldate, link])
+	touch(['touch', '-h', '-d', '2023-01-01T20:00:35', link])
 
 	// check original file
 	fstat := os.lstat(file)!
-	assert fstat.atime == ftime
-	assert fstat.mtime == ftime
+	assert fstat.atime == 1_669_879_801
+	assert fstat.mtime == 1_669_879_801
 
 	// lstat does not 'follow' links
 	lstat := os.lstat(link)!
-	assert lstat.atime == ltime
-	assert lstat.mtime == ltime
+	assert lstat.atime == 1_672_590_635
+	assert lstat.mtime == 1_672_590_635
 
 	os.rm(link)!
 	os.rm(file)!
