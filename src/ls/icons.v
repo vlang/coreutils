@@ -429,12 +429,3 @@ const folders_map = {
 	'hidden':                '\uf023'
 	'node_modules':          '\ue5fa'
 }
-
-const other_icons_map = {
-	'link':       '\uf0c1'
-	'linkDir':    '\uf0c1'
-	'brokenLink': '\uf127'
-	'device':     '\uf0a0'
-	'socket':     '\uf1e6'
-	'pipe':       '\ufce3'
-}
