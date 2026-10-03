@@ -1,133 +1,74 @@
-import os
-import common
-
-struct Directory {
-	name string
-mut:
-	contents []string
-}
-
-fn go_print(file_list []Directory, seperator string) {
-	mut constructed := ''
-	if file_list.len == 1 {
-		// Single directory
-		for i, contents in file_list[0].contents {
-			constructed += contents
-			if i == file_list[0].contents.len - 1 {
-				break
-			}
-			constructed += seperator
-		}
-	} else {
-		// Multiple directories
-		for i, dir in file_list {
-			constructed += dir.name + ':\n'
-			for j, contents in dir.contents {
-				constructed += contents
-				if j == dir.contents.len - 1 {
-					break
-				}
-				constructed += seperator
-			}
-			if i != file_list.len - 1 {
-				constructed += '\n\n'
-			}
-		}
-	}
-	print(constructed)
-}
+import arrays { group_by }
+import datatypes { Set }
+import math
 
 fn main() {
-	mut fp := common.flag_parser(os.args)
-	fp.application('ls')
-	fp.description('list directory contents')
+	options, files := get_args()
+	set_auto_wrap(options)
+	entries, dirs, status := get_entries(files, options)
+	mut cyclic := Set[string]{}
+	mut printed_any := false
+	status1 := ls(entries, dirs, options, mut cyclic, &printed_any, '')
+	exit(math.max(status, status1))
+}
 
-	arg_1 := fp.bool('', `1`, false, 'list one file per line')
-	arg_all := fp.bool('all', `a`, false, 'do not ignore entries starting with .')
-	arg_almost_all := fp.bool('almost-all', `A`, false, 'do not list implied . and ..')
-	arg_comma_seperated := fp.bool('comma-seperated', `m`, false,
-		'fill width with a comma seperated list of entries')
-	arg_reverse := fp.bool('reverse', `r`, false, 'reverse order wile sorting')
-	arg_help := fp.bool('help', 0, false, 'display this help and exit')
+// section names the directory this call is listing, so that one holding nothing
+// still gets its header. GNU prints `./Zdir:` above no rows at all rather than
+// skipping it. dirs carries the directory operands so that an empty one still
+// gets a section: it produces no entries, so grouping alone would lose it.
+fn ls(entries []Entry, dirs []string, options Options, mut cyclic Set[string], printed_any &bool, section string) int {
+	mut status := 0
+	group_by_dirs := group_by[string, Entry](entries, fn (e Entry) string {
+		return e.dir_name
+	})
+	mut sections := dirs.clone()
+	for name in group_by_dirs.keys() {
+		if !sections.contains(name) {
+			sections << name
+		}
+	}
+	sorted_dirs := sections.sorted()
 
-	// Get folders
-	args := fp.finalize() or {
-		eprintln(err)
-		println(fp.usage())
-		exit(1)
+	if sorted_dirs.len == 0 {
+		// Nothing came back from the directory, but its header still has to be
+		// printed and the long listing still has to say `total 0`.
+		print_dir_name(section, options, printed_any)
+		print_files([], options)
+		return 0
 	}
 
-	// Help command
-	if arg_help {
-		println(fp.usage())
-		exit(0)
-	}
-
-	// Get dir / dirs
-	mut file_list := match args.len {
-		0 {
-			list := os.ls('.') or {
-				eprintln(err)
-				println("ls: cannot access '.': No such file or directory")
-				exit(1)
+	for dir in sorted_dirs {
+		files := group_by_dirs[dir]
+		filtered := filter(files, options)
+		sorted := sort(filtered, options)
+		if sections.len > 1 || options.recursive {
+			print_dir_name(dir, options, printed_any)
+		}
+		print_files(sorted, options)
+		// A header that follows rows is still preceded by a blank line, even
+		// when the rows came from an unnamed section such as a bare operand.
+		if sorted.len > 0 {
+			unsafe {
+				*printed_any = true
 			}
-
-			[Directory{'.', list}]
 		}
-		else {
-			// 1 or more dirs
-			mut dirs := []Directory{}
-			for arg in args {
-				name := if args.len > 1 {
-					arg
-				} else {
-					'.'
+
+		if options.recursive {
+			for entry in sorted {
+				if entry.dir {
+					path := entry_path(entry.dir_name, entry.name)
+					if cyclic.exists(path) {
+						println('===> cyclic reference detected <===')
+						continue
+					}
+					cyclic.add(path)
+					dir_entries, sub_dirs, status1 := get_entries([path], options)
+					status2 := ls(dir_entries, sub_dirs, options, mut cyclic, printed_any, path)
+					cyclic.remove(path)
+					status = math.max(status1, status2)
 				}
-				list := os.ls(arg) or {
-					eprintln(err)
-					println("ls: cannot access '" + arg + "': No such file or directory")
-					exit(1)
-				}
-				dirs << Directory{name.replace('/', ''), list}
 			}
-			dirs
 		}
 	}
-
-	// Define initial seperator
-	mut seperator := '  '
-
-	// Modify seperator
-	if arg_comma_seperated {
-		seperator = ', '
-	}
-	if arg_1 {
-		seperator += '\n'
-	}
-
-	// Do not list dotfiles by default
-	if !(arg_all || arg_almost_all) {
-		for i, dir in file_list {
-			file_list[i].contents = dir.contents.filter(fn (contents string) bool {
-				return contents[0] != `.`
-			})
-		}
-	}
-
-	// . and .. path listing
-	if arg_all {
-		for i, _ in file_list {
-			file_list[i].contents.prepend(['.', '..'])
-		}
-	}
-
-	// Reverse
-	if arg_reverse {
-		for i, _ in file_list {
-			file_list[i].contents.reverse_in_place()
-		}
-	}
-
-	// Print
-	go_print(file_list, seperator)
+	return status
 }
