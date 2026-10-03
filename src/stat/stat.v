@@ -13,6 +13,11 @@ const app = common.CoreutilInfo{
 	help:        $embed_file('help.txt').to_string()
 }
 
+// fstypes_data maps the magic numbers the kernel reports for a filesystem to
+// its type name. Embedded at module scope: $embed_file inside a function body
+// does not resolve on all V versions.
+const fstypes_data = $embed_file('fstypes.txt')
+
 // Settings for Utility: stat
 struct Settings {
 mut:
@@ -66,18 +71,22 @@ struct Statx {
 	stx_dio_offset_align u32
 }
 
+// Field types and order mirror the kernel's `struct statvfs`, including the
+// trailing spare, because statvfs() hands this struct to libc through a
+// voidptr. Every f_* member is `unsigned long`/`fsblkcnt_t`, hence usize.
 struct Statvfs {
-	f_bsize   u64 // Filesystem block size
-	f_frsize  u64 // Fragment size
-	f_blocks  u64 // Size of fs in f_frsize units
-	f_bfree   u64 // Number of free blocks
-	f_bavail  u64 // Number of free blocks for unprivileged users
-	f_files   u64 // Number of inodes
-	f_ffree   u64 // Number of free inodes
-	f_favail  u64 // Number of free inodes for unprivileged users
-	f_fsid    u64 // Filesystem ID
-	f_flag    u64 // Mount flags
-	f_namemax u64 // Maximum filename length
+	f_bsize   usize  // Filesystem block size
+	f_frsize  usize  // Fragment size
+	f_blocks  usize  // Size of fs in f_frsize units
+	f_bfree   usize  // Number of free blocks
+	f_bavail  usize  // Number of free blocks for unprivileged users
+	f_files   usize  // Number of inodes
+	f_ffree   usize  // Number of free inodes
+	f_favail  usize  // Number of free inodes for unprivileged users
+	f_fsid    usize  // Filesystem ID
+	f_flag    usize  // Mount flags
+	f_namemax usize  // Maximum filename length
+	f_spare   [6]i32 // __f_spare in the C struct; V rejects leading underscores
 }
 
 enum CacheMode {
@@ -551,8 +560,7 @@ fn get_mount_list() []MountInfo {
 }
 
 fn get_fs_list() map[string]u32 {
-	embedded_file := $embed_file('fstypes.txt')
-	s := embedded_file.to_string()
+	s := fstypes_data.to_string()
 	assert s[s.len - 1] == `\n`, 'fstypes.txt must be newline-terminated.'
 	mut fslist := map[string]u32{}
 	for i := 0; i < s.len; {

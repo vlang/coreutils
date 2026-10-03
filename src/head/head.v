@@ -294,7 +294,7 @@ fn wrap_long_command_description(description string, max_cols int) string {
 	return buf.str()
 }
 
-fn setup_command(args []string) ?(HeadCommand, []InputFile) {
+fn setup_command(args []string) (HeadCommand, []InputFile) {
 	mut fp := common.flag_parser(args)
 	fp.application(name)
 	fp.usage_example('[OPTION]... [FILE]...')
@@ -330,7 +330,7 @@ fn setup_command(args []string) ?(HeadCommand, []InputFile) {
 }
 
 fn run_head(args []string) {
-	head, mut files := setup_command(args) or { common.exit_with_error_message(name, err.msg()) }
+	head, mut files := setup_command(args)
 
 	head.run(mut files)
 }

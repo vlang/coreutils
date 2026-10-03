@@ -159,7 +159,7 @@ fn main() {
 		exit(1)
 	}
 	if wraping_opt < 0 {
-		eprintln('${application_name}: invalid wrap size: \'${wraping_opt}\'')
+		eprintln("${application_name}: invalid wrap size: '${wraping_opt}'")
 		exit(1)
 	}
 

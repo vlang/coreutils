@@ -70,8 +70,9 @@ fn calc_sums(args Args) {
 		}
 
 		mut len_counter := total_length
-		for ; len_counter; len_counter >>= 8 {
+		for len_counter > 0 {
 			crc = (crc << 8) ^ crctab[0][((crc >> 24) ^ len_counter) & 0xFF]
+			len_counter >>= 8
 		}
 		crc = ~crc & 0xffff_ffff
 

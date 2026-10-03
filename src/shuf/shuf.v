@@ -88,7 +88,7 @@ fn shuffle_lines(lines []string, settings Settings) []string {
 			exit(1)
 		}
 		mut bytes := io.read_all(io.ReadAllConfig{ reader: file, read_to_end_of_stream: true }) or {
-			eprintln('${app_name}: ${settings.random_source}: Can\'t read file')
+			eprintln("${app_name}: ${settings.random_source}: Can't read file")
 			exit(1)
 		}
 		mut seed := u32(0)
@@ -159,7 +159,7 @@ fn register_lines_by_file(lines []string, fname string, zero_terminated bool) []
 
 	if zero_terminated {
 		mut bytes := io.read_all(io.ReadAllConfig{ reader: file, read_to_end_of_stream: true }) or {
-			eprintln('${app_name}: ${fname}: Can\'t read file')
+			eprintln("${app_name}: ${fname}: Can't read file")
 			exit(1)
 		}
 

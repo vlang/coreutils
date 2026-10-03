@@ -242,7 +242,10 @@ fn apply_posix_escape(s string) string {
 			}
 		}
 	}
-	return if has_unprintable { '\$\'${upout}\'' } else { s.replace_each([
+	return if has_unprintable {
+		"\$'${upout}'"
+	} else {
+		s.replace_each([
 			'|',
 			'\\|',
 			'&',
@@ -269,7 +272,8 @@ fn apply_posix_escape(s string) string {
 			'\\"',
 			' ',
 			'\\ ',
-		]) }
+		])
+	}
 }
 
 // A code below is modded version of vlib/strconv/vprintf.v whose parameter to be an array of string

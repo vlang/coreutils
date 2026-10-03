@@ -45,21 +45,21 @@ fn get_options() Options {
 		'use locale-defined grouping of digits, e.g. 1,000,000')
 	header := fp.int('header', 0, 1,
 		'print (without converting) the first N header lines; <int>\n${flag.space}' +
-		'defaults to 1 if not specified')
+			'defaults to 1 if not specified')
 	invalid := fp.string('invalid', 0, 'abort',
 		'failure mode for invalid numbers: MODE can be:\n${flag.space}' +
-		'abort (default), fail, warn, ignore')
+			'abort (default), fail, warn, ignore')
 	padding := fp.int('padding', 0, 0,
 		'pad the output to N characters; positive N will\n${flag.space}' +
-		'right-align; negative N will left-align; padding is\n${flag.space}' +
-		'ignored if the output is wider than N; the default is to\n${flag.space}' +
-		'automatically pad if a whitespace is found')
+			'right-align; negative N will left-align; padding is\n${flag.space}' +
+			'ignored if the output is wider than N; the default is to\n${flag.space}' +
+			'automatically pad if a whitespace is found')
 	round := fp.string('round', 0, 'from-zero',
 		'use METHOD for rounding when scaling; METHOD can be:\n${flag.space}' +
-		'up, down, from-zero (default), towards-zero, nearest')
+			'up, down, from-zero (default), towards-zero, nearest')
 	suffix := fp.string('suffix', 0, '',
 		'add SUFFIX to output numbers, and accept optional SUFFIX\n${flag.space}' +
-		'in input numbers')
+			'in input numbers')
 	to := fp.string('to', 0, 'none', 'auto-scale output numbers to UNIT\n${flag.space}' +
 		'none, si, iec, iec-i')
 	to_unit := fp.int('to-unit', 0, 1, 'the output unit size (instead of the default 1)')

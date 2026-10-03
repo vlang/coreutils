@@ -1,7 +1,7 @@
 // tail - output the last part of files
 import os
 import time
-import v.mathutil
+import math
 
 const app_name = 'tail'
 
@@ -82,7 +82,7 @@ fn tail_bytes(file FileInfo, args Args, stat_size u64, out_fn fn (string)) {
 	pos := if args.from_start {
 		args.bytes
 	} else {
-		mathutil.max(u64(0), stat_size - u64(args.bytes))
+		math.max(u64(0), stat_size - u64(args.bytes))
 	}
 	mut f := os.open(file.name) or {
 		if args.retry {
@@ -112,7 +112,7 @@ fn tail_file(file FileInfo, args Args, stat_size u64, out_fn fn (string)) {
 		mut pos := i64(0)
 
 		loop1: for pos <= end {
-			len := mathutil.min(end - pos, buf_size)
+			len := math.min(end - pos, buf_size)
 			f.read_bytes_into(u64(pos), mut buf) or { exit_error(err.msg()) }
 
 			for i := 0; i < len; i += 1 {
@@ -133,8 +133,8 @@ fn tail_file(file FileInfo, args Args, stat_size u64, out_fn fn (string)) {
 		mut pos := end
 
 		loop2: for pos > 0 {
-			len := mathutil.min(pos, buf_size)
-			pos = mathutil.max(pos - buf_size, 0)
+			len := math.min(pos, buf_size)
+			pos = math.max(pos - buf_size, 0)
 			f.read_bytes_into(u64(pos), mut buf) or { exit_error(err.msg()) }
 
 			for i := len - 1; i >= 0; i -= 1 {

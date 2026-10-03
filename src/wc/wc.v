@@ -59,7 +59,7 @@ fn get_count(chunk FileChunk, last_line_length u32) (Count, u32) {
 				}
 				line_length = 0
 			}
-			space, carriage_return, vertical_tab, form_feed {
+			space, vertical_tab, form_feed {
 				prev_char_is_space = true
 				line_length++
 			}
@@ -96,14 +96,19 @@ mut:
 	mutex              sync.Mutex
 }
 
-fn (mut file_reader FileReader) read_chunk(mut buffer []u8) ?FileChunk {
+// read_chunk reads the next buffer_size bytes. os.File.read signals
+// exhaustion with an os.Eof error, which the caller has to tell apart from a
+// genuine read failure.
+fn (mut file_reader FileReader) read_chunk(mut buffer []u8) !FileChunk {
 	file_reader.mutex.@lock()
 	defer {
 		file_reader.mutex.unlock()
 	}
 
-	nbytes :=
-		file_reader.file.read(mut buffer) or { return none } // Propagate error. Either EOF or read error.
+	nbytes := file_reader.file.read(mut buffer) or { return err }
+	if nbytes == 0 {
+		return os.Eof{}
+	}
 	mut chunk := FileChunk{file_reader.last_char_is_space, buffer[..nbytes].clone(), false}
 	file_reader.last_char_is_space = is_space(buffer[nbytes - 1])
 	if nbytes < buffer.len {
@@ -121,16 +126,14 @@ fn file_reader_counter(mut file_reader FileReader) Count {
 	for {
 		chunk := file_reader.read_chunk(mut buffer) or {
 			match err {
-				none {
-					// EOF 'error', just break out of the loop.
+				os.Eof {
 					break
 				}
 				else {
-					println(err)
+					eprintln('${application_name}: ${err}')
+					exit(1)
 				}
 			}
-
-			exit(1)
 		}
 
 		count, line_length = get_count(chunk, line_length)
@@ -256,7 +259,8 @@ fn main() {
 	max_line_length_len := max_line_length.str().len
 
 	mut col_size := int(0)
-	if byte(bytes_opt) + byte(chars_opt) + byte(lines_opt) + byte(words_opt) + byte(maxline_opt) == 1 {
+	// A single selected count is printed without a header or column padding.
+	if [bytes_opt, chars_opt, lines_opt, words_opt, maxline_opt].filter(it).len == 1 {
 		col_size = 0
 	} else {
 		if total_line_count_len > col_size {

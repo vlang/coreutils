@@ -8,7 +8,7 @@ const nl = '\n'
 fn process_line(line string, initial bool, tabs int) {
 	mut sp := ''
 
-	for i := tabs; i; i-- {
+	for _ in 0 .. tabs {
 		sp += ' '
 	}
 

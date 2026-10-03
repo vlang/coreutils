@@ -4,11 +4,55 @@ import os
 #include <unistd.h>
 #include <sys/stat.h>
 #include <sys/statvfs.h>
-#include <bits/statx.h>
+// The kernel uapi definitions of statx()/STATX_* live here. Do not use
+// <bits/statx.h> for that: it is a glibc internal header, so it is missing on
+// musl based distributions (see issue #145).
+#include <linux/stat.h>
+
+// vlib/builtin/cfns.c.v already declares a private `fn C.statvfs`, so a
+// `fn C.statvfs` here resolves to that one and fails to compile. Give the libc
+// call a distinct V-level name instead.
+#define vcu_statvfs statvfs
+
+// Mirror the kernel's `struct statx` exactly. Passing a V struct through a
+// voidptr and hoping for the best truncates the kernel's 224 byte write to the
+// size of the V view, which corrupts memory.
+struct C.statx_timestamp {
+	tv_sec   i64
+	tv_nsec  u32
+	reserved i32
+}
 
 // Ref: https://www.man7.org/linux/man-pages/man2/statx.2.html
-fn C.statx(int, &char, int, u32, voidptr) int
-fn C.statvfs(&char, voidptr) int
+struct C.statx {
+	stx_mask             u32
+	stx_blksize          u32
+	stx_attributes       u64
+	stx_nlink            u32
+	stx_uid              u32
+	stx_gid              u32
+	stx_mode             u16
+	__spare0             [1]u16
+	stx_ino              u64
+	stx_size             u64
+	stx_blocks           u64
+	stx_attributes_mask  u64
+	stx_atime            C.statx_timestamp
+	stx_btime            C.statx_timestamp
+	stx_ctime            C.statx_timestamp
+	stx_mtime            C.statx_timestamp
+	stx_rdev_major       u32
+	stx_rdev_minor       u32
+	stx_dev_major        u32
+	stx_dev_minor        u32
+	stx_mnt_id           u64
+	stx_dio_mem_align    u32
+	stx_dio_offset_align u32
+	__spare3             [12]u32
+}
+
+fn C.statx(int, &char, int, u32, &C.statx) int
+fn C.vcu_statvfs(&char, voidptr) int
 fn C.readlink(pathname &char, buf &char, bufsiz usize) int
 
 const c_at_statx_sync_as_stat = 0x0000 // C.AT_STATX_SYNC_AS_STAT from fcntl.h
@@ -18,8 +62,7 @@ const c_at_symlink_nofollow = 0x0100 // C.AT_SYMLINK_NOFOLLOW from fcntl.h
 const c_chmod_bits = C.S_ISUID | C.S_ISGID | C.S_ISVTX | C.S_IRWXU | C.S_IRWXG | C.S_IRWXO
 
 fn statx(path string, dereference bool, cache_mode CacheMode) !Statx {
-	mut s := Statx{}
-	ptr := voidptr(&s)
+	mut c := C.statx{}
 	unsafe {
 		symlink_flag := if dereference { 0 } else { c_at_symlink_nofollow }
 		sync_flag := match cache_mode {
@@ -29,19 +72,50 @@ fn statx(path string, dereference bool, cache_mode CacheMode) !Statx {
 		}
 
 		res := C.statx(0, os.abs_path(path).str, sync_flag | symlink_flag,
-			C.STATX_BASIC_STATS | C.STATX_BTIME, ptr)
+			C.STATX_BASIC_STATS | C.STATX_BTIME, &c)
 		if res != 0 {
 			return os.error_posix()
 		}
 	}
-	return s
+	return Statx{
+		stx_mask:             c.stx_mask
+		stx_blksize:          c.stx_blksize
+		stx_attributes:       c.stx_attributes
+		stx_nlink:            c.stx_nlink
+		stx_uid:              c.stx_uid
+		stx_gid:              c.stx_gid
+		stx_mode:             c.stx_mode
+		stx_ino:              c.stx_ino
+		stx_size:             c.stx_size
+		stx_blocks:           c.stx_blocks
+		stx_attributes_mask:  c.stx_attributes_mask
+		stx_atime:            to_timestamp(c.stx_atime)
+		stx_btime:            to_timestamp(c.stx_btime)
+		stx_ctime:            to_timestamp(c.stx_ctime)
+		stx_mtime:            to_timestamp(c.stx_mtime)
+		stx_rdev_major:       c.stx_rdev_major
+		stx_rdev_minor:       c.stx_rdev_minor
+		stx_dev_major:        c.stx_dev_major
+		stx_dev_minor:        c.stx_dev_minor
+		stx_mnt_id:           c.stx_mnt_id
+		stx_dio_mem_align:    c.stx_dio_mem_align
+		stx_dio_offset_align: c.stx_dio_offset_align
+	}
 }
 
+fn to_timestamp(ts C.statx_timestamp) StatxTimestamp {
+	return StatxTimestamp{
+		tv_sec:  ts.tv_sec
+		tv_nsec: ts.tv_nsec
+	}
+}
+
+// statvfs() passes the V Statvfs struct through a voidptr, so that struct has
+// to match the kernel's `struct statvfs` exactly, trailing spare included.
 fn statvfs(path string) !Statvfs {
 	mut s := Statvfs{}
-	ptr := voidptr(&s)
 	unsafe {
-		res := C.statvfs(os.abs_path(path).str, ptr)
+		res := C.vcu_statvfs(os.abs_path(path).str, voidptr(&s))
 		if res != 0 {
 			return os.error_posix()
 		}

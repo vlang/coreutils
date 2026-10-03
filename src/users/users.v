@@ -13,9 +13,9 @@ mut:
 }
 
 fn users(settings Settings) {
-	users := utmp_users(settings.input_file).join(' ')
-	print(users)
-	if users != '' {
+	names := utmp_users(settings.input_file).join(' ')
+	print(names)
+	if names != '' {
 		print(common.eol())
 	}
 }

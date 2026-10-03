@@ -1,5 +1,5 @@
 import os
-import v.mathutil
+import math
 import encoding.base64
 import encoding.base32
 
@@ -51,7 +51,7 @@ fn print_encoded(encoded string, options Options) {
 		return
 	}
 	for start := 0; start < encoded.len; start += options.wrap {
-		end := mathutil.min(start + options.wrap, encoded.len)
+		end := math.min(start + options.wrap, encoded.len)
 		// safe to use string slicing because all chars
 		// are in printable ascii
 		println(encoded[start..end])
