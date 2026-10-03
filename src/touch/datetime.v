@@ -89,7 +89,221 @@ fn to_iso8601(s string, compact bool) ?string {
 		return '${y}-${pad2(m)}-${pad2(d)}' +
 			'T${pad2(bare.hour)}:${pad2(bare.minute)}:${pad2(bare.second)}'
 	}
+	// Month names, weekday names and the C locale's m/d/y come after the shapes
+	// above, so nothing here can shadow them.
+	shortened := short_time(s)
+	if shortened != none {
+		return shortened
+	}
+	worded := worded_date(s)
+	if worded != none {
+		return worded
+	}
 	return none
+}
+
+// short_time supplies the seconds that `2020-01-02 03:04` and `2020-01-02 03`
+// leave out. GNU takes both; parse_iso8601 insists on HH:MM:SS.
+fn short_time(s string) ?string {
+	mut sep := s.index_('T')
+	mut cut := sep + 1
+	if sep == -1 {
+		sep = s.index_(' ')
+		if sep == -1 {
+			return none
+		}
+		cut = sep + 1
+	}
+	date_part := s[..sep]
+	// Only an ISO date, so that `1 March 2020` cannot reach here.
+	if date_part.len != 10 || !date_part.contains('-') {
+		return none
+	}
+	time_part := s[cut..]
+	if time_part.count(':') == 2 {
+		return none
+	}
+	clock := clock_of(time_part) or { return none }
+	return '${date_part}T${pad2(clock.hour)}:${pad2(clock.minute)}:${pad2(clock.second)}'
+}
+
+// month_numbers maps a month name to its number, ignoring case and an optional
+// full stop: GNU takes MARCH, march and Mar. alike.
+const month_numbers = {
+	'january':   1
+	'jan':       1
+	'february':  2
+	'feb':       2
+	'march':     3
+	'mar':       3
+	'april':     4
+	'apr':       4
+	'may':       5
+	'june':      6
+	'jun':       6
+	'july':      7
+	'jul':       7
+	'august':    8
+	'aug':       8
+	'september': 9
+	'sep':       9
+	'sept':      9
+	'october':   10
+	'oct':       10
+	'november':  11
+	'nov':       11
+	'december':  12
+	'dec':       12
+}
+
+// weekday_names are accepted and then ignored, the way GNU does: `Mon March 2
+// 2020` gives 2020-03-02 whether or not that day was a Monday.
+const weekday_names = ['sunday', 'sun', 'monday', 'mon', 'tuesday', 'tue', 'tues', 'wednesday',
+	'wed', 'thursday', 'thu', 'thur', 'thurs', 'friday', 'fri', 'saturday', 'sat']
+
+// worded_date rewrites the dates that name a month or separate their parts with
+// slashes, and returns none for everything else.
+//
+// What GNU does, all measured:
+//   March 1, 2020 / 1 March 2020 / Mar 1 2020   the month may come first or last,
+//                                               with or without commas, in any
+//                                               case
+//   Mon March 2 2020                             a weekday name is ignored
+//   1 March                                      a missing year is the current one
+//   31 April 2020                                rejected, so the day is checked
+//   March 2020                                   rejected, so a day is required
+//   1/2/2020 and 2/1/2020                        the C locale is month first:
+//                                               2 January and 1 February
+//   13/2/2020                                    rejected, so a slash date's first
+//                                               number must be a month and is never
+//                                               read as a day
+//   1/2/20                                       a two digit year
+//   March 1 2020 03:04                           a time may follow
+fn worded_date(s string) ?string {
+	mut words := s.replace(',', ' ').split(' ').filter(it != '')
+	if words.len == 0 {
+		return none
+	}
+	// A time may trail the date. It has to carry its colons here: a bare four digit
+	// token is read as a year inside a worded date, and only as HHMM when it stands
+	// on its own. GNU draws that line too, since `-d 2020` is 20:20 today while
+	// `March 1 2020 0304` keeps 2020 as the year and takes 0304 as the time.
+	mut stamp := '00:00:00'
+	if words[words.len - 1].contains(':') {
+		trailing := clock_of(words[words.len - 1])
+		if trailing == none {
+			return none
+		}
+		stamp = '${pad2(trailing.hour)}:${pad2(trailing.minute)}:${pad2(trailing.second)}'
+		words = words[..words.len - 1]
+		if words.len == 0 {
+			// A bare time after all, which to_iso8601 already handles.
+			return none
+		}
+	}
+	// A slashed date is one token and follows the C locale strictly.
+	if words.len == 1 {
+		if iso := slashed_date(words[0], stamp) {
+			return iso
+		}
+	}
+	mut month := 0
+	mut day := 0
+	mut year := 0
+	for word in words {
+		mut w := word.to_lower_ascii()
+		if w.contains('.') {
+			w = w.trim_right('.').to_lower_ascii()
+		}
+		if m := month_numbers[w] {
+			month = m
+			continue
+		}
+		if weekday_names.contains(w) {
+			continue
+		}
+		n := strconv.atoi(w) or { return none }
+		// Four digits are ambiguous on their own: alone they are HHMM, but after
+		// a year has been taken they are another time, as
+		// `March 1 2020 0304` is 03:04 on 1 March 2020.
+		if word.len == 4 && all_digits(w) {
+			hour := strconv.atoi(w[..2]) or { return none }
+			minute := strconv.atoi(w[2..]) or { return none }
+			if year != 0 && hour <= 23 && minute <= 59 {
+				stamp = '${pad2(hour)}:${pad2(minute)}:00'
+				continue
+			}
+			if year == 0 {
+				year = n
+				continue
+			}
+			return none
+		}
+		// A number in day range is the day. Anything else is the year, and a two
+		// digit year takes its century the same way the slashed form does.
+		if day == 0 && n >= 1 && n <= 31 {
+			day = n
+			continue
+		}
+		if year == 0 {
+			year = if word.len == 2 { 2000 + n } else { n }
+			continue
+		}
+		return none
+	}
+	if month == 0 || day == 0 {
+		return none
+	}
+	if year == 0 {
+		// No year given, so this year. Measured: `1 March` on 2026-10-03 gives
+		// 2026-03-01.
+		year = time.now().year
+	}
+	if day > days_in_month(month, year) {
+		// GNU rejects 31 April rather than rolling it over into May.
+		return none
+	}
+	return '${year}-${pad2(month)}-${pad2(day)}T${stamp}'
+}
+
+// slashed_date reads the C locale's m/d/y, where the first number must be a
+// month: 13/2/2020 is an error at GNU, not 13 February.
+fn slashed_date(word string, stamp string) ?string {
+	parts := word.split('/')
+	if parts.len != 3 {
+		return none
+	}
+	month := strconv.atoi(parts[0]) or { return none }
+	day := strconv.atoi(parts[1]) or { return none }
+	if month < 1 || month > 12 || day < 1 {
+		return none
+	}
+	mut year := 0
+	if parts[2].len == 4 {
+		year = strconv.atoi(parts[2]) or { return none }
+	} else if parts[2].len == 2 {
+		// Measured: 1/2/20 is 2020-01-02, so the century comes from the first two.
+		year = 2000 + (strconv.atoi(parts[2]) or { return none })
+	} else {
+		return none
+	}
+	if day > days_in_month(month, year) {
+		return none
+	}
+	return '${year}-${pad2(month)}-${pad2(day)}T${stamp}'
+}
+
+// days_in_month is a local copy rather than a reach into time, which keeps this
+// file's idea of a calendar in one place.
+fn days_in_month(month int, year int) int {
+	if month == 2 {
+		leap := (year % 4 == 0 && year % 100 != 0) || year % 400 == 0
+		return if leap { 29 } else { 28 }
+	}
+	if month == 4 || month == 6 || month == 9 || month == 11 {
+		return 30
+	}
+	return 31
 }
 
 struct Clock {

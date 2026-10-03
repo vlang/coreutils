@@ -270,6 +270,142 @@ fn assert_parse_fails(s string, compact bool) {
 	assert false, 'expected ${s} to be rejected'
 }
 
+// Month names, weekday names and the C locale's m/d/y. Stamps read off GNU 9.4
+// under TZ=Asia/Tehran:
+//	March 1 2020        -> 1583008200
+//	1/2/2020            -> 1577910600
+//	29 February 2020    -> 1582921800
+//	March 1 2020 03:04  -> 1583019240
+fn test_parse_datetime_month_names() {
+	p(@METHOD)
+	saved := pin_zone(tehran)
+	defer {
+		_ = os.setenv('TZ', saved, true)
+	}
+	if !zone_available() {
+		return
+	}
+	// The month may come first or last, with or without commas, in any case.
+	assert parse_datetime('March 1 2020', false)! == 1_583_008_200
+	assert parse_datetime('1 March 2020', false)! == 1_583_008_200
+	assert parse_datetime('March 1, 2020', false)! == 1_583_008_200
+	assert parse_datetime('march 1, 2020', false)! == 1_583_008_200
+	assert parse_datetime('MARCH 1 2020', false)! == 1_583_008_200
+	// The three letter form, and the full one.
+	assert parse_datetime('Mar 1 2020', false)! == 1_583_008_200
+	assert parse_datetime('February 29 2020', false)! == 1_582_921_800
+	assert parse_datetime('29 February 2020', false)! == 1_582_921_800
+	// A time may follow.
+	assert parse_datetime('March 1 2020 03:04', false)! == 1_583_019_240
+	pass()
+}
+
+// A weekday name is accepted and then ignored, even when it is the wrong one:
+// 2020-03-01 was a Sunday, and GNU gives 2020-03-01 for Sun, Mon and Sat alike.
+fn test_parse_datetime_weekday_is_ignored() {
+	p(@METHOD)
+	saved := pin_zone(tehran)
+	defer {
+		_ = os.setenv('TZ', saved, true)
+	}
+	if !zone_available() {
+		return
+	}
+	plain := parse_datetime('March 1 2020', false)!
+	assert parse_datetime('Sun March 1 2020', false)! == plain
+	assert parse_datetime('Mon March 1 2020', false)! == plain
+	assert parse_datetime('Monday, March 1, 2020', false)! == plain
+	pass()
+}
+
+// The C locale reads a slashed date month first, and does not fall back to
+// day first when the first number cannot be a month.
+fn test_parse_datetime_slashed_date() {
+	p(@METHOD)
+	saved := pin_zone(tehran)
+	defer {
+		_ = os.setenv('TZ', saved, true)
+	}
+	if !zone_available() {
+		return
+	}
+	// 1/2/2020 is 2 January here, not 1 February.
+	assert parse_datetime('1/2/2020', false)! == 1_577_910_600
+	assert parse_datetime('1/2/2020', false)! == parse_datetime('2020-01-02', false)!
+	// 2/1/2020 is 1 February.
+	assert parse_datetime('2/1/2020', false)! == parse_datetime('2020-02-01', false)!
+	// 13 cannot be a month, and GNU rejects it rather than reading 13 February.
+	assert_parse_fails('13/2/2020', false)
+	assert parse_datetime('1/13/2020', false)! == parse_datetime('2020-01-13', false)!
+	// A two digit year, and a time may follow.
+	assert parse_datetime('1/2/20', false)! == parse_datetime('2020-01-02', false)!
+	assert parse_datetime('1/2/2020 03:04:05', false)! == parse_datetime('2020-01-02 03:04:05', false)!
+	pass()
+}
+
+// A missing year is the current one, so the expectation has to be built rather
+// than written down.
+fn test_parse_datetime_missing_year_is_this_year() {
+	p(@METHOD)
+	saved := pin_zone(tehran)
+	defer {
+		_ = os.setenv('TZ', saved, true)
+	}
+	if !zone_available() {
+		return
+	}
+	loc := time.load_location('Local') or { return }
+	this_year := time.unix(time.now().unix()).in(loc) or { return }.year
+	stamp := parse_datetime('1 March', false) or {
+		assert false, '1 March should parse'
+		return
+	}
+	read_back := time.unix(stamp).in(loc) or { return }
+	assert read_back.year == this_year
+	assert read_back.month == 3
+	assert read_back.day == 1
+	pass()
+}
+
+// GNU checks the day against the month rather than rolling it over, and needs a
+// day at all: `March 2020` is an error there too.
+fn test_parse_datetime_rejects_impossible_dates() {
+	p(@METHOD)
+	saved := pin_zone(tehran)
+	defer {
+		_ = os.setenv('TZ', saved, true)
+	}
+	if !zone_available() {
+		return
+	}
+	assert_parse_fails('31 April 2020', false)
+	assert_parse_fails('30 February 2020', false)
+	assert_parse_fails('March 2020', false)
+	// 29 February is fine in a leap year and not otherwise.
+	assert parse_datetime('29 February 2020', false)! != 0
+	assert_parse_fails('29 February 2021', false)
+	pass()
+}
+
+// A bare four digit number is HHMM on its own, but a year once a year is taken.
+// Both were measured: `-d 2020` is 20:20 today, and `March 1 2020 0304` is 03:04
+// on 1 March 2020.
+fn test_parse_datetime_four_digits_are_ambiguous() {
+	p(@METHOD)
+	saved := pin_zone(tehran)
+	defer {
+		_ = os.setenv('TZ', saved, true)
+	}
+	if !zone_available() {
+		return
+	}
+	midnight := parse_datetime('00:00', false)!
+	assert parse_datetime('2020', false)! == midnight + (20 * 3600 + 20 * 60)
+	assert parse_datetime('0304', false)! == midnight + (3 * 3600 + 4 * 60)
+	assert parse_datetime('March 1 2020 0304', false)! == parse_datetime('2020-03-01 03:04', false)!
+	pass()
+}
+
 fn test_touch_create_with_d_option() {
 	p(@METHOD)
 	saved := pin_zone(tehran)
