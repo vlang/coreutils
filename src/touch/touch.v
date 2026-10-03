@@ -115,7 +115,7 @@ fn get_date_time(args TouchArgs) (int, int) {
 		// parse_datetime, not time.parse_iso8601: a string with no zone in it
 		// names a local time, and the offset that has to be applied is the one
 		// in force at that date, not the one in force now. See datetime.v.
-		stamp := parse_datetime(dt) or {
+		stamp := parse_datetime(dt, args.time_arg.len > 0) or {
 			common.exit_with_error_message(app_name, err.msg())
 		}
 		return stamp, stamp

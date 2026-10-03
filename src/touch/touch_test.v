@@ -94,11 +94,11 @@ fn test_parse_datetime_naive_string_is_local() {
 		return
 	}
 	// A date with no time is local midnight, not UTC midnight.
-	assert parse_datetime('2020-01-02')! == 1_577_910_600
-	assert parse_datetime('2020-01-02 03:04:05')! == 1_577_921_645
-	assert parse_datetime('2020-01-02T03:04:05')! == 1_577_921_645
-	assert parse_datetime('2020-02-29 12:00:00')! == 1_582_965_000
-	assert parse_datetime('2025-01-01 00:00:00')! == 1_735_677_000
+	assert parse_datetime('2020-01-02', false)! == 1_577_910_600
+	assert parse_datetime('2020-01-02 03:04:05', false)! == 1_577_921_645
+	assert parse_datetime('2020-01-02T03:04:05', false)! == 1_577_921_645
+	assert parse_datetime('2020-02-29 12:00:00', false)! == 1_582_965_000
+	assert parse_datetime('2025-01-01 00:00:00', false)! == 1_735_677_000
 	pass()
 }
 
@@ -114,9 +114,9 @@ fn test_parse_datetime_uses_the_offset_at_that_date() {
 	if !zone_available() {
 		return
 	}
-	assert parse_datetime('2021-06-07 08:09:10')! == 1_623_037_150
+	assert parse_datetime('2021-06-07 08:09:10', false)! == 1_623_037_150
 	// And the same zone in its other period, to show both are in play.
-	assert parse_datetime('2020-01-02 03:04:05')! == 1_577_921_645
+	assert parse_datetime('2020-01-02 03:04:05', false)! == 1_577_921_645
 	pass()
 }
 
@@ -130,10 +130,10 @@ fn test_parse_datetime_leaves_an_explicit_zone_alone() {
 	if !zone_available() {
 		return
 	}
-	assert parse_datetime('2020-01-02T03:04:05Z')! == 1_577_934_245
+	assert parse_datetime('2020-01-02T03:04:05Z', false)! == 1_577_934_245
 	// +03:30 is the zone's own offset in January, so this lands where the naive
 	// spelling of the same wall clock does. It has to get there on its own.
-	assert parse_datetime('2020-01-02T03:04:05+03:30')! == 1_577_921_645
+	assert parse_datetime('2020-01-02T03:04:05+03:30', false)! == 1_577_921_645
 	pass()
 }
 
@@ -152,6 +152,122 @@ fn test_has_explicit_zone() {
 	assert !has_explicit_zone('2020-01-02')
 	assert !has_explicit_zone('2020-01-02 03:04:05.678')
 	pass()
+}
+
+// @1600000000 is an instant already, so no zone logic applies and the fraction
+// is dropped, since a file stamp holds whole seconds. Read off GNU:
+//	@1600000000 -> 1600000000  @0 -> 0  @1600000000.5 -> 1600000000
+fn test_parse_datetime_epoch() {
+	p(@METHOD)
+	assert parse_datetime('@1600000000', false)! == 1_600_000_000
+	assert parse_datetime('@0', false)! == 0
+	assert parse_datetime('@1600000000.5', false)! == 1_600_000_000
+	pass()
+}
+
+// -t's compact stamp is [[CC]YY]MMDDhhmm[.ss]. GNU rejects fourteen digits, so
+// the seconds only exist as the fractional part, and a ten digit reading takes
+// the century from the first two. All four were read off GNU under Tehran.
+fn test_parse_datetime_compact_stamp() {
+	p(@METHOD)
+	saved := pin_zone(tehran)
+	defer {
+		_ = os.setenv('TZ', saved, true)
+	}
+	if !zone_available() {
+		return
+	}
+	// The compact reading is the same wall clock as the spelled out one, and the
+	// two digit year resolves to 2020 rather than 1920.
+	spelled := parse_datetime('2020-01-02 03:04:00', false)!
+	assert parse_datetime('202001020304', true)! == spelled
+	assert parse_datetime('2001020304', true)! == spelled
+	// Fourteen digits is not a stamp.
+	assert_parse_fails('20200102030405', true)
+	// The compact reading belongs to -t only. Under -d GNU reads the same digits
+	// as something else entirely and lands in the year 2446, so -d must not
+	// quietly accept them as a date.
+	assert_parse_fails('202001020304', false)
+	pass()
+}
+
+// A bare time means today at that time, not 1970. The date therefore has to come
+// from the local zone, which is what local_today reads. The expectations are
+// built from the same local date rather than hard coded, because "today" moves.
+fn test_parse_datetime_bare_time_is_today() {
+	p(@METHOD)
+	saved := pin_zone(tehran)
+	defer {
+		_ = os.setenv('TZ', saved, true)
+	}
+	if !zone_available() {
+		return
+	}
+	loc := time.load_location('Local') or { return }
+	today := time.unix(time.now().unix()).in(loc) or { return }
+	midnight := parse_datetime('00:00', false)!
+	day := parse_datetime('00:00:00', false)!
+	assert midnight == day
+	// 5 is 05:00, and 0304 is 03:04.
+	assert parse_datetime('5', false)! == midnight + 5 * 3600
+	assert parse_datetime('0304', false)! == midnight + (3 * 3600 + 4 * 60)
+	assert parse_datetime('03:04', false)! == parse_datetime('0304', false)!
+	assert parse_datetime('03:04:05', false)! == parse_datetime('0304', false)! + 5
+	// And it is today's date, not a fixed one: read the result back into the zone
+	// and compare the calendar fields with today.
+	read_back := time.unix(midnight).in(loc) or { return }
+	assert read_back.year == today.year
+	assert read_back.month == today.month
+	assert read_back.day == today.day
+	assert read_back.hour == 0
+	pass()
+}
+
+// A bare YYYYMMDD is local midnight on that date. Measured under Tehran:
+//	20200102 -> 1577910600
+fn test_parse_datetime_basic_date() {
+	p(@METHOD)
+	saved := pin_zone(tehran)
+	defer {
+		_ = os.setenv('TZ', saved, true)
+	}
+	if !zone_available() {
+		return
+	}
+	assert parse_datetime('20200102', false)! == 1_577_910_600
+	assert parse_datetime('20200102', false)! == parse_datetime('2020-01-02', false)!
+	pass()
+}
+
+// A zone word after a bare time names today at that time in that zone, so the
+// suffix's sign is the opposite of what it looks like. Measured under Tehran,
+// where the local offset is +0330:
+//	10:00 UTC     -> 2026-10-03 13:30 local
+//	10:00 GMT+3   -> 2026-10-03 10:30 local
+//	10:00 UTC-2   -> 2026-10-03 15:30 local
+fn test_parse_datetime_zone_word() {
+	p(@METHOD)
+	saved := pin_zone(tehran)
+	defer {
+		_ = os.setenv('TZ', saved, true)
+	}
+	if !zone_available() {
+		return
+	}
+	plain := parse_datetime('10:00', false)!
+	utc := parse_datetime('10:00 UTC', false)!
+	assert utc - plain == 3 * 3600 + 30 * 60
+	assert parse_datetime('10:00 GMT', false)! == utc
+	// GMT+3 is three hours ahead of UTC, so it lands three hours earlier than UTC.
+	assert utc - parse_datetime('10:00 GMT+3', false)! == 3 * 3600
+	// UTC-2 is two hours behind UTC.
+	assert parse_datetime('10:00 UTC-2', false)! - utc == 2 * 3600
+	pass()
+}
+
+fn assert_parse_fails(s string, compact bool) {
+	parse_datetime(s, compact) or { return }
+	assert false, 'expected ${s} to be rejected'
 }
 
 fn test_touch_create_with_d_option() {
