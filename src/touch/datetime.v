@@ -33,6 +33,13 @@ fn parse_datetime(s string, compact bool) !i64 {
 	if s.starts_with('@') {
 		return epoch_seconds(s)
 	}
+	// A relative item belongs to -d alone. -t reads the compact stamp and nothing
+	// else, so `touch -t yesterday` is an error at GNU and has to be one here.
+	if !compact {
+		if relative := relative_date(s) {
+			return relative
+		}
+	}
 	iso := to_iso8601(s, compact)
 	if iso != none {
 		return from_iso8601(iso)

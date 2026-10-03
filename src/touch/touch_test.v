@@ -432,6 +432,166 @@ fn test_parse_datetime_four_digits_are_ambiguous() {
 	pass()
 }
 
+// The relative items GNU resolves against the clock. Measured at GNU 9.4, and
+// identical in UTC, Asia/Tehran and America/New_York, because a bare item is a
+// plain number of seconds and consults no zone at all:
+//
+//	yesterday  -86400		tomorrow    +86400
+//	-1 day     -86400		1 day ago   -86400
+//	last day   -86400		next day    +86400
+//	2 hours ago -7200		2 hours     +7200
+//	last week  -604800		next week   +604800
+//	+2 weeks   +1209600		1 fortnight +1209600
+//
+// The comparison is a window rather than an equality because both sides read the
+// clock as they run: parse_datetime calls time.now() and so does the expectation,
+// and the second between those two calls is not a disagreement with GNU.
+//
+// Each zone is entered through a control that has to hold before the deltas are
+// read, because a relative item looks the same in every zone. If TZ stopped being
+// honoured the deltas below would carry on passing and prove nothing, and the one
+// assertion that would notice is a local midnight.
+const zone_midnights = {
+	'UTC':              1_577_923_200
+	'Asia/Tehran':      1_577_910_600
+	'America/New_York': 1_577_941_200
+}
+
+fn test_parse_datetime_relative_items() {
+	p(@METHOD)
+	for zone, midnight in zone_midnights {
+		saved := pin_zone(zone)
+		assert parse_datetime('2020-01-02', false)! == midnight, 'TZ ${zone} not in force'
+		assert_relative_delta('yesterday', -86_400)
+		assert_relative_delta('tomorrow', 86_400)
+		assert_relative_delta('-1 day', -86_400)
+		assert_relative_delta('1 day ago', -86_400)
+		assert_relative_delta('last day', -86_400)
+		assert_relative_delta('next day', 86_400)
+		assert_relative_delta('this day', 0)
+		assert_relative_delta('2 hours ago', -7_200)
+		assert_relative_delta('2 hours', 7_200)
+		assert_relative_delta('-30 minutes', -1_800)
+		assert_relative_delta('last week', -604_800)
+		assert_relative_delta('next week', 604_800)
+		assert_relative_delta('+2 weeks', 1_209_600)
+		assert_relative_delta('1 fortnight', 1_209_600)
+		assert_relative_delta('1 fortnight ago', -1_209_600)
+		assert_relative_delta('now', 0)
+		assert_relative_delta('today', 0)
+		assert_relative_delta('last second', -1)
+		_ = os.setenv('TZ', saved, true)
+	}
+	pass()
+}
+
+// `ago` negates the item it follows and leaves the rest of the string alone, which
+// is the opposite of negating the whole thing. Measured at GNU 9.4:
+//
+//	1 day 2 hours ago   +79200	a day forward and two hours back
+//	2 hours 1 day ago   -79200	the same two items the other way round
+//	1 day 1 day         +172800	two items, no direction word, both positive
+//	next day next week   +691200
+fn test_parse_datetime_ago_negates_only_its_own_item() {
+	p(@METHOD)
+	assert_relative_delta('1 day 2 hours ago', 79_200)
+	assert_relative_delta('2 hours 1 day ago', -79_200)
+	assert_relative_delta('1 day 1 day', 172_800)
+	assert_relative_delta('next day next week', 691_200)
+	pass()
+}
+
+// The words are read in any case, and `hence` is accepted without changing the
+// sign. Both measured at GNU 9.4.
+fn test_parse_datetime_relative_words_are_case_insensitive() {
+	p(@METHOD)
+	assert_relative_delta('Yesterday', -86_400)
+	assert_relative_delta('YESTERDAY', -86_400)
+	assert_relative_delta('Next Week', 604_800)
+	assert_relative_delta('2 HOURS AGO', -7_200)
+	assert_relative_delta('1 day hence', 86_400)
+	pass()
+}
+
+// Whole months are the one item whose number of seconds depends on the day of the
+// month, so the arithmetic is pinned on its own here and the wiring is checked by
+// the test below it. GNU normalises the overflow rather than clamping it, so
+// 31 January is 2 March and not 29 February.
+fn test_add_months_carries_an_over_long_day() {
+	p(@METHOD)
+	mut year := 0
+	mut month := 0
+	mut day := 0
+	year, month, day = add_months(2020, 1, 31, 1)
+	assert year == 2020 && month == 3 && day == 2
+	year, month, day = add_months(2020, 3, 31, -1)
+	assert year == 2020 && month == 3 && day == 2
+	year, month, day = add_months(2020, 3, 31, 1)
+	assert year == 2020 && month == 5 && day == 1
+	year, month, day = add_months(2020, 2, 29, 12)
+	assert year == 2021 && month == 3 && day == 1
+	// A year is twelve months, and a month before 1970 keeps its own month rather
+	// than wrapping, which is what floor division is for.
+	year, month, day = add_months(1969, 12, 31, -12)
+	assert year == 1968 && month == 12 && day == 31
+	pass()
+}
+
+// `last month` has to land a calendar month back and keep the time of day, and a
+// month is between 28 and 31 days. The day of the month is left to add_months
+// above, because on the 31st the two readings of it differ and only one is right.
+fn test_parse_datetime_month_items_move_the_month() {
+	p(@METHOD)
+	before := time.now().unix()
+	got := parse_datetime('last month', false)!
+	after := time.now().unix()
+	landed := time.unix(got)
+	now := time.unix(before)
+	assert landed.hour == now.hour && landed.minute == now.minute
+	if now.month == 1 {
+		assert landed.month == 12 && landed.year == now.year - 1
+	} else {
+		assert landed.month == now.month - 1 && landed.year == now.year
+	}
+	assert got <= after && got >= after - 31 * 86400
+	assert got >= before - 31 * 86400 && got <= before - 28 * 86400
+	pass()
+}
+
+// Spellings and combinations that read like the ones GNU takes and that it
+// rejects. Each was measured, and each has to stay rejected: accepting one would
+// be a wrong answer rather than a missing feature.
+fn test_parse_datetime_rejects_relative_words_gnu_rejects() {
+	p(@METHOD)
+	assert_parse_fails('previous day', false)
+	assert_parse_fails('last 2 days', false)
+	assert_parse_fails('next 2 weeks', false)
+	assert_parse_fails('1 day from now', false)
+	assert_parse_fails('1 day after', false)
+	assert_parse_fails('1 day before', false)
+	assert_parse_fails('ago', false)
+	assert_parse_fails('hence', false)
+	assert_parse_fails('from now', false)
+	assert_parse_fails('last', false)
+	assert_parse_fails('2 weeks yonder', false)
+	// -t reads the compact stamp and nothing else, so the relative items are not
+	// in its vocabulary even though they are in -d's.
+	assert_parse_fails('yesterday', true)
+	assert_parse_fails('+2 weeks', true)
+	pass()
+}
+
+// assert_relative_delta checks a relative item against a measured number of
+// seconds. parse_datetime reads the clock itself, so the result can only be pinned
+// to the second between the two reads: got - want has to land between them.
+fn assert_relative_delta(form string, want i64) {
+	before := time.now().unix()
+	got := parse_datetime(form, false) or { panic('${form} was rejected') }
+	after := time.now().unix()
+	landed := got - want
+	assert landed >= before && landed <= after, '${form}: ${got} - ${want} = ${landed}, outside [${before}, ${after}]'
+}
+
 fn test_touch_create_with_d_option() {
 	p(@METHOD)
 	saved := pin_zone(tehran)
