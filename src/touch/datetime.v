@@ -1,3 +1,4 @@
+import os
 import strconv
 import time
 
@@ -475,9 +476,19 @@ fn basic_date(s string) ?BasicDate {
 	return date
 }
 
+// local_today is today's date as the local zone reads it: the epoch moved by the
+// offset in force now and then read as UTC fields. Time.local() cannot be used
+// for this, because it answers with the machine's zone rather than with TZ.
 fn local_today() (int, int, int) {
-	now := time.unix(time.now().unix()).local()
-	return now.year, now.month, now.day
+	now := time.now().unix()
+	mut local := now
+	if loc := local_location() {
+		if offset := loc.offset_at(now) {
+			local += i64(offset)
+		}
+	}
+	today := time.unix(local)
+	return today.year, today.month, today.day
 }
 
 fn all_digits(s string) bool {
@@ -503,8 +514,29 @@ fn from_iso8601(s string) !i64 {
 	if has_explicit_zone(s) {
 		return parsed.unix()
 	}
-	loc := time.load_location('Local') or { return error(unresolved) }
+	loc := local_location()!
 	return local_wall_clock(loc, parsed)
+}
+
+// local_location is the zone a string with no zone in it should be read in.
+//
+// TZ is consulted before 'Local', which is what a caller who exports TZ means,
+// and it has to be consulted at all: on Windows V answers 'Local' with the zone
+// the machine is set to whatever the environment says. Measured on this host,
+// TZ=America/New_York still gave +0330, which would leave this package's tests
+// passing or failing according to where the machine happens to be.
+//
+// A TZ that names no zone V can load is ignored rather than fatal, so an unusual
+// value falls back to the machine's own zone instead of turning every date into
+// an error.
+fn local_location() !&time.Location {
+	tz := os.getenv('TZ')
+	if tz != '' {
+		if loc := time.load_location(tz) {
+			return loc
+		}
+	}
+	return time.load_location('Local') or { error(unresolved) }
 }
 
 // local_wall_clock converts a parsed Time whose calendar fields are local wall

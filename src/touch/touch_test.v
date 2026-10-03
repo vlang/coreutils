@@ -102,6 +102,32 @@ fn test_parse_datetime_naive_string_is_local() {
 	pass()
 }
 
+// A string with no zone in it is read in the zone TZ names, and this is what makes
+// the rest of the file mean anything. On Windows V answers 'Local' with the zone
+// the machine is set to whatever the environment says, so measured on this host at
+// +0330, TZ=America/New_York still gave +0330 and every stamp below would have been
+// off by the difference on any other machine.
+//
+//	2020-01-02 in UTC               ->  1_577_923_200
+//	2020-01-02 in Asia/Tehran       ->  1_577_910_600
+//	2020-01-02 in America/New_York  ->  1_577_941_200
+fn test_parse_datetime_follows_tz() {
+	p(@METHOD)
+	saved := pin_zone(tehran)
+	defer {
+		_ = os.setenv('TZ', saved, true)
+	}
+	if !zone_available() {
+		return
+	}
+	assert parse_datetime('2020-01-02', false)! == 1_577_910_600
+	_ = os.setenv('TZ', 'America/New_York', true)
+	assert parse_datetime('2020-01-02', false)! == 1_577_941_200
+	_ = os.setenv('TZ', 'UTC', true)
+	assert parse_datetime('2020-01-02', false)! == 1_577_923_200
+	pass()
+}
+
 // The offset that applies is the one in force at that date, not the one in force
 // now. Tehran is +0430 in June and +0330 in October, so subtracting the current
 // offset puts this one an hour out: 08:09:10 - 4:30 = 03:39:10 UTC.
