@@ -2,12 +2,21 @@ module main
 
 import os
 
+// tail() is handed a closure to write through, and the closure has to append
+// somewhere the assertion can read back. Neither of the two obvious ways works: a
+// closure that appends to a captured `mut []string` appends to its own copy, and
+// one that appends through a `&[]string` points at a local that has already gone
+// (measured: the first reads back empty, the second crashes in array__push). The
+// fix is to heap allocate the array header; see setup() below. Before this, all five
+// tests here compared an empty string against their expected output and failed.
+
 fn setup() (fn (s string), fn () string) {
 	os.chdir(os.dir(@FILE)) or { exit_error(err.msg()) }
 
 	// The array header has to be heap allocated: a pointer to a local would
 	// dangle as soon as setup() returned, and the closures would then append to
-	// freed stack memory.
+	// freed stack memory. That is the fix from 475101a (#196); the Sink struct this
+	// PR brought along solved the same dangling pointer and is gone again.
 	mut result := &[]string{}
 	out_fn := fn [mut result] (s string) {
 		(*result) << s
