@@ -142,7 +142,11 @@ fn (c FoldCommand) run(mut files []InputFile) {
 	mut open_fails_num := 0
 	for mut file in files {
 		file.open() or {
-			eprintln('${name}: ${err.msg()}')
+			// GNU names the file and then gives the system's reason:
+			//	fold: nope1: No such file or directory
+			// This printed the program name and then its own wording, with the file
+			// quoted inside it.
+			eprintln('${name}: ${file.name}: ${reason(err.code(), err.msg())}')
 			open_fails_num++
 			continue
 		}
@@ -150,9 +154,23 @@ fn (c FoldCommand) run(mut files []InputFile) {
 			c.count_bytes_ignore_control_chars, c.break_at_spaces)
 		file.close()
 	}
-	if open_fails_num == files.len {
+	// Any file that could not be opened is a failure, not only the case where every
+	// one of them failed: GNU prints the lines it could read and still exits 1.
+	if open_fails_num > 0 {
 		exit(1)
 	}
+}
+
+// reason is what follows the file name in the diagnostic.
+//
+// V's own wording for a file that is not there is `failed to open file "x"`, which
+// is this port's and not GNU's, so the common case is translated and everything
+// else keeps what V said. ENOENT is 2 on both platforms here.
+fn reason(code int, msg string) string {
+	if code == 2 {
+		return 'No such file or directory'
+	}
+	return msg
 }
 
 // Print messages and exit
