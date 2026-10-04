@@ -42,6 +42,10 @@ fn main() {
 	$if windows {
 		// compensate for os.uname "unique" values (as of "V 0.3.2 3625a74")
 		uname.sysname = 'Windows_NT'
+		// and for the nodename, which os.uname takes from COMPUTERNAME and so
+		// reports uppercased where Windows, GNU and uutils all report the
+		// registered name. Measured on this machine: MRLAPTOP against MRLaptop.
+		uname.nodename = win_nodename(uname.nodename)
 		// pull out version components from uname.release and uname.version
 		// * recipe works both for early "unique" os.uname variant and later more consistent (eg, "10.0" and "19040")
 		mut re := regex.regex_opt('[0-9]+')!
