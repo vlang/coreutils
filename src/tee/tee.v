@@ -59,7 +59,12 @@ fn tee(set Settings) {
 }
 
 fn open_sink(path string, append bool) !os.File {
-	return if append { os.open_append(path) } else { os.create(path) }
+	// Written out rather than as one expression of two Results, which V does not let
+	// a function return in one arm and the other.
+	if append {
+		return os.open_append(path)
+	}
+	return os.create(path)
 }
 
 struct Settings {
