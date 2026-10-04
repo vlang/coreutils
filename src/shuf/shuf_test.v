@@ -3,7 +3,15 @@ import os
 
 const rig = testing.prepare_rig(util: 'shuf')
 const executable_under_test = rig.executable_under_test
-const eol = testing.output_eol()
+// GNU writes a bare LF to stdout and stderr on every platform, Windows included,
+// so this is not common's eol. Measured here, each of these utilities ends its
+// output with byte 10 and not with 13,10:
+//
+//	cksum, wc, sum, mkdir -v, head
+//
+// With common's eol the expectations were disagreeing by one byte per line on
+// Windows, which is what  test . has been reporting as a content difference.
+const eol = '\n'
 const test_txt_path = os.join_path(rig.temp_dir, 'test.txt')
 
 fn testsuite_begin() {
