@@ -92,8 +92,8 @@ fn format_long_listing(entries []Entry, options Options) {
 
 		// checksum
 		if options.checksum != '' {
-			checksum := format_cell(entry.checksum, longest.checksum, .left, dim, options)
-			print(checksum)
+			sum := format_cell(entry.checksum, longest.checksum, .left, dim, options)
+			print(sum)
 			print_space()
 		}
 
@@ -106,7 +106,7 @@ fn format_long_listing(entries []Entry, options Options) {
 
 		// octal permissions
 		if options.octal_permissions {
-			content := format_octal_permissions(entry, options)
+			content := format_octal_permissions(entry)
 			print(format_cell(content, 4, .left, dim, options))
 			print_space()
 		}
@@ -317,40 +317,6 @@ fn right_pad_end(s string, width int) string {
 	return if pad > 0 { s + space.repeat(pad) } else { s }
 }
 
-fn statistics(entries []Entry, len int, options Options) {
-	file_count := entries.filter(it.file).len
-	total := arrays.sum(entries.map(if it.file || it.exe { it.stat.size } else { 0 })) or { 0 }
-	dir_count := entries.filter(it.dir).len
-	link_count := entries.filter(it.link).len
-	mut stats := ''
-
-	dim := if options.no_dim { no_style } else { dim_style }
-	file_count_styled := style_string(file_count.str(), options.style_fi, options)
-
-	file := if file_count == 1 { 'file' } else { 'files' }
-	files := style_string(file, dim, options)
-	dir_count_styled := style_string(dir_count.str(), options.style_di, options)
-
-	dir := if dir_count == 1 { 'directory' } else { 'directories' }
-	dirs := style_string(dir, dim, options)
-
-	size := match true {
-		options.size_ki { readable_size(total, true) }
-		options.size_kb { readable_size(total, false) }
-		else { total.str() }
-	}
-
-	totals := style_string(size, options.style_fi, options)
-	stats = '${dir_count_styled} ${dirs} | ${file_count_styled} ${files} [${totals}]'
-
-	if link_count > 0 {
-		link_count_styled := style_string(link_count.str(), options.style_ln, options)
-		links := style_string('links', dim, options)
-		stats += ' | ${link_count_styled} ${links}'
-	}
-	println(stats)
-}
-
 fn file_flag(entry Entry, options Options) string {
 	return match true {
 		// vfmt off
@@ -367,7 +333,7 @@ fn file_flag(entry Entry, options Options) string {
 	}
 }
 
-fn format_octal_permissions(entry Entry, options Options) string {
+fn format_octal_permissions(entry Entry) string {
 	mode := entry.stat.get_mode()
 	return '0${mode.owner.bitmask()}${mode.group.bitmask()}${mode.others.bitmask()}'
 }
