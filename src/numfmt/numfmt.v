@@ -57,13 +57,21 @@ fn numfmt(number string, mut app App, options Options) !string {
 	num_part, scale_part := split_parts(number)
 	num := strconv.atof64(num_part)!
 	pow := suffix_to_power(scale_part)!
-	sca := scale_number(num, pow, options)
-	n := f64(sca) * options.from_unit / options.to_unit
+	// A number with no suffix and no unit to convert is passed through as it is,
+	// which is what --to=none means. Measured at GNU 9.4 and uutils 0.0.17:
+	// `numfmt 0.5` answers 0.5 and `numfmt -12.25` answers -12.25, where rounding to
+	// an integer first answered 1 and -13.
+	converting := pow != 0 || options.from_unit != options.to_unit
+	n := if converting {
+		f64(round(num * math.pow10(pow), options.round)) * options.from_unit / options.to_unit
+	} else {
+		num
+	}
 	// apply formating
 	mut result := match true {
 		options.pformat.len != 0 { unsafe { strconv.v_sprintf(options.pformat, n) } }
 		options.grouping { commaize(n) }
-		options.to == 'none' { n.str() }
+		options.to == 'none' { number_str(n) }
 		else { num_to_str(n, options) or { handle_error(err.msg(), mut app, options) } }
 	}
 
@@ -77,6 +85,22 @@ fn numfmt(number string, mut app App, options Options) !string {
 		})
 	}
 	return result
+}
+
+// number_str prints a number the way GNU does, which f64.str() does not do in two
+// ways: it keeps a ".0" on a whole number, and it switches to scientific notation
+// on a large fractional one. Measured at GNU 9.4:
+//
+//	numfmt 1000          1000		f64.str() would give 1000.0
+//	numfmt 2000000.6     2000000.6	f64.str() would give 2.0000006e+06
+//
+// The bound is where an i64 stops being exact, so that a value too large for one
+// keeps its float spelling rather than wrapping.
+fn number_str(n f64) string {
+	if n == math.trunc(n) && math.abs(n) < 9.007_199_254_740_992e15 {
+		return i64(n).str()
+	}
+	return strconv.f64_to_str_l(n)
 }
 
 fn split_parts(number string) (string, string) {
@@ -119,21 +143,6 @@ fn suffix_to_power(suffix string) !int {
 	}
 }
 
-fn power_to_suffix(power u64) !string {
-	return match power {
-		0 { '' }
-		3 { 'K' }
-		6 { 'M' }
-		9 { 'G' }
-		12 { 'T' }
-		15 { 'P' }
-		18 { 'E' }
-		21 { 'Z' }
-		24 { 'Y' }
-		else { error('unknown power ${power}') }
-	}
-}
-
 fn num_to_str(num f64, options Options) !string {
 	return match options.to {
 		'si' { readable_size(num, Unit.si, options.round)! }
@@ -147,7 +156,10 @@ fn readable_size(size f64, unit Unit, rounding string) !string {
 	kb := if unit == .iec || unit == .iec_i { f64(1024) } else { f64(1000) }
 	mut sz := size
 	suffixes := match unit {
-		.si { ['', 'k', 'm', 'g', 't', 'p', 'e', 'z'] }
+		// SI suffixes are upper case at GNU, not lower: measured at GNU 9.4,
+		// `numfmt --to=si 1500` answers 1.5K and `--to=si 1000000` answers 1.0M.
+		// This used to answer 1.5k and 1.0m.
+		.si { ['', 'K', 'M', 'G', 'T', 'P', 'E', 'Z'] }
 		.iec { ['', 'K', 'M', 'G', 'T', 'P', 'E', 'Z'] }
 		.iec_i { ['', 'Ki', 'Mi', 'Gi', 'Ti', 'Pi', 'Ei', 'Zi'] }
 		else { [''] }
@@ -171,11 +183,6 @@ fn readable_size(size f64, unit Unit, rounding string) !string {
 		sz /= kb
 	}
 	return size.str()
-}
-
-fn scale_number(num f64, pow int, options Options) i64 {
-	n := num * math.pow10(pow)
-	return round_from_zero(n)
 }
 
 fn commaize(num f64) string {
