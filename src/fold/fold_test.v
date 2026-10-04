@@ -3,7 +3,6 @@ import os
 
 const rig = testing.prepare_rig(util: 'fold')
 const executable_under_test = rig.executable_under_test
-const eol = testing.output_eol()
 const test_txt_path = os.join_path(rig.temp_dir, 'test.txt')
 
 fn testsuite_begin() {
@@ -23,16 +22,33 @@ fn test_help_and_version() {
 	rig.assert_help_and_version_options_work()
 }
 
+// The diagnostics are GNU's, and they end in a bare newline on every platform
+// including Windows, so ${eol} is deliberately not used here: GNU writes "\n" and
+// common.eol() is "\r\n" on this one. Measured at GNU 9.4:
+//
+//	fold nope1                 fold: nope1: No such file or directory   exit 1
+//	fold nope1 nope2           one line each, for both files             exit 1
+//	fold ok.txt nope2          the lines of ok.txt, then the error        exit 1
 fn test_non_existent_file() {
 	res := os.execute('${executable_under_test} non-existent-file')
 	assert res.exit_code == 1
-	assert res.output.trim_space() == 'fold: failed to open file "non-existent-file"'
+	assert res.output.trim_space() == 'fold: non-existent-file: No such file or directory'
 }
 
 fn test_non_existent_files() {
 	res := os.execute('${executable_under_test} non-existent-file second-non-existent-file')
 	assert res.exit_code == 1
-	assert res.output.trim_space() == 'fold: failed to open file "non-existent-file"${eol}fold: failed to open file "second-non-existent-file"'
+	assert res.output.trim_space() == 'fold: non-existent-file: No such file or directory\n' +
+		'fold: second-non-existent-file: No such file or directory'
+}
+
+// A file that could not be read is a failure even when another one could, and GNU
+// exits 1 after printing the lines it did read.
+fn test_one_missing_among_two_files() {
+	res := os.execute('${executable_under_test} ${test_txt_path} non-existent-file')
+	assert res.exit_code == 1
+	assert res.output.contains('No such file or directory')
+	assert res.output.contains('[0] Example test line')
 }
 
 const testtxtcontent = [
