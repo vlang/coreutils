@@ -63,7 +63,7 @@ fn numfmt(number string, mut app App, options Options) !string {
 	mut result := match true {
 		options.pformat.len != 0 { unsafe { strconv.v_sprintf(options.pformat, n) } }
 		options.grouping { commaize(n) }
-		options.to == 'none' { n.str() }
+		options.to == 'none' { number_str(n) }
 		else { num_to_str(n, options) or { handle_error(err.msg(), mut app, options) } }
 	}
 
@@ -170,7 +170,19 @@ fn readable_size(size f64, unit Unit, rounding string) !string {
 		}
 		sz /= kb
 	}
-	return size.str()
+	return number_str(size)
+}
+
+// number_str renders n the way GNU numfmt does: plain decimal digits, never
+// exponent notation, and no trailing ".0" on an integral value. f64.str()
+// switches to scientific notation above a million and always keeps the
+// fractional part, which would turn 2000000 into "2e+06" and 2000 into "2000.0".
+fn number_str(n f64) string {
+	s := n.strlong()
+	if s.ends_with('.0') {
+		return s[..s.len - 2]
+	}
+	return s
 }
 
 fn scale_number(num f64, pow int, options Options) i64 {

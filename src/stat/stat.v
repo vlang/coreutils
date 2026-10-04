@@ -100,6 +100,10 @@ enum CacheMode {
 const tokens_statx = 'aAbBCdDfFgGhimnNosrRtTuUwWxXyYzZV'.bytes()
 const tokens_statvfs = 'abcdfilnsStT'.bytes()
 
+// The two character format tokens, which need to be matched before the single
+// character ones.
+const two_char_tokens = ['Hd', 'Ld']
+
 @[inline]
 fn make_dev(major u32, minor u32) u32 {
 	return major << 8 | minor
@@ -169,6 +173,14 @@ fn process_token(token string, st Statx, path string, mtab []MountInfo) string {
 		}
 		'D' {
 			'${make_dev(st.stx_dev_major, st.stx_dev_minor):x}'
+		}
+		'Hd' {
+			// major device number, decimal; GNU's default Device: field
+			'${st.stx_dev_major}'
+		}
+		'Ld' {
+			// minor device number, decimal; GNU's default Device: field
+			'${st.stx_dev_minor}'
 		}
 		'f' {
 			'${st.stx_mode:4x}'
@@ -339,11 +351,13 @@ fn scan_num(s &string) int {
 	return (*s).len
 }
 
-// TODO: When we upgrade to coreutil 9.4 compatibility, we will need two-byte tokens
-// if (*s).len > 1 && (*s)[..2] in ['Hd', 'Hr', 'Ld', 'Lr'] {
-// 	return 2
-// }
+// Some of GNU's format tokens are two characters wide, e.g. %Hd and %Ld for
+// the major and minor device numbers. They have to be recognised before the
+// single character tokens, otherwise %Hd would be read as %H followed by "d".
 fn scan_for_tokens(s &string, tokens []u8) int {
+	if (*s).len > 1 && (*s)[..2] in two_char_tokens {
+		return 2
+	}
 	if (*s).len > 0 {
 		if (*s)[0] in tokens {
 			return 1
@@ -507,7 +521,7 @@ fn args() Settings {
 			if st.file_system {
 				st.format = '  File: "%n"\n    ID: %-8i Namelen: %-7l Type: %T\nBlock size: %-10s Fundamental block size: %S\nBlocks: Total: %-10b Free: %-10f Available: %a\nInodes: Total: %-10c Free: %d\n'
 			} else {
-				st.format = '  File: %V\n  Size: %-10s\tBlocks: %-10b IO Block: %-6o %F\nDevice: %Dh/%dd\tInode: %-10i  Links: %h\nAccess: (%04a/%10A)  Uid: (%5u/%8U)   Gid: (%5g/%8G)\nAccess: %x\nModify: %y\nChange: %z\n Birth: %w\n'
+				st.format = '  File: %V\n  Size: %-10s\tBlocks: %-10b IO Block: %-6o %F\nDevice: %Hd,%Ld\tInode: %-10i  Links: %h\nAccess: (%04a/%10A)  Uid: (%5u/%8U)   Gid: (%5g/%8G)\nAccess: %x\nModify: %y\nChange: %z\n Birth: %w\n'
 			}
 		}
 	} else {

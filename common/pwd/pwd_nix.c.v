@@ -22,11 +22,21 @@ struct C.passwd {
 	pw_shell  &char
 }
 
+// getgrgid returns a `struct group`, not a `struct passwd`. Reading it through
+// a passwd only worked because gr_name happens to sit at the same offset.
+struct C.group {
+	gr_name   &char
+	gr_passwd &char
+	gr_gid    u32
+	gr_mem    voidptr // char **
+}
+
 fn C.getpwuid(int) &C.passwd
-fn C.getgrgid(int) &C.passwd
+fn C.getgrgid(int) &C.group
 fn C.getpwnam(&char) &C.passwd
-fn C.getgroups(int, &int) int
-fn C.getgrouplist(&char, int, &int, &int) int
+// gid_t is a 32 bit type, so both of these fill a u32 array.
+fn C.getgroups(int, &u32) int
+fn C.getgrouplist(&char, u32, &u32, &int) int
 
 pub fn get_uid_for_name(username string) !int {
 	r := C.getpwnam(username.str)
@@ -60,7 +70,7 @@ pub fn get_name_for_gid(gid int) !string {
 			}
 			return os.error_posix()
 		}
-		return cstring_to_vstring(r.pw_name)
+		return cstring_to_vstring(r.gr_name)
 	}
 }
 
@@ -82,26 +92,29 @@ pub fn get_groups(username string) ![]int {
 	user := get_userinfo_for_name(username)!
 	unsafe {
 		mut count := init_group_buf_size
-		mut groups := []int{len: count}
-		mut res := C.getgrouplist(username.str, user.gid, &groups[0], &count)
+		// getgrouplist stores gid_t values, which are 32 bits wide. Handing it
+		// a []int would leave the upper half of every slot holding whatever was
+		// there before, so the ids come back as things like 103079215108.
+		mut gids := []u32{len: count}
+		mut res := C.getgrouplist(username.str, u32(user.gid), &gids[0], &count)
 		// If the buffer was not big enough, count will be updated with the
 		// number we need.
 		if res == -1 {
-			groups = []int{len: count}
-			res = C.getgrouplist(username.str, user.gid, &groups[0], &count)
+			gids = []u32{len: count}
+			res = C.getgrouplist(username.str, u32(user.gid), &gids[0], &count)
 		}
-		return groups[0..count]
+		return gids[0..count].map(int(it))
 	}
 }
 
 fn get_effective_groups_up_to(limit int) !(int, []int) {
-	mut groups := []int{len: init_group_buf_size}
 	unsafe {
-		num_groups := C.getgroups(limit, &groups[0])
+		gids := []u32{len: init_group_buf_size}
+		num_groups := C.getgroups(limit, &gids[0])
 		if num_groups < 0 {
 			return os.error_posix()
 		}
-		return num_groups, groups
+		return num_groups, gids[0..num_groups].map(int(it))
 	}
 }
 

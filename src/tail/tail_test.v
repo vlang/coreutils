@@ -5,13 +5,15 @@ import os
 fn setup() (fn (s string), fn () string) {
 	os.chdir(os.dir(@FILE)) or { exit_error(err.msg()) }
 
-	mut result := []string{}
-	mut result_ref := &result
-	out_fn := fn [mut result_ref] (s string) {
-		result_ref << s
+	// The array header has to be heap allocated: a pointer to a local would
+	// dangle as soon as setup() returned, and the closures would then append to
+	// freed stack memory.
+	mut result := &[]string{}
+	out_fn := fn [mut result] (s string) {
+		(*result) << s
 	}
-	result_fn := fn [mut result_ref] () string {
-		return result_ref.join('')
+	result_fn := fn [result] () string {
+		return result.join('')
 	}
 	return out_fn, result_fn
 }

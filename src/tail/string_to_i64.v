@@ -1,32 +1,35 @@
 // convert strings like 10K to i164
 const block = i64(512)
 
+// binary (IEC) multipliers, i.e. GNU's suffix without the extra i
 // **1
 const kilo = i64(1024)
-const kilobyte = i64(1000)
 
 // **2
 const mega = kilo * kilo
-const megabyte = kilobyte * kilobyte
 
 // **3
 const giga = mega * kilo
-const gigabyte = megabyte * kilobyte
 
 // **4
 const terra = giga * kilo
-const terrabyte = gigabyte * kilobyte
 
 // **5
 const peta = terra * kilo
-const petabyte = terra * kilobyte
 
 // **6
 const exa = peta * kilo
-const exabyte = peta * kilo
 
 // **7
 const zetta = exa * kilo
+
+// decimal (SI) multipliers
+const kilobyte = i64(1000)
+const megabyte = kilobyte * kilobyte
+const gigabyte = megabyte * kilobyte
+const terrabyte = gigabyte * kilobyte
+const petabyte = terrabyte * kilobyte
+const exabyte = petabyte * kilobyte
 const zettabyte = exabyte * kilobyte
 
 fn string_to_i64(s string) ?i64 {
@@ -52,17 +55,23 @@ fn string_to_i64(s string) ?i64 {
 	multiplier := match suffix.to_lower() {
 		'b' { block }
 		'k' { kilo }
-		'kb', 'kib' { kilobyte }
+		'kb' { kilobyte }
+		'kib' { kilo }
 		'm' { mega }
-		'mb', 'mib' { megabyte }
+		'mb' { megabyte }
+		'mib' { mega }
 		'g' { giga }
-		'gb', 'gib' { gigabyte }
+		'gb' { gigabyte }
+		'gib' { giga }
 		't' { terra }
-		'tb', 'tib' { terrabyte }
+		'tb' { terrabyte }
+		'tib' { terra }
 		'p' { peta }
-		'pb', 'pib' { petabyte }
+		'pb' { petabyte }
+		'pib' { peta }
 		'e' { exa }
-		'eb', 'eib' { exabyte }
+		'eb' { exabyte }
+		'eib' { exa }
 		// oddball formats found in __xstrtol source
 		'c' { 1 }
 		'w' { 2 }
@@ -70,7 +79,8 @@ fn string_to_i64(s string) ?i64 {
 	}
 
 	result := number * multiplier
-	if result == 0 && number != 0 {
+	if number != 0 && result / number != multiplier {
+		// the multiplication wrapped around
 		return none
 	}
 	return result

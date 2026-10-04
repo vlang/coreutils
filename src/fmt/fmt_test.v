@@ -24,13 +24,15 @@ fn to_tmp_file(data []string) string {
 }
 
 fn setup() (fn (s string), fn () []string) {
-	mut result := []string{}
-	mut result_ref := &result
-	out_fn := fn [mut result_ref] (s string) {
-		result_ref << s
+	// The array header has to be heap allocated: a pointer to a local would
+	// dangle as soon as setup() returned, and the closures would then append to
+	// freed stack memory.
+	mut result := &[]string{}
+	out_fn := fn [mut result] (s string) {
+		(*result) << s
 	}
-	result_fn := fn [mut result_ref] () []string {
-		return *result_ref
+	result_fn := fn [result] () []string {
+		return *result
 	}
 	return out_fn, result_fn
 }

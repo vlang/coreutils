@@ -28,7 +28,7 @@ fn test_size_parser() {
 
 	s = parse_size_opt('-24GB')
 	assert s.mode == .subtract
-	assert s.size == 24 * 1000 * 1000 * 1000
+	assert s.size == u64(24) * 1000 * 1000 * 1000
 
 	s = parse_size_opt('<13kB')
 	assert s.mode == .at_most
@@ -46,12 +46,12 @@ fn test_size_parser() {
 
 	s = parse_size_opt('/14PB')
 	assert s.mode == .round_down
-	assert s.size == 14 * 1000 * 1000 * 1000 * 1000 * 1000
+	assert s.size == u64(14) * 1000 * 1000 * 1000 * 1000 * 1000
 	assert s != t
 
 	s = parse_size_opt('%1E')
 	assert s.mode == .round_up
-	assert s.size == 1 * 1024 * 1024 * 1024 * 1024 * 1024 * 1024
+	assert s.size == u64(1024) * 1024 * 1024 * 1024 * 1024 * 1024
 
 	// TODO: Test u64 overflows
 }
