@@ -12,7 +12,7 @@ fn setup_process_group(p os.Process, foreground bool) {
 	}
 }
 
-fn terminate_process(p os.Process, sig_num int, process_group bool) {
+fn terminate_process(p &os.Process, sig_num int, process_group bool) {
 	pid := if process_group { -p.pid } else { p.pid }
 	C.kill(pid, sig_num)
 }
