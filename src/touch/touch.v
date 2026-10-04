@@ -112,10 +112,13 @@ fn get_date_time(args TouchArgs) (int, int) {
 	dt := if args.date_arg.len > 0 { args.date_arg } else { args.time_arg }
 
 	if dt.len > 0 {
-		date := time.parse_iso8601(dt) or {
-			common.exit_with_error_message(app_name, 'unable to parse date ${dt}')
+		// parse_datetime, not time.parse_iso8601: a string with no zone in it
+		// names a local time, and the offset that has to be applied is the one
+		// in force at that date, not the one in force now. See datetime.v.
+		stamp := parse_datetime(dt, args.time_arg.len > 0) or {
+			common.exit_with_error_message(app_name, err.msg())
 		}
-		return int(date.unix()), int(date.unix())
+		return stamp, stamp
 	}
 
 	if args.reference.len > 0 {
