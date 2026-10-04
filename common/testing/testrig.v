@@ -24,7 +24,7 @@ pub:
 }
 
 pub fn (rig TestRig) call_for_test(args string) os.Result {
-	res := os.execute('${rig.executable_under_test} ${args}')
+	res := run_args(rig.executable_under_test, args)
 	assert res.exit_code == 0
 	return res
 }
@@ -66,7 +66,7 @@ pub fn (rig TestRig) clean_up() {
 }
 
 pub fn (rig TestRig) assert_platform_util() {
-	platform_ver := os.execute('${rig.platform_util_call} --version')
+	platform_ver := run_args(rig.platform_util_call, '--version')
 	eprintln('Platform util version: [${platform_ver.output}]')
 	assert platform_ver.exit_code == 0
 
@@ -90,11 +90,11 @@ pub fn (rig TestRig) assert_platform_util() {
 }
 
 pub fn (rig TestRig) call_orig(args string) os.Result {
-	return os.execute('${rig.platform_util_call} ${args}')
+	return run_args(rig.platform_util_call, args)
 }
 
 pub fn (rig TestRig) call_new(args string) os.Result {
-	return os.execute('${rig.executable_under_test} ${args}')
+	return run_args(rig.executable_under_test, args)
 }
 
 // print_small_diff eprints only differing small results that differ
@@ -208,8 +208,8 @@ pub fn (rig TestRig) assert_help_and_version_options_work() {
 	// For now, assume that the original has --version and --help
 	// and that they already work correctly.
 
-	ver := os.execute('${rig.executable_under_test} --version')
+	ver := run_args(rig.executable_under_test, '--version')
 	assert ver.output.trim_space() == '${rig.util} (V coreutils) ${common.version}'
 	assert ver.exit_code == 0
-	assert os.execute('${rig.executable_under_test} --help').exit_code == 0
+	assert run_args(rig.executable_under_test, '--help').exit_code == 0
 }

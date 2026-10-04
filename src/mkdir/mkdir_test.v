@@ -49,7 +49,7 @@ fn test_help_and_version() {
 
 fn test_default_create_single_dir() {
 	test_dir_to_make := 'testdir'
-	res := os.execute('${executable_under_test} ${test_dir_to_make}')
+	res := os.exec(testing.split_args('${executable_under_test} ${test_dir_to_make}'))
 	assert res.exit_code == 0
 	assert res.output.trim_space() == ''
 	assert testing.check_dir_exists(test_dir_to_make)
@@ -60,7 +60,7 @@ fn test_default_create_multiple_dirs() {
 	first_test_dir_to_make := 'testdir'
 	second_test_dir_to_make := 'secondtestdir'
 	res :=
-		os.execute('${executable_under_test} ${first_test_dir_to_make} ${second_test_dir_to_make}')
+		os.exec(testing.split_args('${executable_under_test} ${first_test_dir_to_make} ${second_test_dir_to_make}'))
 	assert res.exit_code == 0
 	assert res.output.trim_space() == ''
 	assert testing.check_dir_exists(first_test_dir_to_make)
@@ -78,7 +78,7 @@ fn test_default_create_multiple_dirs_with_verbose() {
 	first_test_dir_to_make := 'testdir'
 	second_test_dir_to_make := 'secondtestdir'
 	res :=
-		os.execute('${executable_under_test} -v ${first_test_dir_to_make} ${second_test_dir_to_make}')
+		os.exec(testing.split_args('${executable_under_test} -v ${first_test_dir_to_make} ${second_test_dir_to_make}'))
 	assert res.exit_code == 0
 	assert res.output.trim_space() == "mkdir: created directory 'testdir'${eol}mkdir: created directory 'secondtestdir'"
 	assert testing.check_dir_exists(first_test_dir_to_make)
@@ -94,7 +94,7 @@ fn test_default_create_multiple_dirs_with_verbose() {
 
 fn test_create_dir_with_parents_and_flag() {
 	test_dir_to_make := os.join_path('parent-one', 'child-one', 'last-child')
-	res := os.execute('${executable_under_test} -p ${test_dir_to_make}')
+	res := os.exec(testing.split_args('${executable_under_test} -p ${test_dir_to_make}'))
 	assert res.exit_code == 0
 	assert res.output.trim_space() == ''
 	assert testing.check_dir_exists(test_dir_to_make)
@@ -104,7 +104,7 @@ fn test_create_dir_with_parents_and_flag() {
 fn test_create_dir_with_parents_without_flag_fails() {
 	test_dir_to_make := os.join_path('parent-two', 'child-two', 'last-child')
 	output_path := os.norm_path(test_dir_to_make)
-	res := os.execute('${executable_under_test} ${test_dir_to_make}')
+	res := os.exec(testing.split_args('${executable_under_test} ${test_dir_to_make}'))
 	assert res.exit_code == 1
 	assert res.output.trim_space() == "mkdir: cannot create directory '${output_path}': No such file or directory"
 	assert !testing.check_dir_exists(test_dir_to_make)

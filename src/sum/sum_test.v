@@ -54,14 +54,14 @@ fn testsuite_end() {
 	tests from main branch for completeness
 */
 fn test_bsd() {
-	res := os.execute('cat ${main_txt} | ${executable_under_test} -r')
+	res := os.exec(testing.split_args('cat ${main_txt} | ${executable_under_test} -r'))
 
 	assert res.exit_code == 0
 	assert res.output == '38039     1${eol}'
 }
 
 fn test_sysv() {
-	res := os.execute('cat ${main_txt} | ${executable_under_test} -s')
+	res := os.exec(testing.split_args('cat ${main_txt} | ${executable_under_test} -s'))
 
 	assert res.exit_code == 0
 	assert res.output == '25426 1${eol}'
@@ -71,28 +71,28 @@ fn test_sysv() {
 	test main SysV switch behavior
 */
 fn test_sysv_stream_succeeds() {
-	res := os.execute('cat ${test1_txt} | ${executable_under_test} -s')
+	res := os.exec(testing.split_args('cat ${test1_txt} | ${executable_under_test} -s'))
 
 	assert res.exit_code == 0
 	assert res.output == '2185 1${eol}'
 }
 
 fn test_sysv_one_file_succeeds() {
-	res := os.execute('${executable_under_test} -s ${test1_txt}')
+	res := os.exec(testing.split_args('${executable_under_test} -s ${test1_txt}'))
 
 	assert res.exit_code == 0
 	assert res.output == '2185 1 ${test1_txt}${eol}'
 }
 
 fn test_sysv_repeated_files_not_get_filtered() {
-	res := os.execute('${executable_under_test} -s ${test1_txt} ${test1_txt} ${test1_txt}')
+	res := os.exec(testing.split_args('${executable_under_test} -s ${test1_txt} ${test1_txt} ${test1_txt}'))
 
 	assert res.exit_code == 0
 	assert res.output == '2185 1 ${test1_txt}${eol}2185 1 ${test1_txt}${eol}2185 1 ${test1_txt}${eol}'
 }
 
 fn test_sysv_several_files_succeeds() {
-	res := os.execute('${executable_under_test} -s ${test1_txt} ${test2_txt} ${test3_txt}')
+	res := os.exec(testing.split_args('${executable_under_test} -s ${test1_txt} ${test2_txt} ${test3_txt}'))
 
 	assert res.exit_code == 0
 	assert res.output == '2185 1 ${test1_txt}${eol}3372 1 ${test2_txt}${eol}556 1 ${test3_txt}${eol}'
@@ -103,9 +103,9 @@ fn sum_arbitrary_value(value string, arg string) !os.Result {
 	f.write_string('${value}\n')!
 	f.close()
 	res := $if windows {
-		os.execute("cat ${path} | tr -d '\\r' | ${executable_under_test} ${arg}")
+		os.exec(testing.split_args("cat ${path} | tr -d '\\r' | ${executable_under_test} ${arg}"))
 	} $else {
-		os.execute('cat ${path} | ${executable_under_test} ${arg}')
+		os.exec(testing.split_args('cat ${path} | ${executable_under_test} ${arg}'))
 	}
 	os.rm(path)!
 	return res
@@ -137,7 +137,7 @@ fn test_sysv_width_4_col_no_padding() {
 
 fn test_sysv_different_col_widths_no_alignment() {
 	res :=
-		os.execute('${executable_under_test} -s ${long_line} ${test1_txt} ${test2_txt} ${test3_txt}')
+		os.exec(testing.split_args('${executable_under_test} -s ${long_line} ${test1_txt} ${test2_txt} ${test3_txt}'))
 
 	assert res.exit_code == 0
 	assert res.output == '55583 302 ${long_line}${eol}2185 1 ${test1_txt}${eol}3372 1 ${test2_txt}${eol}556 1 ${test3_txt}${eol}'
@@ -147,28 +147,28 @@ fn test_sysv_different_col_widths_no_alignment() {
 	test main BSD switch behavior
 */
 fn test_bsd_sum_stream_succeeds() {
-	res := os.execute('cat ${test1_txt} | ${executable_under_test} -r')
+	res := os.exec(testing.split_args('cat ${test1_txt} | ${executable_under_test} -r'))
 
 	assert res.exit_code == 0
 	assert res.output == '59852     1${eol}'
 }
 
 fn test_bsd_sum_one_file_succeeds() {
-	res := os.execute('${executable_under_test} -r ${test1_txt}')
+	res := os.exec(testing.split_args('${executable_under_test} -r ${test1_txt}'))
 
 	assert res.exit_code == 0
 	assert res.output == '59852     1${eol}'
 }
 
 fn test_bsd_sum_repeated_files_not_get_filtered() {
-	res := os.execute('${executable_under_test} -r ${test1_txt} ${test1_txt} ${test1_txt}')
+	res := os.exec(testing.split_args('${executable_under_test} -r ${test1_txt} ${test1_txt} ${test1_txt}'))
 
 	assert res.exit_code == 0
 	assert res.output == '59852     1 ${test1_txt}${eol}59852     1 ${test1_txt}${eol}59852     1 ${test1_txt}${eol}'
 }
 
 fn test_bsd_sum_several_files_succeeds() {
-	res := os.execute('${executable_under_test} -r ${test1_txt} ${test2_txt} ${test3_txt}')
+	res := os.exec(testing.split_args('${executable_under_test} -r ${test1_txt} ${test2_txt} ${test3_txt}'))
 
 	assert res.exit_code == 0
 	assert res.output == '59852     1 ${test1_txt}${eol}11628     1 ${test2_txt}${eol}41183     1 ${test3_txt}${eol}'
@@ -201,7 +201,7 @@ fn test_bsd_sum_col_width_4_padded_with_zero() {
 fn test_bsd_block_col_width_more_than_5_not_aligned() {
 	// this test needs 100+MB input string and since there's no easy way to mock block count fn,
 	// we need to create an actual file
-	res := os.execute('${executable_under_test} -r ${test1_txt} ${large_file} ${test2_txt}')
+	res := os.exec(testing.split_args('${executable_under_test} -r ${test1_txt} ${large_file} ${test2_txt}'))
 	assert res.exit_code == 0
 	assert res.output == '59852     1 ${test1_txt}${eol}62707 112640 ${large_file}${eol}11628     1 ${test2_txt}${eol}'
 }

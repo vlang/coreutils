@@ -23,7 +23,7 @@ fn test_help_and_version() {
 }
 
 fn test_non_existent_file() {
-	res := os.execute('${executable_under_test} non-existent-file')
+	res := os.exec(testing.split_args('${executable_under_test} non-existent-file'))
 	assert res.exit_code == 1
 	assert res.output.trim_space() == 'expand: failed to open file "non-existent-file"'
 }
@@ -36,7 +36,7 @@ const testtxtcontent = [
 ]
 
 fn test_default() {
-	res := os.execute('${executable_under_test} ${test_txt_path}')
+	res := os.exec(testing.split_args('${executable_under_test} ${test_txt_path}'))
 	assert res.exit_code == 0
 	assert res.output.split_into_lines().filter(it != '') == [
 		'        [0] Line with first tab',
@@ -47,7 +47,7 @@ fn test_default() {
 }
 
 fn test_initial_option() {
-	res := os.execute('${executable_under_test} ${test_txt_path} -i')
+	res := os.exec(testing.split_args('${executable_under_test} ${test_txt_path} -i'))
 	assert res.exit_code == 0
 	assert res.output.split_into_lines().filter(it != '') == [
 		'        [0] Line with first tab',
@@ -58,7 +58,7 @@ fn test_initial_option() {
 }
 
 fn test_tabs_option() {
-	res := os.execute('${executable_under_test} ${test_txt_path} -t 4')
+	res := os.exec(testing.split_args('${executable_under_test} ${test_txt_path} -t 4'))
 	assert res.exit_code == 0
 	assert res.output.split_into_lines().filter(it != '') == [
 		'    [0] Line with first tab',

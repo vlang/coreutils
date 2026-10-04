@@ -25,13 +25,13 @@ fn test_help_and_version() {
 }
 
 fn test_non_existent_file() {
-	res := os.execute('${executable_under_test} non-existent-file')
+	res := os.exec(testing.split_args('${executable_under_test} non-existent-file'))
 	assert res.exit_code == 1
 	assert res.output.trim_space() == 'head: failed to open file "non-existent-file"'
 }
 
 fn test_non_existent_files() {
-	res := os.execute('${executable_under_test} non-existent-file second-non-existent-file')
+	res := os.exec(testing.split_args('${executable_under_test} non-existent-file second-non-existent-file'))
 	assert res.exit_code == 1
 	assert res.output.trim_space() == 'head: failed to open file "non-existent-file"${eol}head: failed to open file "second-non-existent-file"'
 }
@@ -53,7 +53,7 @@ const testtxtcontent = [
 ]
 
 fn test_default() {
-	res := os.execute('${executable_under_test} ${test_txt_path}')
+	res := os.exec(testing.split_args('${executable_under_test} ${test_txt_path}'))
 	assert res.exit_code == 0
 	assert res.output.split_into_lines().filter(it != '') == [
 		'[0] Line in test text file',
@@ -70,7 +70,7 @@ fn test_default() {
 }
 
 fn test_max_lines_option() {
-	res := os.execute('${executable_under_test} ${test_txt_path} -n 4')
+	res := os.exec(testing.split_args('${executable_under_test} ${test_txt_path} -n 4'))
 	assert res.exit_code == 0
 	assert res.output.split_into_lines().filter(it != '') == [
 		'[0] Line in test text file',
@@ -81,7 +81,7 @@ fn test_max_lines_option() {
 }
 
 fn test_max_lines_from_end_option() {
-	res := os.execute('${executable_under_test} ${test_txt_path} -n -4')
+	res := os.exec(testing.split_args('${executable_under_test} ${test_txt_path} -n -4'))
 	assert res.exit_code == 0
 	assert res.output.split_into_lines().filter(it != '') == [
 		'[0] Line in test text file',
@@ -97,7 +97,7 @@ fn test_max_lines_from_end_option() {
 }
 
 fn test_upto_max_bytes() {
-	res := os.execute('${executable_under_test} ${test_txt_path} -c 223')
+	res := os.exec(testing.split_args('${executable_under_test} ${test_txt_path} -c 223'))
 	assert res.exit_code == 0
 	assert res.output.split_into_lines().filter(it != '') == [
 		'[0] Line in test text file',
@@ -113,7 +113,7 @@ fn test_upto_max_bytes() {
 }
 
 fn test_upto_max_bytes_from_end_option() {
-	res := os.execute('${executable_under_test} ${test_txt_path} -c -312')
+	res := os.exec(testing.split_args('${executable_under_test} ${test_txt_path} -c -312'))
 	assert res.exit_code == 0
 	assert res.output.split_into_lines().filter(it != '') == [
 		'[0] Line in test text file',

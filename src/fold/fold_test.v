@@ -30,13 +30,13 @@ fn test_help_and_version() {
 //	fold nope1 nope2           one line each, for both files             exit 1
 //	fold ok.txt nope2          the lines of ok.txt, then the error        exit 1
 fn test_non_existent_file() {
-	res := os.execute('${executable_under_test} non-existent-file')
+	res := os.exec(testing.split_args('${executable_under_test} non-existent-file'))
 	assert res.exit_code == 1
 	assert res.output.trim_space() == 'fold: non-existent-file: No such file or directory'
 }
 
 fn test_non_existent_files() {
-	res := os.execute('${executable_under_test} non-existent-file second-non-existent-file')
+	res := os.exec(testing.split_args('${executable_under_test} non-existent-file second-non-existent-file'))
 	assert res.exit_code == 1
 	assert res.output.trim_space() == 'fold: non-existent-file: No such file or directory\n' +
 		'fold: second-non-existent-file: No such file or directory'
@@ -65,7 +65,7 @@ const testtxtcontent = [
 ]
 
 fn test_wrap_default() {
-	res := os.execute('${executable_under_test} ${test_txt_path}')
+	res := os.exec(testing.split_args('${executable_under_test} ${test_txt_path}'))
 	assert res.exit_code == 0
 	assert res.output.split_into_lines().filter(it != '') == [
 		'[0] Example test line',
@@ -82,7 +82,7 @@ fn test_wrap_default() {
 }
 
 fn test_wrap_multiline_file_with_width_10() {
-	res := os.execute('${executable_under_test} ${test_txt_path} -w 10')
+	res := os.exec(testing.split_args('${executable_under_test} ${test_txt_path} -w 10'))
 	assert res.exit_code == 0
 	assert res.output.split_into_lines().filter(it != '') == [
 		'[0] Exampl',
@@ -119,7 +119,7 @@ fn test_wrap_multiline_file_with_width_10() {
 }
 
 fn test_wrap_multiline_file_with_width_3() {
-	res := os.execute('${executable_under_test} ${test_txt_path} -w 3')
+	res := os.exec(testing.split_args('${executable_under_test} ${test_txt_path} -w 3'))
 	assert res.exit_code == 0
 	assert res.output.split_into_lines().filter(it != '') == [
 		'[0]',

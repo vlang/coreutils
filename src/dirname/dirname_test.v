@@ -18,7 +18,7 @@ fn test_help_and_version() {
 }
 
 fn expected_result(input string, output string) {
-	res := os.execute('${executable_under_test} ${input}')
+	res := os.exec(testing.split_args('${executable_under_test} ${input}'))
 	assert res.exit_code == 0
 	assert res.output.trim_space() == output
 	testing.same_results('${rig.util} ${input}', '${executable_under_test} ${input}')

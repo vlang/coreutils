@@ -32,28 +32,28 @@ fn test_help_and_version() {
 }
 
 fn test_stdin() {
-	res := os.execute('cat ${test1_txt_path} | ${executable_under_test}')
+	res := os.exec(testing.split_args('cat ${test1_txt_path} | ${executable_under_test}'))
 
 	assert res.exit_code == 0
 	assert res.output.trim_space() == '365965416 25'
 }
 
 fn test_file_not_exist() {
-	res := os.execute('${executable_under_test} abcd')
+	res := os.exec(testing.split_args('${executable_under_test} abcd'))
 
 	assert res.exit_code == 1
 	assert res.output.trim_space() == 'cksum: abcd: No such file or directory'
 }
 
 fn test_one_file() {
-	res := os.execute('${executable_under_test} ${test1_txt_path}')
+	res := os.exec(testing.split_args('${executable_under_test} ${test1_txt_path}'))
 
 	assert res.exit_code == 0
 	assert res.output == '365965416 25 ${test1_txt_path}${eol}'
 }
 
 fn test_several_files() {
-	res := os.execute('${executable_under_test} ${test1_txt_path} ${test2_txt_path}')
+	res := os.exec(testing.split_args('${executable_under_test} ${test1_txt_path} ${test2_txt_path}'))
 
 	assert res.exit_code == 0
 	assert res.output == '365965416 25 ${test1_txt_path}${eol}1338884673 131077 ${test2_txt_path}${eol}'
