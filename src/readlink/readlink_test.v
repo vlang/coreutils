@@ -10,13 +10,18 @@ fn testsuite_begin() {
 	os.mkdir('c')!
 	os.write_file('c/a', '')!
 	os.write_file('c/b', '42')!
-	os.symlink('b', 'link_to_b')!
-	os.symlink('c', 'link_to_c')!
-	os.symlink('link_to_c', 'link_to_link_to_c')!
-	os.symlink('link_to_link_to_c', 'link_to_link_to_link_to_c')!
-	os.symlink('recursive_link', 'recursive_link')!
 
+	// Creating a symbolic link on Windows needs a privilege this process does not
+	// have, and asking for one takes the whole file down rather than one test:
+	// measured, `os.symlink` panics with "A required privilege is not held by the
+	// client" before any assertion runs. So everything that needs a link is behind
+	// this, which is where the rest of the file already put its own links.
 	$if !windows {
+		os.symlink('b', 'link_to_b')!
+		os.symlink('c', 'link_to_c')!
+		os.symlink('link_to_c', 'link_to_link_to_c')!
+		os.symlink('link_to_link_to_c', 'link_to_link_to_link_to_c')!
+		os.symlink('recursive_link', 'recursive_link')!
 		os.chdir('c')!
 		os.symlink('..', 'c_up')!
 		os.symlink('.', 'c_same')!
@@ -59,8 +64,9 @@ fn test_compare() {
 	rig.assert_same_results('-ev b')
 	rig.assert_same_results('-mv a')
 	rig.assert_same_results('-ev link_to_a')
-	rig.assert_same_results('-ev link_to_b')
 	$if !windows {
+		// Needs the link testsuite_begin did not make: see the note there.
+		rig.assert_same_results('-ev link_to_b')
 		// Error message does not match in Windows and POSIX
 		rig.assert_same_results('-v does_not_exist/neither_does_this')
 		rig.assert_same_results('link_to_b')

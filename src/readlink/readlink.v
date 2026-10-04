@@ -99,6 +99,20 @@ fn readlink(settings Settings) {
 				exit_code = 1
 			}
 		} else {
+			// GetFinalPathNameByHandleW resolves any file, not only a link, so on
+			// Windows a plain file or a directory would print its own canonical path.
+			// GNU prints nothing and exits 1, and so does uutils; measured on this
+			// machine for a plain file, a directory and a name that is not there. The
+			// nix build asks readlink(2), which already fails for anything else.
+			$if windows {
+				if !is_link(path) {
+					if settings.verbose {
+						app.eprintln('${path}: Not a symbolic link')
+					}
+					exit_code = 1
+					continue
+				}
+			}
 			if resolved_path := do_readlink(path) {
 				println(resolved_path)
 			} else {
