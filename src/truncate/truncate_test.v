@@ -17,6 +17,13 @@ fn test_help_and_version() {
 	rig.assert_help_and_version_options_work()
 }
 
+// The three sizes below are written out rather than multiplied out. `size` is a
+// u64 and V's int is 32 bits, so `24 * 1000 * 1000 * 1000` overflowed to
+// -1769803776 and the assertion was comparing a correct value with a wrapped one:
+//
+//	-24GB   24_000_000_000
+//	/14PB   14_000_000_000_000_000
+//	%1E     1_152_921_504_606_846_976
 fn test_size_parser() {
 	mut s := parse_size_opt('0')
 	assert s.mode == .absolute
@@ -28,7 +35,7 @@ fn test_size_parser() {
 
 	s = parse_size_opt('-24GB')
 	assert s.mode == .subtract
-	assert s.size == 24 * 1000 * 1000 * 1000
+	assert s.size == 24_000_000_000
 
 	s = parse_size_opt('<13kB')
 	assert s.mode == .at_most
@@ -46,12 +53,12 @@ fn test_size_parser() {
 
 	s = parse_size_opt('/14PB')
 	assert s.mode == .round_down
-	assert s.size == 14 * 1000 * 1000 * 1000 * 1000 * 1000
+	assert s.size == 14_000_000_000_000_000
 	assert s != t
 
 	s = parse_size_opt('%1E')
 	assert s.mode == .round_up
-	assert s.size == 1 * 1024 * 1024 * 1024 * 1024 * 1024 * 1024
+	assert s.size == 1_152_921_504_606_846_976
 
 	// TODO: Test u64 overflows
 }
