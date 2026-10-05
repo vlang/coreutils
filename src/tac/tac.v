@@ -82,7 +82,11 @@ fn tac(settings Settings) {
 			file = os.stdin()
 		} else {
 			file = os.open_file(fname, 'r') or {
-				app.quit(message: "failed to open '${fname}' for reading: ${err}")
+				// os.open_file builds a message ending in "; code: N", which no coreutils
+				// prints: this complaint is 86 bytes with it and 78 without, and uutils
+				// writes the 78.
+				reason := common.strip_error_code_from_msg(err.msg())
+				app.quit(message: "failed to open '${fname}' for reading: ${reason}")
 			}
 		}
 		process_file(file, settings)
