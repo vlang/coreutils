@@ -110,7 +110,7 @@ compare against the true GNU coreutils version on the Linux-based tests first.
 | &check; | nohup     | Run a command immune to hangups                  | &check; |
 | &check; | nproc     | Print the number of available processors         | &check; |
 | &check; | numfmt    | Reformat numbers                                 | &check; |
-|         | od        | Write files in octal or other formats            | &check; |
+| &check; | od        | Write files in octal or other formats            | &check; |
 | &check; | paste     | Merge lines of files                             | &check; |
 |         | pathchk   | Check file name validity and portability         | &check; |
 |         | pinky     | Lightweight finger                               |         |
