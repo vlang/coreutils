@@ -47,7 +47,10 @@ fn emit(lines []InputLine, options Options) {
 	delim := line_delimiter(options)
 	if options.output.len > 0 {
 		mut file := os.create(options.output) or {
-			eprintln('${app_name}: cannot write ${options.output}: ${os.error_posix().msg()}')
+			// GNU says "open failed" here, not "cannot write": measured on 9.4, where
+			// "sort -o nodir/out.txt" answers
+			// "sort: open failed: nodir/out.txt: No such file or directory".
+			eprintln('${app_name}: open failed: ${options.output}: ${os.error_posix().msg()}')
 			exit(2)
 		}
 		for line in lines {
