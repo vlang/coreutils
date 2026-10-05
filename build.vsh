@@ -117,13 +117,14 @@ for dir in dirs_to_compile {
 			// Released
 			_ := <-ch
 		}
-		mut final_args := '-Wimpure-v'
-		for arg in vargs {
-			final_args += ' ' + arg
-		}
-		cmd := @VEXE + ' ${final_args} -o "${curdir}/bin/${dir}" "./${dir}"'
+		// `os.exec` takes an argument array rather than a command string, so the
+		// word splitting happens here instead of in a shell. Each argument is passed
+		// as it is, which is why a path with a space in it needs no quoting.
+		mut cmd := [@VEXE, '-Wimpure-v']
+		cmd << vargs
+		cmd << ['-o', '${curdir}/bin/${dir}', './${dir}']
 		sw := time.new_stopwatch()
-		execute_or_panic(cmd)
+		os.exec_or_panic(cmd)
 		print_ch <- 'compiling ${dir:-20s}... took ${sw.elapsed().milliseconds()}ms .\n'
 	}()
 }
