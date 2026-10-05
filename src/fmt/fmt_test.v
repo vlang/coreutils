@@ -23,10 +23,21 @@ fn to_tmp_file(data []string) string {
 	return file
 }
 
+// fmt is handed a closure to write through, and the closure has to append
+// somewhere the assertion can read back. Appending through a `&[]string` pointing
+// at a local in setup() does not: that local is gone by the time fmt runs, so every
+// test here compared an empty list against its expected output and failed with
+// `failed to open file "Now is the time for all good"`, which is the file argument
+// being reported by the utility that never got to read anything.
+//
+// A pointer to a heap allocated array header does share, which is what the two closures
+// in setup() below capture. The same trap is fixed in tail_test.v.
+
 fn setup() (fn (s string), fn () []string) {
 	// The array header has to be heap allocated: a pointer to a local would
 	// dangle as soon as setup() returned, and the closures would then append to
-	// freed stack memory.
+	// freed stack memory. This is the fix from 475101a (#196); the Sink struct this
+	// PR brought along solved the same dangling pointer and is gone again.
 	mut result := &[]string{}
 	out_fn := fn [mut result] (s string) {
 		(*result) << s
