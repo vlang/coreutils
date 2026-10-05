@@ -87,22 +87,6 @@ fn numfmt(number string, mut app App, options Options) !string {
 	return result
 }
 
-// number_str prints a number the way GNU does, which f64.str() does not do in two
-// ways: it keeps a ".0" on a whole number, and it switches to scientific notation
-// on a large fractional one. Measured at GNU 9.4:
-//
-//	numfmt 1000          1000		f64.str() would give 1000.0
-//	numfmt 2000000.6     2000000.6	f64.str() would give 2.0000006e+06
-//
-// The bound is where an i64 stops being exact, so that a value too large for one
-// keeps its float spelling rather than wrapping.
-fn number_str(n f64) string {
-	if n == math.trunc(n) && math.abs(n) < 9.007_199_254_740_992e15 {
-		return i64(n).str()
-	}
-	return strconv.f64_to_str_l(n)
-}
-
 fn split_parts(number string) (string, string) {
 	n_array := number.bytes()
 	for idx := 0; idx < number.len; idx++ {
