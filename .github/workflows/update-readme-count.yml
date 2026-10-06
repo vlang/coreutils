@@ -1,0 +1,40 @@
+name: Update README count
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  update-count:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+
+      - name: Count completed utilities
+        id: count
+        shell: bash
+        run: |
+          count=$(grep -c '| &check; |' README.md)
+          echo "count=${count}" >> $GITHUB_OUTPUT
+
+      - name: Update README
+        shell: bash
+        run: |
+          count="${{ steps.count.outputs.count }}"
+          total=109
+          percent=$(( count * 100 / total ))
+          sed -i "s/^## Completed (\\/109).*/## Completed (${count}\\/109) - ${percent}% done!/" README.md
+
+      - name: Commit and push
+        shell: bash
+        run: |
+          git diff --quiet README.md && exit 0
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add README.md
+          git commit -m "README: update completed count to ${{ steps.count.outputs.count }}/109"
+          git push
