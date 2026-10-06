@@ -1,6 +1,5 @@
 module testing
 
-import common
 import os
 import regex
 
@@ -196,6 +195,15 @@ pub fn check_dir_exists(d string) bool {
 	return os.exists(d) && os.is_dir(d)
 }
 
+// output_eol is the line ending an expectation should be built from.
+//
+// It is "\n" on every platform, even though common.eol() answers "\r\n" on Windows. The
+// distinction matters because no tool here writes "\r\n": measured on Windows, head.exe
+// writes 45 + LF + 52 bytes for a two-line complaint, while common.eol() would have had
+// the test expecting 45 + CRLF + 52, so head_test and mkdir_test could not pass there.
+// common.eol() is still what src/ wants, for a pad or a help description, which is why
+// this does not just call it - the tests that pass already compare a byte-exact "\n"
+// without asking here (paste, uniq and comm never call this at all).
 pub fn output_eol() string {
-	return common.eol()
+	return '\n'
 }

@@ -191,12 +191,12 @@ fn args() Settings {
 		flag.FlagConfig{}) or { false }
 	settings.input_range = fp.string_opt('input-range', `i`,
 		'treat each number LO through HI as an input line', flag.FlagConfig{
-			val_desc: 'LO-HI'
+			val_desc: '=LO-HI'
 		}) or { '' }
 
 	head_count := fp.string_opt('head-count', `n`, 'output at most COUNT lines',
 		flag.FlagConfig{
-			val_desc: 'COUNT'
+			val_desc: '=COUNT'
 		}) or { '' }
 	settings.head_count_given = head_count.len > 0
 	if settings.head_count_given {
@@ -207,14 +207,14 @@ fn args() Settings {
 
 	output := fp.string_opt('output', `o`, 'write result to FILE instead of standard output',
 		flag.FlagConfig{
-			val_desc: 'FILE'
+			val_desc: '=FILE'
 		}) or { '' }
 	settings.output_given = output.len > 0
 	settings.output = output
 
 	random_source := fp.string_opt('random-source', 0, 'get random bytes from FILE',
 		flag.FlagConfig{
-			val_desc: 'FILE'
+			val_desc: '=FILE'
 		}) or { '' }
 	settings.random_source_given = random_source.len > 0
 	settings.random_source = random_source

@@ -54,7 +54,10 @@ fn tail(args Args, out_fn fn (string)) {
 			tail_forever = true
 			time.sleep(i64(args.sleep_interval * time.second))
 			if args.pid.len > 0 {
-				result := os.execute('ps ${args.pid}')
+				// An argument array rather than a command string: `ps` here is a
+				// fixed program with one operand, and os.execute is deprecated, which
+				// `make test` turns into an error because it builds with -W.
+				result := os.exec(['ps', args.pid])
 				if result.exit_code != 0 {
 					break
 				}

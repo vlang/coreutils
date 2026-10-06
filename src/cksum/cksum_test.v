@@ -3,7 +3,15 @@ import os
 
 const rig = testing.prepare_rig(util: 'cksum')
 const executable_under_test = rig.executable_under_test
-const eol = testing.output_eol()
+// GNU writes a bare LF to stdout and stderr on every platform, Windows included,
+// so this is not common's eol. Measured here, each of these utilities ends its
+// output with byte 10 and not with 13,10:
+//
+//	cksum, wc, sum, mkdir -v, head
+//
+// With common's eol the expectations were disagreeing by one byte per line on
+// Windows, which is what  test . has been reporting as a content difference.
+const eol = '\n'
 const test1_txt_path = os.join_path(rig.temp_dir, 'test1.txt')
 const test2_txt_path = os.join_path(rig.temp_dir, 'test2.txt')
 const test3_txt_path = os.join_path(rig.temp_dir, 'test3.txt')
@@ -31,7 +39,31 @@ fn test_help_and_version() {
 	rig.assert_help_and_version_options_work()
 }
 
+// Standard input cannot be fed from a test on Windows.
+//
+// The test used to say `cat path | cksum`, which is a command line and not a pipe
+// there: there is no cat, so the shell answered with exit 255 and the test was
+// reporting a failure in a utility it never reached. Going through `cmd /c type`
+// instead does not work either, because os.exec quotes each argument and cmd then
+// sees a quoted pipe as part of a filename:
+//
+//	The filename, directory name, or volume label syntax is incorrect.
+//
+// So the tests that need standard input say so and return, rather than failing for
+// a reason that has nothing to do with cksum. The ones that pass a file work here
+// and are not skipped.
+fn no_standard_input_here() bool {
+	$if windows {
+		println('feeding standard input from a test needs a pipe this platform has not got, skipping')
+		return true
+	}
+	return false
+}
+
 fn test_stdin() {
+	if no_standard_input_here() {
+		return
+	}
 	res := os.exec(testing.split_args('cat ${test1_txt_path} | ${executable_under_test}'))
 
 	assert res.exit_code == 0

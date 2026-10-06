@@ -3,7 +3,6 @@ import common.testing
 
 const rig = testing.prepare_rig(util: 'expand')
 const executable_under_test = rig.executable_under_test
-const eol = testing.output_eol()
 const test_txt_path = os.join_path(rig.temp_dir, 'test.txt')
 
 fn testsuite_begin() {

@@ -54,7 +54,9 @@ fn get_options() Options {
 			'right-align; negative N will left-align; padding is\n${flag.space}' +
 			'ignored if the output is wider than N; the default is to\n${flag.space}' +
 			'automatically pad if a whitespace is found')
-	round := fp.string('round', 0, 'from-zero',
+	// Named `round_method`, because a local `round` shadows the `round` function
+	// and `-W` turns that notice into an error.
+	round_method := fp.string('round', 0, 'from-zero',
 		'use METHOD for rounding when scaling; METHOD can be:\n${flag.space}' +
 			'up, down, from-zero (default), towards-zero, nearest')
 	suffix := fp.string('suffix', 0, '',
@@ -122,8 +124,8 @@ fn get_options() Options {
 		exit_error('unrecognized scale option ${to}')
 	}
 
-	if round !in rounds {
-		exit_error('unrecognized rounding option ${round}')
+	if round_method !in rounds {
+		exit_error('unrecognized rounding option ${round_method}')
 	}
 
 	return Options{
@@ -136,7 +138,7 @@ fn get_options() Options {
 		numbers:   numbers
 		padding:   padding
 		pformat:   pformat
-		round:     round
+		round:     round_method
 		suffix:    suffix
 		to:        to
 		to_unit:   to_unit

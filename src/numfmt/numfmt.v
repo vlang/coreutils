@@ -185,18 +185,6 @@ fn readable_size(size f64, unit Unit, rounding string) !string {
 	return number_str(size)
 }
 
-// number_str renders n the way GNU numfmt does: plain decimal digits, never
-// exponent notation, and no trailing ".0" on an integral value. f64.str()
-// switches to scientific notation above a million and always keeps the
-// fractional part, which would turn 2000000 into "2e+06" and 2000 into "2000.0".
-fn number_str(n f64) string {
-	s := n.strlong()
-	if s.ends_with('.0') {
-		return s[..s.len - 2]
-	}
-	return s
-}
-
 fn commaize(num f64) string {
 	str := strconv.f64_to_str_l(num)
 	n, _ := str.split_once('.') or { return 'oops' }
@@ -268,10 +256,6 @@ fn handle_error(msg string, mut app App, options Options) string {
 	}
 
 	return ''
-}
-
-fn print_space() {
-	print_character(` `)
 }
 
 @[noreturn]

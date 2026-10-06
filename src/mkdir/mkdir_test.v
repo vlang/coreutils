@@ -2,7 +2,15 @@ import os
 import common.testing
 
 const rig = testing.prepare_rig(util: 'mkdir')
-const eol = testing.output_eol()
+// GNU writes a bare LF to stdout and stderr on every platform, Windows included,
+// so this is not common's eol. Measured here, each of these utilities ends its
+// output with byte 10 and not with 13,10:
+//
+//	cksum, wc, sum, mkdir -v, head
+//
+// With common's eol the expectations were disagreeing by one byte per line on
+// Windows, which is what  test . has been reporting as a content difference.
+const eol = '\n'
 
 // A lot of the following has been lifted directly from os_test.v in vlib,
 // since it is a good demonstration of the ideal/canonical method of testing

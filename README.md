@@ -49,7 +49,7 @@ count below and mark it as done in this README.md. Thanks!
 GNU coreutils. They are not 100% compatiable. If you encounter different behaviors,
 compare against the true GNU coreutils version on the Linux-based tests first.
 
-## Completed (76/109) - 69% done!
+## Completed (79/109) - 72% done!
 
 |  Done   | Cmd       | Descripton                                       | Windows | 
 | :-----: | --------- | ------------------------------------------------ | ------- |
@@ -70,7 +70,7 @@ compare against the true GNU coreutils version on the Linux-based tests first.
 | &check; | comm      | Compare two sorted files line by line            | &check; |
 |         | coreutils | Multi-call program                               | &check; |
 | &check; | cp        | Copy files and directories                       | &check; |
-|         | csplit    | Split a file into context-determined pieces      | &check; |
+| &check; | csplit    | Split a file into context-determined pieces      | &check; |
 | &check; | cut       | Print selected parts of lines                    | &check; |
 |         | date      | Print or set system date and time                | &check; |
 |         | dd        | Convert and copy a file                          | &check; |
@@ -93,7 +93,7 @@ compare against the true GNU coreutils version on the Linux-based tests first.
 | &check; | hostname  | Print or set system name                         |         |
 | &check; | id        | Print user identity                              |         |
 |         | install   | Copy files and set attributes                    |         |
-|         | join      | Join lines on a common field                     | &check; |
+| &check; | join      | Join lines on a common field                     | &check; |
 |         | kill      | Send a signal to processes                       | &check; |
 | &check; | link      | Make a hard link via the link syscall            | &check; |
 | &check; | ln        | Make links between files                         | &check; |
@@ -110,7 +110,7 @@ compare against the true GNU coreutils version on the Linux-based tests first.
 | &check; | nohup     | Run a command immune to hangups                  | &check; |
 | &check; | nproc     | Print the number of available processors         | &check; |
 | &check; | numfmt    | Reformat numbers                                 | &check; |
-|         | od        | Write files in octal or other formats            | &check; |
+| &check; | od        | Write files in octal or other formats            | &check; |
 | &check; | paste     | Merge lines of files                             | &check; |
 |         | pathchk   | Check file name validity and portability         | &check; |
 |         | pinky     | Lightweight finger                               |         |

@@ -82,6 +82,7 @@ fn setup_cp_command(args []string) (CpCommand, []string, string) {
 	target_directory := fp.string('target-directory', `t`, '', 'target-directory')
 	no_target_directory := fp.bool('no-target-directory', `T`, false, 'no-target-directory')
 	recursive := fp.bool('recursive', `r`, false, 'recursive')
+	progress := fp.bool('progress', 0, false, 'show a progress bar while copying')
 
 	help := fp.bool('help', 0, false, 'display this help and exit')
 	version := fp.bool('version', 0, false, 'output version information and exit')
@@ -139,6 +140,7 @@ fn setup_cp_command(args []string) (CpCommand, []string, string) {
 		target_directory:    target_directory
 		no_target_directory: no_target_directory
 		recursive:           recursive
+		progress:            progress
 	}, sources, dest
 }
 
