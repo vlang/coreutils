@@ -49,7 +49,7 @@ count below and mark it as done in this README.md. Thanks!
 GNU coreutils. They are not 100% compatiable. If you encounter different behaviors,
 compare against the true GNU coreutils version on the Linux-based tests first.
 
-## Completed (79/109) - 72% done!
+## Completed (80/109) - 73% done!
 
 |  Done   | Cmd       | Descripton                                       | Windows | 
 | :-----: | --------- | ------------------------------------------------ | ------- |
@@ -112,7 +112,7 @@ compare against the true GNU coreutils version on the Linux-based tests first.
 | &check; | numfmt    | Reformat numbers                                 | &check; |
 | &check; | od        | Write files in octal or other formats            | &check; |
 | &check; | paste     | Merge lines of files                             | &check; |
-|         | pathchk   | Check file name validity and portability         | &check; |
+| &check; | pathchk   | Check file name validity and portability         | &check; |
 |         | pinky     | Lightweight finger                               |         |
 |         | pr        | Paginate or columnate files for printing         | &check; |
 | &check; | printenv  | Print all or some environment variables          | &check; |
