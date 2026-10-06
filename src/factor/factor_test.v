@@ -13,13 +13,13 @@ fn test_help_and_version() {
 }
 
 fn test_abcd() {
-	res := os.execute('${executable_under_test} abcd')
+	res := os.exec(testing.split_args('${executable_under_test} abcd'))
 	assert res.exit_code == 1
 	assert res.output.trim_space() == 'factor: ‘abcd’ is not a valid positive integer'
 }
 
 fn expected_result(input string, output []string) {
-	res := os.execute('${executable_under_test} ${input}')
+	res := os.exec(testing.split_args('${executable_under_test} ${input}'))
 	assert res.exit_code == 0
 	assert res.output.split_into_lines() == output
 	testing.same_results('${rig.util} ${input}', '${executable_under_test} ${input}')

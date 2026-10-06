@@ -35,7 +35,7 @@ pub fn prepare_executable(tool_name string) string {
 	$if debug {
 		eprintln('>> compiling with: `${compilation_cmd}`')
 	}
-	res := os.execute(compilation_cmd)
+	res := os.exec_opt(split_args(compilation_cmd)) or { panic('could not run ${compilation_cmd}') }
 	if res.exit_code != 0 {
 		eprintln('Tool ${tool_name} could not be compiled.')
 		eprintln('Compilation command:\n${compilation_cmd}')

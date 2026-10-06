@@ -49,14 +49,14 @@ pub fn (p CommandPair) same_results(options string) bool {
 // and the deputy commands with them, and ensure that they both fail
 // with the same exit_code
 pub fn (p CommandPair) expected_failure(options string) !os.Result {
-	ores := os.execute('${p.original} ${options}')
+	ores := run_args(p.original, options)
 	if ores.exit_code == 0 {
 		return DidNotFailError{
 			msg:  '${p.original} ${options}'
 			code: 1
 		}
 	}
-	dres := os.execute('${p.deputy} ${options}')
+	dres := run_args(p.deputy, options)
 	if dres.exit_code == 0 {
 		return DidNotFailError{
 			msg:  '${p.deputy} ${options}'
@@ -76,13 +76,13 @@ pub fn (p CommandPair) expected_failure(options string) !os.Result {
 pub fn (p CommandPair) ensure_help_and_version_options_work() ! {
 	// For now, assume that the original has --version and --help
 	// and that they already work correctly.
-	if os.execute('${p.deputy} --help').exit_code != 0 {
+	if run_args(p.deputy, '--help').exit_code != 0 {
 		return DoesNotWorkError{
 			msg:  '--help'
 			code: 1
 		}
 	}
-	if os.execute('${p.deputy} --version').exit_code != 0 {
+	if run_args(p.deputy, '--version').exit_code != 0 {
 		return DoesNotWorkError{
 			msg:  '--version'
 			code: 2
@@ -96,7 +96,7 @@ pub fn (p CommandPair) ensure_help_and_version_options_work() ! {
 // It also returns the actual result of the execution,
 // so that you can inspect it further for more details.
 pub fn command_fails(cmd string) !os.Result {
-	res := os.execute(cmd)
+	res := os.exec(split_args(cmd))
 	if res.exit_code == 0 {
 		return DidNotFailError{
 			msg:  cmd
@@ -115,8 +115,8 @@ const use_multi_binary_to_test = os.getenv('USE_MULTI_BINARY_TO_TEST')
 // and for their output.
 // note: use `v -d trace_same_results ...` to enable trace output
 pub fn same_results(cmd1 string, cmd2 string) bool {
-	cmd1_res := os.execute(cmd1)
-	cmd2_res := os.execute(cmd2)
+	cmd1_res := os.exec(split_args(cmd1))
+	cmd2_res := os.exec(split_args(cmd2))
 	mut noutput1 := normalise(cmd1_res.output)
 	mut noutput2 := normalise(cmd2_res.output)
 	$if trace_same_results ? {
