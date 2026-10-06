@@ -13,14 +13,14 @@ fn test_help_and_version() {
 }
 
 fn test_abcd() {
-	res := os.execute('${rig.executable_under_test} abcd')
+	res := os.exec(testing.split_args('${rig.executable_under_test} abcd'))
 	assert res.exit_code == 1
 	assert res.output.trim_space() == 'base64: abcd: No such file or directory'
 }
 
 fn expected_result(input string, output string) {
 	c := '${executable_under_test} ${input}'
-	res := os.execute(c)
+	res := os.exec(testing.split_args(c))
 	eprintln('>>>> cmd: `${c}`')
 	if res.exit_code != 0 || res.output.split_into_lines() != output.split_into_lines() {
 		eprintln('>>>> res.exit_code: ${res.exit_code}')

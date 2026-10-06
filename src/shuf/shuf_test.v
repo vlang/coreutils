@@ -23,13 +23,13 @@ fn test_help_and_version() {
 }
 
 fn test_echo() {
-	res := os.execute('${executable_under_test} -e aa bb')
+	res := os.exec(testing.split_args('${executable_under_test} -e aa bb'))
 	assert res.output == 'aa${eol}bb${eol}' || res.output == 'bb${eol}aa${eol}'
 }
 
 fn test_file() {
 	os.write_file(test_txt_path, 'hello\nworld!')!
-	res := os.execute('${executable_under_test} ${test_txt_path}')
+	res := os.exec(testing.split_args('${executable_under_test} ${test_txt_path}'))
 	assert res.output == 'hello${eol}world!${eol}' || res.output == 'world!${eol}hello${eol}'
 }
 
@@ -44,13 +44,13 @@ fn test_zero_terminated_file() {
 }
 
 fn test_head_count() {
-	res := os.execute('${executable_under_test} -n 5 -i 1-10')
+	res := os.exec(testing.split_args('${executable_under_test} -n 5 -i 1-10'))
 	println(res.output.split_into_lines())
 	assert res.output.split_into_lines().len == 5
 }
 
 fn test_input_range() {
-	res := os.execute('${executable_under_test} -i 1-10')
+	res := os.exec(testing.split_args('${executable_under_test} -i 1-10'))
 	assert res.output.split_into_lines().len == 10
 }
 
@@ -106,7 +106,7 @@ fn test_output_file_matches() {
 
 fn test_head_count_zero_outputs_nothing() {
 	os.write_file(test_txt_path, 'a\nb\nc\n')!
-	res := os.execute('${executable_under_test} -n 0 ${test_txt_path}')
+	res := os.exec(testing.split_args('${executable_under_test} -n 0 ${test_txt_path}'))
 	assert res.exit_code == 0
 	assert res.output == ''
 }
@@ -126,6 +126,6 @@ fn test_echo_and_input_range_conflict() {
 }
 
 fn test_unknown_option() ? {
-	res := os.execute('${executable_under_test} -x')
+	res := os.exec(testing.split_args('${executable_under_test} -x'))
 	assert res.exit_code == 1
 }

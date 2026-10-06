@@ -21,7 +21,7 @@ fn test_comm_basic() {
 	os.write_lines(file2_path, ['banana', 'cherry', 'date', 'fig'])!
 
 	// Test basic functionality
-	res := os.execute('${executable_under_test} ${file1_path} ${file2_path}')
+	res := os.exec(testing.split_args('${executable_under_test} ${file1_path} ${file2_path}'))
 	assert res.exit_code == 0
 
 	// Normalize line endings for cross-platform compatibility
@@ -45,22 +45,22 @@ fn test_comm_suppress_columns() {
 	os.write_lines(file2_path, ['b', 'c', 'd'])!
 
 	// Test -1 flag
-	res1 := os.execute('${executable_under_test} -1 ${file1_path} ${file2_path}')
+	res1 := os.exec(testing.split_args('${executable_under_test} -1 ${file1_path} ${file2_path}'))
 	assert res1.exit_code == 0
 	assert res1.output.replace('\r\n', '\n') == '\tb\n\tc\nd\n'
 
 	// Test -2 flag
-	res2 := os.execute('${executable_under_test} -2 ${file1_path} ${file2_path}')
+	res2 := os.exec(testing.split_args('${executable_under_test} -2 ${file1_path} ${file2_path}'))
 	assert res2.exit_code == 0
 	assert res2.output.replace('\r\n', '\n') == 'a\n\tb\n\tc\n'
 
 	// Test -3 flag
-	res3 := os.execute('${executable_under_test} -3 ${file1_path} ${file2_path}')
+	res3 := os.exec(testing.split_args('${executable_under_test} -3 ${file1_path} ${file2_path}'))
 	assert res3.exit_code == 0
 	assert res3.output.replace('\r\n', '\n') == 'a\n\td\n'
 
 	// Test -12 (show only common)
-	res12 := os.execute('${executable_under_test} -12 ${file1_path} ${file2_path}')
+	res12 := os.exec(testing.split_args('${executable_under_test} -12 ${file1_path} ${file2_path}'))
 	assert res12.exit_code == 0
 	assert res12.output.replace('\r\n', '\n') == 'b\nc\n'
 
@@ -83,17 +83,17 @@ fn test_comm_empty_files() {
 	os.write_lines(nonempty_file, ['hello', 'world'])!
 
 	// Both files empty
-	res1 := os.execute('${executable_under_test} ${empty_file} ${empty_file}')
+	res1 := os.exec(testing.split_args('${executable_under_test} ${empty_file} ${empty_file}'))
 	assert res1.exit_code == 0
 	assert res1.output == ''
 
 	// First file empty
-	res2 := os.execute('${executable_under_test} ${empty_file} ${nonempty_file}')
+	res2 := os.exec(testing.split_args('${executable_under_test} ${empty_file} ${nonempty_file}'))
 	assert res2.exit_code == 0
 	assert res2.output.replace('\r\n', '\n') == '\thello\n\tworld\n'
 
 	// Second file empty
-	res3 := os.execute('${executable_under_test} ${nonempty_file} ${empty_file}')
+	res3 := os.exec(testing.split_args('${executable_under_test} ${nonempty_file} ${empty_file}'))
 	assert res3.exit_code == 0
 	assert res3.output.replace('\r\n', '\n') == 'hello\nworld\n'
 
@@ -120,7 +120,7 @@ fn test_comm_stdin() {
 	os.write_lines(stdin_file, ['banana', 'cherry'])!
 
 	// Test stdin as first file
-	res1 := os.execute('cat ${stdin_file} | ${executable_under_test} - ${file_path}')
+	res1 := os.exec(testing.split_args('cat ${stdin_file} | ${executable_under_test} - ${file_path}'))
 	assert res1.exit_code == 0
 	// stdin has: banana, cherry
 	// file_path has: apple, banana
@@ -129,7 +129,7 @@ fn test_comm_stdin() {
 	assert res1.output.replace('\r\n', '\n') == expected1
 
 	// Test stdin as second file
-	res2 := os.execute('cat ${stdin_file} | ${executable_under_test} ${file_path} -')
+	res2 := os.exec(testing.split_args('cat ${stdin_file} | ${executable_under_test} ${file_path} -'))
 	assert res2.exit_code == 0
 	expected2 := 'apple\n\t\tbanana\n\tcherry\n'
 	assert res2.output.replace('\r\n', '\n') == expected2
@@ -141,7 +141,7 @@ fn test_comm_stdin() {
 
 fn test_comm_missing_file() {
 	// Missing file should produce error
-	res := os.execute('${executable_under_test} /nonexistent/file1 /nonexistent/file2')
+	res := os.exec(testing.split_args('${executable_under_test} /nonexistent/file1 /nonexistent/file2'))
 	assert res.exit_code == 1
 	// Error message varies by platform, but should contain the filename
 	assert res.output.contains('/nonexistent/file1') || res.output.contains('\\nonexistent\\file1')
@@ -149,12 +149,12 @@ fn test_comm_missing_file() {
 
 fn test_comm_missing_operand() {
 	// No arguments should produce error
-	res1 := os.execute('${executable_under_test}')
+	res1 := os.exec(testing.split_args('${executable_under_test}'))
 	assert res1.exit_code == 1
 	assert res1.output.contains('missing operand')
 
 	// One argument should produce error
-	res2 := os.execute('${executable_under_test} /tmp/file1')
+	res2 := os.exec(testing.split_args('${executable_under_test} /tmp/file1'))
 	assert res2.exit_code == 1
 	assert res2.output.contains('missing operand')
 }
@@ -167,7 +167,7 @@ fn test_comm_delimiter() {
 	os.write_lines(file2_path, ['b', 'c'])!
 
 	// Test custom delimiter
-	res := os.execute('${executable_under_test} --output-delimiter="|" ${file1_path} ${file2_path}')
+	res := os.exec(testing.split_args('${executable_under_test} --output-delimiter="|" ${file1_path} ${file2_path}'))
 	assert res.exit_code == 0
 	assert res.output.replace('\r\n', '\n') == 'a\n|b\n||c\n'
 
