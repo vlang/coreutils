@@ -125,8 +125,8 @@ fn test_results() {
 	for test in tests {
 		res := cmd.same_results(test)
 		if !res {
-			if os.execute('${cmd.original} ${test}').exit_code == 2
-				&& os.execute('${cmd.deputy} ${test}').exit_code == 2 {
+			if os.exec(testing.split_args('${cmd.original} ${test}')).exit_code == 2
+				&& os.exec(testing.split_args('${cmd.deputy} ${test}')).exit_code == 2 {
 				continue
 			}
 			failed << test
@@ -184,8 +184,8 @@ fn test_multi_byte_results() {
 			if !res {
 				original_cmd := '${cmd.original} ${test}'
 				deputy_cmd := '${cmd.deputy} ${test}'
-				ores := os.execute(original_cmd)
-				dres := os.execute(deputy_cmd)
+				ores := os.exec(testing.split_args(original_cmd))
+				dres := os.exec(testing.split_args(deputy_cmd))
 				if ores.exit_code == 2 && dres.exit_code == 2 {
 					continue
 				}

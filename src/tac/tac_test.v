@@ -26,7 +26,7 @@ const tac_test_files = {
 }
 
 fn call_for_test(args string) os.Result {
-	res := os.execute('${rig.executable_under_test} ${args}')
+	res := os.exec(testing.split_args('${rig.executable_under_test} ${args}'))
 	assert res.exit_code == 0
 	return res
 }
