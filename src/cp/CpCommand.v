@@ -1,4 +1,5 @@
 import os
+import common
 
 enum OverwriteMode {
 	force
@@ -10,6 +11,7 @@ struct CpCommand {
 	overwrite           OverwriteMode
 	update              bool
 	verbose             bool
+	progress            bool
 	target_directory    string
 	no_target_directory bool
 	recursive           bool
@@ -20,7 +22,7 @@ fn (c CpCommand) run(source string, dest string) {
 		eprintln(not_exist(source))
 		return
 	}
-	if c.verbose || c.overwrite != .force {
+	if c.verbose || c.progress || c.overwrite != .force {
 		c.copy(source, dest)
 	} else {
 		if os.is_dir(source) && !c.recursive {
@@ -43,7 +45,19 @@ fn (c CpCommand) copy(src string, dst string) {
 	if !c.int_yes(rdst) {
 		return
 	}
-	os.cp(src, rdst) or { return }
+	if c.progress {
+		// The size is collected up front so the bar has a total to work against,
+		// which is the cost -progress pays for showing progress at all.
+		mut bar := common.new_progress_bar(common.dir_size(src))
+		if os.is_dir(src) {
+			copy_dir_progress(src, rdst, mut bar)
+		} else {
+			copy_file_progress(src, rdst, mut bar)
+		}
+		bar.finish()
+	} else {
+		os.cp(src, rdst) or { return }
+	}
 	if c.verbose {
 		println(renamed(src, dst))
 	}

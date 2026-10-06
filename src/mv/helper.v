@@ -67,6 +67,7 @@ fn setup_mv_command(args []string) (MvCommand, []string, string) {
 	no_clobber := fp.bool('no-clobber', `n`, false, 'do not overwrite')
 	update := fp.bool('update', `u`, false, 'update')
 	verbose := fp.bool('verbose', `v`, false, 'print each rename')
+	progress := fp.bool('progress', 0, false, 'show a progress bar while moving')
 	target_directory := fp.string('target-directory', `t`, '', 'target-directory')
 	no_target_directory := fp.bool('no-target-directory', `T`, false, 'no-target-directory')
 
@@ -123,6 +124,7 @@ fn setup_mv_command(args []string) (MvCommand, []string, string) {
 		overwrite:           overwrite
 		update:              update
 		verbose:             verbose
+		progress:            progress
 		target_directory:    target_directory
 		no_target_directory: no_target_directory
 	}, sources, dest
