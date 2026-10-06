@@ -49,7 +49,7 @@ count below and mark it as done in this README.md. Thanks!
 GNU coreutils. They are not 100% compatiable. If you encounter different behaviors,
 compare against the true GNU coreutils version on the Linux-based tests first.
 
-## Completed (80/109) - 73% done!
+## Completed (81/109) - 74% done!
 
 |  Done   | Cmd       | Descripton                                       | Windows | 
 | :-----: | --------- | ------------------------------------------------ | ------- |
@@ -149,7 +149,7 @@ compare against the true GNU coreutils version on the Linux-based tests first.
 |         | tr        | Translate, squeeze, and/or delete characters     | &check; |
 | &check; | true      | Do nothing, successfully                         | &check; |
 | &check; | truncate  | Shrink or extend the size of a file              | &check; |
-|         | tsort     | Topological sort                                 | &check; |
+| &check; | tsort     | Topological sort                                 | &check; |
 | &check; | tty       | Print file name of terminal on standard input    |         |
 | &check; | uname     | Print system information                         | &check; |
 | &check; | unexpand  | Convert spaces to tabs                           | &check; |
