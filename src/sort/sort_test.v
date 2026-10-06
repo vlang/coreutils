@@ -305,10 +305,16 @@ fn test_missing_file() {
 // newlines is sorted.
 
 fn test_zero_terminated() {
-	res := os.execute('${executable_under_test} -z ${od_path}')
-
+	// The output is captured to a file and read back as bytes rather than through
+	// os.execute, because os.execute hands the captured output over as a string and
+	// the NUL bytes do not survive that: measured, `sort -z` on b\0c\nd\0e\n writes
+	// b\0c\nd\0e\n\0, nine bytes, and os.execute reports six with the NULs gone.
+	cap := os.join_path(rig.temp_dir, 'zcap.txt')
+	res := os.execute('${executable_under_test} -z ${od_path} > ${cap}')
 	assert res.exit_code == 0
-	assert res.output == 'b\x00c${eol}d\x00e${eol}\x00'
+	data := os.read_bytes(cap) or { panic(err) }
+	assert data.hex() == '6200630a6400650a00'
+	os.rm(cap)!
 }
 
 // --files0-from reads the list of names from a file of NUL separated names.
