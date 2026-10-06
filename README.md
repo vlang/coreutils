@@ -41,8 +41,8 @@ Contributions are welcome!
 Please only contribute versions of the original utilities written in V.
 Contributions written in other languages will likely be rejected.
 
-When your contribution is finalized, don't forget to update the completed
-count below and mark it as done in this README.md. Thanks!
+When your contribution is finalized, mark it as done in the table below.
+The completed count is updated automatically by a GitHub Action after merge.
 
 **NOTE: When testing on Windows**, comparison tests are currently run against
 [uutils/coreutils](https://github.com/uutils/coreutils), a Rust re-implementation of
