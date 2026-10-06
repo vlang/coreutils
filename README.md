@@ -49,7 +49,7 @@ The completed count is updated automatically by a GitHub Action after merge.
 GNU coreutils. They are not 100% compatiable. If you encounter different behaviors,
 compare against the true GNU coreutils version on the Linux-based tests first.
 
-## Completed (81/109) - 74% done!
+## Completed (82/109) - 75% done!
 
 |  Done   | Cmd       | Descripton                                       | Windows | 
 | :-----: | --------- | ------------------------------------------------ | ------- |
@@ -76,7 +76,7 @@ compare against the true GNU coreutils version on the Linux-based tests first.
 |         | dd        | Convert and copy a file                          | &check; |
 |         | df        | Report file system disk space usage              |         |
 |         | dir       | Briefly list directory contents                  |         |
-|         | dircolors | Color setup for ls                               | &check; |
+| &check; | dircolors | Color setup for ls                               | &check; |
 | &check; | dirname   | Strip last file name component                   | &check; |
 |         | du        | Estimate file space usage                        | &check; |
 | &check; | echo      | Print a line of text                             | &check; |
