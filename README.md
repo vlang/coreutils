@@ -74,7 +74,7 @@ compare against the true GNU coreutils version on the Linux-based tests first.
 | &check; | cut       | Print selected parts of lines                    | &check; |
 |         | date      | Print or set system date and time                | &check; |
 |         | dd        | Convert and copy a file                          | &check; |
-|         | df        | Report file system disk space usage              |         |
+| &check; | df        | Report file system disk space usage              | &check; |
 |         | dir       | Briefly list directory contents                  |         |
 | &check; | dircolors | Color setup for ls                               | &check; |
 | &check; | dirname   | Strip last file name component                   | &check; |
