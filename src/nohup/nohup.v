@@ -70,7 +70,7 @@ fn main() {
 			open_nohup_out(mut f, false) or { common.exit_with_error_message(tool_name, err.msg()) }
 		} else {
 			// couldn't find a v equilavent of this
-			C.dup2(os.stdout().fd, os.stderr().fd)
+			dup2_fds(os.stdout().fd, os.stderr().fd)
 		}
 	}
 
