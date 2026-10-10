@@ -73,7 +73,7 @@ compare against the true GNU coreutils version on the Linux-based tests first.
 | &check; | csplit    | Split a file into context-determined pieces      | &check; |
 | &check; | cut       | Print selected parts of lines                    | &check; |
 |         | date      | Print or set system date and time                | &check; |
-|         | dd        | Convert and copy a file                          | &check; |
+| &check; | dd        | Convert and copy a file                          | &check; |
 |         | df        | Report file system disk space usage              |         |
 |         | dir       | Briefly list directory contents                  |         |
 | &check; | dircolors | Color setup for ls                               | &check; |
