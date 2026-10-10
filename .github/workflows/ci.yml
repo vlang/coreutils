@@ -104,6 +104,59 @@ jobs:
       - name: Run tests
         run: cd coreutils && make test
 
+  # There is no Vinix runner on GitHub, so this job does not run the suite. It
+  # cross-compiles every tool for the target instead, which is the check that
+  # catches what the platform-gated files in src/*/ get wrong: a tool whose
+  # shared .v and its _nix/_default variants disagree will not build for Vinix
+  # even though it builds for Windows, and that is exactly how `timeout` was
+  # broken on all three Unix targets before this existed.
+  vinix-cross-build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Latest V
+        uses: actions/checkout@v6
+        with:
+          repository: vlang/v
+          path: v
+      - name: Build V
+        run: cd v && make && sudo ./v symlink && cd -
+      - name: Checkout Coreutils
+        uses: actions/checkout@v6
+        with:
+          path: coreutils
+      - name: V doctor
+        run: v doctor
+      - name: Cross-compile every tool for Vinix
+        shell: bash
+        run: |
+          cd coreutils
+          # Read the ignore list straight out of build.vsh so the two cannot
+          # drift. `grep -n` and `sed -n` are both 1-based, so the key's own
+          # line is the one to read and there is no offset to get wrong.
+          # The key word itself is dropped, since it is not a tool name.
+          ignored=$(grep -E "^\s*'vinix':" build.vsh | grep -oE "'[a-z0-9_]+'" | tr -d "'"
+            | grep -vx 'vinix')
+          echo "vinix ignores: ${ignored:-<none>}"
+          ok=0 skipped=0 failed=0
+          for d in src/*/; do
+            name=$(basename "$d")
+            # A tool directory is one holding at least one .v file.
+            compgen -G "$d*.v" >/dev/null || continue
+            if printf '%s\n' "$ignored" | grep -qx "$name"; then
+              skipped=$((skipped + 1))
+              continue
+            fi
+            if v -os vinix -o "/tmp/vinix_${name}.c" "$d" >/dev/null 2>&1; then
+              ok=$((ok + 1))
+            else
+              echo "::error file=$d::cross-compile for vinix failed: $name"
+              v -os vinix -o "/tmp/vinix_${name}.c" "$d" 2>&1 | head -20 || true
+              failed=$((failed + 1))
+            fi
+          done
+          echo "vinix cross-compile: ok=$ok skipped=$skipped failed=$failed"
+          [ "$failed" -eq 0 ]
+
   ubuntu-gnu-coreutils:
     runs-on: ubuntu-latest
     steps:
