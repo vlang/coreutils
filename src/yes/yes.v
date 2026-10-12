@@ -1,4 +1,4 @@
-module main
+module yes
 
 import common
 import os
@@ -6,15 +6,20 @@ import os
 const app_name = 'yes'
 const buf_size = 8192
 
-fn yes() {
-	mut fp := common.flag_parser(os.args)
+// run is the entry point shared by the standalone binary and the multicall
+// binary, so both dispatch through the same code.
+//
+// The write loop never terminates, so the return at the end is unreachable; it
+// is there because the multicall needs an int status from every tool.
+pub fn run(args []string) int {
+	mut fp := common.flag_parser(args)
 	fp.application(app_name)
 	fp.description('')
 
 	additional_args := fp.finalize() or {
 		eprintln(err)
 		println(fp.usage())
-		exit(1)
+		return 1
 	}
 
 	mut expletive := 'y'
@@ -40,8 +45,5 @@ fn yes() {
 			out.write_ptr(yes_buf, buf_used)
 		}
 	}
-}
-
-fn main() {
-	yes()
+	return 0
 }

@@ -6,6 +6,7 @@ import pwd
 import os
 import true as true_tool
 import tty
+import yes
 import whoami
 
 // multicall is the busybox-style binary: one executable that contains several
@@ -22,6 +23,12 @@ import whoami
 // first argument also works, which is how this repo's earlier `coreutils`
 // dispatcher was invoked.
 //
+// sync is absent on purpose as well: vlib ships a module named sync for
+// Mutex, RwMutex and WaitGroup, and V resolves the import to that one before it
+// looks in this tree - an alias does not redirect it. A tool whose name collides
+// with a stdlib module cannot be imported into a multicall without renaming the
+// directory, so bin/sync keeps its own binary.
+//
 // alse is absent on purpose: V rejects module false because false is a
 // keyword, and a module name has to match its directory, so the tool cannot be
 // imported here without renaming its directory. The standalone bin/false binary// is unaffected and stays on disk.
@@ -34,6 +41,7 @@ const tools = {
 	'true':   true_tool.run
 	'tty':    tty.run
 	'whoami': whoami.run
+	'yes':    yes.run
 }
 
 fn main() {
