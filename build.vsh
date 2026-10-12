@@ -60,7 +60,7 @@ const ignore_dirs = {
 // `false` is deliberately not here: V rejects `module false` because `false` is
 // a keyword and a module name has to match its directory, so the tool cannot be
 // imported into a multicall without renaming its directory.
-const multicall_tools = ['arch', 'hostid', 'pwd', 'true', 'whoami']
+const multicall_tools = ['arch', 'hostid', 'pwd', 'true', 'tty', 'whoami']
 
 // build_multicall compiles the single binary that implements the converted
 // tools, then links another name to it for each of them. Hard links rather than

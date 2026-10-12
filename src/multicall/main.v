@@ -5,6 +5,7 @@ import hostid
 import pwd
 import os
 import true as true_tool
+import tty
 import whoami
 
 // multicall is the busybox-style binary: one executable that contains several
@@ -27,11 +28,12 @@ import whoami
 //
 // Tools not converted to a module are likewise absent rather than broken.
 const tools = {
-	'arch':    arch.run
-	'hostid':  hostid.run
-	'pwd':     pwd.run
-	'true':    true_tool.run
-	'whoami':  whoami.run
+	'arch':   arch.run
+	'hostid': hostid.run
+	'pwd':    pwd.run
+	'true':   true_tool.run
+	'tty':    tty.run
+	'whoami': whoami.run
 }
 
 fn main() {
