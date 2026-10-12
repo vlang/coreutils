@@ -399,6 +399,10 @@ fn summarize(log string, bin_dir string) {
 		println('  -------')
 		println('  pass rate ${rate:.1f}%   ${pass} of ${runnable} runnable tests')
 	}
+	// A single machine-readable line, so that a CI job can update the README
+	// without re-parsing the prose above. The key names are stable.
+	println('')
+	println('GNU_SUITE_RESULT pass=${pass} fail=${fail} error=${error} skip=${skip} notrun=${unbuilt} runnable=${runnable} rate=${rate:.1f}')
 	if failures.len > 0 {
 		println('')
 		println('failing tests:')
