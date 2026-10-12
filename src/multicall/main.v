@@ -2,6 +2,7 @@ module main
 
 import arch
 import hostid
+import pwd
 import os
 import true as true_tool
 import whoami
@@ -28,6 +29,7 @@ import whoami
 const tools = {
 	'arch':    arch.run
 	'hostid':  hostid.run
+	'pwd':     pwd.run
 	'true':    true_tool.run
 	'whoami':  whoami.run
 }
