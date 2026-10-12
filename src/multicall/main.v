@@ -23,11 +23,17 @@ import whoami
 // first argument also works, which is how this repo's earlier `coreutils`
 // dispatcher was invoked.
 //
-// sync is absent on purpose as well: vlib ships a module named sync for
-// Mutex, RwMutex and WaitGroup, and V resolves the import to that one before it
-// looks in this tree - an alias does not redirect it. A tool whose name collides
-// with a stdlib module cannot be imported into a multicall without renaming the
-// directory, so bin/sync keeps its own binary.
+// The exclusion list is short, and it is a property of the name rather than of the
+// tool, so it is worth stating once rather than discovering per tool. Only three
+// tools are excluded, verified by trying each import rather than by guessing:
+//
+//   true, false - V keywords. module false does not parse, and a module name
+//                  has to match its directory, so no alias can reach it.
+//   sync         - vlib ships a top-level sync module for Mutex, RwMutex and
+//                  WaitGroup, and import sync resolves to that. An alias does
+//                  not redirect it either: import sync as probe_sync compiles
+//                  with no more than an unused-import warning, which is how this
+//                  was confirmed rather than inferred.
 //
 // alse is absent on purpose: V rejects module false because false is a
 // keyword, and a module name has to match its directory, so the tool cannot be
