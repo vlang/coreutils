@@ -1,5 +1,6 @@
+module hostid
+
 import common
-import os
 
 const app_name = 'hostid'
 const app_description = 'Print the numeric identifier (in hexadecimal) of the current host.'
@@ -8,12 +9,15 @@ const app_description = 'Print the numeric identifier (in hexadecimal) of the cu
 ** hostid clone written in V
 ** Original author: B. <SheatNoisette> Malhomme
 */
-fn main() {
-	mut fp := common.flag_parser(os.args)
+
+// run is the entry point shared by the standalone binary and the multicall
+// binary, so both dispatch through the same code.
+pub fn run(args []string) int {
+	mut fp := common.flag_parser(args)
 	fp.application(app_name)
 	fp.description(app_description)
 
-	fp.limit_free_args(0, 0)!
+	fp.limit_free_args(0, 0) or { return 1 }
 
 	// Get hostid using wrapper
 	hostid := hd_get_hostid() & 0xffffffff
@@ -23,4 +27,5 @@ fn main() {
 
 	// Other flags
 	fp.remaining_parameters()
+	return 0
 }
