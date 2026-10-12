@@ -1,0 +1,126 @@
+# Report the GNU coreutils test suite pass rate in the README.
+#
+# The suite job in ci.yml measures us on every push and PR. This job runs the
+# same measurement on a schedule and writes the number into the README, so the
+# headline figure is the real pass rate rather than a count someone typed by
+# hand. Both run util/gnu_test_suite.vsh, so they cannot disagree about the
+# measurement itself.
+name: GNU test suite report
+
+on:
+  schedule:
+    # Weekly, Monday 06:00 UTC. Chosen so a busy day does not race it.
+    - cron: '0 6 * * 1'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: gnu-suite-report
+  cancel-in-progress: false
+
+jobs:
+  report:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - name: Checkout Latest V
+        uses: actions/checkout@v6
+        with:
+          repository: vlang/v
+          path: v
+      - name: Build V
+        run: cd v && make && sudo ./v symlink && cd -
+
+      - name: Checkout Coreutils
+        uses: actions/checkout@v6
+        with:
+          path: coreutils
+          # The default token, so the commit below is attributed to Actions.
+          persist-credentials: true
+
+      - name: Build all our tools
+        run: cd coreutils && v run build.vsh
+
+      - name: Restore the GNU suite build cache
+        uses: actions/cache@v4
+        with:
+          path: coreutils/.gnu
+          key: gnu-suite-report-${{ runner.os }}-${{ hashFiles('coreutils/util/gnu_test_suite.vsh') }}
+          restore-keys: |
+            gnu-suite-report-${{ runner.os }}-
+
+      - name: Run the GNU coreutils test suite
+        id: suite
+        run: |
+          cd coreutils
+          # The harness prints a machine-readable GNU_SUITE_RESULT line; capture
+          # the whole run for the log, and the result line for the README.
+          v run util/gnu_test_suite.vsh --bin-dir bin --jobs $(nproc) 2>&1 | tee ../suite-output.txt
+          result=$(grep '^GNU_SUITE_RESULT ' ../suite-output.txt | tail -1)
+          if [ -z "$result" ]; then
+            echo "::error::the harness produced no GNU_SUITE_RESULT line"
+            exit 1
+          fi
+          echo "result=$result" >> "$GITHUB_OUTPUT"
+          # shellcheck disable=SC2001
+          rate=$(echo "$result" | sed 's/.*rate=\([0-9.]*\).*/\1/')
+          runnable=$(echo "$result" | sed 's/.*runnable=\([0-9]*\).*/\1/')
+          echo "pass_rate=${rate}" >> "$GITHUB_OUTPUT"
+          echo "runnable_tests=${runnable}" >> "$GITHUB_OUTPUT"
+          echo "GNU test suite: ${rate}% of ${runnable} runnable tests"
+        continue-on-error: true
+
+      - name: Upload the full suite log
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: gnu-suite-report-log
+          path: |
+            coreutils/.gnu/coreutils-9.4/tests/test-suite.log
+            suite-output.txt
+          if-no-files-found: warn
+
+      - name: Update the README with the measured rate
+        run: |
+          cd coreutils
+          rate="${{ steps.suite.outputs.pass_rate }}"
+          runnable="${{ steps.suite.outputs.runnable_tests }}"
+          if [ -z "$rate" ]; then
+            echo "::warning::no rate to write, skipping the README update"
+            exit 0
+          fi
+          # Replace the two markers so that the surrounding prose and the
+          # date line stay under our control and the number is the only part
+          # a machine writes.
+          date=$(date -u '+%Y-%m-%d')
+          python3 - "$rate" "$runnable" "$date" <<'PY'
+          import re, sys
+          rate, runnable, date = sys.argv[1], sys.argv[2], sys.argv[3]
+          path = "README.md"
+          text = open(path).read()
+          text = re.sub(r"(<!-- GNU_SUITE_RATE -->).*?(<!-- /GNU_SUITE_RATE -->)",
+                        r"\g<1>**%s%%** (%s runnable tests)\g<2>" % (rate, runnable),
+                        text, flags=re.S)
+          text = re.sub(r"(<!-- GNU_SUITE_UPDATED -->).*?(<!-- /GNU_SUITE_UPDATED -->)",
+                        r"\g<1>%s\g<2>" % date, text, flags=re.S)
+          open(path, "w").write(text)
+          PY
+          grep -n "GNU_SUITE_RATE" README.md || true
+
+      - name: Commit the updated README
+        run: |
+          cd coreutils
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          if git diff --quiet README.md; then
+            echo "README already up to date"
+            exit 0
+          fi
+          git add README.md
+          git commit -m "docs: update the GNU test suite pass rate
+
+Autocommitted by the GNU test suite report workflow, which runs
+util/gnu_test_suite.vsh on a schedule and writes the measured number."
+          git push
