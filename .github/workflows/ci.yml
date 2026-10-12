@@ -2,6 +2,18 @@ name: Build and Test
 
 on: [push, pull_request]
 
+env:
+  # The V revision CI builds. Pinned rather than taken from master, because V
+  # master broke its own bootstrap on 2026-10-02 in 233f259a7a, which added
+  # C.S_IFMT to vlib/os/os_stat_windows.c.v - a constant the bundled tcc does not
+  # define on Windows. Every job here was red for ten days as a result, with no
+  # change on this side.
+  #
+  # 532f63b6d2 is the parent of that commit and builds. To move it forward, bump
+  # this and check all four jobs; the bump-v workflow does that automatically and
+  # opens a PR when a newer V is green, so this does not silently go stale.
+  V_REF: 532f63b6d2369708e62dd9e8b77e987dedac5152
+
 jobs:
   winos-test:
     runs-on: windows-latest
@@ -14,10 +26,11 @@ jobs:
         uses: actions/checkout@v6
         with:
           path: coreutils
-      - name: Checkout Latest V
+      - name: Checkout V
         uses: actions/checkout@v6
         with:
           repository: vlang/v
+          ref: ${{ env.V_REF }}
           path: v
       - name: Build V
         shell: bash
@@ -63,10 +76,11 @@ jobs:
   ubuntu-fast-build:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout Latest V
+      - name: Checkout V
         uses: actions/checkout@v6
         with:
           repository: vlang/v
+          ref: ${{ env.V_REF }}
           path: v
       - name: Build V
         run: cd v && make && sudo ./v symlink && cd -
@@ -88,10 +102,11 @@ jobs:
   ubuntu-prod-build:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout Latest V
+      - name: Checkout V
         uses: actions/checkout@v6
         with:
           repository: vlang/v
+          ref: ${{ env.V_REF }}
           path: v
       - name: Build V
         run: cd v && make && sudo ./v symlink && cd -
@@ -107,10 +122,11 @@ jobs:
   ubuntu-gnu-coreutils:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout Latest V
+      - name: Checkout V
         uses: actions/checkout@v6
         with:
           repository: vlang/v
+          ref: ${{ env.V_REF }}
           path: v
       - name: Build V
         run: cd v && make && sudo ./v symlink && cd -

@@ -1,0 +1,97 @@
+# Keep the pinned V revision from going stale.
+#
+# ci.yml pins V to a specific revision, because V master broke its own bootstrap
+# on 2026-10-02 and reddened every job in this repo for ten days without anything
+# changing here. A pin trades that exposure for a different one: it goes stale, and
+# a stale pin means the tools quietly stop building against current V.
+#
+# This closes that loop. It builds the tree against the *current* V master, and
+# only if both the compile and the test suite are green does it open a PR bumping
+# the pin. If V master is broken it stays quiet - which is the desired behaviour,
+# since it is reporting an upstream problem and not one of ours.
+name: Bump the pinned V
+
+on:
+  schedule:
+    # Weekly, Monday 05:00 UTC.
+    - cron: '0 5 * * 1'
+  workflow_dispatch:
+    inputs:
+      v_ref:
+        description: 'V revision to try, defaulting to master'
+        required: false
+        default: ''
+
+permissions:
+  contents: read
+
+concurrency:
+  group: bump-v
+  cancel-in-progress: false
+
+jobs:
+  try-current-v:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - name: Checkout V
+        uses: actions/checkout@v6
+        with:
+          repository: vlang/v
+          ref: ${{ github.event.inputs.v_ref || 'master' }}
+          path: v
+      - name: Build V
+        run: cd v && make && sudo ./v symlink && cd -
+
+      - name: Checkout Coreutils
+        uses: actions/checkout@v6
+        with:
+          path: coreutils
+          persist-credentials: true
+
+      # A cheap signal first: does every tool still compile? This is the step a
+      # stale pin breaks, and it runs in a couple of minutes rather than after
+      # the full build.
+      - name: Compile every tool against current V
+        id: compile
+        run: cd coreutils && v run build.vsh
+        continue-on-error: true
+
+      - name: Run the test suite against current V
+        if: steps.compile.outcome == 'success'
+        run: cd coreutils && make test
+        continue-on-error: true
+
+      - name: Record the outcome
+        if: always()
+        id: result
+        run: |
+          echo "v_sha=$(cd v && git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+
+      # Only a green build and test run moves the pin. A red one means either V
+      # master is broken again or this tree needs work, and neither is something
+      # to paper over by moving the pin.
+      - name: Open a PR bumping the pin
+        if: steps.compile.outcome == 'success' && steps.test.outcome == 'success'
+        run: |
+          cd coreutils
+          pin=$(grep -oP 'V_REF: \K[0-9a-f]+' .github/workflows/ci.yml)
+          tried="${{ steps.result.outputs.v_sha }}"
+          if [ "$pin" = "$tried" ]; then
+            echo "Pin is already at $tried, nothing to do."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git checkout -b bump-v-$(date -u +%Y%m%d)
+          sed -i "s/V_REF: [0-9a-f]*/V_REF: $tried/" .github/workflows/ci.yml
+          git add .github/workflows/ci.yml
+          # Single-line messages: a multi-line one inside this run block loses
+          # its indentation and the YAML stops parsing.
+          git commit -m "ci: bump the pinned V to ${tried:0:10}"
+          git push -q origin HEAD
+          gh pr create --fill --base main \
+            --title "ci: bump the pinned V to ${tried:0:10}" \
+            --body "Current V master compiles and tests clean against this tree, so the pin moves from ${pin:0:10} to ${tried:0:10}. Opened by the Bump the pinned V workflow; if this PR's own checks go red the bump is wrong and should be closed."
+        env:
+          GH_TOKEN: ${{ github.token }}
