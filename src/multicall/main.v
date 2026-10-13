@@ -2,6 +2,7 @@ module main
 
 import arch
 import hostid
+import logname
 import pwd
 import os
 import true as true_tool
@@ -41,13 +42,14 @@ import whoami
 //
 // Tools not converted to a module are likewise absent rather than broken.
 const tools = {
-	'arch':   arch.run
-	'hostid': hostid.run
-	'pwd':    pwd.run
-	'true':   true_tool.run
-	'tty':    tty.run
-	'whoami': whoami.run
-	'yes':    yes.run
+	'arch':    arch.run
+	'hostid':  hostid.run
+	'logname': logname.run
+	'pwd':     pwd.run
+	'true':    true_tool.run
+	'tty':     tty.run
+	'whoami':  whoami.run
+	'yes':     yes.run
 }
 
 fn main() {
