@@ -9,10 +9,19 @@ env:
   # define on Windows. Every job here was red for ten days as a result, with no
   # change on this side.
   #
-  # 532f63b6d2 is the parent of that commit and builds. To move it forward, bump
-  # this and check all four jobs; the bump-v workflow does that automatically and
-  # opens a PR when a newer V is green, so this does not silently go stale.
-  V_REF: 532f63b6d2369708e62dd9e8b77e987dedac5152
+  # 532f63b6d2, the parent of that commit, then failed differently: its own
+  # vc/v.c bootstrap cannot parse vlib/math/bits/bits.v, because the bootstrap
+  # compiler rejects the if-expression assigned to abs_x at line 621. A pin that
+  # does not bootstrap is no better than no pin, which is why this is an official
+  # weekly tag instead.
+  #
+  # weekly.2026.41 avoids both: the S_IFMT commit is not an ancestor of it, and its
+  # bits.v assigns from an if expression rather than starting a condition with one.
+  #
+  # To move it forward, change this and check all four jobs; the bump-v workflow
+  # does that automatically and opens a PR when a newer V is green, so this does
+  # not silently go stale.
+  V_REF: weekly.2026.41
 
 jobs:
   winos-test:
