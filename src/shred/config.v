@@ -5,17 +5,17 @@ import os
 @[name: 'shred']
 @[version: '0.1']
 struct Config {
-	force         bool   @[short: f; xdoc: 'change permissions to allow writing if necessary']
-	iterations    int = 3     @[short: n; xdoc: 'overwrite N times instead of the default (3)']
-	random_source string @[xdoc: 'get random bytes from <string>']
-	size          string @[short: s; xdoc: 'shred this many bytes (suffixes like K, M, G accepted)\n']
-	rm            bool   @[only: u; xdoc: 'deallocate and remove file after overwriting']
-	remove_how    string @[long: remove; xdoc: 'like -u but give control on <string> to delete;  See below']
-	verbose       bool   @[short: v; xdoc: 'show progress']
-	exact         bool   @[short: x; xdoc: 'do not round file sizes up to the next full block; this is the default for non-regular files']
-	zero          bool   @[short: z; xdoc: 'add a final overwrite with zeros to hide shredding']
-	show_help     bool   @[long: help; short: h; xdoc: 'show this help']
-	show_version  bool   @[long: 'version'; xdoc: 'show version and exit']
+	force         bool    @[short: f; xdoc: 'change permissions to allow writing if necessary']
+	iterations    int = 3 @[short: n; xdoc: 'overwrite N times instead of the default (3)']
+	random_source string  @[xdoc: 'get random bytes from <string>']
+	size          string  @[short: s; xdoc: 'shred this many bytes (suffixes like K, M, G accepted)\n']
+	rm            bool    @[only: u; xdoc: 'deallocate and remove file after overwriting']
+	remove_how    string  @[long: remove; xdoc: 'like -u but give control on <string> to delete;  See below']
+	verbose       bool    @[short: v; xdoc: 'show progress']
+	exact         bool    @[short: x; xdoc: 'do not round file sizes up to the next full block; this is the default for non-regular files']
+	zero          bool    @[short: z; xdoc: 'add a final overwrite with zeros to hide shredding']
+	show_help     bool    @[long: help; short: h; xdoc: 'show this help']
+	show_version  bool    @[long: 'version'; xdoc: 'show version and exit']
 }
 
 fn get_args() (Config, []string) {

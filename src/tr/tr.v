@@ -19,7 +19,7 @@ fn main() {
 }
 
 fn tr(set Settings) {
-	input := io.read_all(io.ReadAllConfig{reader: os.stdin()}) or { []u8{} }
+	input := io.read_all(io.ReadAllConfig{ reader: os.stdin() }) or { []u8{} }
 	mut output := []u8{}
 
 	if set.delete && set.squeeze {
@@ -88,15 +88,15 @@ fn parse_set(s string) string {
 			class := s[i + 2..end]
 			match class {
 				'alpha' {
-					for c in u8(`a`)..u8(`z`) {
+					for c in u8(`a`) .. u8(`z`) {
 						result += c.ascii_str()
 					}
-					for c in u8(`A`)..u8(`Z`) {
+					for c in u8(`A`) .. u8(`Z`) {
 						result += c.ascii_str()
 					}
 				}
 				'digit' {
-					for c in u8(`0`)..u8(`9`) {
+					for c in u8(`0`) .. u8(`9`) {
 						result += c.ascii_str()
 					}
 				}
@@ -104,12 +104,12 @@ fn parse_set(s string) string {
 					result += ' \t\n\r'
 				}
 				'lower' {
-					for c in u8(`a`)..u8(`z`) {
+					for c in u8(`a`) .. u8(`z`) {
 						result += c.ascii_str()
 					}
 				}
 				'upper' {
-					for c in u8(`A`)..u8(`Z`) {
+					for c in u8(`A`) .. u8(`Z`) {
 						result += c.ascii_str()
 					}
 				}
@@ -119,7 +119,7 @@ fn parse_set(s string) string {
 		} else if i + 2 < s.len && s[i + 1] == `-` {
 			start := s[i]
 			end_ch := s[i + 2]
-			for c in u8(start)..u8(end_ch) {
+			for c in u8(start) .. u8(end_ch) {
 				result += c.ascii_str()
 			}
 			i += 3
@@ -148,7 +148,7 @@ fn args() !Settings {
 		common.exit_with_error_message(app_name, 'missing operand')
 	}
 	if !delete && !squeeze && rest.len < 2 {
-		common.exit_with_error_message(app_name, 'missing operand after \'${rest[0]}\'')
+		common.exit_with_error_message(app_name, "missing operand after '${rest[0]}'")
 	}
 
 	mut set1 := ''
