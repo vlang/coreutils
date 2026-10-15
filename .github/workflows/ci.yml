@@ -131,3 +131,55 @@ jobs:
         run: uptime --version
       - name: Run tests
         run: cd coreutils && GNU_COREUTILS_INSTALLED=1 make test
+
+  # Run GNU's own test suite against our binaries. This is a different
+  # measurement from `make test`: make test runs the unit tests this repo
+  # wrote, while this runs the tests GNU writes for its own implementation,
+  # against ours. The number it produces is the pass rate of the real suite.
+  #
+  # It fetches the GNU release tarball rather than the git sources, because the
+  # tarball ships its configure and tests/ pre-generated, and the only workaround
+  # the build needs is copying lib/stdckdint.in.h into place. See the comment at
+  # the top of util/gnu_test_suite.vsh.
+  ubuntu-gnu-test-suite:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - name: Checkout Latest V
+        uses: actions/checkout@v6
+        with:
+          repository: vlang/v
+          path: v
+      - name: Build V
+        run: cd v && make && sudo ./v symlink && cd -
+      - name: Checkout Coreutils
+        uses: actions/checkout@v6
+        with:
+          path: coreutils
+      - name: V doctor
+        run: v doctor
+      - name: Build all our tools
+        run: cd coreutils && v run build.vsh
+      - name: Cache the GNU test suite build
+        uses: actions/cache@v4
+        with:
+          path: coreutils/.gnu
+          key: gnu-suite-${{ runner.os }}-${{ hashFiles('util/gnu_test_suite.vsh') }}
+      - name: Run the GNU coreutils test suite against our binaries
+        run: |
+          cd coreutils
+          v run util/gnu_test_suite.vsh --bin-dir bin --jobs $(nproc)
+          status=$?
+          if [ $status -ne 0 ]; then
+            echo "::warning::the GNU suite reported failing tests; see the log below"
+          fi
+          exit 0
+      - name: Upload the full suite log
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: gnu-test-suite-log
+          path: |
+            coreutils/.gnu/coreutils-9.4/tests/test-suite.log
+            coreutils/.gnu/coreutils-9.4/check.log
+          if-no-files-found: warn
