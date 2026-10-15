@@ -23,14 +23,14 @@ enum ResolveMode {
 
 struct Settings {
 mut:
-	mode         CanonicalizeMode
-	resolve_mode ResolveMode
-	quiet        bool
-	strip        bool
-	zero         bool
-	relative_to  string
+	mode          CanonicalizeMode
+	resolve_mode  ResolveMode
+	quiet         bool
+	strip         bool
+	zero          bool
+	relative_to   string
 	relative_base string
-	target_files []string
+	target_files  []string
 }
 
 fn resolve_link_fully(path string, max_depth int) !string {
@@ -199,11 +199,11 @@ fn realpath(settings Settings) {
 			}
 		} else {
 			if cpath, exists := canonicalize(abs, settings.mode, settings.resolve_mode) {
-			if !exists {
-				if !settings.quiet {
-					app.eprintln('${path}: No such file or directory')
-					exit_code = 1
-				}
+				if !exists {
+					if !settings.quiet {
+						app.eprintln('${path}: No such file or directory')
+						exit_code = 1
+					}
 				} else {
 					mut out := cpath
 					if settings.relative_to != '' {
@@ -216,19 +216,19 @@ fn realpath(settings Settings) {
 							out = make_relative(out, settings.relative_base)
 						}
 					}
-				if settings.zero {
-					print(out)
-					print(u8(0).ascii_str())
-				} else {
-					println(out)
+					if settings.zero {
+						print(out)
+						print(u8(0).ascii_str())
+					} else {
+						println(out)
+					}
 				}
+			} else {
+				if !settings.quiet {
+					app.eprintln('${path}: ${err.msg()}')
+					exit_code = 1
 				}
-		} else {
-			if !settings.quiet {
-				app.eprintln('${path}: ${err.msg()}')
-				exit_code = 1
 			}
-		}
 		}
 	}
 	exit(exit_code)
@@ -246,8 +246,8 @@ fn args() Settings {
 	_ = fp.bool('physical', `P`, false,
 		'resolve symlinks as encountered (default)', flag.FlagConfig{})
 	st.quiet = fp.bool('quiet', `q`, false, 'suppress most error messages')
-	st.strip = fp.bool('strip', `s`, false, 'don\'t expand symlinks')
-	_ = fp.bool('no-symlinks', 0, false, 'don\'t expand symlinks', flag.FlagConfig{})
+	st.strip = fp.bool('strip', `s`, false, "don't expand symlinks")
+	_ = fp.bool('no-symlinks', 0, false, "don't expand symlinks", flag.FlagConfig{})
 	st.zero = fp.bool('zero', `z`, false, 'end each output line with NUL, not newline')
 	rel_to := fp.string('relative-to', 0, '', 'print the resolved path relative to DIR')
 	rel_base := fp.string('relative-base', 0, '', 'print absolute paths except for PATHs beneath DIR')
