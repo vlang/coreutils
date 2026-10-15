@@ -92,7 +92,7 @@ compare against the true GNU coreutils version on the Linux-based tests first.
 | &check; | hostid    | Print numeric host identifier                    |         |
 | &check; | hostname  | Print or set system name                         |         |
 | &check; | id        | Print user identity                              |         |
-|         | install   | Copy files and set attributes                    |         |
+| &check; | install   | Copy files and set attributes                    |         |
 | &check; | join      | Join lines on a common field                     | &check; |
 |         | kill      | Send a signal to processes                       | &check; |
 | &check; | link      | Make a hard link via the link syscall            | &check; |
