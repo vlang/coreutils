@@ -22,14 +22,14 @@ jobs:
           path: coreutils
       - name: Checkout Latest V
         id: checkout_latest_v
-        if: ${{ !cancelled() && steps.checkout.outcome == 'success' }}
+        if: ${{ success() && !cancelled() && steps.checkout.outcome == 'success' }}
         uses: actions/checkout@v6
         with:
           repository: vlang/v
           path: v
       - name: Build V
         id: build_v
-        if: ${{ !cancelled() && steps.checkout_latest_v.outcome == 'success' }}
+        if: ${{ success() && !cancelled() && steps.checkout_latest_v.outcome == 'success' }}
         shell: bash
         run: |
           # Build V
@@ -38,7 +38,7 @@ jobs:
           echo "${PWD}" >> $GITHUB_PATH
       - name: Download uutils/coreutils
         id: download_uutils_coreutils
-        if: ${{ !cancelled() && steps.build_v.outcome == 'success' }}
+        if: ${{ success() && !cancelled() && steps.build_v.outcome == 'success' }}
         uses: engineerd/configurator@v0.0.10 
         with:
           name: 'coreutils.exe'
@@ -46,14 +46,14 @@ jobs:
           pathInArchive: 'coreutils-0.0.17-x86_64-pc-windows-msvc/coreutils.exe'
       - name: V doctor
         id: v_doctor
-        if: ${{ !cancelled() && steps.download_uutils_coreutils.outcome == 'success' }}
+        if: ${{ success() && !cancelled() && steps.download_uutils_coreutils.outcome == 'success' }}
         shell: bash
         run: |
           # V doctor
           v doctor
       - name: Info
         id: info
-        if: ${{ !cancelled() && steps.v_doctor.outcome == 'success' }}
+        if: ${{ success() && !cancelled() && steps.v_doctor.outcome == 'success' }}
         shell: bash
         run: |
           ## Info
@@ -67,14 +67,14 @@ jobs:
           v --version
       - name: Build all
         id: build_all
-        if: ${{ !cancelled() && steps.info.outcome == 'success' }}
+        if: ${{ success() && !cancelled() && steps.info.outcome == 'success' }}
         shell: bash
         run: |
           # Build all
           cd coreutils && v build.vsh
       - name: Run tests
         id: run_tests
-        if: ${{ !cancelled() && steps.build_all.outcome == 'success' }}
+        if: ${{ success() && !cancelled() && steps.build_all.outcome == 'success' }}
         shell: bash
         run: |
           # Run tests
@@ -92,33 +92,33 @@ jobs:
           path: v
       - name: Build V
         id: build_v
-        if: ${{ !cancelled() && steps.checkout_latest_v.outcome == 'success' }}
+        if: ${{ success() && !cancelled() && steps.checkout_latest_v.outcome == 'success' }}
         run: cd v && make && sudo ./v symlink && cd -
       - name: Checkout Coreutils (for tests)
         id: checkout_coreutils_for_tests
-        if: ${{ !cancelled() && steps.build_v.outcome == 'success' }}
+        if: ${{ success() && !cancelled() && steps.build_v.outcome == 'success' }}
         uses: actions/checkout@v6
         with:
           path: coreutils
       - name: V doctor
         id: v_doctor
-        if: ${{ !cancelled() && steps.checkout_coreutils_for_tests.outcome == 'success' }}
+        if: ${{ success() && !cancelled() && steps.checkout_coreutils_for_tests.outcome == 'success' }}
         run: v doctor
       - name: Ensure everything is formatted
         id: ensure_everything_is_formatted
-        if: ${{ !cancelled() && steps.v_doctor.outcome == 'success' }}
+        if: ${{ success() && !cancelled() && steps.v_doctor.outcome == 'success' }}
         run: cd coreutils && make testfmt
       - name: Build all
         id: build_all
-        if: ${{ !cancelled() && steps.ensure_everything_is_formatted.outcome == 'success' }}
+        if: ${{ success() && !cancelled() && steps.ensure_everything_is_formatted.outcome == 'success' }}
         run: cd coreutils && v run build.vsh
       - name: Debug uptime_nix_test.v
         id: debug_uptime_nix_test_v
-        if: ${{ !cancelled() && steps.build_all.outcome == 'success' }}
+        if: ${{ success() && !cancelled() && steps.build_all.outcome == 'success' }}
         run: cd coreutils && v -d trace_same_results -stats src/uptime/uptime_nix_test.v
       - name: Run tests
         id: run_tests
-        if: ${{ !cancelled() && steps.debug_uptime_nix_test_v.outcome == 'success' }}
+        if: ${{ success() && !cancelled() && steps.debug_uptime_nix_test_v.outcome == 'success' }}
         run: cd coreutils && make test
 
   ubuntu-prod-build:
@@ -133,21 +133,21 @@ jobs:
           path: v
       - name: Build V
         id: build_v
-        if: ${{ !cancelled() && steps.checkout_latest_v.outcome == 'success' }}
+        if: ${{ success() && !cancelled() && steps.checkout_latest_v.outcome == 'success' }}
         run: cd v && make && sudo ./v symlink && cd -
       - name: Checkout Coreutils (for tests)
         id: checkout_coreutils_for_tests
-        if: ${{ !cancelled() && steps.build_v.outcome == 'success' }}
+        if: ${{ success() && !cancelled() && steps.build_v.outcome == 'success' }}
         uses: actions/checkout@v6
         with:
           path: coreutils
       - name: Build all with -prod
         id: build_all_with_prod
-        if: ${{ !cancelled() && steps.checkout_coreutils_for_tests.outcome == 'success' }}
+        if: ${{ success() && !cancelled() && steps.checkout_coreutils_for_tests.outcome == 'success' }}
         run: cd coreutils && v run build.vsh -prod
       - name: Run tests
         id: run_tests
-        if: ${{ !cancelled() && steps.build_all_with_prod.outcome == 'success' }}
+        if: ${{ success() && !cancelled() && steps.build_all_with_prod.outcome == 'success' }}
         run: cd coreutils && make test
 
   ubuntu-gnu-coreutils:
@@ -162,34 +162,34 @@ jobs:
           path: v
       - name: Build V
         id: build_v
-        if: ${{ !cancelled() && steps.checkout_latest_v.outcome == 'success' }}
+        if: ${{ success() && !cancelled() && steps.checkout_latest_v.outcome == 'success' }}
         run: cd v && make && sudo ./v symlink && cd -
       - name: Checkout Coreutils (for tests)
         id: checkout_coreutils_for_tests
-        if: ${{ !cancelled() && steps.build_v.outcome == 'success' }}
+        if: ${{ success() && !cancelled() && steps.build_v.outcome == 'success' }}
         uses: actions/checkout@v4
         with:
           path: coreutils
       - name: Build all
         id: build_all
-        if: ${{ !cancelled() && steps.checkout_coreutils_for_tests.outcome == 'success' }}
+        if: ${{ success() && !cancelled() && steps.checkout_coreutils_for_tests.outcome == 'success' }}
         run: cd coreutils && v run build.vsh
       - name: Native utils diagnostics (before GNU coreutils)
         id: native_utils_diagnostics_before_gnu_coreutils
-        if: ${{ !cancelled() && steps.build_all.outcome == 'success' }}
+        if: ${{ success() && !cancelled() && steps.build_all.outcome == 'success' }}
         run: |
           echo "::remove-matcher owner=v-problem-matcher::"
           sleep --version
           uptime --version
       - name: Setup the original GNU coreutils for comparison
         id: setup_the_original_gnu_coreutils_for_comparison
-        if: ${{ !cancelled() && steps.native_utils_diagnostics_before_gnu_coreutils.outcome == 'success' }}
+        if: ${{ success() && !cancelled() && steps.native_utils_diagnostics_before_gnu_coreutils.outcome == 'success' }}
         uses: ShenTengTu/setup-gnu-coreutils-action@v1
       - name: Test GNU coreutils uptime
         id: test_gnu_coreutils_uptime
-        if: ${{ !cancelled() && steps.setup_the_original_gnu_coreutils_for_comparison.outcome == 'success' }}
+        if: ${{ success() && !cancelled() && steps.setup_the_original_gnu_coreutils_for_comparison.outcome == 'success' }}
         run: uptime --version
       - name: Run tests
         id: run_tests
-        if: ${{ !cancelled() && steps.test_gnu_coreutils_uptime.outcome == 'success' }}
+        if: ${{ success() && !cancelled() && steps.test_gnu_coreutils_uptime.outcome == 'success' }}
         run: cd coreutils && GNU_COREUTILS_INSTALLED=1 make test
