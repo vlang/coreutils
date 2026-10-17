@@ -216,7 +216,7 @@ fn read_input(set Settings) ?[]u8 {
 fn write_output(data []u8, set Settings, out_offset u64, mut report Report) int {
 	if set.ofile == '' || set.ofile == '-' {
 		unsafe {
-			C.write(1, data.data, u64(data.len))
+			write_fds(1, data.data, u64(data.len))
 		}
 		report.records_out = report.records_in
 		report.partial_out = report.partial_in
@@ -264,5 +264,3 @@ fn report_error(set Settings, msg string) {
 	}
 	eprintln('dd: ${msg}')
 }
-
-fn C.write(fd i64, buf voidptr, count u64) i64
