@@ -49,7 +49,7 @@ The completed count is updated automatically by a GitHub Action after merge.
 GNU coreutils. They are not 100% compatiable. If you encounter different behaviors,
 compare against the true GNU coreutils version on the Linux-based tests first.
 
-## Completed (84/109) - 77% done!
+## Completed (82/109) - 75% done!
 
 |  Done   | Cmd       | Descripton                                       | Windows | 
 | :-----: | --------- | ------------------------------------------------ | ------- |
