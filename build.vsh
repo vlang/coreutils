@@ -9,34 +9,31 @@ struct Config {
 	jobs int @[long: cpus; short: 'j']
 }
 
+// Which tools the collective build skips, per platform.
+//
+// This list used to mirror what Win32 GNU coreutils 8.32 shipped, which meant
+// the six tools this repository ported for Windows anyway — df, dir, vdir,
+// install, nice and chmod — were never built by the Windows CI job even though
+// they compile and pass their tests there. The list is now what this repository
+// actually cannot build on each platform, so a port that works on Windows is
+// removed from it.
 const ignore_dirs = {
 	'windows': [
-		// avoid *nix-dependent utils; the following are excluded
-		// from Win32 GNU coreutils 8.32:
+		// these need POSIX APIs Windows does not expose
 		'arch',
 		'chgrp',
-		'chmod',
 		'chown',
 		'chroot',
-		'df',
-		'dir',
 		'groups',
 		'hostid',
 		'hostname',
 		'id',
-		'install',
-		'ls',
-		'nice',
 		'pinky',
 		'stat',
 		'stdbuf',
 		'stty',
-		'sync',
-		'timeout',
 		'tty',
-		'vdir',
-		// The following are excluded because utmp-dependent
-		// (and also not part of Win32 GNU coreutils):
+		// these are utmp-dependent (and also not part of Win32 GNU coreutils)
 		'uptime',
 		'users',
 		'who',
