@@ -56,12 +56,19 @@ fn main() {
 	args := os.args
 	// argv[0] is the path this binary was invoked as; its last component is
 	// the name to dispatch on when the binary is linked or symlinked per tool.
+	// On Windows that component carries the extension, so a copy named pwd.exe
+	// has to be matched as `pwd` or the per-tool names never hit.
 	invoked := os.base(os.executable())
+	invoked_name := if invoked.to_lower().ends_with('.exe') {
+		invoked[..invoked.len - 4]
+	} else {
+		invoked
+	}
 
 	mut name := ''
 	mut rest := []string{}
-	if invoked in tools {
-		name = invoked
+	if invoked_name in tools {
+		name = invoked_name
 		rest = args[1..]
 	} else if args.len > 1 && args[1] in tools {
 		name = args[1]
