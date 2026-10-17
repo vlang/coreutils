@@ -41,9 +41,6 @@ const ignore_dirs = {
 		'nohup',
 	]
 	'macos':   ['stat', 'sync', 'uptime']
-	// Vinix shares the POSIX surface, so only uptime is excluded there: it
-	// reads the utmp database, which Vinix does not implement yet.
-	'vinix':   ['uptime']
 }[user_os()] or { [] }
 
 unbuffer_stdout()
