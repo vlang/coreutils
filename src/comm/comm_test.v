@@ -120,7 +120,7 @@ fn test_comm_stdin() {
 	os.write_lines(stdin_file, ['banana', 'cherry'])!
 
 	// Test stdin as first file
-	res1 := os.exec(testing.split_args('cat ${stdin_file} | ${executable_under_test} - ${file_path}'))
+	res1 := testing.run_stdin(executable_under_test, ['-', file_path], stdin_file)
 	assert res1.exit_code == 0
 	// stdin has: banana, cherry
 	// file_path has: apple, banana
@@ -129,7 +129,7 @@ fn test_comm_stdin() {
 	assert res1.output.replace('\r\n', '\n') == expected1
 
 	// Test stdin as second file
-	res2 := os.exec(testing.split_args('cat ${stdin_file} | ${executable_under_test} ${file_path} -'))
+	res2 := testing.run_stdin(executable_under_test, [file_path, '-'], stdin_file)
 	assert res2.exit_code == 0
 	expected2 := 'apple\n\t\tbanana\n\tcherry\n'
 	assert res2.output.replace('\r\n', '\n') == expected2

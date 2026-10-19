@@ -28,45 +28,54 @@ fn test_help_and_version() {
 }
 
 fn test_chain() {
-	res := os.execute('${rig.executable_under_test} ${chain_path}')
+	res := os.exec(testing.split_args('${rig.executable_under_test} ${chain_path}'))
 	assert res.exit_code == 0
 	assert res.output == 'a\nb\nc\nd\n'
 }
 
 fn test_cycle_reports_loop() {
-	res := os.execute('${rig.executable_under_test} ${cycle_path}')
+	res := os.exec(testing.split_args('${rig.executable_under_test} ${cycle_path}'))
 	assert res.exit_code == 1
 	assert res.output.contains('input contains a loop')
 }
 
 fn test_odd_number_of_tokens() {
-	res := os.execute('${rig.executable_under_test} ${odd_path}')
+	res := os.exec(testing.split_args('${rig.executable_under_test} ${odd_path}'))
 	assert res.exit_code == 1
 	assert res.output.contains('odd number of tokens')
 }
 
 fn test_empty_input() {
-	res := os.execute('${rig.executable_under_test} ${empty_path}')
+	res := os.exec(testing.split_args('${rig.executable_under_test} ${empty_path}'))
 	assert res.exit_code == 0
 	assert res.output == ''
 }
 
 fn test_missing_file() {
-	res := os.execute('${rig.executable_under_test} nosuchfile')
+	res := os.exec(testing.split_args('${rig.executable_under_test} nosuchfile'))
 	assert res.exit_code == 1
 	assert res.output.contains('No such file or directory')
 }
 
 fn test_reads_stdin_when_no_file() {
-	res := os.execute('${rig.executable_under_test} < ${chain_path}')
-	assert res.exit_code == 0
-	assert res.output == 'a\nb\nc\nd\n'
+	// A `<` redirect is a shell feature, and the shell is gone: the input file goes
+	// to the child directly as its standard input.
+	mut p := os.new_process(rig.executable_under_test)
+	p.set_args([])
+	p.set_redirect_stdio()
+	p.set_stdin_path(chain_path)
+	p.wait()
+	defer {
+		p.close()
+	}
+	assert p.code == 0
+	assert p.stdout_slurp() == 'a\nb\nc\nd\n'
 }
 
 fn test_duplicate_pairs_are_fine() {
 	// The same pair twice is not an error: the edge is simply there once.
 	os.write_file(dup_path, 'a b\na b\n')!
-	res := os.execute('${rig.executable_under_test} ${dup_path}')
+	res := os.exec(testing.split_args('${rig.executable_under_test} ${dup_path}'))
 	assert res.exit_code == 0
 	assert res.output == 'a\nb\n'
 	os.rm(dup_path) or {}
@@ -76,7 +85,7 @@ fn test_self_loop_is_not_a_cycle() {
 	// a a is a self loop, which GNU does not treat as a cycle: the node is printed
 	// once and the exit code is 0.
 	os.write_file(self_path, 'a a\n')!
-	res := os.execute('${rig.executable_under_test} ${self_path}')
+	res := os.exec(testing.split_args('${rig.executable_under_test} ${self_path}'))
 	assert res.exit_code == 0
 	assert res.output == 'a\n'
 	os.rm(self_path) or {}

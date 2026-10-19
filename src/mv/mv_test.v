@@ -34,20 +34,20 @@ fn test_help_and_version() {
 }
 
 fn test_progress_is_listed_in_help() {
-	res := os.execute('${rig.executable_under_test} --help')
+	res := os.exec(testing.split_args('${rig.executable_under_test} --help'))
 	assert res.exit_code == 0
 	assert res.output.contains('--progress')
 }
 
 fn test_progress_moves_a_file() {
-	res := os.execute('${rig.executable_under_test} --progress ${src_path} ${dst_path}')
+	res := os.exec(testing.split_args('${rig.executable_under_test} --progress ${src_path} ${dst_path}'))
 	assert res.exit_code == 0
 	assert !os.exists(src_path)
 	assert os.read_bytes(dst_path)! == 'the quick brown fox\n'.bytes()
 }
 
 fn test_progress_moves_a_directory() {
-	res := os.execute('${rig.executable_under_test} --progress ${dir_src} ${dir_dst}')
+	res := os.exec(testing.split_args('${rig.executable_under_test} --progress ${dir_src} ${dir_dst}'))
 	assert res.exit_code == 0
 	assert !os.exists(dir_src)
 	assert os.read_bytes(os.join_path(dir_dst, 'a.txt'))! == 'aaa\n'.bytes()
@@ -62,7 +62,7 @@ fn test_progress_draws_a_bar() {
 	bar_dst := 'mv_bar_dst'
 	os.mkdir(bar_src)!
 	os.write_file(os.join_path(bar_src, 'x.txt'), 'xxxx\n')!
-	res := os.execute('${rig.executable_under_test} --progress ${bar_src} ${bar_dst}')
+	res := os.exec(testing.split_args('${rig.executable_under_test} --progress ${bar_src} ${bar_dst}'))
 	assert res.exit_code == 0
 	assert res.output.contains('100%')
 	assert res.output.contains('[')

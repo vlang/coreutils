@@ -15,28 +15,28 @@ fn test_help_and_version() {
 }
 
 fn test_bourne_shell_output() {
-	res := os.execute('${rig.executable_under_test} -b')
+	res := os.exec(testing.split_args('${rig.executable_under_test} -b'))
 	assert res.exit_code == 0
 	assert res.output.starts_with("LS_COLORS='rs=0:")
 	assert res.output.contains('export LS_COLORS')
 }
 
 fn test_c_shell_output() {
-	res := os.execute('${rig.executable_under_test} -c')
+	res := os.exec(testing.split_args('${rig.executable_under_test} -c'))
 	assert res.exit_code == 0
 	assert res.output.starts_with("setenv LS_COLORS 'rs=0:")
 }
 
 fn test_no_term_outputs_empty() {
 	os.setenv('TERM', 'dumb', true)
-	res := os.execute('${rig.executable_under_test} -b')
+	res := os.exec(testing.split_args('${rig.executable_under_test} -b'))
 	assert res.exit_code == 0
 	assert res.output == "LS_COLORS='';\nexport LS_COLORS\n"
 	os.setenv('TERM', 'xterm', true)
 }
 
 fn test_missing_database_file() {
-	res := os.execute('${rig.executable_under_test} nosuchdb')
+	res := os.exec(testing.split_args('${rig.executable_under_test} nosuchdb'))
 	assert res.exit_code == 1
 	assert res.output.contains('No such file or directory')
 }

@@ -45,7 +45,7 @@ fn test_non_existent_files() {
 // A file that could not be read is a failure even when another one could, and GNU
 // exits 1 after printing the lines it did read.
 fn test_one_missing_among_two_files() {
-	res := os.execute('${executable_under_test} ${test_txt_path} non-existent-file')
+	res := os.exec(testing.split_args('${executable_under_test} ${test_txt_path} non-existent-file'))
 	assert res.exit_code == 1
 	assert res.output.contains('No such file or directory')
 	assert res.output.contains('[0] Example test line')

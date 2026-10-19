@@ -25,7 +25,7 @@ fn test_help_and_version() {
 }
 
 fn test_lines() {
-	res := os.execute('${rig.executable_under_test} -l 3 ${input_path}')
+	res := os.exec(testing.split_args('${rig.executable_under_test} -l 3 ${input_path}'))
 	assert res.exit_code == 0
 	assert os.read_file('xaa')! == 'a\nb\nc\n'
 	assert os.read_file('xab')! == 'd\ne\nf\n'
@@ -35,7 +35,7 @@ fn test_lines() {
 fn test_bytes() {
 	// -b 3 cuts on the byte count, which lands inside a line: the pieces are
 	// a\nb, \nc\n, d\ne and so on, and the last holds whatever is left.
-	res := os.execute('${rig.executable_under_test} -b 3 ${input_path}')
+	res := os.exec(testing.split_args('${rig.executable_under_test} -b 3 ${input_path}'))
 	assert res.exit_code == 0
 	assert os.read_file('xaa')! == 'a\nb'
 	assert os.read_file('xab')! == '\nc\n'
@@ -48,7 +48,7 @@ fn test_bytes() {
 fn test_line_bytes_never_breaks_a_line() {
 	// -C 4 over eight one byte lines: two lines fit in four bytes, so the cut lands
 	// on a line boundary even though a third line would only take two more.
-	res := os.execute('${rig.executable_under_test} -C 4 ${input_path}')
+	res := os.exec(testing.split_args('${rig.executable_under_test} -C 4 ${input_path}'))
 	assert res.exit_code == 0
 	assert os.read_file('xaa')! == 'a\nb\n'
 	assert os.read_file('xab')! == 'c\nd\n'
@@ -57,34 +57,34 @@ fn test_line_bytes_never_breaks_a_line() {
 }
 
 fn test_suffix_length() {
-	res := os.execute('${rig.executable_under_test} -l 4 -a 1 ${input_path}')
+	res := os.exec(testing.split_args('${rig.executable_under_test} -l 4 -a 1 ${input_path}'))
 	assert res.exit_code == 0
 	assert os.read_file('xa')! == 'a\nb\nc\nd\n'
 	assert os.read_file('xb')! == 'e\nf\ng\nh\n'
 }
 
 fn test_numeric_suffixes() {
-	res := os.execute('${rig.executable_under_test} -l 4 -d ${input_path}')
+	res := os.exec(testing.split_args('${rig.executable_under_test} -l 4 -d ${input_path}'))
 	assert res.exit_code == 0
 	assert os.read_file('x00')! == 'a\nb\nc\nd\n'
 	assert os.read_file('x01')! == 'e\nf\ng\nh\n'
 }
 
 fn test_custom_prefix() {
-	res := os.execute('${rig.executable_under_test} -l 4 ${input_path} out')
+	res := os.exec(testing.split_args('${rig.executable_under_test} -l 4 ${input_path} out'))
 	assert res.exit_code == 0
 	assert os.read_file('outaa')! == 'a\nb\nc\nd\n'
 	assert os.read_file('outab')! == 'e\nf\ng\nh\n'
 }
 
 fn test_missing_file() {
-	res := os.execute('${rig.executable_under_test} -l 4 nosuchfile')
+	res := os.exec(testing.split_args('${rig.executable_under_test} -l 4 nosuchfile'))
 	assert res.exit_code == 1
 	assert res.output.contains('No such file or directory')
 }
 
 fn test_two_ways_to_cut_is_refused() {
-	res := os.execute('${rig.executable_under_test} -l 4 -b 2 ${input_path}')
+	res := os.exec(testing.split_args('${rig.executable_under_test} -l 4 -b 2 ${input_path}'))
 	assert res.exit_code == 1
 	assert res.output.contains('cannot split in more than one way')
 }

@@ -78,7 +78,7 @@ fn test_bsd() {
 	if no_standard_input_here() {
 		return
 	}
-	res := os.exec(testing.split_args('cat ${main_txt} | ${executable_under_test} -r'))
+	res := testing.run_stdin(executable_under_test, ['-r'], main_txt)
 
 	assert res.exit_code == 0
 	assert res.output == '38039     1${eol}'
@@ -88,7 +88,7 @@ fn test_sysv() {
 	if no_standard_input_here() {
 		return
 	}
-	res := os.exec(testing.split_args('cat ${main_txt} | ${executable_under_test} -s'))
+	res := testing.run_stdin(executable_under_test, ['-s'], main_txt)
 
 	assert res.exit_code == 0
 	assert res.output == '25426 1${eol}'
@@ -101,7 +101,7 @@ fn test_sysv_stream_succeeds() {
 	if no_standard_input_here() {
 		return
 	}
-	res := os.exec(testing.split_args('cat ${test1_txt} | ${executable_under_test} -s'))
+	res := testing.run_stdin(executable_under_test, ['-s'], test1_txt)
 
 	assert res.exit_code == 0
 	assert res.output == '2185 1${eol}'
@@ -137,11 +137,7 @@ fn sum_arbitrary_value(value string, arg string) !os.Result {
 	mut f, path := io_util.temp_file()!
 	f.write_string('${value}\n')!
 	f.close()
-	res := $if windows {
-		os.exec(testing.split_args("cat ${path} | tr -d '\\r' | ${executable_under_test} ${arg}"))
-	} $else {
-		os.exec(testing.split_args('cat ${path} | ${executable_under_test} ${arg}'))
-	}
+	res := testing.run_stdin(executable_under_test, [arg], path)
 	os.rm(path)!
 	return res
 }
@@ -185,7 +181,7 @@ fn test_bsd_sum_stream_succeeds() {
 	if no_standard_input_here() {
 		return
 	}
-	res := os.exec(testing.split_args('cat ${test1_txt} | ${executable_under_test} -r'))
+	res := testing.run_stdin(executable_under_test, ['-r'], test1_txt)
 
 	assert res.exit_code == 0
 	assert res.output == '59852     1${eol}'

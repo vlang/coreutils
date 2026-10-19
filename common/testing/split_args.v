@@ -65,3 +65,27 @@ pub fn split_args(cmd string) []string {
 pub fn run_args(exe string, args string) os.Result {
 	return os.exec(split_args('${exe} ${args}'))
 }
+
+// run_stdin drives a binary with an argument array and gives the named file to the
+// child directly as its standard input, which is what a shell did for
+// `tool args < file` and `cat file | tool args` in the tests that used os.execute.
+//
+// os.execute is deprecated; the argument array of os.exec has no notion of `<` or
+// `|` at all, and passing either through would be an ordinary operand. An additional
+// process is not needed either: os.Process can hold the pipe open on the parent side,
+// but a file in the working folder takes no parent code to feed, so that is what this
+// does. The output is the two streams in the order os.exec combines them, with stderr
+// after stdout.
+pub fn run_stdin(exe string, args []string, stdin_path string) os.Result {
+	mut p := os.new_process(exe)
+	p.set_args(args)
+	p.set_redirect_stdio()
+	p.set_stdin_path(stdin_path)
+	p.wait()
+	mut res := os.Result{
+		exit_code: p.code
+		output:    p.stdout_slurp() + p.stderr_slurp()
+	}
+	p.close()
+	return res
+}
