@@ -64,7 +64,7 @@ fn test_help_and_version() {
 // its own argv[0]. The text is checked rather than left out, so a wrong reason still
 // fails: only the program name and the quotes differ.
 fn error_text_of(args string) string {
-	res := os.execute('${rig.executable_under_test} ${args}')
+	res := os.exec(testing.split_args('${rig.executable_under_test} ${args}'))
 	assert res.exit_code == 1
 	return res.output.split_into_lines()[0]
 }
@@ -95,7 +95,7 @@ fn first_line(args string) string {
 }
 
 fn all_lines(args string) []string {
-	res := os.execute('${rig.executable_under_test} ${args}')
+	res := os.exec(testing.split_args('${rig.executable_under_test} ${args}'))
 	// The failure has to say which invocation failed, because the assertion is in
 	// here and not at the call site.
 	assert res.exit_code == 0, 'od ${args}: exit ${res.exit_code}, output: ${res.output}'

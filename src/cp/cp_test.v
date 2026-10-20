@@ -39,30 +39,30 @@ fn test_help_and_version() {
 // --progress is a long option with no short form, so it is spelled with two
 // dashes. A single dash leaves it as a free argument and the copy fails.
 fn test_progress_is_listed_in_help() {
-	res := os.execute('${rig.executable_under_test} --help')
+	res := os.exec(testing.split_args('${rig.executable_under_test} --help'))
 	assert res.exit_code == 0
 	assert res.output.contains('--progress')
 }
 
 fn test_progress_copies_a_file() {
-	res := os.execute('${rig.executable_under_test} --progress ${src_path} ${dst_path}')
+	res := os.exec(testing.split_args('${rig.executable_under_test} --progress ${src_path} ${dst_path}'))
 	assert res.exit_code == 0
 	assert os.read_bytes(dst_path)! == os.read_bytes(src_path)!
 }
 
 fn test_progress_copies_a_directory() {
-	res := os.execute('${rig.executable_under_test} --progress -r ${dir_src} ${dir_dst}')
+	res := os.exec(testing.split_args('${rig.executable_under_test} --progress -r ${dir_src} ${dir_dst}'))
 	assert res.exit_code == 0
 	assert os.read_bytes(os.join_path(dir_dst, 'a.txt'))! == 'aaa\n'.bytes()
 	assert os.read_bytes(os.join_path(dir_dst, 'b.txt'))! == 'bbbb\n'.bytes()
 	assert os.read_bytes(os.join_path(dir_dst, 'sub', 'c.txt'))! == 'cc\n'.bytes()
 }
 
-// The bar is drawn on standard error, which os.execute captures along with
+// The bar is drawn on standard error, which os.exec captures along with
 // standard output. It is a sequence of carriage-terminated updates ending at
 // 100%, so the last one is the one to look for.
 fn test_progress_draws_a_bar() {
-	res := os.execute('${rig.executable_under_test} --progress -r ${dir_src} ${dir_dst}')
+	res := os.exec(testing.split_args('${rig.executable_under_test} --progress -r ${dir_src} ${dir_dst}'))
 	assert res.exit_code == 0
 	assert res.output.contains('100%')
 	assert res.output.contains('[')

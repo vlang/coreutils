@@ -69,7 +69,7 @@ fn test_stdin() {
 	if no_standard_input_here() {
 		return
 	}
-	res := os.exec(testing.split_args('cat ${test1_txt_path} | ${executable_under_test} -cmwlL'))
+	res := testing.run_stdin(executable_under_test, ['-cmwlL'], test1_txt_path)
 
 	assert res.exit_code == 0
 	assert res.output.trim_space() == '1  5 25 25 12'
@@ -79,7 +79,7 @@ fn test_stdin_file_list() {
 	if no_standard_input_here() {
 		return
 	}
-	res := os.exec(testing.split_args('cat ${file_list_path} | ${executable_under_test} -cmwlL --files0-from=-'))
+	res := testing.run_stdin(executable_under_test, ['-cmwlL', '--files0-from=-'], file_list_path)
 
 	assert res.exit_code == 0
 	assert res.output.trim_space() == '1 5 25 25 12 ${test1_txt_path}${eol}1 2 26 26 16 ${test2_txt_path}${eol}2 2 28 28 17 ${test3_txt_path}${eol}4 9 79 79 17 total'

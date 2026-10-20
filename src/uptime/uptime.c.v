@@ -3,6 +3,10 @@ import math
 import common
 
 #include <time.h>
+// Calls declared below rely on these headers for their prototypes: an fn C keeps
+// no C declaration of its own, so the header that says the function is what makes
+// the call legal, and gcc 14 makes an implicit declaration an error.
+#include <stdlib.h>
 
 struct C.tm {
 	tm_sec   int

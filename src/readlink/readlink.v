@@ -47,9 +47,12 @@ fn resolve_link_fully(path string, max_depth int) !string {
 	return error('Too many levels of symbolic links')
 }
 
-// canonicalize takes an absolute path and resolves each component of it if it is
+// canonicalize_path takes an absolute path and resolves each component of it if it is
 // a symlink, depending on mode allowing or disallowing missing components
-fn canonicalize(path string, mode CanonicalizeMode) !(string, bool) {
+//
+// The name cannot be plain `canonicalize`: glibc declares `canonicalize` in math.h,
+// and once the build asks for the GNU declarations the C symbols collide.
+fn canonicalize_path(path string, mode CanonicalizeMode) !(string, bool) {
 	assert os.is_abs_path(path)
 	mut ok := true
 	// mut res := ''
@@ -87,7 +90,7 @@ fn readlink(settings Settings) {
 	mut exit_code := 0
 	for path in settings.target_files {
 		if settings.canonicalize != .do_not {
-			if cpath, exists := canonicalize(os.abs_path(path), settings.canonicalize) {
+			if cpath, exists := canonicalize_path(os.abs_path(path), settings.canonicalize) {
 				if !exists {
 					app.eprintln('${path}: No such file or directory')
 					exit_code = 1

@@ -5,13 +5,17 @@ const app_name = 'tee'
 
 fn main() {
 	set := args()!
-	tee(set)
+	copy_input(set)
 }
 
-// tee copies standard input to standard output and to every file named, which is
+// copy_input copies standard input to standard output and to every file named, which is
 // what GNU does and what nothing else in this repository did: src/tee held a
 // delete.me and nothing else.
-fn tee(set Settings) {
+//
+// The name cannot be `tee`: glibc declares its own `tee` function in fcntl.h when
+// _GNU_SOURCE is defined, which this build has to, and a C symbol of the same name
+// collides with it.
+fn copy_input(set Settings) {
 	mut exit_code := 0
 	mut sinks := []os.File{}
 	// -a appends and without it the file is truncated, so the two are opened

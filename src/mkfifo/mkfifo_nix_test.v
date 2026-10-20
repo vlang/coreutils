@@ -34,7 +34,7 @@ fn testsuite_end() {
 
 fn test_default_create_single_pipe() {
 	target := 'test_piped'
-	res := os.execute('${executable_under_test} ${target}')
+	res := os.exec(testing.split_args('${executable_under_test} ${target}'))
 	assert res.exit_code == 0
 	assert res.output.trim_space() == ''
 	assert os.is_file(target)
@@ -44,7 +44,7 @@ fn test_default_create_single_pipe() {
 
 fn test_default_create_multiple_pipes() {
 	target := 'tp1 tp2 tp3'
-	res := os.execute('${executable_under_test} ${target}')
+	res := os.exec(testing.split_args('${executable_under_test} ${target}'))
 	assert res.exit_code == 0
 	assert res.output.trim_space() == ''
 	for p in target.split(' ') {

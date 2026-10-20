@@ -1,5 +1,13 @@
 module common
 
+// utmpxname is a glibc extension, declared in its <utmpx.h> only when _GNU_SOURCE is
+// defined, and a gcc that treats an implicit function declaration as an error, as
+// gcc 14 does by default, refuses the module without one. Asking for _GNU_SOURCE
+// project wide would drag every other GNU declaration into every compile, where they
+// collide with the ones these commands share names with, so the prototype stands on
+// its own instead. The guard is for the compilers that scan headers more than once.
+#include "readutmp_nix.h"
+
 #include <utmp.h>
 #include <utmpx.h>
 #include <errno.h>
