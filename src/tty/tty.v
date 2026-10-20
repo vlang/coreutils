@@ -1,3 +1,5 @@
+module tty
+
 import common
 import os
 
@@ -12,24 +14,25 @@ mut:
 	silent bool
 }
 
-fn tty(settings Settings) {
+fn tty(settings Settings) int {
 	if settings.silent {
 		if isatty(c_stdin) or { false } {
-			exit(0)
+			return 0
 		}
-		exit(1) // TTY_STDIN_NOTTY
+		return 1 // TTY_STDIN_NOTTY
 	}
 
 	if name := ttyname(c_stdin) {
 		println(name)
 	} else {
 		println('not a tty')
-		exit(1)
+		return 1
 	}
+	return 0
 }
 
-fn args() Settings {
-	mut fp := app.make_flag_parser(os.args)
+fn parse(args []string) (int, Settings) {
+	mut fp := app.make_flag_parser(args)
 	mut st := Settings{}
 	st.silent = fp.bool('silent', `s`, false, 'print nothing, only return an exit status')
 	if fp.bool('quiet', 0, false, 'print nothing, only return an exit status') {
@@ -37,12 +40,17 @@ fn args() Settings {
 	}
 	rem_pars := fp.remaining_parameters()
 	if rem_pars.len > 0 {
-		app.quit(message: 'extra operand ‘${rem_pars[0]}’')
+		// quit_status rather than quit: this tool can run inside the multicall
+		// binary, where exiting would end every other tool too.
+		return app.quit_status(message: 'extra operand ‘${rem_pars[0]}’'), st
 	}
-	return st
+	return 0, st
 }
 
-fn main() {
+// run is the entry point shared by the standalone binary and the multicall
+// binary, so both dispatch through the same code.
+pub fn run(args []string) int {
 	// TODO: Invalid usage should return with exit code 2 (TTY_FAILURE)
-	tty(args())
+	code, settings := parse(args)
+	return code | tty(settings)
 }

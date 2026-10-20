@@ -1,3 +1,5 @@
+module hostid
+
 /*
 ** Get hostid on unsupported platforms
 */

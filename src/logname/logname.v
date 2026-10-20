@@ -1,32 +1,13 @@
-import os
+module logname
+
 import flag
+import os
 
 /*
 The following block has been created in this file, but should be extracted to a common module for use by all utils
 */
 
 const version_str = 'V Coreutils 0.0.1'
-
-// A default error exit, when code is not important
-fn error_exit(errors ...string) {
-	error_exit_code(1, ...errors)
-}
-
-// Use only if error code is important (some semantic meaning to particular codes)
-fn error_exit_code(code int, errors ...string) {
-	for error in errors {
-		eprintln(error)
-	}
-	exit(code)
-}
-
-// Use if successful exit
-fn success_exit(messages ...string) {
-	for message in messages {
-		println(message)
-	}
-	exit(0)
-}
 
 /*
 ** Standard function to perform basic flag parsing an help and version processing
@@ -37,14 +18,16 @@ fn success_exit(messages ...string) {
 
 fn flags_common(args []string, app_name string, free_args_min int, free_args_max int) !(&flag.FlagParser, string) {
 	// Flags
-	mut fp := flag.new_flag_parser(os.args)
+	// The parser is built from the args it is given, not from os.args. It used to
+	// read os.args directly despite taking the parameter, which meant the tool
+	// only behaved correctly when invoked as its own binary - and parsed the
+	// wrong argv when called any other way.
+	mut fp := flag.new_flag_parser(args)
 	fp.application(app_name)
 	fp.limit_free_args(free_args_min, free_args_max)!
 	fp.version(version_str) // Preferably take from common version constant, should be updated regularly
 	fp.description('Tool to display login name')
 	exec := fp.args[0]
-
-	// println(exec)
 
 	fp.skip_executable()
 
@@ -73,11 +56,20 @@ logname
 ** Standard way to take arguments - Solved by using flags module
 */
 
-fn main() {
+// run is the entry point shared by the standalone binary and the multicall
+// binary, so both dispatch through the same code.
+pub fn run(args []string) int {
 	// Exec is not needed
-	mut fp, _ := flags_common_no_args(os.args, 'logname')!
+	mut fp, _ := flags_common_no_args(args, 'logname') or {
+		eprintln(err)
+		return 1
+	}
 
-	fp.finalize() or { error_exit(err.str(), fp.usage()) }
+	fp.finalize() or {
+		eprintln(err)
+		eprintln(fp.usage())
+		return 1
+	}
 
 	// Main functionality
 
@@ -85,8 +77,10 @@ fn main() {
 	lname := os.loginname() or { '' }
 	if lname == '' {
 		// C.getlogin failed
-		error_exit('no login name')
+		eprintln('logname: no login name')
+		return 1
 	}
 
-	success_exit(lname)
+	println(lname)
+	return 0
 }
