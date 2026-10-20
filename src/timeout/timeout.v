@@ -249,7 +249,7 @@ fn handle_timeout(mut p os.Process, kill_after_ms i64, signal string, preserve_s
 	if verbose {
 		eprintln('${app_name}: sending signal ${signal} to command')
 	}
-	terminate_process(p, sig_num, !foreground)
+	terminate_process(mut &p, sig_num, !foreground)
 
 	if kill_after_ms > 0 {
 		kill_start := time.now()
@@ -263,7 +263,7 @@ fn handle_timeout(mut p os.Process, kill_after_ms i64, signal string, preserve_s
 					if verbose {
 						eprintln('${app_name}: sending signal KILL to command')
 					}
-					terminate_process(p, 9, !foreground)
+					terminate_process(mut &p, 9, !foreground)
 				}
 				return handle_process_exit(mut p, preserve_status, 124)
 			}
