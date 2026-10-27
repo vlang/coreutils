@@ -3,14 +3,6 @@ module main
 import os
 import time
 
-fn print_lines(lines []string) {
-	println(' ')
-	println('-------------')
-	for line in lines {
-		println(line)
-	}
-}
-
 fn temp_file_name() string {
 	dir := os.temp_dir()
 	file := '${dir}/t${time.ticks()}'

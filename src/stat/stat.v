@@ -73,19 +73,19 @@ struct Statx {
 
 // Field types and order mirror the kernel's `struct statvfs`, including the
 // trailing spare, because statvfs() hands this struct to libc through a
-// voidptr. Every f_* member is `unsigned long`/`fsblkcnt_t`, hence usize.
+// voidptr. Every f_* member is `unsigned long`/`fsblkcnt_t`, hence uint.
 struct Statvfs {
-	f_bsize   usize  // Filesystem block size
-	f_frsize  usize  // Fragment size
-	f_blocks  usize  // Size of fs in f_frsize units
-	f_bfree   usize  // Number of free blocks
-	f_bavail  usize  // Number of free blocks for unprivileged users
-	f_files   usize  // Number of inodes
-	f_ffree   usize  // Number of free inodes
-	f_favail  usize  // Number of free inodes for unprivileged users
-	f_fsid    usize  // Filesystem ID
-	f_flag    usize  // Mount flags
-	f_namemax usize  // Maximum filename length
+	f_bsize   uint   // Filesystem block size
+	f_frsize  uint   // Fragment size
+	f_blocks  uint   // Size of fs in f_frsize units
+	f_bfree   uint   // Number of free blocks
+	f_bavail  uint   // Number of free blocks for unprivileged users
+	f_files   uint   // Number of inodes
+	f_ffree   uint   // Number of free inodes
+	f_favail  uint   // Number of free inodes for unprivileged users
+	f_fsid    uint   // Filesystem ID
+	f_flag    uint   // Mount flags
+	f_namemax uint   // Maximum filename length
 	f_spare   [6]i32 // __f_spare in the C struct; V rejects leading underscores
 }
 
