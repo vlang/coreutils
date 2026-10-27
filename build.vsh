@@ -73,7 +73,7 @@ fn build_multicall(curdir string, vargs []string) ! {
 	if !exists(mc_exe) {
 		mut cmd := [@VEXE, '-Wimpure-v']
 		cmd << vargs
-		cmd << ['-o', mc_exe, './multicall']
+		cmd << ['-o', mc_exe, './src/multicall']
 		println('> building the multicall binary ${exe_name}')
 		os.exec_or_panic(cmd)
 	}
