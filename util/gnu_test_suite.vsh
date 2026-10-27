@@ -67,7 +67,7 @@ fn gnu_version(tag string) string {
 // status and output. The arguments are passed rather than interpolated so that
 // the script can use "$1" and friends without V rewriting them.
 fn run_shell(args []string) (int, string) {
-	res := os.exec_opt(args) or { return -1, err.msg() }
+	res := os.exec(args)
 	return res.exit_code, res.output
 }
 
@@ -201,7 +201,10 @@ fn patch_path(gnu_root string, bin_dir string) ! {
 	touch_args := ['touch', os.join_path(gnu_root, 'tests/local.mk'), os.join_path(gnu_root,
 		'tests/Makefile.in'), os.join_path(gnu_root, 'Makefile'), os.join_path(gnu_root,
 		'Makefile.in')]
-	_ := os.exec_opt(touch_args) or { return error('could not touch the makefiles') }
+	touch_res := os.exec(touch_args)
+	if touch_res.exit_code != 0 {
+		return error('could not touch the makefiles')
+	}
 }
 
 // built_programs returns the names of the executables in bin_dir, which is both
