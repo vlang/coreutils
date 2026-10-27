@@ -1,7 +1,6 @@
 module install
 
 import common
-import os
 
 pub fn parse_args(args []string) Settings {
 	mut s := Settings{}
