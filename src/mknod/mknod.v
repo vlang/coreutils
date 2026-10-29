@@ -1,4 +1,5 @@
 import common
+import common.mknod as mknodmod
 import os
 
 const app_name = 'mknod'
@@ -32,13 +33,13 @@ fn main() {
 		}
 		major := rest[2].int()
 		minor := rest[3].int()
-		dev = device_number(major, minor)
-		mode |= type_bits(kind)
+		dev = mknodmod.device_number(major, minor)
+		mode |= mknodmod.type_bits(kind)
 	} else if kind == `p` {
 		if rest.len > 2 {
 			common.exit_with_error_message(app_name, 'extra operand ‘${rest[2]}’')
 		}
-		mode |= s_ififo
+		mode |= mknodmod.s_ififo
 	} else {
 		common.exit_with_error_message(app_name, 'invalid device type ‘${kind.ascii_str()}’')
 	}
@@ -53,21 +54,9 @@ fn main() {
 	}
 }
 
-fn type_bits(kind u8) u32 {
-	return match kind {
-		`b` { s_ifblk }
-		`c` { s_ifchr }
-		else { u32(0) }
-	}
-}
-
 fn quoted(s string) string {
 	return "'${s}'"
 }
-
-const s_ififo = u32(0o010000)
-const s_ifblk = u32(0o060000)
-const s_ifchr = u32(0o020000)
 
 fn args() !(Settings, []string) {
 	mut st := Settings{
@@ -92,7 +81,7 @@ fn args() !(Settings, []string) {
 		}
 		if a.starts_with('--mode=') {
 			st.mode_text = a['--mode='.len..]
-			st.mode = parse_mode(st.mode_text)
+			st.mode = mknodmod.parse_mode(st.mode_text)
 			continue
 		}
 		if a.starts_with('--') {
@@ -102,7 +91,7 @@ fn args() !(Settings, []string) {
 			if a[1] == `m` {
 				value := if a.len > 2 { a[2..] } else { args[i + 1] }
 				st.mode_text = value
-				st.mode = parse_mode(value)
+				st.mode = mknodmod.parse_mode(value)
 				if a.len <= 2 {
 					i++
 				}
@@ -123,20 +112,6 @@ fn umask_value() u32 {
 	// A process-wide read of the umask, which is what GNU applies when no -m
 	// is given. V does not expose it, so this reflects the common default.
 	return 0o022
-}
-
-fn parse_mode(s string) u32 {
-	if s == '' {
-		common.exit_with_error_message(app_name, 'invalid mode')
-	}
-	mut n := u32(0)
-	for c in s.bytes() {
-		if c < `0` || c > `7` {
-			common.exit_with_error_message(app_name, "invalid mode '${s}'")
-		}
-		n = n * 8 + u32(c - `0`)
-	}
-	return n
 }
 
 fn print_help() {
