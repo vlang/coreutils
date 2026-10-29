@@ -53,7 +53,7 @@ struct C.statx {
 
 fn C.statx(int, &char, int, u32, &C.statx) int
 fn C.vcu_statvfs(&char, voidptr) int
-fn C.readlink(pathname &char, buf &char, bufsiz usize) int
+fn C.readlink(pathname &char, buf &char, bufsiz uint) int
 
 const c_at_statx_sync_as_stat = 0x0000 // C.AT_STATX_SYNC_AS_STAT from fcntl.h
 const c_at_statx_force_sync = 0x2000 // C.AT_STATX_FORCE_SYNC from fcntl.h

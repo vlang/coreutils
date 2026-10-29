@@ -3,7 +3,7 @@ import os
 #include <fcntl.h>
 #include <unistd.h>
 
-fn C.readlink(pathname &char, buf &char, bufsiz usize) int
+fn C.readlink(pathname &char, buf &char, bufsiz uint) int
 
 pub fn do_readlink(path string) !string {
 	mut result := [os.max_path_len]u8{}
