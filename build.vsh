@@ -26,6 +26,7 @@ const ignore_dirs = {
 		'id',
 		'install',
 		'ls',
+		'mknod',
 		'nice',
 		'pinky',
 		'stat',
