@@ -26,6 +26,7 @@ const ignore_dirs = {
 		'id',
 		'install',
 		'ls',
+		'mknod',
 		'nice',
 		'pinky',
 		'stat',
@@ -43,7 +44,7 @@ const ignore_dirs = {
 		// TODO: nohup is included in Win32 version
 		'nohup',
 	]
-	'macos':   ['stat', 'sync', 'uptime']
+	'macos':   ['stat', 'sync', 'uptime', 'mknod']
 }[user_os()] or { [] }
 
 unbuffer_stdout()
