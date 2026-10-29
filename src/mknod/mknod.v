@@ -55,7 +55,9 @@ fn main() {
 }
 
 fn quoted(s string) string {
-	return "'${s}'"
+	// GNU wraps the operand in single quotes and escapes any embedded
+	// single quote as '\'' (close, escaped quote, reopen).
+	return "'" + s.replace("'", "'\\''") + "'"
 }
 
 fn args() !(Settings, []string) {
@@ -109,9 +111,9 @@ fn args() !(Settings, []string) {
 }
 
 fn umask_value() u32 {
-	// A process-wide read of the umask, which is what GNU applies when no -m
-	// is given. V does not expose it, so this reflects the common default.
-	return 0o022
+	// Read the actual process umask rather than assuming 0o022, which is what
+	// GNU applies when no -m is given.
+	return read_umask()
 }
 
 fn print_help() {
