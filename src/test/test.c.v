@@ -237,14 +237,8 @@ fn test_unary(option u8, arg string) bool {
 				// group ID not supported for WinOS
 				return false
 			} $else {
-				if !os.exists(arg) {
-					return false
-				}
-				attr := C.stat{}
-				unsafe {
-					C.stat(&char(arg.str), &attr)
-				}
-				return attr.st_mode & os.s_isgid > 0
+				attr := os.stat(arg) or { return false }
+				return attr.mode & os.s_isgid > 0
 			}
 		}
 		`h`, `L` {
@@ -273,14 +267,8 @@ fn test_unary(option u8, arg string) bool {
 				// user ID not supported for WinOS
 				return false
 			} $else {
-				if !os.exists(arg) {
-					return false
-				}
-				attr := C.stat{}
-				unsafe {
-					C.stat(&char(arg.str), &attr)
-				}
-				return attr.st_mode & os.s_isuid > 0
+				attr := os.stat(arg) or { return false }
+				return attr.mode & os.s_isuid > 0
 			}
 		}
 		`w` {
@@ -296,23 +284,6 @@ fn test_unary(option u8, arg string) bool {
 	}
 
 	my_panic('unexpected unary operator')
-}
-
-// Minimal stat struct as specified in
-// https://pubs.opengroup.org/onlinepubs/9699919799/basedefs/sys_stat.h.html
-// TODO: Replace with os.stat() once it's in in v:main
-pub struct C.stat {
-	st_dev   u64
-	st_ino   u64
-	st_mode  u32
-	st_nlink u64
-	st_uid   u32
-	st_gid   u32
-	st_rdev  u64
-	st_size  u64
-	st_atime int
-	st_mtime int
-	st_ctime int
 }
 
 enum FileType {
@@ -376,16 +347,9 @@ fn test_binary(option string, arg1 string, arg2 string) bool {
 			return os.file_last_mod_unix(arg1) < os.file_last_mod_unix(arg2)
 		}
 		'-ef' {
-			if !os.exists(arg1) || !os.exists(arg2) {
-				return false
-			}
-			attr1 := C.stat{}
-			attr2 := C.stat{}
-			unsafe {
-				C.stat(&char(arg1.str), &attr1)
-				C.stat(&char(arg2.str), &attr2)
-			}
-			return attr1.st_dev == attr2.st_dev && attr1.st_ino == attr2.st_ino
+			attr1 := os.stat(arg1) or { return false }
+			attr2 := os.stat(arg2) or { return false }
+			return attr1.dev == attr2.dev && attr1.inode == attr2.inode
 		}
 		else {
 			my_panic('unexpected binary operator')
