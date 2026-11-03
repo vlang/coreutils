@@ -436,7 +436,8 @@ fn format_output_fs(path string, st Statvfs, fmt string, mtab []MountInfo, fslis
 	}
 }
 
-fn stat(settings Settings) {
+fn stat(settings Settings) int {
+	mut exit_code := 0
 	mut mtab := []MountInfo{}
 	mut fslist := map[string]u32{}
 	// Only load mount table if we need the info from it
@@ -452,17 +453,20 @@ fn stat(settings Settings) {
 			if st := statvfs(fname) {
 				format_output_fs(fname, st, settings.format, mtab, fslist)
 			} else {
-				app.eprintln_posix("cannot statx '${fname}'")
+				app.eprintln_posix("cannot read file system information for '${fname}'")
+				exit_code = 1
 			}
 		} else {
 			// Individual files
 			if st := statx(fname, settings.dereference, settings.cache_mode) {
 				format_output(fname, st, settings.format, mtab)
 			} else {
-				app.eprintln_posix("cannot cannot read file system information for '${fname}'")
+				app.eprintln_posix("cannot statx '${fname}'")
+				exit_code = 1
 			}
 		}
 	}
+	return exit_code
 }
 
 fn args() Settings {
@@ -543,7 +547,7 @@ fn args() Settings {
 }
 
 fn main() {
-	stat(args())
+	exit(stat(args()))
 }
 
 fn get_mount_list() []MountInfo {
