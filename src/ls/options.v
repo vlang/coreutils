@@ -39,7 +39,7 @@ mut:
 	no_size               bool                @[xdoc: 'hide file size']
 	no_wrap               bool                @[xdoc: 'do not wrap long lines']
 	size_kb               bool                @[long: 'human-readable'; short: 'h'; xdoc: 'with -l and -s, print sizes like 1K 234M 2G etc.']
-	header                bool                @[xddoc: 'show column headers (implies -l)']
+	header                bool                @[xdoc: 'show column headers (implies -l)']
 	size_ki               bool                @[long: 'si'; xdoc: 'likewise, but use powers of 1000 not 1024']
 	inode                 bool                @[long: 'inode'; short: 'i'; xdoc: 'print the index number of each file']
 	long_format           bool                @[only: 'l'; xdoc: 'use a long listing format']
