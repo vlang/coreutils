@@ -55,6 +55,48 @@ fn test_current_group_order_comes_from_process_with_or_without_real_flag() {
 	}
 }
 
+fn test_current_process_group_edge_cases() {
+	$if !linux {
+		return
+	}
+	root := os.join_path(rig.temp_dir, 'group_edges')
+	os.mkdir_all(root)!
+	defer {
+		os.rmdir_all(root) or {}
+	}
+	fixture := os.join_path(@VMODROOT, 'src', 'id', 'testdata', 'group_edges.c')
+	tool := os.join_path(root, 'id')
+	built := os.exec([@VEXE, '-cg', '-cflags', fixture, '-o', tool,
+		os.join_path(@VMODROOT, 'src', 'id')])
+	assert built.exit_code == 0, built.output
+	mut many_groups := [0, 55]
+	for gid in 100 .. 120 {
+		many_groups << gid
+	}
+	cases := {
+		'different': [0, 55, 22, 33]
+		'many':      many_groups
+		'grow':      many_groups
+		'shrink':    [0, 55, 22, 33]
+		'empty':     [0, 55]
+		'primary':   [0, 55, 22, 33]
+		'same':      [55, 22, 33]
+	}
+	for fixture_case, groups in cases {
+		for option in ['-G', '-Gr', '-Gz', '-Grz'] {
+			res := os.exec(['env', 'V_ID_GROUP_FIXTURE=${fixture_case}', tool, option])
+			separator := if option.ends_with('z') { '\0' } else { ' ' }
+			ending := if option.ends_with('z') { '\0' } else { '\n' }
+			assert res.exit_code == 0, '${fixture_case}: ${res.output}'
+			assert res.output == groups.map(it.str()).join(separator) + ending, '${fixture_case}: ${res.output}'
+		}
+	}
+	for fixture_case in ['query_error', 'read_error', 'busy'] {
+		res := os.exec(['env', 'V_ID_GROUP_FIXTURE=${fixture_case}', tool, '-Gr'])
+		assert res.exit_code != 0, fixture_case
+	}
+}
+
 fn test_non_existing_users() {
 	compare('does_not_exist_1 does_not_exist_2 does_not_exist_3 root does_not_exist_4')
 }

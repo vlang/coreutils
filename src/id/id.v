@@ -136,7 +136,7 @@ fn id(settings Settings) !int {
 		if settings.groups {
 			// With no USER operand, -G describes this process, including with -r.
 			// Account-database membership and ordering can differ from its groups.
-			gids := pwd.get_effective_groups()!
+			gids := current_process_groups(rgid)!
 			print_groups(gids, settings.name, settings.line_sep, settings.field_sep)!
 		} else if settings.real {
 			print_info(ruid, rgid, settings)!
