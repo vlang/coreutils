@@ -133,7 +133,12 @@ fn id(settings Settings) !int {
 		if rgid == -1 {
 			app.quit(message: 'cannot get real GID')
 		}
-		if settings.real {
+		if settings.groups {
+			// With no USER operand, -G describes this process, including with -r.
+			// Account-database membership and ordering can differ from its groups.
+			gids := pwd.get_effective_groups()!
+			print_groups(gids, settings.name, settings.line_sep, settings.field_sep)!
+		} else if settings.real {
 			print_info(ruid, rgid, settings)!
 		} else {
 			// We only need effective UID and GID if -r is not set
@@ -150,10 +155,6 @@ fn id(settings Settings) !int {
 			}
 			if settings.user {
 				print_uid(euid, settings.name, settings.line_sep)!
-			}
-			if settings.groups {
-				gids := pwd.get_effective_groups()!
-				print_groups(gids, settings.name, settings.line_sep, settings.field_sep)!
 			}
 			if !settings.group && !settings.user && !settings.groups {
 				mut buffer := []string{}

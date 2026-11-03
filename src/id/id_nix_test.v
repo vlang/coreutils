@@ -1,6 +1,7 @@
 module main
 
 import common.testing
+import common.pwd
 import os
 
 const rig = testing.prepare_rig(util: 'id')
@@ -17,6 +18,41 @@ fn test_help_and_version() {
 
 fn test_current_user() {
 	compare('')
+}
+
+fn test_current_group_order_comes_from_process_with_or_without_real_flag() {
+	$if !linux {
+		return
+	}
+	root := os.join_path(rig.temp_dir, 'group_order')
+	os.mkdir_all(root)!
+	defer {
+		os.rmdir_all(root) or {}
+	}
+	fixture := os.join_path(@VMODROOT, 'src', 'id', 'testdata', 'group_order.c')
+	tool := os.join_path(root, 'id')
+	built := os.exec([@VEXE, '-cg', '-cflags', fixture, '-o', tool,
+		os.join_path(@VMODROOT, 'src', 'id')])
+	assert built.exit_code == 0, built.output
+	// The C fixture makes kernel and account-database group order differ even
+	// when the account running this test belongs to only one group.
+	gid := os.getegid()
+	process_groups := [gid, gid ^ 8, gid ^ 2, gid ^ 4]
+	for options in [['-G'], ['-Gr'], ['-Gz'], ['-Grz']] {
+		res := os.exec([tool, ...options])
+		separator := if options[0].ends_with('z') { '\0' } else { ' ' }
+		ending := if options[0].ends_with('z') { '\0' } else { '\n' }
+		assert res.exit_code == 0, res.output
+		assert res.output == process_groups.map(it.str()).join(separator) + ending
+	}
+	username := pwd.get_name_for_uid(os.getuid())!
+	user := pwd.get_userinfo_for_name(username)!
+	database_groups := [user.gid, user.gid ^ 4, user.gid ^ 8, user.gid ^ 2]
+	for option in ['-G', '-Gr'] {
+		res := os.exec([tool, option, username])
+		assert res.exit_code == 0, res.output
+		assert res.output == database_groups.map(it.str()).join(' ') + '\n'
+	}
 }
 
 fn test_non_existing_users() {
