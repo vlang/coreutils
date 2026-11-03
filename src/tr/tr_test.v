@@ -98,3 +98,23 @@ fn test_character_classes() {
 fn test_backslash_escapes() {
 	assert_tr_matches_gnu(['\\n', 'X'])
 }
+
+fn test_set_ranges_include_their_endpoints() ! {
+	os.write_file(input_path, 'xyzXYZ019 \t\n\v\f\r')!
+	defer { os.write_file(input_path, input_content) or { panic(err) } }
+	assert_tr_matches_gnu(['x-z', 'X-Z'])
+	assert_tr_matches_gnu(['Z-Z', '!'])
+	assert_tr_matches_gnu(['[:lower:]', '[:upper:]'])
+	assert_tr_matches_gnu(['[:upper:]', '[:lower:]'])
+	assert_tr_matches_gnu(['[:digit:]', 'X'])
+	assert_tr_matches_gnu(['[:space:]', '_'])
+	os.write_file(input_path, 'AZaz\t\n\v\f\r ')!
+	assert_tr_matches_gnu(['[:alpha:]', '0-9'])
+	assert_tr_matches_gnu(['[:space:]', 'abcdef'])
+}
+
+fn test_complement_deletion_and_short_replacement() {
+	assert_tr_matches_gnu(['-cd', 'a-z'])
+	assert_tr_matches_gnu(['a-z', 'X'])
+	assert_tr_matches_gnu(['[:digit:]', 'X'])
+}

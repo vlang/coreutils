@@ -53,12 +53,9 @@ fn tr(set Settings) {
 	} else {
 		for b in input {
 			idx := set.set1.index(b.ascii_str()) or { -1 }
-			if idx >= 0 && idx < set.set2.len {
-				output << set.set2[idx]
-			} else if set.complement {
-				if set.set2.len > 0 {
-					output << set.set2[0]
-				}
+			if idx >= 0 && set.set2.len > 0 {
+				// A shorter SET2 repeats its final byte for the remaining SET1.
+				output << set.set2[if idx < set.set2.len { idx } else { set.set2.len - 1 }]
 			} else {
 				output << b
 			}
@@ -84,43 +81,43 @@ fn parse_set(s string) string {
 			}
 			i++
 		} else if s[i] == `[` && i + 2 < s.len && s[i + 1] == `:` {
-			end := s.index_after(']', i + 2) or { s.len }
+			end := s.index_after(':]', i + 2) or { s.len }
 			class := s[i + 2..end]
 			match class {
 				'alpha' {
-					for c in u8(`a`) .. u8(`z`) {
-						result += c.ascii_str()
+					for c in int(`A`) .. int(`Z`) + 1 {
+						result += u8(c).ascii_str()
 					}
-					for c in u8(`A`) .. u8(`Z`) {
-						result += c.ascii_str()
+					for c in int(`a`) .. int(`z`) + 1 {
+						result += u8(c).ascii_str()
 					}
 				}
 				'digit' {
-					for c in u8(`0`) .. u8(`9`) {
-						result += c.ascii_str()
+					for c in int(`0`) .. int(`9`) + 1 {
+						result += u8(c).ascii_str()
 					}
 				}
 				'space' {
-					result += ' \t\n\r'
+					result += '\t\n\v\f\r '
 				}
 				'lower' {
-					for c in u8(`a`) .. u8(`z`) {
-						result += c.ascii_str()
+					for c in int(`a`) .. int(`z`) + 1 {
+						result += u8(c).ascii_str()
 					}
 				}
 				'upper' {
-					for c in u8(`A`) .. u8(`Z`) {
-						result += c.ascii_str()
+					for c in int(`A`) .. int(`Z`) + 1 {
+						result += u8(c).ascii_str()
 					}
 				}
 				else {}
 			}
-			i = end + 1
+			i = end + 2
 		} else if i + 2 < s.len && s[i + 1] == `-` {
 			start := s[i]
 			end_ch := s[i + 2]
-			for c in u8(start) .. u8(end_ch) {
-				result += c.ascii_str()
+			for c in int(start) .. int(end_ch) + 1 {
+				result += u8(c).ascii_str()
 			}
 			i += 3
 		} else {
@@ -161,6 +158,15 @@ fn args() !Settings {
 	} else {
 		set1 = parse_set(rest[0])
 		set2 = parse_set(rest[1])
+	}
+	if complement {
+		mut bytes := []u8{}
+		for c in 0 .. 256 {
+			if !set1.contains(u8(c).ascii_str()) {
+				bytes << u8(c)
+			}
+		}
+		set1 = bytes.bytestr()
 	}
 
 	return Settings{
