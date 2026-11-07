@@ -75,7 +75,7 @@ fn get_group_descr(gid int) string {
 	return '${gid}(${pwd.get_name_for_gid(gid) or { '' }})'
 }
 
-fn print_gid(gid int, print_name bool, line_sep string) ! {
+fn print_gid(gid int, print_name bool, _line_sep string) ! {
 	if !print_name {
 		print(gid)
 	} else {
@@ -83,7 +83,7 @@ fn print_gid(gid int, print_name bool, line_sep string) ! {
 	}
 }
 
-fn print_uid(uid int, print_name bool, line_sep string) ! {
+fn print_uid(uid int, print_name bool, _line_sep string) ! {
 	if !print_name {
 		print(uid)
 	} else {
@@ -91,7 +91,7 @@ fn print_uid(uid int, print_name bool, line_sep string) ! {
 	}
 }
 
-fn print_groups(gids []int, print_name bool, line_sep string, field_sep string) ! {
+fn print_groups(gids []int, print_name bool, _line_sep string, field_sep string) ! {
 	if !print_name {
 		print(gids.map(it.str()).join(field_sep))
 	} else {

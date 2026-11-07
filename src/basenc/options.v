@@ -36,7 +36,7 @@ fn get_options() Options {
 		'bit string with most significant bit (msb) first')
 	base2lsbf := fp.bool('base2lsbf', ` `, false,
 		'bit string with least significant bit (lsb) first')
-	decode := fp.bool('decode', `d`, false, 'decode data')
+	dec := fp.bool('decode', `d`, false, 'decode data')
 	wrap := fp.int('wrap', `w`, 76,
 		'wrap encoded lines after <int> COLS character (default 76)\n${flag.space}' + 'Use 0 to disable line wrapping')
 	z85 := fp.bool('z85', ` `, false,
@@ -52,7 +52,7 @@ fn get_options() Options {
 		base16:    base16
 		base2msbf: base2msbf
 		base2lsbf: base2lsbf
-		decode:    decode
+		decode:    dec
 		wrap:      wrap
 		z85:       z85
 		files:     scan_files_arg(files)
