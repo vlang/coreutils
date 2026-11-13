@@ -1,20 +1,16 @@
-module main
+module true
 
 import common
-import os
 
 const app_name = 'true'
 
-fn true_fn() ! {
-	mut fp := common.flag_parser(os.args)
+// run is the entry point shared by the standalone binary and the multicall
+// binary, so both dispatch through the same code.
+pub fn run(args []string) int {
+	mut fp := common.flag_parser(args)
 	fp.application(app_name)
 	fp.description('Exit with a status code indicating success.')
-	fp.limit_free_args(0, 0)!
+	fp.limit_free_args(0, 0) or { return 1 }
 	fp.finalize() or {}
-
-	exit(0)
-}
-
-fn main() {
-	true_fn()!
+	return 0
 }

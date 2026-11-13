@@ -1,3 +1,5 @@
+module tty
+
 import os
 
 #include <unistd.h>

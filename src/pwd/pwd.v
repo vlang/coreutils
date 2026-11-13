@@ -1,3 +1,5 @@
+module pwd
+
 import os
 
 fn help() {
@@ -5,14 +7,16 @@ fn help() {
 	println('Only one flag can be given at a time. If more are given it will run with -L option.')
 }
 
-fn main() {
+// run is the entry point shared by the standalone binary and the multicall
+// binary, so both dispatch through the same code.
+pub fn run(args []string) int {
 	path := os.getwd()
 	mut arg := 'null'
-	if os.args.len == 2 {
-		arg = os.args[1]
+	if args.len == 2 {
+		arg = args[1]
 	}
 	if os.user_os() == 'windows' {
-		if os.args.len == 2 {
+		if args.len == 2 {
 			if arg == '-L' {
 				pwd := os.getenv('cd')
 				println(pwd)
@@ -28,7 +32,7 @@ fn main() {
 			println(pwd)
 		}
 	} else {
-		if os.args.len == 2 {
+		if args.len == 2 {
 			if arg == '-L' {
 				pwd := os.getenv('PWD')
 				println(pwd)
@@ -44,4 +48,5 @@ fn main() {
 			println(pwd)
 		}
 	}
+	return 0
 }
