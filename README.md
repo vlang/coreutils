@@ -78,7 +78,7 @@ compare against the true GNU coreutils version on the Linux-based tests first.
 |         | dir       | Briefly list directory contents                  |         |
 | &check; | dircolors | Color setup for ls                               | &check; |
 | &check; | dirname   | Strip last file name component                   | &check; |
-|         | du        | Estimate file space usage                        | &check; |
+| &check; | du        | Estimate file space usage                        | &check; |
 | &check; | echo      | Print a line of text                             | &check; |
 | &check; | env       | Run a command in a modified environment          | &check; |
 | &check; | expand    | Convert tabs to spaces                           | &check; |
