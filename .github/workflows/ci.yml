@@ -81,7 +81,7 @@ jobs:
           cd coreutils && USE_MULTI_BINARY_TO_TEST=coreutils v test .
 
   ubuntu-fast-build:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 60
     steps:
       - name: Checkout Latest V
@@ -122,7 +122,7 @@ jobs:
         run: cd coreutils && make test
 
   ubuntu-prod-build:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 60
     steps:
       - name: Checkout Latest V
@@ -157,7 +157,7 @@ jobs:
   # even though it builds for Windows, and that is exactly how `timeout` was
   # broken on all three Unix targets before this existed.
   vinix-cross-build:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - name: Checkout Latest V
         uses: actions/checkout@v6
@@ -204,7 +204,7 @@ jobs:
           [ "$failed" -eq 0 ]
 
   ubuntu-gnu-coreutils:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 60
     steps:
       - name: Checkout Latest V
