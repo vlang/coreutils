@@ -447,22 +447,26 @@ fn stat(settings Settings) {
 	if settings.file_system && settings.format.contains('%t') {
 		fslist = get_fs_list()
 	}
+	mut errors := 0
 	for fname in settings.input_files {
 		if settings.file_system {
 			if st := statvfs(fname) {
 				format_output_fs(fname, st, settings.format, mtab, fslist)
 			} else {
-				app.eprintln_posix("cannot statx '${fname}'")
+				app.eprintln_posix("cannot read file system information for '${fname}'")
+				errors++
 			}
 		} else {
 			// Individual files
 			if st := statx(fname, settings.dereference, settings.cache_mode) {
 				format_output(fname, st, settings.format, mtab)
 			} else {
-				app.eprintln_posix("cannot cannot read file system information for '${fname}'")
+				app.eprintln_posix("cannot stat '${fname}'")
+				errors++
 			}
 		}
 	}
+	common.exit_on_errors(errors)
 }
 
 fn args() Settings {
