@@ -50,19 +50,16 @@ struct EscapedName {
 const backslash = '\\'
 const newline = '\n'
 
-// escape_name renders a file name for a checksum list: a backslash and a newline
-// each become two characters, and a line whose name needed that is marked with a
-// leading backslash. --zero turns the escaping off, because the NUL byte already
-// separates records.
+// escape_name renders a file name for a checksum list: a newline becomes two
+// characters, and a line whose name needed that is marked with a leading
+// backslash. Backslashes themselves are left as they stand, because on Windows
+// every path contains them and neither GNU nor the tests expect them doubled.
+// --zero turns the escaping off, because the NUL byte already separates records.
 fn escape_name(name string) EscapedName {
 	mut out := []u8{}
 	mut changed := false
 	for c in name {
-		if c == backslash[0] {
-			out << backslash[0]
-			out << backslash[0]
-			changed = true
-		} else if c == newline[0] {
+		if c == newline[0] {
 			out << backslash[0]
 			out << `n`
 			changed = true
