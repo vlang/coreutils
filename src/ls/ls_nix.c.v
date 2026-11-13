@@ -4,22 +4,16 @@ import os
 #include <grp.h>
 #include <unistd.h>
 
-struct Passwd {
-	pw_name  &char
-	pw_uid   usize
-	pw_gid   usize
-	pw_dir   &char
-	pw_shell &char
+struct C.passwd {
+	pw_name &char
 }
 
-struct Group {
+struct C.group {
 	gr_name &char
-	gr_gid  usize
-	gr_mem  &&char
 }
 
-fn C.getpwuid(uid usize) &Passwd
-fn C.getgrgid(uid usize) &Group
+fn C.getpwuid(uid u32) &C.passwd
+fn C.getgrgid(uid u32) &C.group
 
 // V's os.Stat has no st_blocks, and GNU's `total` line is the sum of those in
 // 1K units, so the port cannot get the number any other way. vlib/os has the
@@ -45,7 +39,7 @@ struct C.stat {
 	st_ctime   i64
 }
 
-fn C.lstat(path &char, buf &C.stat) int
+fn C.lstat(path &char, buf &C.stat) i32
 
 // allocated_size returns the space the entry occupies on disk, which is not
 // what GNU's -h prints: a 3000 byte file on a 4K filesystem is shown as 3.0K,
@@ -60,7 +54,7 @@ fn allocated_size(path string) u64 {
 	return buf.st_blocks * 512
 }
 
-fn get_owner_name(uid usize) string {
+fn get_owner_name(uid u32) string {
 	pwd := C.getpwuid(uid)
 	unsafe {
 		if isnil(pwd) {
@@ -74,7 +68,7 @@ fn get_owner_name(uid usize) string {
 	}
 }
 
-fn get_group_name(uid usize) string {
+fn get_group_name(uid u32) string {
 	grp := C.getgrgid(uid)
 	unsafe {
 		if isnil(grp) {
@@ -91,7 +85,7 @@ fn get_group_name(uid usize) string {
 fn read_link(file string) string {
 	buf_size := 2048
 	buf := '\0'.repeat(buf_size)
-	len := C.readlink(file.str, buf.str, usize(buf_size))
+	len := C.readlink(file.str, buf.str, uint(buf_size))
 	if len == -1 {
 		return os.error_posix().msg()
 	}

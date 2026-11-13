@@ -8,7 +8,7 @@ $if linux || macos || solaris {
 */
 fn nb_configured_processors() int {
 	$if linux || macos || solaris {
-		return int(C.sysconf(C._SC_NPROCESSORS_CONF))
+		return unsafe { int(C.sysconf(C._SC_NPROCESSORS_CONF)) }
 	}
 	return 1
 }

@@ -1,7 +1,7 @@
 // The handle is a voidptr because that is what vlib's C.CreateFileW returns;
 // it used to return u32, and declaring the parameter as u32 is what made this
 // file stop compiling on current V. A HANDLE is a pointer either way.
-fn C.SetFileTime(hfile voidptr, const_creation_time voidptr, const_access_time voidptr, const_modification_time voidptr) bool
+fn C.SetFileTime(hfile voidptr, const_creation_time voidptr, const_access_time voidptr, const_modification_time voidptr) i32
 
 fn lutime(path string, acctime int, modtime int) ! {
 	creation_time := t2filetime(-1)
@@ -17,7 +17,7 @@ fn lutime(path string, acctime int, modtime int) ! {
 	defer {
 		C.CloseHandle(f_handle)
 	}
-	if !C.SetFileTime(f_handle, &creation_time, &access_time, &modification_time) {
+	if C.SetFileTime(f_handle, &creation_time, &access_time, &modification_time) == 0 {
 		return error('unable to set file times')
 	}
 }
