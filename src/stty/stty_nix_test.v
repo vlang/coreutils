@@ -28,7 +28,7 @@ fn test_lookup_mode_rejects_unknown() {
 fn test_apply_mode_sets_and_clears() {
 	// A terminal is not available under `v test` on a non-tty, so the flags
 	// are exercised on a zeroed struct, which is what the set/clear path needs.
-	mut t := GlibcTermios{}
+	mut t := C.termios{}
 	apply_mode(mut t, Mode{'icanon', .lflag, 0o000002}, true)
 	assert u32(t.c_lflag) & u32(0o000002) != 0
 	apply_mode(mut t, Mode{'icanon', .lflag, 0o000002}, false)
@@ -36,7 +36,7 @@ fn test_apply_mode_sets_and_clears() {
 }
 
 fn test_apply_sane_matches_gnu_values() {
-	mut t := GlibcTermios{}
+	mut t := C.termios{}
 	apply_sane(mut t)
 	// These are the flag words GNU's `stty sane` produces, measured on a
 	// terminal whose -a output matched this port byte for byte.
@@ -48,7 +48,7 @@ fn test_apply_sane_matches_gnu_values() {
 
 fn test_flags_lines_wraps_at_seventy_nine() {
 	// A struct with every input bit set produces the longest row GNU prints.
-	mut t := GlibcTermios{}
+	mut t := C.termios{}
 	all := Mode{'imaxbel', .iflag, 0o040000}
 	apply_mode(mut t, all, true)
 	mut m2 := Mode{'iuclc', .iflag, 0o001000}
@@ -60,7 +60,7 @@ fn test_flags_lines_wraps_at_seventy_nine() {
 }
 
 fn test_flags_lines_dash_means_clear() {
-	mut t := GlibcTermios{}
+	mut t := C.termios{}
 	lines := flags_lines(&t, .iflag)
 	// Nothing is set on a zeroed struct, so every entry should carry a dash.
 	assert lines.len > 0
@@ -70,7 +70,7 @@ fn test_flags_lines_dash_means_clear() {
 }
 
 fn test_oflag_delay_bits_print_bare_when_clear() {
-	mut t := GlibcTermios{}
+	mut t := C.termios{}
 	// GNU prints nl0, cr0, tab0, bs0, vt0 and ff0 when their delay bits are
 	// clear, appended after the regular modes.
 	lines := flags_lines(&t, .oflag)
