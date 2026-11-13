@@ -45,6 +45,22 @@ fn test_help_and_version() {
 	rig.assert_help_and_version_options_work()
 }
 
+fn test_quiet_errors_preserve_failure_status() {
+	for args in ['-q does_not_exist/neither_does_this', '-qe does_not_exist'] {
+		res := rig.call_new(args)
+		assert res.exit_code == 1
+		assert res.output == ''
+		rig.assert_same_results(args)
+	}
+	rig.assert_same_results('-q does_not_exist/neither_does_this a')
+	$if !windows {
+		res := rig.call_new('-q recursive_link')
+		assert res.exit_code == 1
+		assert res.output == ''
+		rig.assert_same_results('-q recursive_link')
+	}
+}
+
 fn test_compare() {
 	rig.assert_same_exit_code('')
 	rig.assert_same_results('.')

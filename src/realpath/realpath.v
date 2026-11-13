@@ -200,9 +200,9 @@ fn realpath(settings Settings) {
 		} else {
 			if cpath, exists := canonicalize(abs, settings.mode, settings.resolve_mode) {
 				if !exists {
+					exit_code = 1
 					if !settings.quiet {
 						app.eprintln('${path}: No such file or directory')
-						exit_code = 1
 					}
 				} else {
 					mut out := cpath
@@ -224,9 +224,9 @@ fn realpath(settings Settings) {
 					}
 				}
 			} else {
+				exit_code = 1
 				if !settings.quiet {
 					app.eprintln('${path}: ${err.msg()}')
-					exit_code = 1
 				}
 			}
 		}
