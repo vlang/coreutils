@@ -30,10 +30,8 @@ fn run_tr_on(args []string, stdin_path string) Run {
 }
 
 fn run_gnu_on(args []string, stdin_path string) Run {
-	mut full_args := ['tr']
-	full_args << args
 	mut p := os.new_process(rig.platform_util_path)
-	p.set_args(full_args)
+	p.set_args(args)
 	p.set_redirect_stdio()
 	p.set_stdin_path(stdin_path)
 	p.wait()
