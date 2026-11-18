@@ -146,7 +146,7 @@ compare against the true GNU coreutils version on the Linux-based tests first.
 | &check; | test      | Check file types and compare values              | &check; |
 | &check; | timeout   | Run a command with a time limit                  |         |
 | &check; | touch     | Change file timestamps                           | &check; |
-|         | tr        | Translate, squeeze, and/or delete characters     | &check; |
+| &check; | tr        | Translate, squeeze, and/or delete characters     | &check; |
 | &check; | true      | Do nothing, successfully                         | &check; |
 | &check; | truncate  | Shrink or extend the size of a file              | &check; |
 | &check; | tsort     | Topological sort                                 | &check; |
