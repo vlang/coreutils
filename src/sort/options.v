@@ -212,15 +212,6 @@ fn in_bytes(set string, c u8) bool {
 	return false
 }
 
-fn in_string(set []string, needle string) bool {
-	for s in set {
-		if s == needle {
-			return true
-		}
-	}
-	return false
-}
-
 fn apply_short(mut o Options, letter u8) {
 	match letter {
 		`b` { o.ordering.ignore_blanks = true }

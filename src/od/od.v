@@ -597,7 +597,7 @@ fn main() {
 	for path in files {
 		mut part := []u8{}
 		if path == '' {
-			part = io.read_all(io.ReadAllConfig{}) or { []u8{} }
+			part = io.read_all(io.ReadAllConfig{ reader: os.stdin() }) or { []u8{} }
 		} else {
 			if !os.exists(path) {
 				eprintln('od: ${path}: No such file or directory')

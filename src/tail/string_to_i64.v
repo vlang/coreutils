@@ -20,9 +20,6 @@ const peta = terra * kilo
 // **6
 const exa = peta * kilo
 
-// **7
-const zetta = exa * kilo
-
 // decimal (SI) multipliers
 const kilobyte = i64(1000)
 const megabyte = kilobyte * kilobyte
@@ -30,7 +27,6 @@ const gigabyte = megabyte * kilobyte
 const terrabyte = gigabyte * kilobyte
 const petabyte = terrabyte * kilobyte
 const exabyte = petabyte * kilobyte
-const zettabyte = exabyte * kilobyte
 
 fn string_to_i64(s string) ?i64 {
 	if s.len == 0 {

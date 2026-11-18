@@ -34,10 +34,6 @@ fn testsuite_begin() {
 	]) or {}
 }
 
-fn add(s string, cb fn (string)) {
-	cb(s)
-}
-
 fn test_serialize_option() {
 	options := Options{
 		serial: true
