@@ -128,7 +128,7 @@ fn sorted_names(names []string, path string, set Settings) []string {
 
 	if set.by_time {
 		entries.sort_with_compare(fn (a &Entry, b &Entry) int {
-			if a.path == '.' || a.path == '..' || b.path == '.' || b.path == '..' {
+			if a.name == '.' || a.name == '..' || b.name == '.' || b.name == '..' {
 				return 0
 			}
 			ma := mtime_of(a.path)
@@ -148,10 +148,10 @@ fn sorted_names(names []string, path string, set Settings) []string {
 			}
 			sa := size_of(a.path)
 			sb := size_of(b.path)
-			if sb > sa {
+			if sa > sb {
 				return -1
 			}
-			if sb < sa {
+			if sa < sb {
 				return 1
 			}
 			return compare_names(a, b)
