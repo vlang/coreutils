@@ -1,50 +1,18 @@
 module main
 
-import common
 import os
 import term.termios
 
-#include <termios.h>
-#include <sys/ioctl.h>
-
-// glibc's `struct termios` has c_cc at offset 17, and V's own `termios.Termios`
-// has it at 20 because the compiler pads after c_line. Measured with an
-// offsetof probe on this host, that three-byte shift is enough to make every
-// control character and the top byte of every flag word wrong: glibc reports
-// c_lflag 0x105073 where the V struct read 0x8a3b.
-//
-// So this port uses `C.termios`, which vlib/term/termios declares against the
-// real header. Importing that module also brings `C.tcgetattr`, `C.tcsetattr`
-// and `C.ioctl` into scope, which is why none of them are redeclared here.
-
-struct C.winsize {
-	ws_row    u16
-	ws_col    u16
-	ws_xpixel u16
-	ws_ypixel u16
-}
-
-const tiocgwinsz = u64(0x5413)
-
-fn get_termios(fd int) ?C.termios {
-	mut t := C.termios{}
-	if C.tcgetattr(fd, &t) != 0 {
-		return none
-	}
-	return t
-}
-
-fn set_termios(fd int, t &C.termios) int {
-	return C.tcsetattr(fd, 0, t)
-}
-
-fn window_size(fd int) ?(int, int) {
-	mut ws := C.winsize{}
-	if C.ioctl(fd, tiocgwinsz, &ws) != 0 {
-		return none
-	}
-	return int(ws.ws_row), int(ws.ws_col)
-}
+// All terminal control goes through vlib's pure-V `term.termios` wrappers
+// (`tcgetattr`, `tcsetattr`, `ioctl`) and its `Termios` struct, which vlib
+// declares against the real header on every platform that has one. The raw
+// C traffic — the `C.winsize` declaration and the `get_termios` /
+// `set_termios` / `window_size` helpers — lives in stty_nix.c.v (with a
+// no-termios stub in stty_windows.c.v), because the compiler no longer
+// permits any `C.` reference in a pure .v file. stty.v itself stays pure V:
+// it only sees `termios.Termios`, whose field order and types vlib keeps
+// identical to the C struct, so the flag words, the control characters and
+// every pty-verified constant below behave exactly as before.
 
 // Words of the termios struct that a mode's bit lives in.
 enum Word {
@@ -131,7 +99,7 @@ const oflag_delay_bits = [
 	Mode{'ff0', .oflag, 0o100000},
 ]
 
-fn word_value(t &C.termios, w Word) u32 {
+fn word_value(t &termios.Termios, w Word) u32 {
 	return match w {
 		.iflag { u32(t.c_iflag) }
 		.oflag { u32(t.c_oflag) }
@@ -140,7 +108,7 @@ fn word_value(t &C.termios, w Word) u32 {
 	}
 }
 
-fn set_word(mut t C.termios, w Word, v u32) {
+fn set_word(mut t termios.Termios, w Word, v u32) {
 	match w {
 		.iflag { t.c_iflag = v }
 		.oflag { t.c_oflag = v }
@@ -158,7 +126,7 @@ fn lookup_mode(name string) ?Mode {
 	return none
 }
 
-fn apply_mode(mut t C.termios, m Mode, on bool) {
+fn apply_mode(mut t termios.Termios, m Mode, on bool) {
 	v := word_value(&t, m.word)
 	if on {
 		set_word(mut t, m.word, v | m.bit)
@@ -185,7 +153,7 @@ fn char_repr(c u8) string {
 // flags_lines renders one word's modes wrapped the way GNU does: rows of at
 // most 79 characters, breaking before the entry that would not fit. Measured
 // against `stty -a` in a pty, not taken from the manual.
-fn flags_lines(t &C.termios, w Word) []string {
+fn flags_lines(t &termios.Termios, w Word) []string {
 	mut parts := []string{}
 	for m in modes {
 		if m.word != w {
@@ -223,7 +191,7 @@ fn flags_lines(t &C.termios, w Word) []string {
 	return lines
 }
 
-fn print_all(t &C.termios) {
+fn print_all(t &termios.Termios) {
 	println('speed 38400 baud; rows 0; columns 0; line = 0;')
 	chars_line := [
 		'intr = ${char_repr(t.c_cc[0])}',
@@ -246,9 +214,9 @@ fn print_all(t &C.termios) {
 // print_save renders the -g form: the four flag words in hex, then all 32
 // control characters. GNU emits the whole struct so that `stty -g` output can
 // be fed straight back in, so omitting the c_cc half makes it unusable.
-fn print_save(t &C.termios) {
+fn print_save(t &termios.Termios) {
 	// Cast each word to u32 before formatting: `${x}` applied directly to the
-	// C type prints decimal, which silently produces the wrong -g output.
+	// flag field prints decimal, which silently produces the wrong -g output.
 	mut s := '${u32(t.c_iflag):x}:${u32(t.c_oflag):x}:${u32(t.c_cflag):x}:${u32(t.c_lflag):x}'
 	for c in t.c_cc {
 		s += ':${c:x}'
@@ -258,7 +226,7 @@ fn print_save(t &C.termios) {
 
 // apply_sane restores the flag words GNU's `stty sane` lists. The control
 // characters are deliberately left alone, which matches GNU.
-fn apply_sane(mut t C.termios) {
+fn apply_sane(mut t termios.Termios) {
 	t.c_iflag = 0o600 | 1
 	t.c_oflag = 5
 	t.c_lflag = 0o105073
@@ -358,6 +326,6 @@ fn main() {
 	}
 
 	if mutates {
-		set_termios(fd, &attrs)
+		set_termios(fd, attrs)
 	}
 }
