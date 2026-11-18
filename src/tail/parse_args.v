@@ -129,12 +129,6 @@ fn stdin_to_tmp() string {
 }
 
 @[noreturn]
-fn exit_success(msg string) {
-	println(msg)
-	exit(0)
-}
-
-@[noreturn]
 fn exit_error(msg string) {
 	common.exit_with_error_message(app_name, msg)
 }

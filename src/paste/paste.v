@@ -1,8 +1,6 @@
 import os
 import arrays
 
-const max_buf_len = 4096
-
 fn main() {
 	options := get_options()
 	paste(options, fn [options] (s string) {

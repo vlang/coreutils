@@ -1,6 +1,5 @@
 import common
 import os
-import time
 
 const app_name = 'paste'
 
@@ -46,40 +45,6 @@ fn next_delimiter(delimiters string) fn (bool) string {
 		idx += (idx + 1) % sd.len
 		return delimiter.str()
 	}
-}
-
-fn scan_files_arg(files_arg []string) []string {
-	mut files := []string{}
-
-	for file in files_arg {
-		if file == '-' {
-			files << stdin_to_tmp()
-			continue
-		}
-		files << file
-	}
-
-	if files.len == 0 {
-		files << stdin_to_tmp()
-	}
-
-	return files
-}
-
-fn stdin_to_tmp() string {
-	tmp := '${os.temp_dir()}/${app_name}-${time.ticks()}'
-	os.create(tmp) or { exit_error(err.msg()) }
-	mut f := os.open_append(tmp) or { exit_error(err.msg()) }
-	defer { f.close() }
-
-	for {
-		s := os.get_raw_line()
-		if s.len == 0 {
-			break
-		}
-		f.write_string(s) or { exit_error(err.msg()) }
-	}
-	return tmp
 }
 
 @[noreturn]

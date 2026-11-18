@@ -130,9 +130,6 @@ fn read_field_number(spec string, i int) (int, int) {
 	return n, j
 }
 
-// ordering_letters are the ones a key definition may name after its positions.
-const ordering_letters = 'bdfghiMhnRrV'
-
 // apply_ordering_letter applies one ordering letter to a key's ordering. The
 // Ordering fields are declared mut, so a local copy is enough.
 fn apply_ordering_letter(mut ordering Ordering, c u8, spec string) Ordering {
@@ -288,19 +285,6 @@ fn field_end(line string, field int, separator string, has_separator bool,
 		pos++
 	}
 	return pos
-}
-
-// find_next_non_blank returns the position of the next character that is not a
-// blank, or -1 when there is none.
-fn find_next_non_blank(line string, from int) int {
-	mut pos := from
-	for pos < line.len {
-		if !is_blank(line[pos]) {
-			return pos
-		}
-		pos++
-	}
-	return -1
 }
 
 // find_from returns where sep first appears at or after pos, or -1 when it does

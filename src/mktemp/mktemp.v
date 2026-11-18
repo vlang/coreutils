@@ -69,7 +69,7 @@ fn error_for_temporary_folder(fn_name string, d string) !string {
 	return error('${fn_name} could not create temporary directory "${d}". Ensure you have write permissions for it.')
 }
 
-fn error_for_temporary_file(fn_name string, d string) !string {
+fn error_for_temporary_file(fn_name string, _d string) !string {
 	return error('${fn_name} unable to create temporary file in "${fn_name}". Ensure write permissions.')
 }
 

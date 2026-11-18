@@ -173,25 +173,3 @@ fn print_file_at(file os.File, pos i64, out_fn fn (string)) {
 		idx += bytes_read
 	}
 }
-
-fn tmp_from_stdin() string {
-	tmp := temp_file_name()
-	os.create(tmp) or { exit_error(err.msg()) }
-	mut f := os.open_append(tmp) or { exit_error(err.msg()) }
-	defer { f.close() }
-
-	for {
-		s := os.get_raw_line()
-		if s.len == 0 {
-			break
-		}
-		f.write_string(s) or { exit_error(err.msg()) }
-	}
-	return tmp
-}
-
-fn temp_file_name() string {
-	dir := os.temp_dir()
-	name := '${dir}/t${time.ticks()}'
-	return name
-}
