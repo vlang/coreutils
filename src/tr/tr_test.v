@@ -55,18 +55,18 @@ fn run_gnu(args []string) Run {
 fn assert_tr_matches_gnu(args []string) {
 	gnu := run_gnu(args)
 	tr := run_tr(args)
-	assert tr.code == gnu.code, 'exit code: tr=${tr.code} gnu=${gnu.code}'
-	assert tr.stdout == gnu.stdout, 'stdout: tr=${tr.stdout} gnu=${gnu.stdout}'
-	assert tr.stderr == gnu.stderr, 'stderr: tr=${tr.stderr} gnu=${gnu.stderr}'
+	assert tr.code == gnu.code, 'exit code: tr=${tr.code} gnu=${gnu.code} args=${args}'
+	assert tr.stdout == gnu.stdout, 'stdout: tr=${tr.stdout} gnu=${gnu.stdout} args=${args}'
+	assert tr.stderr == gnu.stderr, 'stderr: tr=${tr.stderr} gnu=${gnu.stderr} args=${args}'
 }
 
 fn assert_tr_matches_gnu_with_input(args []string, content string) {
 	os.write_file(case_input_path, content) or { panic('cannot write case input: ${err.msg()}') }
 	gnu := run_gnu_on(args, case_input_path)
 	tr := run_tr_on(args, case_input_path)
-	assert tr.code == gnu.code, 'exit code: tr=${tr.code} gnu=${gnu.code}'
-	assert tr.stdout == gnu.stdout, 'stdout: tr=${tr.stdout} gnu=${gnu.stdout}'
-	assert tr.stderr == gnu.stderr, 'stderr: tr=${tr.stderr} gnu=${gnu.stderr}'
+	assert tr.code == gnu.code, 'exit code: tr=${tr.code} gnu=${gnu.code} args=${args} content=${content.bytes()}'
+	assert tr.stdout == gnu.stdout, 'stdout: tr=${tr.stdout} gnu=${gnu.stdout} args=${args}'
+	assert tr.stderr == gnu.stderr, 'stderr: tr=${tr.stderr} gnu=${gnu.stderr} args=${args}'
 }
 
 fn testsuite_begin() {

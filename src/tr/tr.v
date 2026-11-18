@@ -162,26 +162,26 @@ fn parse_set(s string, star_pad_to int) string {
 			}
 			match name {
 				'alpha' {
-					for c in u8(`a`) .. u8(`z`) + 1 {
+					for c in u8(`A`) .. u8(`Z`) + 1 {
 						result += c.ascii_str()
 					}
-					for c in u8(`A`) .. u8(`Z`) + 1 {
+					for c in u8(`a`) .. u8(`z`) + 1 {
 						result += c.ascii_str()
 					}
 				}
 				'alnum' {
+					for c in u8(`0`) .. u8(`9`) + 1 {
+						result += c.ascii_str()
+					}
 					for c in u8(`A`) .. u8(`Z`) + 1 {
 						result += c.ascii_str()
 					}
 					for c in u8(`a`) .. u8(`z`) + 1 {
 						result += c.ascii_str()
 					}
-					for c in u8(`0`) .. u8(`9`) + 1 {
-						result += c.ascii_str()
-					}
 				}
 				'blank' {
-					result += ' \t'
+					result += '\t '
 				}
 				'cntrl' {
 					for c in u8(0x00) .. u8(0x1f) + 1 {
