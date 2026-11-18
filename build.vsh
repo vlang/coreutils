@@ -62,6 +62,30 @@ const ignore_dirs = {
 // imported into a multicall without renaming its directory.
 const multicall_tools = ['arch', 'hostid', 'logname', 'pwd', 'true', 'tty', 'whoami', 'yes']
 
+// link_or_copy points link_path at the multicall binary. A hard link keeps
+// one executable on disk, so a rebuild updates every tool at once; where the
+// platform or filesystem does not allow one, a copy does the same job.
+//
+// Removal and retries are inside, not at the call site: on Windows a freshly
+// built exe can be briefly locked by antivirus/indexer, and both link (target
+// exists) and CopyFile then fail with code 32 (sharing violation). Removing
+// first and retrying briefly rides that out instead of panicking the build.
+fn link_or_copy(src string, dst string) ! {
+	mut last_err := error('could not link or copy ${src} to ${dst}')
+	for _ in 0 .. 50 {
+		rm(dst) or {}
+		os.link(src, dst) or {
+			os.cp(src, dst) or {
+				last_err = err
+				time.sleep(100 * time.millisecond)
+				continue
+			}
+		}
+		return
+	}
+	return last_err
+}
+
 // build_multicall compiles the single binary that implements the converted
 // tools, then links another name to it for each of them. Hard links rather than
 // copies, so there is one executable on disk and a rebuild updates every tool at
@@ -80,12 +104,7 @@ fn build_multicall(curdir string, vargs []string) ! {
 	for tool in multicall_tools {
 		link_name := if user_os() == 'windows' { '${tool}.exe' } else { tool }
 		link_path := '${curdir}/bin/${link_name}'
-		rm(link_path) or {}
-		// A hard link on the same filesystem, falling back to a copy where the
-		// platform or filesystem does not allow one.
-		if os.link(mc_exe, link_path) != none {
-			cp(mc_exe, link_path)!
-		}
+		link_or_copy(mc_exe, link_path)!
 	}
 	println('> Linked ${multicall_tools.len} tools to ${exe_name}: ${multicall_tools.join(', ')}')
 }
