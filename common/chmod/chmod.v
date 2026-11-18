@@ -46,15 +46,25 @@ fn apply_mode(bits int, set Settings, spec string) int {
 }
 
 fn walk(path string, bits int, set Settings, spec string) int {
-	mut failed := change(path, bits, set, spec)
-	st := os.lstat(path) or { return failed }
+	// List directory contents before changing the directory itself: a
+	// recursive mode such as 444 removes the execute bit, and without it
+	// the children are no longer reachable by path.
+	st := os.lstat(path) or {
+		return change(path, bits, set, spec)
+	}
 	if st.get_filetype() == .directory {
-		entries := os.ls(path) or { return failed }
+		entries := os.ls(path) or {
+			eprintln("chmod: cannot access '${path}': No such file or directory")
+			return 1
+		}
+		mut failed := 0
 		for e in entries {
 			failed += walk(os.join_path(path, e), bits, set, spec)
 		}
+		failed += change(path, bits, set, spec)
+		return failed
 	}
-	return failed
+	return change(path, bits, set, spec)
 }
 
 fn change(path string, bits int, set Settings, spec string) int {

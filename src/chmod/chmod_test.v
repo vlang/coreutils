@@ -151,6 +151,12 @@ fn test_recursive_covers_nested_files() {
 }
 
 fn make_writable(path string) {
+	// Directories need the execute bit to stay traversable: 666 would
+	// leave them unlistable on Unix and break every later access by path.
+	if os.is_dir(path) {
+		chmodmod.run(chmodmod.parse_args(['777', path]))
+		return
+	}
 	chmodmod.run(chmodmod.parse_args(['666', path]))
 }
 
