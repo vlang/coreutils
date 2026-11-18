@@ -461,7 +461,7 @@ fn stat(settings Settings) {
 			if st := statx(fname, settings.dereference, settings.cache_mode) {
 				format_output(fname, st, settings.format, mtab)
 			} else {
-				app.eprintln_posix("cannot stat '${fname}'")
+				app.eprintln_posix("cannot statx '${fname}'")
 				errors++
 			}
 		}
