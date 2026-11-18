@@ -27,10 +27,8 @@ fn run_dd(args []string) Result {
 }
 
 fn run_ref(args []string) Result {
-	mut full := ['dd']
-	full << args
 	mut p := os.new_process(rig.platform_util_path)
-	p.set_args(full)
+	p.set_args(args)
 	p.set_redirect_stdio()
 	p.wait()
 	r := Result{
