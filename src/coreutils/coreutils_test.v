@@ -1,10 +1,14 @@
-// No assert_platform_util here: it probes with --version, and --version is
-// deliberately not an option to this binary -- it is read as the name of a
-// sub-utility, which does not exist, so the probe would always fail.
+// No prepare_rig here: there is no GNU `coreutils` binary to compare
+// against (GNU ships individual utilities, not a multicall binary), so
+// probing for a platform util would always fail with
+// "Local platform util 'coreutils' not found!". Compile the binary under
+// test directly instead. (--version is also deliberately not an option to
+// this binary -- it is read as the name of a sub-utility, which does not
+// exist, so a version probe would always fail too.)
 import common.testing
 import os
 
-const rig = testing.prepare_rig(util: 'coreutils')
+const executable_under_test = testing.prepare_executable('coreutils')
 
 struct Run {
 mut:
@@ -14,7 +18,7 @@ mut:
 }
 
 fn run_me(args []string) Run {
-	mut p := os.new_process(rig.executable_under_test)
+	mut p := os.new_process(executable_under_test)
 	p.set_args(args)
 	p.set_redirect_stdio()
 	p.wait()
@@ -67,5 +71,5 @@ fn test_dispatches_to_a_sibling_binary() {
 fn test_executable_path_is_derived_from_argv0_directory() {
 	// Guards the assumption the dispatcher rests on: placing the binary
 	// somewhere else must not change where it looks for siblings.
-	assert rig.executable_under_test.contains(os.dir(rig.executable_under_test))
+	assert executable_under_test.contains(os.dir(executable_under_test))
 }
