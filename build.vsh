@@ -43,7 +43,14 @@ const ignore_dirs = {
 		// TODO: nohup is included in Win32 version
 		'nohup',
 	]
+	// Vinix is a Unix-like, so it shares the macOS list. The two categories
+	// differ for a reason worth spelling out: `stat` and `sync` are excluded on
+	// macOS because the BSD syscall surface differs from Linux, and Vinix
+	// follows POSIX closely enough that they do build there; `uptime` is
+	// excluded everywhere because it reads the utmp database, which Vinix
+	// does not implement yet.
 	'macos':   ['stat', 'sync', 'uptime']
+	'vinix':   ['uptime']
 }[user_os()] or { [] }
 
 unbuffer_stdout()
