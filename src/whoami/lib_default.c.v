@@ -1,3 +1,5 @@
+module whoami
+
 import os
 
 #include <pwd.h>

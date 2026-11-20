@@ -1,3 +1,5 @@
+module tty
+
 import common
 
 const c_stdin = 1

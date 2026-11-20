@@ -78,6 +78,18 @@ pub fn (app CoreutilInfo) quit(detail CoreutilExitDetail) {
 	exit(detail.return_code)
 }
 
+// quit_status reports the same failure as quit, but returns the status instead
+// of exiting. A tool needs this when it runs inside the multicall binary, where
+// exit() would end the whole process and take every other tool with it.
+// It is additive, so the tools that still call quit() are unaffected.
+pub fn (app CoreutilInfo) quit_status(detail CoreutilExitDetail) int {
+	eprintln('${app.name}: ${detail.message}')
+	if detail.show_help_advice {
+		eprintln("Try '${app.name} --help' for more information.")
+	}
+	return detail.return_code
+}
+
 // strip_error_code_from_msg strips the final semicolon and code
 // ("<msg>; code: <code>") away from a POSIX and Win32 error to make
 // it match what GNU coreutils return

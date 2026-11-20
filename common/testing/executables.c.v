@@ -23,6 +23,35 @@ fn init() {
 	})
 }
 
+// has_main_module reports whether dir holds a `module main` file, and so can
+// be compiled to a standalone binary with `v -o exe dir`. Tools converted
+// for the multicall are `module <tool>` instead, exposing `pub fn run`, so
+// compiling their directory fails with "project must include a `main`
+// module". Test files without a module clause do not count either way.
+fn has_main_module(dir string) bool {
+	files := os.ls(dir) or { return true }
+	for f in files {
+		if !f.ends_with('.v') {
+			continue
+		}
+		content := os.read_file(os.join_path(dir, f)) or { continue }
+		for line in content.split_into_lines() {
+			t := line.trim_space()
+			if t == '' || t.starts_with('//') {
+				continue
+			}
+			if t.starts_with('module ') {
+				if t == 'module main' || t.starts_with('module main ') || t.starts_with('module main\t') {
+					return true
+				}
+				break
+			}
+			break
+		}
+	}
+	return false
+}
+
 // prepare_executable compiles a coreutil executable,
 // and returns its path. prepare_executable also ensures
 // that the compiled executable will be deleted, when all
@@ -31,7 +60,16 @@ pub fn prepare_executable(tool_name string) string {
 	tool_source_folder := os.join_path(@VMODROOT, 'src', tool_name)
 	tool_executable_path := os.join_path(os.cache_dir(), '${tool_name}.exe')
 	os.rm(tool_executable_path) or {}
-	compilation_cmd := '${@VEXE} -cg -o ${tool_executable_path} ${tool_source_folder}'
+	mut tool_source := tool_source_folder
+	if !has_main_module(tool_source_folder) {
+		// The tool was converted for the multicall: its directory has no
+		// `fn main`, so `v -o exe src/<tool>` fails. Build the multicall
+		// source instead, keeping the output named after the tool: dispatch
+		// is by argv[0], so a binary called `<tool>.exe` runs `<tool>` with
+		// no sub-command, and the tests keep invoking one path per tool.
+		tool_source = os.join_path(@VMODROOT, 'src', 'multicall')
+	}
+	compilation_cmd := '${@VEXE} -cg -o ${tool_executable_path} ${tool_source}'
 	$if debug {
 		eprintln('>> compiling with: `${compilation_cmd}`')
 	}

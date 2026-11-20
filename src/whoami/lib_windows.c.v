@@ -1,3 +1,5 @@
+module whoami
+
 import os
 
 fn whoami() !string {
