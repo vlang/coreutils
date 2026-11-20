@@ -134,7 +134,26 @@ fn id(settings Settings) !int {
 			app.quit(message: 'cannot get real GID')
 		}
 		if settings.real {
-			print_info(ruid, rgid, settings)!
+			// For the current process, GNU reports the groups from getgroups(2)
+			// for both -G and -Gr (via xgetgroups with a NULL username), while
+			// getgrouplist(3) for the same user can return the same IDs in a
+			// different order (e.g. 118,999 vs 999,118 on the CI runners).
+			// Using get_effective_groups() here keeps -Gr byte-identical to -G
+			// and to GNU. Lookup by name (get_groups) is still correct for
+			// explicitly named users in print_info below.
+			if settings.group {
+				print_gid(rgid, settings.name, settings.line_sep)!
+			}
+			if settings.user {
+				print_uid(ruid, settings.name, settings.line_sep)!
+			}
+			if settings.groups {
+				gids := pwd.get_effective_groups()!
+				print_groups(gids, settings.name, settings.line_sep, settings.field_sep)!
+			}
+			if !settings.group && !settings.user && !settings.groups {
+				print_info(ruid, rgid, settings)!
+			}
 		} else {
 			// We only need effective UID and GID if -r is not set
 			euid := os.geteuid()
