@@ -114,7 +114,7 @@ compare against the true GNU coreutils version on the Linux-based tests first.
 | &check; | paste     | Merge lines of files                             | &check; |
 | &check; | pathchk   | Check file name validity and portability         | &check; |
 |         | pinky     | Lightweight finger                               |         |
-|         | pr        | Paginate or columnate files for printing         | &check; |
+| &check; | pr        | Paginate or columnate files for printing         | &check; |
 | &check; | printenv  | Print all or some environment variables          | &check; |
 | &check; | printf    | Format and print data                            | &check; |
 |         | ptx       | Produce permuted indexes                         | &check; |
