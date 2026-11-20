@@ -68,7 +68,7 @@ compare against the true GNU coreutils version on the Linux-based tests first.
 |         | chroot    | Run a command with a different root directory    |         |
 | &check; | cksum     | Print CRC checksum and byte counts               | &check; |
 | &check; | comm      | Compare two sorted files line by line            | &check; |
-|         | coreutils | Multi-call program                               | &check; |
+| &check; | coreutils | Multi-call program                               | &check; |
 | &check; | cp        | Copy files and directories                       | &check; |
 | &check; | csplit    | Split a file into context-determined pieces      | &check; |
 | &check; | cut       | Print selected parts of lines                    | &check; |
