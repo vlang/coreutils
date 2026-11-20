@@ -63,7 +63,7 @@ compare against the true GNU coreutils version on the Linux-based tests first.
 | &check; | cat       | Concatenate and write files                      | &check; |
 |         | chcon     | Change SELinux context of file                   | &check; |
 |         | chgrp     | Change group ownership                           |         |
-|         | chmod     | Change access permissions                        |         |
+| &check; | chmod     | Change access permissions                        |         |
 |         | chown     | Change file owner and group                      |         |
 |         | chroot    | Run a command with a different root directory    |         |
 | &check; | cksum     | Print CRC checksum and byte counts               | &check; |
