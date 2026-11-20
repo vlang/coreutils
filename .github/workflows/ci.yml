@@ -81,7 +81,7 @@ jobs:
           cd coreutils && USE_MULTI_BINARY_TO_TEST=coreutils v test .
 
   ubuntu-fast-build:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 60
     steps:
       - name: Checkout Latest V
@@ -122,7 +122,7 @@ jobs:
         run: cd coreutils && make test
 
   ubuntu-prod-build:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 60
     steps:
       - name: Checkout Latest V
@@ -151,7 +151,7 @@ jobs:
         run: cd coreutils && make test
 
   ubuntu-gnu-coreutils:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 60
     steps:
       - name: Checkout Latest V
