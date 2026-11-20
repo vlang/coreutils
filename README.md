@@ -49,6 +49,22 @@ The completed count is updated automatically by a GitHub Action after merge.
 GNU coreutils. They are not 100% compatiable. If you encounter different behaviors,
 compare against the true GNU coreutils version on the Linux-based tests first.
 
+### Compatibility with real GNU coreutils
+
+The unit tests in this repository are tests we wrote for ourselves, so a green run
+says our code does what we intended, not that it matches GNU. To answer that
+question, `util/gnu_test_suite.vsh` runs *GNU's own test suite* against the
+binaries this repo builds: it fetches the GNU release tarball, builds it, points
+`tests/local.mk` and every test's `path_prepend_ ./src` at our `bin/` instead of
+GNU's own `src/`, and runs `make check`.
+
+<!-- GNU_SUITE_RATE -->not yet measured<!-- /GNU_SUITE_RATE -->
+of the runnable tests pass, as of <!-- GNU_SUITE_UPDATED -->never run<!-- /GNU_SUITE_UPDATED -->.
+The figure is written by the `GNU test suite report` workflow, which runs the
+suite on a schedule, so it is a measurement rather than a claim. Tests for tools
+that are not built are reported as `not-run` and excluded from the rate, and the
+full `test-suite.log` is uploaded as a build artifact.
+
 ## Completed (82/109) - 75% done!
 
 |  Done   | Cmd       | Descripton                                       | Windows | 
