@@ -308,6 +308,13 @@ fn test_check_algorithm_must_match_list() {
 // with the line marked by a leading backslash, and --zero turns that off.
 
 fn test_escapes_newline_in_name() {
+	$if windows {
+		// Windows forbids control characters (including '\n') in file names,
+		// so a file with a newline cannot be created here. Skip instead of
+		// failing on os.write_file.
+		println('skipping test_escapes_newline_in_name on Windows: newline in file name not allowed')
+		return
+	}
 	odd := os.join_path(rig.temp_dir, 'two\nlines')
 	os.write_file(odd, 'x')!
 	res := os.exec([executable_under_test, '-a', 'md5', odd])
@@ -318,6 +325,10 @@ fn test_escapes_newline_in_name() {
 }
 
 fn test_zero_disables_name_escaping() {
+	$if windows {
+		println('skipping test_zero_disables_name_escaping on Windows: newline in file name not allowed')
+		return
+	}
 	odd := os.join_path(rig.temp_dir, 'two\nlines')
 	os.write_file(odd, 'x')!
 	res := os.exec([executable_under_test, '-a', 'md5', '-z', odd])
@@ -337,6 +348,10 @@ fn escaped_name(name string) string {
 // A list written with an escaped name has to read back as the real name.
 
 fn test_check_unescapes_name() {
+	$if windows {
+		println('skipping test_check_unescapes_name on Windows: newline in file name not allowed')
+		return
+	}
 	odd := os.join_path(rig.temp_dir, 'two\nlines')
 	os.write_file(odd, 'x')!
 	list := os.join_path(rig.temp_dir, 'escaped.md5')
